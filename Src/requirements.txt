@@ -1,4 +1,3 @@
-urllib
 playsound
 requests
 pyPrivnote
@@ -9,3 +8,4 @@ gtts
 colorama
 AuthGG
 tqdm
+win10toast
