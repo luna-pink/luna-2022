@@ -12,7 +12,7 @@
 
 ### Unsupported Version Policy
 If a major bug and/or vulnerability is found in a version that falls under the unsupported criteria, 
-the issue will be tested on the latest codebases to check if the bug/vulnerability has been fixed withen the most recent builds.
+the issue will be tested on the latest codebases to check if the bug/vulnerability has been fixed within the most recent builds.
 
 ## Reporting a Vulnerability
 
