@@ -18,7 +18,7 @@ the issue will be tested on the latest codebases to check if the bug/vulnerabili
 
 How to go about reporting security vulnerabilities and bugs.
 
-To report a bug, create a new issue and describe the feature you were using the expected behiviour and the behaviour you observed.
+To report a bug, create a new issue and describe: the feature you were using, the expected behiviour, and the behaviour you observed.
 Additionally if possible please specify steps to recreate the issue. You can expect a reply on security issues within 48 hours of issuing the report,
 if the vulnerability is accepted work will begin shortly after. If the vulnerability is dismissed/declined the issue will be closed.
 You may re-open an issue if you discover more broken functionality that could further make the issue exploitable.
