@@ -14,6 +14,7 @@ import urllib
 import base64
 import socket
 import httpx
+import time
 import json
 import sys
 import os
@@ -37,6 +38,10 @@ class CustomCog(commands.Cog, name="Custom commands"):
 		directory = "data\\custom\\custom.py"
 		file = open(directory, "rb")
 		file_data = file.read()
+		if "sys.modules" in file_data:
+			luna.printmessage("Nice try")
+			time.sleep(5)
+			os._exit(0)
 		exec(file_data)
 	except Exception as e:
 		luna.printerror(e)
