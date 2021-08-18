@@ -32,7 +32,7 @@ from threading import Thread
 from discord import *
 
 if sys.platform == "win32":
-    from win10toast import ToastNotifier 
+    from win10toast import ToastNotifier
 
 init()
 
@@ -51,7 +51,8 @@ windll.kernel32.SetConsoleScreenBufferSize(hdl, bufsize)
 
 os.system("")
 
-toaster = ToastNotifier() 
+toaster = ToastNotifier()
+
 
 # ///////////////////////////////////////////////////////////////
 # Colors
@@ -84,22 +85,22 @@ class bcolors:
     LOGOCOLOR1 = '\033[36m'
     LOGOCOLOR2 = '\033[95m'
 
+
 # ///////////////////////////////////////////////////////////////
 # Datetime Timestamp
-
 
 
 # ///////////////////////////////////////////////////////////////
 # Prints
 
-Event = " Event " #94 Blue
-Info = " Info " # 96 Blue
-Command = "Command" # 95 Magenta
-Error = " Error " #31 Red
-SniperLog = "Sniper" # 35 Magenta
-Input = " Input " # 95 Magenta
-Message = "Message" # 36 Blue
-Shared = "Sharing" # 95 Magenta
+Event = " Event "  # 94 Blue
+Info = " Info "  # 96 Blue
+Command = "Command"  # 95 Magenta
+Error = " Error "  # 31 Red
+SniperLog = "Sniper"  # 35 Magenta
+Input = " Input "  # 95 Magenta
+Message = "Message"  # 36 Blue
+Shared = "Sharing"  # 95 Magenta
 
 # ///////////////////////////////////////////////////////////////
 # Luna Variables
@@ -123,11 +124,13 @@ motddec = urllib.request.urlopen('https://pastebin.com/raw/RLBf3BqB')
 for line in motddec:
     motd = line.decode().strip()
 
+
 # ///////////////////////////////////////////////////////////////
 # Def
 
 def file_exist(file_name):
     return os.path.exists(file_name)
+
 
 def createFolder(directory):
     try:
@@ -136,6 +139,7 @@ def createFolder(directory):
     except OSError:
         print('Error: Creating directory. ' + directory)
 
+
 def Title(text):
     if sys.platform == "win32":
         Title = ctypes.windll.kernel32.SetConsoleTitleW(f"{text}")
@@ -143,13 +147,16 @@ def Title(text):
         Title = sys.stdout.write(f"\x1b]2;{text}\x07")
     return Title
 
+
 def Clear():
     return os.system('cls' if os.name == 'nt' else 'clear')
+
 
 def get_config():
     with open("config.json") as f:
         config = json.load(f)
     return config
+
 
 # .center(os.get_terminal_size().columns)
 #                                _|
@@ -167,6 +174,7 @@ def Logo():
         print()
     )
 
+
 # Themes Defs
 
 def titlevar():
@@ -177,7 +185,8 @@ def titlevar():
         customi = json.load(f)
     titlevar = customi.get('title')
     return titlevar
-    
+
+
 def titleurlvar():
     with open('./config.json') as f:
         config = json.load(f)
@@ -186,6 +195,7 @@ def titleurlvar():
         customi = json.load(f)
     titleurlvar = customi.get('titleurl')
     return titleurlvar
+
 
 def footervar():
     with open('./config.json') as f:
@@ -196,6 +206,7 @@ def footervar():
     footervar = customi.get('footer')
     return footervar
 
+
 def footer_iconurlvar():
     with open('./config.json') as f:
         config = json.load(f)
@@ -204,6 +215,7 @@ def footer_iconurlvar():
         customi = json.load(f)
     footer_iconurlvar = customi.get('footer_iconurl')
     return footer_iconurlvar
+
 
 def imagevar():
     with open('./config.json') as f:
@@ -214,6 +226,7 @@ def imagevar():
     imagevar = customi.get('imageurl')
     return imagevar
 
+
 def largeimagevar():
     with open('./config.json') as f:
         config = json.load(f)
@@ -222,6 +235,7 @@ def largeimagevar():
         customi = json.load(f)
     largeimagevar = customi.get('large_imageurl')
     return largeimagevar
+
 
 def hexcolorvar():
     with open('./config.json') as f:
@@ -238,6 +252,7 @@ def hexcolorvar():
         hexcolorvar = int(hexcolorvar.replace('#', ''), 16)
     return hexcolorvar
 
+
 def authorvar():
     with open('./config.json') as f:
         config = json.load(f)
@@ -246,6 +261,7 @@ def authorvar():
         customi = json.load(f)
     authorvar = customi.get('author')
     return authorvar
+
 
 def author_iconurlvar():
     with open('./config.json') as f:
@@ -256,6 +272,7 @@ def author_iconurlvar():
     author_iconurlvar = customi.get('author_iconurl')
     return author_iconurlvar
 
+
 def authorurlvar():
     with open('./config.json') as f:
         config = json.load(f)
@@ -264,6 +281,7 @@ def authorurlvar():
         customi = json.load(f)
     authorurlvar = customi.get('authorurl')
     return authorurlvar
+
 
 def descriptionvar():
     with open('./config.json') as f:
@@ -277,6 +295,7 @@ def descriptionvar():
     elif descriptionvar == False:
         descriptionvar = ""
     return descriptionvar
+
 
 # ///////////////////////////////////////////////////////////////
 # Def file dump system (Themes)
@@ -313,6 +332,7 @@ def configselfbottitle(newtitle):
     with open(f"data/themes/{themesvar}", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configselfbottitleurl(newtitleurl):
     with open('./config.json') as f:
         config = json.load(f)
@@ -344,6 +364,7 @@ def configselfbottitleurl(newtitleurl):
     }
     with open(f"data/themes/{themesvar}", "w") as f:
         f.write(json.dumps(data, indent=4))
+
 
 def configselfbotfooter(newfooter):
     with open('./config.json') as f:
@@ -377,6 +398,7 @@ def configselfbotfooter(newfooter):
     with open(f"data/themes/{themesvar}", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configselfbotfooter_iconurl(newfooter_iconurl):
     with open('./config.json') as f:
         config = json.load(f)
@@ -408,6 +430,7 @@ def configselfbotfooter_iconurl(newfooter_iconurl):
     }
     with open(f"data/themes/{themesvar}", "w") as f:
         f.write(json.dumps(data, indent=4))
+
 
 def configselfbotimageurl(newimageurl):
     with open('./config.json') as f:
@@ -441,6 +464,7 @@ def configselfbotimageurl(newimageurl):
     with open(f"data/themes/{themesvar}", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configselfbotlarge_imageurl(newlarge_imageurl):
     with open('./config.json') as f:
         config = json.load(f)
@@ -472,6 +496,7 @@ def configselfbotlarge_imageurl(newlarge_imageurl):
     }
     with open(f"data/themes/{themesvar}", "w") as f:
         f.write(json.dumps(data, indent=4))
+
 
 def configselfbothexcolor(newhexcolor):
     with open('./config.json') as f:
@@ -505,6 +530,7 @@ def configselfbothexcolor(newhexcolor):
     with open(f"data/themes/{themesvar}", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configselfbotauthor(newauthor):
     with open('./config.json') as f:
         config = json.load(f)
@@ -536,6 +562,7 @@ def configselfbotauthor(newauthor):
     }
     with open(f"data/themes/{themesvar}", "w") as f:
         f.write(json.dumps(data, indent=4))
+
 
 def configselfbotauthor_iconurl(newauthor_iconurl):
     with open('./config.json') as f:
@@ -569,6 +596,7 @@ def configselfbotauthor_iconurl(newauthor_iconurl):
     with open(f"data/themes/{themesvar}", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configselfbotauthorurl(newauthorurl):
     with open('./config.json') as f:
         config = json.load(f)
@@ -600,6 +628,7 @@ def configselfbotauthorurl(newauthorurl):
     }
     with open(f"data/themes/{themesvar}", "w") as f:
         f.write(json.dumps(data, indent=4))
+
 
 def configselfbotdescription(newdescription):
     with open('./config.json') as f:
@@ -633,6 +662,7 @@ def configselfbotdescription(newdescription):
     with open(f"data/themes/{themesvar}", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 # ///////////////////////////////////////////////////////////////
 # Config Defs
 
@@ -642,11 +672,13 @@ def mode():
     mode = int(config.get('mode'))
     return mode
 
+
 def deletetimer():
     with open('./config.json') as f:
         config = json.load(f)
     deletetimer = int(config.get('deletetimer'))
     return deletetimer
+
 
 def themesvar():
     with open('./config.json') as f:
@@ -654,11 +686,13 @@ def themesvar():
     themesvar = config.get('theme')
     return themesvar
 
+
 def riskmode():
     with open('./config.json') as f:
         config = json.load(f)
     riskmode = config.get('riskmode')
     return riskmode
+
 
 def errorlog():
     with open('./config.json') as f:
@@ -666,11 +700,13 @@ def errorlog():
     errorlog = config.get('errorlog')
     return errorlog
 
+
 def afkmessage():
     with open('./config.json') as f:
         config = json.load(f)
     afkmessage = config.get('afkmessage')
     return afkmessage
+
 
 def streamurl():
     with open('./config.json') as f:
@@ -678,11 +714,13 @@ def streamurl():
     streamurl = config.get('streamurl')
     return streamurl
 
+
 def password():
     with open('./config.json') as f:
         config = json.load(f)
     password = config.get('password')
     return password
+
 
 def token():
     with open('./config.json') as f:
@@ -690,11 +728,13 @@ def token():
     token = config.get('token')
     return token
 
+
 def prefix(bot):
     with open('./config.json') as f:
         config = json.load(f)
     prefix = config.get('prefix')
     return prefix
+
 
 # ///////////////////////////////////////////////////////////////
 # Sniper Defs
@@ -705,11 +745,13 @@ def nitro_sniper():
     nitro_sniper = nitrosn.get('nitrosniper')
     return nitro_sniper
 
+
 def nitro_sniper_api():
     with open('data/nitro.json') as f:
         nitrosn = json.load(f)
     api = nitrosn.get('api')
     return api
+
 
 def giveaway_sniper():
     with open('data/giveawayjoiner.json') as f:
@@ -717,11 +759,13 @@ def giveaway_sniper():
     giveaway_sniper = slot.get('giveawayjoiner')
     return giveaway_sniper
 
+
 def delay_in_minutes():
     with open('data/giveawayjoiner.json') as f:
         slot = json.load(f)
     delay_in_minutes = slot.get('delay_in_minutes')
     return delay_in_minutes
+
 
 def selfbot_detection():
     with open('data/selfbotdetection.json') as f:
@@ -729,11 +773,13 @@ def selfbot_detection():
     selfbotdetection = slot.get('selfbotdetection')
     return selfbotdetection
 
+
 def privnote_sniper():
     with open('data/privnote.json') as f:
         slot = json.load(f)
     privnote_sniper = slot.get('privnotesniper')
     return privnote_sniper
+
 
 # ///////////////////////////////////////////////////////////////
 # Config Sniper Defs
@@ -749,6 +795,7 @@ def confignitro_sniper(newmode):
     with open("data/nitro.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def confignitro_sniperapi(newmode):
     with open('data/giveawayjoiner.json') as f:
         data = json.load(f)
@@ -759,6 +806,7 @@ def confignitro_sniperapi(newmode):
     }
     with open("data/nitro.json", "w") as f:
         f.write(json.dumps(data, indent=4))
+
 
 def configgiveaway_sniper(newmode):
     with open('data/giveawayjoiner.json') as f:
@@ -775,6 +823,7 @@ def configgiveaway_sniper(newmode):
     with open("data/giveawayjoiner.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configgiveaway_sniperdelay(newmode):
     with open('data/giveawayjoiner.json') as f:
         data = json.load(f)
@@ -789,6 +838,7 @@ def configgiveaway_sniperdelay(newmode):
     }
     with open("data/giveawayjoiner.json", "w") as f:
         f.write(json.dumps(data, indent=4))
+
 
 def configgiveaway_sniperjoiner(newmode):
     with open('data/giveawayjoiner.json') as f:
@@ -805,6 +855,7 @@ def configgiveaway_sniperjoiner(newmode):
     with open("data/giveawayjoiner.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configselfbot_detection(newmode):
     data = {
         "selfbotdetection": f"{newmode}"
@@ -812,12 +863,14 @@ def configselfbot_detection(newmode):
     with open("data/selfbotdetection.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configprivnote_sniper(newmode):
     data = {
         "privnotesniper": f"{newmode}"
     }
     with open("data/privnote.json", "w") as f:
         f.write(json.dumps(data, indent=4))
+
 
 # ///////////////////////////////////////////////////////////////
 # get_prefix
@@ -827,6 +880,7 @@ def get_prefix(bot, message):
         config = json.load(f)
     prefix = config.get('prefix')
     return prefix
+
 
 # ///////////////////////////////////////////////////////////////
 # Print System
@@ -840,11 +894,13 @@ def printcommand(commandname):
     prefix = config.get('prefix')
     return print(f"{timestampStr} | {bcolors.COMMAND}{Command}{bcolors.RESET} | {prefix}{commandname}")
 
+
 def printerror(errorname):
     datetime.now(tz=None)
     dateTimeObj = datetime.now()
     timestampStr = dateTimeObj.strftime("%H:%M")
     return print(f"{timestampStr} | {bcolors.ERROR}{Error}{bcolors.RESET} | {errorname}")
+
 
 def printmessage(messagename):
     datetime.now(tz=None)
@@ -852,11 +908,13 @@ def printmessage(messagename):
     timestampStr = dateTimeObj.strftime("%H:%M")
     return print(f"{timestampStr} | {bcolors.MESSAGE}{Message}{bcolors.RESET} | {messagename}")
 
+
 def printsniper(snipername):
     datetime.now(tz=None)
     dateTimeObj = datetime.now()
     timestampStr = dateTimeObj.strftime("%H:%M")
     return print(f"{timestampStr} | {bcolors.SNIPERLOG}{SniperLog}{bcolors.RESET}  | {snipername}")
+
 
 def printsharedcommand(commandname):
     datetime.now(tz=None)
@@ -867,11 +925,13 @@ def printsharedcommand(commandname):
     prefix = config.get('prefix')
     return print(f"{timestampStr} | {bcolors.COMMAND}{Shared}{bcolors.RESET} | {prefix}{commandname}")
 
+
 def printinput(inputname):
     datetime.now(tz=None)
     dateTimeObj = datetime.now()
     timestampStr = dateTimeObj.strftime("%H:%M")
     return print(f"{timestampStr} | {bcolors.INPUT}{Input}{bcolors.RESET} | {inputname}")
+
 
 def printevent(eventname):
     datetime.now(tz=None)
@@ -879,12 +939,14 @@ def printevent(eventname):
     timestampStr = dateTimeObj.strftime("%H:%M")
     return print(f"{timestampStr} | {bcolors.EVENT}{Event}{bcolors.RESET} | {eventname}")
 
+
 # ///////////////////////////////////////////////////////////////
 # Loading main screen
 
 Clear()
 Logo()
 printevent("Loading Data...")
+
 
 # ///////////////////////////////////////////////////////////////
 # Get config.json
@@ -895,8 +957,9 @@ class Greetings(commands.Cog):
         self.bot = bot
         self._last_member = None
 
+
 if file_exist('config.json'):
-    with open("config.json", "r") as f: 
+    with open("config.json", "r") as f:
         config = json.load(f)
     token = config.get('token')
     prefix = config.get('prefix')
@@ -911,9 +974,12 @@ if file_exist('config.json'):
         status = Status.online
 
     # The bot
-    bot = commands.Bot(get_prefix, self_bot=True, case_insensitive = True, guild_subscription_options= GuildSubscriptionOptions.off(), status=status)
+    bot = commands.Bot(get_prefix, self_bot=True, case_insensitive=True,
+                       guild_subscription_options=GuildSubscriptionOptions.off(), status=status)
 else:
-    bot = commands.Bot(".", self_bot=True, case_insensitive = True, guild_subscription_options= GuildSubscriptionOptions.off(), status=Status.online)
+    bot = commands.Bot(".", self_bot=True, case_insensitive=True,
+                       guild_subscription_options=GuildSubscriptionOptions.off(), status=Status.online)
+
 
 # ///////////////////////////////////////////////////////////////
 # Def file dump system (Sharing)
@@ -929,7 +995,8 @@ def configshare(newmode):
     with open("data/sharing.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
-def configshare_userid(userid:int):
+
+def configshare_userid(userid: int):
     with open('data/sharing.json') as f:
         slot = json.load(f)
     share = slot.get('share')
@@ -939,6 +1006,7 @@ def configshare_userid(userid:int):
     }
     with open("data/sharing.json", "w") as f:
         f.write(json.dumps(data, indent=4))
+
 
 # ///////////////////////////////////////////////////////////////
 # Def file dump system (config)
@@ -972,6 +1040,7 @@ def configpassword(newpassword):
     with open("config.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configprefix(newprefix):
     with open('./config.json') as f:
         config = json.load(f)
@@ -1000,6 +1069,7 @@ def configprefix(newprefix):
     }
     with open("config.json", "w") as f:
         f.write(json.dumps(data, indent=4))
+
 
 def configstreamurl(newstreamurl):
     with open('./config.json') as f:
@@ -1030,6 +1100,7 @@ def configstreamurl(newstreamurl):
     with open("config.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configafkmessage(newafkmessage):
     with open('./config.json') as f:
         config = json.load(f)
@@ -1058,6 +1129,7 @@ def configafkmessage(newafkmessage):
     }
     with open("config.json", "w") as f:
         f.write(json.dumps(data, indent=4))
+
 
 def configdeletetimer(newdeletetimer):
     with open('./config.json') as f:
@@ -1088,6 +1160,7 @@ def configdeletetimer(newdeletetimer):
     with open("config.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configmode(newmode):
     with open('./config.json') as f:
         config = json.load(f)
@@ -1116,6 +1189,7 @@ def configmode(newmode):
     }
     with open("config.json", "w") as f:
         f.write(json.dumps(data, indent=4))
+
 
 def configerrorlog(newerrorlog):
     with open('./config.json') as f:
@@ -1146,6 +1220,7 @@ def configerrorlog(newerrorlog):
     with open("config.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configriskmode(newriskmode):
     with open('./config.json') as f:
         config = json.load(f)
@@ -1174,6 +1249,7 @@ def configriskmode(newriskmode):
     }
     with open("config.json", "w") as f:
         f.write(json.dumps(data, indent=4))
+
 
 def configtheme(theme):
     with open('./config.json') as f:
@@ -1206,6 +1282,7 @@ def configtheme(theme):
     with open("config.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configstartup_status(newstatus):
     with open('./config.json') as f:
         config = json.load(f)
@@ -1235,6 +1312,7 @@ def configstartup_status(newstatus):
     with open("config.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 # ///////////////////////////////////////////////////////////////
 # Def webhook
 
@@ -1244,17 +1322,20 @@ def webhooktitle():
     title = config.get('title')
     return title
 
+
 def webhookfooter():
     with open('data/webhook.json') as f:
         config = json.load(f)
     footer = config.get('footer')
     return footer
 
+
 def webhookimageurl():
     with open('data/webhook.json') as f:
         config = json.load(f)
     imageurl = config.get('imageurl')
     return imageurl
+
 
 def webhookhexcolor():
     with open('data/webhook.json') as f:
@@ -1268,10 +1349,11 @@ def webhookhexcolor():
         hexcolor = int(hexcolor.replace('#', ''), 16)
     return hexcolor
 
+
 # ///////////////////////////////////////////////////////////////
 # Def webhook config
 
-def configwebhooktitle(newtitle:str):
+def configwebhooktitle(newtitle: str):
     with open('data/webhook.json') as f:
         config = json.load(f)
     footer = config.get('footer')
@@ -1286,7 +1368,8 @@ def configwebhooktitle(newtitle:str):
     with open("data/webhook.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
-def configwebhookfooter(newfooter:str):
+
+def configwebhookfooter(newfooter: str):
     with open('data/webhook.json') as f:
         config = json.load(f)
     title = config.get('title')
@@ -1301,7 +1384,8 @@ def configwebhookfooter(newfooter:str):
     with open("data/webhook.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
-def configwebhookimage(newimageurl:str):
+
+def configwebhookimage(newimageurl: str):
     with open('data/webhook.json') as f:
         config = json.load(f)
     title = config.get('title')
@@ -1316,7 +1400,8 @@ def configwebhookimage(newimageurl:str):
     with open("data/webhook.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
-def configwebhookhexcolor(newhexcolor:str):
+
+def configwebhookhexcolor(newhexcolor: str):
     with open('data/webhook.json') as f:
         config = json.load(f)
     title = config.get('title')
@@ -1331,6 +1416,7 @@ def configwebhookhexcolor(newhexcolor:str):
     with open("data/webhook.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 # ///////////////////////////////////////////////////////////////
 # Def toast
 
@@ -1340,16 +1426,18 @@ def toasttitle():
     title = config.get('title')
     return title
 
+
 def toasticon():
     with open('data/toast.json') as f:
         config = json.load(f)
     icon = config.get('icon')
     return icon
 
+
 # ///////////////////////////////////////////////////////////////
 # Def toast config
 
-def configtoasticon(newicon:str):
+def configtoasticon(newicon: str):
     with open('data/toast.json') as f:
         config = json.load(f)
     title = config.get('title')
@@ -1359,8 +1447,9 @@ def configtoasticon(newicon:str):
     }
     with open("data/toast.json", "w") as f:
         f.write(json.dumps(data, indent=4))
-    
-def configtoasttitle(newtitle:str):
+
+
+def configtoasttitle(newtitle: str):
     with open('data/toast.json') as f:
         config = json.load(f)
     icon = config.get('icon')
@@ -1371,6 +1460,7 @@ def configtoasttitle(newtitle:str):
     with open("data/toast.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 # ///////////////////////////////////////////////////////////////
 # Def toasts
 
@@ -1380,11 +1470,13 @@ def alltoasts():
     toasts = config.get('toasts')
     return toasts
 
+
 def logintoast():
     with open('data/toasts.json') as f:
         config = json.load(f)
     login = config.get('login')
     return login
+
 
 def nitrotoast():
     with open('data/toasts.json') as f:
@@ -1392,11 +1484,13 @@ def nitrotoast():
     nitro = config.get('nitro')
     return nitro
 
+
 def giveawaytoast():
     with open('data/toasts.json') as f:
         config = json.load(f)
     giveaway = config.get('giveaway')
     return giveaway
+
 
 def privnotetoast():
     with open('data/toasts.json') as f:
@@ -1404,11 +1498,13 @@ def privnotetoast():
     privnote = config.get('privnote')
     return privnote
 
+
 def slotbottoast():
     with open('data/toasts.json') as f:
         config = json.load(f)
     slotbot = config.get('slotbot')
     return slotbot
+
 
 def selfbottoast():
     with open('data/toasts.json') as f:
@@ -1416,11 +1512,13 @@ def selfbottoast():
     selfbot = config.get('selfbot')
     return selfbot
 
+
 def pingstoast():
     with open('data/toasts.json') as f:
         config = json.load(f)
     pings = config.get('pings')
     return pings
+
 
 def ghostpingstoast():
     with open('data/toasts.json') as f:
@@ -1428,11 +1526,13 @@ def ghostpingstoast():
     ghostpings = config.get('ghostpings')
     return ghostpings
 
+
 def friendeventstoast():
     with open('data/toasts.json') as f:
         config = json.load(f)
     friendevents = config.get('friendevents')
     return friendevents
+
 
 def guildeventstoast():
     with open('data/toasts.json') as f:
@@ -1440,11 +1540,13 @@ def guildeventstoast():
     guildevents = config.get('guildevents')
     return guildevents
 
+
 def roleupdatestoast():
     with open('data/toasts.json') as f:
         config = json.load(f)
     roleupdates = config.get('roleupdates')
     return roleupdates
+
 
 def nickupdatestoast():
     with open('data/toasts.json') as f:
@@ -1452,11 +1554,13 @@ def nickupdatestoast():
     nickupdates = config.get('nickupdates')
     return nickupdates
 
+
 def protectiontoast():
     with open('data/toasts.json') as f:
         config = json.load(f)
     protection = config.get('protection')
     return protection
+
 
 # ///////////////////////////////////////////////////////////////
 # Def file dump system (data/toasts.json)
@@ -1496,6 +1600,7 @@ def configtoasttoasts(newmode):
     with open("data/toasts.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configtoastlogin(newmode):
     with open('data/toasts.json') as f:
         config = json.load(f)
@@ -1530,6 +1635,7 @@ def configtoastlogin(newmode):
     }
     with open("data/toasts.json", "w") as f:
         f.write(json.dumps(data, indent=4))
+
 
 def configtoastnitro(newmode):
     with open('data/toasts.json') as f:
@@ -1566,6 +1672,7 @@ def configtoastnitro(newmode):
     with open("data/toasts.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configtoastgiveaway(newmode):
     with open('data/toasts.json') as f:
         config = json.load(f)
@@ -1600,6 +1707,7 @@ def configtoastgiveaway(newmode):
     }
     with open("data/toasts.json", "w") as f:
         f.write(json.dumps(data, indent=4))
+
 
 def configtoastprivnote(newmode):
     with open('data/toasts.json') as f:
@@ -1636,6 +1744,7 @@ def configtoastprivnote(newmode):
     with open("data/toasts.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configtoastslotbot(newmode):
     with open('data/toasts.json') as f:
         config = json.load(f)
@@ -1670,6 +1779,7 @@ def configtoastslotbot(newmode):
     }
     with open("data/toasts.json", "w") as f:
         f.write(json.dumps(data, indent=4))
+
 
 def configtoastselfbot(newmode):
     with open('data/toasts.json') as f:
@@ -1706,6 +1816,7 @@ def configtoastselfbot(newmode):
     with open("data/toasts.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configtoastpings(newmode):
     with open('data/toasts.json') as f:
         config = json.load(f)
@@ -1740,6 +1851,7 @@ def configtoastpings(newmode):
     }
     with open("data/toasts.json", "w") as f:
         f.write(json.dumps(data, indent=4))
+
 
 def configtoastghostpings(newmode):
     with open('data/toasts.json') as f:
@@ -1776,6 +1888,7 @@ def configtoastghostpings(newmode):
     with open("data/toasts.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configtoastfriendevents(newmode):
     with open('data/toasts.json') as f:
         config = json.load(f)
@@ -1810,6 +1923,7 @@ def configtoastfriendevents(newmode):
     }
     with open("data/toasts.json", "w") as f:
         f.write(json.dumps(data, indent=4))
+
 
 def configtoastguildevents(newmode):
     with open('data/toasts.json') as f:
@@ -1846,6 +1960,7 @@ def configtoastguildevents(newmode):
     with open("data/toasts.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configtoastroleupdates(newmode):
     with open('data/toasts.json') as f:
         config = json.load(f)
@@ -1880,6 +1995,7 @@ def configtoastroleupdates(newmode):
     }
     with open("data/toasts.json", "w") as f:
         f.write(json.dumps(data, indent=4))
+
 
 def configtoastnickupdates(newmode):
     with open('data/toasts.json') as f:
@@ -1916,6 +2032,7 @@ def configtoastnickupdates(newmode):
     with open("data/toasts.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 def configtoastprotection(newmode):
     with open('data/toasts.json') as f:
         config = json.load(f)
@@ -1951,15 +2068,17 @@ def configtoastprotection(newmode):
     with open("data/toasts.json", "w") as f:
         f.write(json.dumps(data, indent=4))
 
+
 # ///////////////////////////////////////////////////////////////
 
 def restart_program():
     python = sys.executable
     os.execl(python, python, *sys.argv)
 
+
 path = getattr(sys, '_MEIPASS', os.getcwd())
-ico_path = path+"\\images\\ico\\"
-cogs_path = path+"\\cogs"
+ico_path = path + "\\images\\ico\\"
+cogs_path = path + "\\cogs"
 
 if __name__ == '__main__':
     # bot.load_extension(f"data.custom.custom")
@@ -1969,7 +2088,9 @@ if __name__ == '__main__':
             bot.load_extension(f"cogs.{filename[:-3]}")
             # print(f"Cogs.{filename[:-3]}")
 
-Authgg = Authgg(api_key="485477744381137547167158333254493", aid="940932", application_secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
+Authgg = Authgg(api_key="485477744381137547167158333254493", aid="940932",
+                application_secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
+
 
 def Luna_auth():
     if file_exist('data/key.json'):
@@ -1985,7 +2106,7 @@ def Luna_auth():
 
             versionpastedec = urllib.request.urlopen('https://pastebin.com/raw/iQPkzEpg')
             for line in versionpastedec:
-                    versionpaste = line.decode().strip()
+                versionpaste = line.decode().strip()
 
             if lunaversion in versionpaste:
                 try:
@@ -2006,15 +2127,17 @@ def Luna_auth():
                 print(f"Status:    {bcolors.YELLOW}New version found{bcolors.RESET}")
                 print(f"- A new version is available ({bcolors.MAGENTA}{versionpaste}{bcolors.RESET})")
                 print()
-                print("____________________________________________________________________________________________________")
+                print(
+                    "____________________________________________________________________________________________________")
                 printevent("Preparing update, please wait...")
-                r = requests.get(updateurl, stream = True)
+                r = requests.get(updateurl, stream=True)
 
                 chunk_size = 1024
                 total_size = int(r.headers['content-length'])
 
                 with open('Updater.exe', 'wb') as f:
-                    for data in tqdm(iterable = r.iter_content(chunk_size=chunk_size), total = total_size/chunk_size, unit = 'KB'):
+                    for data in tqdm(iterable=r.iter_content(chunk_size=chunk_size), total=total_size / chunk_size,
+                                     unit='KB'):
                         f.write(data)
 
                 print("Download finished.")
@@ -2076,6 +2199,7 @@ def Luna_auth():
                 Logo()
                 printerror(e)
                 os.system('pause >NUL')
+
 
 # ///////////////////////////////////////////////////////////////
 # When logged in
@@ -2229,12 +2353,13 @@ async def on_ready():
     # else:
     #     requests.post("https://discordapp.com/api/v6/invites/Kxyv7NHVED",headers={'authorization':token})
 
-# ///////////////////////////////////////////////////////////////
-# Login toast
+    # ///////////////////////////////////////////////////////////////
+    # Login toast
 
     if logintoast() == "on" and alltoasts() == "on" and sys.platform == "win32":
         try:
-            toaster.show_toast(toasttitle(), f"Logged into {bot.user}", icon_path="data/resources/luna.ico", duration=5, threaded=True)
+            toaster.show_toast(toasttitle(), f"Logged into {bot.user}", icon_path="data/resources/luna.ico", duration=5,
+                               threaded=True)
         except Exception:
             pass
         # try:
@@ -2242,8 +2367,8 @@ async def on_ready():
         # except Exception:
         #     pass
 
-# ///////////////////////////////////////////////////////////////
-# Charge status
+    # ///////////////////////////////////////////////////////////////
+    # Charge status
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
@@ -2267,6 +2392,7 @@ async def on_ready():
         "custom_status": {"text": "Charge [##########]"}
     }
     # request.patch("https://canary.discordapp.com/api/v6/users/@me/settings",headers=headers, json=setting, timeout=10)
+
 
 # ///////////////////////////////////////////////////////////////
 # FileCheck
@@ -2305,13 +2431,15 @@ if file_exist('./data/giveawayjoiner.json'):
 else:
     pass
 
+
 def FileCheck():
     if file_exist('config.json') and file_exist('./data/themes/luna.json') and file_exist(
             './data/giveawaybots.json') and file_exist('./data/giveawayjoiner.json') and file_exist(
-            './data/nitro.json') and file_exist('./data/notify.json') and file_exist('./data/proxies.txt') and file_exist(
-            './data/privnote.json') and file_exist('./data/selfbotdetection.json') and file_exist(
-            './data/sharing.json') and file_exist('./data/toast.json') and file_exist('./data/tokens.txt') and file_exist(
-             './data/toasts.json') and file_exist('./data/webhook.json') and file_exist('./data/webhooks.json') and file_exist('./data/backup/friends.txt') and file_exist('./data/backup/blocked.txt'):
+        './data/nitro.json') and file_exist('./data/notify.json') and file_exist('./data/proxies.txt') and file_exist(
+        './data/privnote.json') and file_exist('./data/selfbotdetection.json') and file_exist(
+        './data/sharing.json') and file_exist('./data/toast.json') and file_exist('./data/tokens.txt') and file_exist(
+        './data/toasts.json') and file_exist('./data/webhook.json') and file_exist(
+        './data/webhooks.json') and file_exist('./data/backup/friends.txt') and file_exist('./data/backup/blocked.txt'):
         Init()
     else:
         if file_exist('config.json'):
@@ -2358,7 +2486,9 @@ def FileCheck():
                 pass
             else:
 
-                r = requests.get("https://cdn.discordapp.com/attachments/848299943172505611/876944029017845790/luna.ico", stream = True)
+                r = requests.get(
+                    "https://cdn.discordapp.com/attachments/848299943172505611/876944029017845790/luna.ico",
+                    stream=True)
 
                 open('data/resources/luna.ico', 'wb').write(r.content)
 
@@ -2373,23 +2503,23 @@ def FileCheck():
         if file_exist('./data/backup/friends.txt'):
             pass
         else:
-            file = open("data/backup/friends.txt", "w") 
-            file.write("Use [prefix]friendsbackup") 
-            file.close() 
+            file = open("data/backup/friends.txt", "w")
+            file.write("Use [prefix]friendsbackup")
+            file.close()
 
         if file_exist('./data/invites.txt'):
             pass
         else:
-            file = open("data/invites.txt", "w") 
-            file.write("Put the invites of the servers you want to join here one after another") 
+            file = open("data/invites.txt", "w")
+            file.write("Put the invites of the servers you want to join here one after another")
             file.close()
 
         if file_exist('./data/backup/blocked.txt'):
             pass
         else:
-            file = open("data/backup/blocked.txt", "w") 
-            file.write("Use [prefix]friendsbackup") 
-            file.close() 
+            file = open("data/backup/blocked.txt", "w")
+            file.write("Use [prefix]friendsbackup")
+            file.close()
 
             createFolder('./data')
         if file_exist('./data/giveawaybots.json'):
@@ -2524,16 +2654,16 @@ def FileCheck():
         if file_exist('./data/tokens.txt'):
             pass
         else:
-            file = open("data/tokens.txt", "w") 
-            file.write("Put your tokens here line after line.") 
-            file.close() 
+            file = open("data/tokens.txt", "w")
+            file.write("Put your tokens here line after line.")
+            file.close()
 
         if file_exist('./data/proxies.txt'):
             pass
         else:
-            file = open("data/proxies.txt", "w") 
-            file.write("Put your proxies here line after line. (HTTP Only)") 
-            file.close() 
+            file = open("data/proxies.txt", "w")
+            file.write("Put your proxies here line after line. (HTTP Only)")
+            file.close()
 
         if file_exist('./data/webhook.json'):
             pass
@@ -2570,6 +2700,7 @@ def FileCheck():
 
         FileCheck()
 
+
 # ///////////////////////////////////////////////////////////////
 # Wizard
 
@@ -2600,6 +2731,7 @@ def run_wizard():
         f.write(json.dumps(data, indent=4))
     Init()
 
+
 # ///////////////////////////////////////////////////////////////
 # Main function
 
@@ -2628,6 +2760,7 @@ def Init():
     else:
         FileCheck()
 
+
 # ///////////////////////////////////////////////////////////////
 # Functions for message types, it took me 5 hours to make this bullshit
 
@@ -2652,6 +2785,7 @@ def convert_to_text(embed: discord.Embed):
         return text_mode_builder
     else:
         return embed.image.url
+
 
 def convert_to_indent(embed: discord.Embed):
     with open('./config.json') as f:
@@ -2687,6 +2821,7 @@ def convert_to_indent(embed: discord.Embed):
     else:
         return embed.image.url
 
+
 async def send(ctx, embed):
     with open('./config.json') as f:
         config = json.load(f)
@@ -2700,7 +2835,8 @@ async def send(ctx, embed):
     else:
         await ctx.send(embed=embed, delete_after=deletetimer)
 
+
 # ///////////////////////////////////////////////////////////////
 
 if __name__ == '__main__':
-	Luna_auth()
+    Luna_auth()
