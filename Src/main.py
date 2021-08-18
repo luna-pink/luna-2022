@@ -24,11 +24,9 @@ import gtts
 from ctypes import byref, windll
 from datetime import datetime
 from colorama import init
-from os import name, system
+from os import system
 from AuthGG.client import Client as Authgg
 from tqdm import tqdm
-from sys import platform
-from threading import Thread
 from discord import *
 
 if sys.platform == "win32":
@@ -290,9 +288,9 @@ def descriptionvar():
     with open(f"data/themes/{themesvar}", encoding='utf-8') as f:
         customi = json.load(f)
     descriptionvar = customi.get('description')
-    if descriptionvar == True:
+    if descriptionvar:
         descriptionvar = "<> = required, [] = optional\n\n"
-    elif descriptionvar == False:
+    elif not descriptionvar:
         descriptionvar = ""
     return descriptionvar
 
@@ -2178,7 +2176,7 @@ def Luna_auth():
             printevent("Loading Data...")
             FileCheck()
 
-        except Exception:
+        except:
             try:
                 Authgg.register(key, key, key, key)
                 printevent("Registering...")
@@ -2358,9 +2356,8 @@ async def on_ready():
 
     if logintoast() == "on" and alltoasts() == "on" and sys.platform == "win32":
         try:
-            toaster.show_toast(toasttitle(), f"Logged into {bot.user}", icon_path="data/resources/luna.ico", duration=5,
-                               threaded=True)
-        except Exception:
+            toaster.show_toast(toasttitle(), f"Logged into {bot.user}", icon_path="data/resources/luna.ico", duration=5, threaded=True)
+        except:
             pass
         # try:
         #     playsound.playsound('data/sounds/anime.wav')
@@ -2370,28 +2367,28 @@ async def on_ready():
     # ///////////////////////////////////////////////////////////////
     # Charge status
 
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
-        'Content-Type': 'application/json',
-        'Authorization': token,
-    }
-
-    with open('./config.json') as f:
-        config = json.load(f)
-    startup_status = config.get('startup_status')
-    if startup_status == "dnd":
-        status = "dnd"
-    elif startup_status == "idle":
-        status = "idle"
-    else:
-        status = "online"
-
-    request = requests.Session()
-    setting = {
-        'status': f"{status}",
-        "custom_status": {"text": "Charge [##########]"}
-    }
-    # request.patch("https://canary.discordapp.com/api/v6/users/@me/settings",headers=headers, json=setting, timeout=10)
+    # headers = {
+    #     'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
+    #     'Content-Type': 'application/json',
+    #     'Authorization': token,
+    # }
+    #
+    # with open('./config.json') as f:
+    #     config = json.load(f)
+    # startup_status = config.get('startup_status')
+    # if startup_status == "dnd":
+    #     status = "dnd"
+    # elif startup_status == "idle":
+    #     status = "idle"
+    # else:
+    #     status = "online"
+    #
+    # request = requests.Session()
+    # setting = {
+    #     'status': f"{status}",
+    #     "custom_status": {"text": "Charge [##########]"}
+    # }
+    # # request.patch("https://canary.discordapp.com/api/v6/users/@me/settings",headers=headers, json=setting, timeout=10)
 
 
 # ///////////////////////////////////////////////////////////////
@@ -2773,15 +2770,15 @@ def convert_to_text(embed: discord.Embed):
     largeimagevar = customi.get('large_imageurl')
     if embed.image.url == "":
         if embed.description.endswith("\n"):
-            text_mode_builder = (f"```ini\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('**', '')}\n[ {embed.footer.text} ]\n```")
+            text_mode_builder = f"```ini\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('**', '')}\n[ {embed.footer.text} ]\n```"
         else:
-            text_mode_builder = (f"```ini\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('**', '')}\n\n[ {embed.footer.text} ]\n```")
+            text_mode_builder = f"```ini\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('**', '')}\n\n[ {embed.footer.text} ]\n```"
         return text_mode_builder
     elif embed.image.url == largeimagevar:
         if embed.description.endswith("\n"):
-            text_mode_builder = (f"```ini\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('**', '')}\n[ {embed.footer.text} ]\n```")
+            text_mode_builder = f"```ini\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('**', '')}\n[ {embed.footer.text} ]\n```"
         else:
-            text_mode_builder = (f"```ini\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('**', '')}\n\n[ {embed.footer.text} ]\n```")
+            text_mode_builder = f"```ini\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('**', '')}\n\n[ {embed.footer.text} ]\n```"
         return text_mode_builder
     else:
         return embed.image.url
@@ -2802,9 +2799,9 @@ def convert_to_indent(embed: discord.Embed):
             text += indent + "\n"
 
         if embed.description.endswith("\n"):
-            indent_builder = (f"> **{embed.title}**\n> \n{text}> {embed.footer.text}")
+            indent_builder = f"> **{embed.title}**\n> \n{text}> {embed.footer.text}"
         else:
-            indent_builder = (f"> **{embed.title}**\n> \n{text}> \n> {embed.footer.text}")
+            indent_builder = f"> **{embed.title}**\n> \n{text}> \n> {embed.footer.text}"
         return indent_builder
     elif embed.image.url == largeimagevar:
         text = ""
@@ -2814,9 +2811,9 @@ def convert_to_indent(embed: discord.Embed):
             text += indent + "\n"
 
         if embed.description.endswith("\n"):
-            indent_builder = (f"> **{embed.title}**\n> \n{text}> {embed.footer.text}")
+            indent_builder = f"> **{embed.title}**\n> \n{text}> {embed.footer.text}"
         else:
-            indent_builder = (f"> **{embed.title}**\n> \n{text}> \n> {embed.footer.text}")
+            indent_builder = f"> **{embed.title}**\n> \n{text}> \n> {embed.footer.text}"
         return indent_builder
     else:
         return embed.image.url

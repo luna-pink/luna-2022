@@ -91,7 +91,7 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 					usage="<user_id>",
 					description = "Unban a user")
 	@has_permissions(ban_members=True)
-	async def ban(self, ctx, user: discord.Member = None):
+	async def unban(self, ctx, user: discord.Member = None):
 		await ctx.message.delete()
 
 		if user == None:
@@ -169,7 +169,7 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 	@commands.command(name = "kickgc",
 					usage="",
 					description = "Remove everyone in the group channel")
-	async def servername(self, ctx):
+	async def kickgc(self, ctx):
 		await ctx.message.delete()
 		if isinstance(ctx.message.channel, discord.GroupChannel):
 			for recipient in ctx.message.channel.recipients:
@@ -178,7 +178,7 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 	@commands.command(name = "leavegc",
 					usage="",
 					description = "Leave the group channel")
-	async def servername(self, ctx):
+	async def leavegc(self, ctx):
 		await ctx.message.delete()
 		if isinstance(ctx.message.channel, discord.GroupChannel):
 			await ctx.message.channel.leave()
@@ -220,6 +220,7 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 		await ctx.message.delete()
 		for channel in ctx.guild.channels:
 			await channel.edit(name=name)
+
 
 def setup(bot:commands.Bot):
 	bot.add_cog(AdminCog(bot))
