@@ -220,7 +220,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 
 	@commands.command(name = "update",
 					usage="",
-					description = "Updates Lolicon if there's an update")
+					description = "Updates Luna if there's an update")
 	async def update(self, ctx):
 		await ctx.message.delete()
 		versionpastedec = urllib.request.urlopen('https://pastebin.com/raw/iQPkzEpg')
