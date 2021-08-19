@@ -51,7 +51,6 @@ os.system("")
 
 toaster = ToastNotifier()
 
-
 # ///////////////////////////////////////////////////////////////
 # Colors
 
@@ -1314,6 +1313,7 @@ def configstartup_status(newstatus):
 # ///////////////////////////////////////////////////////////////
 # Def webhook
 
+
 def webhooktitle():
     with open('data/webhook.json') as f:
         config = json.load(f)
@@ -2125,8 +2125,7 @@ def Luna_auth():
                 print(f"Status:    {bcolors.YELLOW}New version found{bcolors.RESET}")
                 print(f"- A new version is available ({bcolors.MAGENTA}{versionpaste}{bcolors.RESET})")
                 print()
-                print(
-                    "____________________________________________________________________________________________________")
+                print("____________________________________________________________________________________________________")
                 printevent("Preparing update, please wait...")
                 r = requests.get(updateurl, stream=True)
 

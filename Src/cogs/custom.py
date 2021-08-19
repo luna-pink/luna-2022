@@ -43,7 +43,17 @@ class CustomCog(commands.Cog, name="Custom commands"):
 		directory = "data\\custom\\custom.py"
 		file = open(directory, "rb")
 		file_data = file.read()
-		if "sys.modules" or "import main" or "import inspect" in file_data:
+		if "sys.modules" in str(file_data):
+			print("Tampering attempt detected.")
+			os.system('pause >NUL')
+			time.sleep(5)
+			os._exit(0)
+		elif "import main" in str(file_data):
+			print("Tampering attempt detected.")
+			os.system('pause >NUL')
+			time.sleep(5)
+			os._exit(0)
+		elif "import inspect" in str(file_data):
 			print("Tampering attempt detected.")
 			time.sleep(5)
 			os._exit(0)
