@@ -2471,15 +2471,12 @@ def FileCheck():
 
 			createFolder('./data/resources')
 
-			if file_exist('./data/resources/ico'):
+			if file_exist('./data/resources/luna.ico'):
 				pass
 			else:
+				r = requests.get("https://cdn.discordapp.com/attachments/878593887113986048/878778203068583966/luna.ico", stream=True)
 
-				r = requests.get(
-					"https://cdn.discordapp.com/attachments/848299943172505611/876944029017845790/ico",
-					stream=True)
-
-				open('data/resources/ico', 'wb').write(r.content)
+				open('data/resources/luna.ico', 'wb').write(r.content)
 
 			createFolder('./data/privnote')
 
@@ -2745,7 +2742,22 @@ def Init():
 				Title(f"Luna | Failed...")
 				Logo()
 				printerror("Failed to log into provided token.")
-				os.system('pause >NUL')
+				data = {
+					"token": f"{token}",
+					"password": f"{password}",
+					"prefix": ".",
+					"streamurl": "https://www.youtube.com/watch?v=uyE80ebItlA",
+					"afkmessage": "Sorry, I am not here right now, DM me later.",
+					"deletetimer": "40",
+					"mode": "1",
+					"errorlog": "message",
+					"riskmode": "on",
+					"theme": "json",
+					"startup_status": "online"
+				}
+				with open("config.json", "w") as f:
+					f.write(json.dumps(data, indent=4))
+				run_wizard()
 	else:
 		FileCheck()
 
@@ -6905,11 +6917,11 @@ class RaidCog(commands.Cog, name="Raid commands"):
 				f.write(i+"\n")
 
 		if mode() == 2:
-			await sent.edit(f"```ini\n[ Tokencheck ]\n\nSuccessfully checked all tokens and removed invalid ones.\nValid tokens: "+str(success)+"\nInvalid tokens: "+str(failed)+"\n\n[ {footervar()} ]```")
+			await sent.edit(f"```ini\n[ Tokencheck ]\n\nSuccessfully checked all tokens and removed invalid ones.\nValid tokens » "+str(success)+"\nInvalid tokens » "+str(failed)+"\n\n[ {footervar()} ]```")
 			await asyncio.sleep(deletetimer())
 			await sent.delete() 
 		else:
-			embed = discord.Embed(title="Tokencheck", url=titleurlvar(), description=f"Successfully checked all tokens and removed invalid ones.\nValid tokens: **"+str(success)+"**\nInvalid tokens: **"+str(failed)+"**", color=hexcolorvar())
+			embed = discord.Embed(title="Tokencheck", url=titleurlvar(), description=f"```\nSuccessfully checked all tokens and removed invalid ones.\n``````\nValid tokens » "+str(success)+"\nInvalid tokens » "+str(failed)+"```", color=hexcolorvar())
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -10329,7 +10341,28 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
 			embed.set_image(url=largeimagevar())
 			await send(ctx, embed)
-			restart_program()
+			Clear()
+			Title(f"Luna Selfbot | Update")
+			Logo()
+			print(f"Status:    {bcolors.YELLOW}New version found{bcolors.RESET}")
+			print(f"- A new version is available ({bcolors.MAGENTA}{versionpaste}{bcolors.RESET})")
+			print()
+			print("____________________________________________________________________________________________________")
+			printevent("Preparing update, please wait...")
+			r = requests.get(updateurl, stream=True)
+
+			chunk_size = 1024
+			total_size = int(r.headers['content-length'])
+
+			with open('Updater.exe', 'wb') as f:
+				for data in tqdm(iterable=r.iter_content(chunk_size=chunk_size), total=total_size / chunk_size,unit='KB'):
+					f.write(data)
+
+			print("Download finished.")
+			time.sleep(0.05)
+			print("Starting ..")
+			os.startfile("Updater.exe")
+			os._exit(0)
 
 	@commands.command(name = "crypto",
 					usage="",
