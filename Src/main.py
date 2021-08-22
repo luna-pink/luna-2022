@@ -1,4 +1,5 @@
 import asyncio
+from logging import exception
 import discord
 import ctypes.wintypes as wintypes
 import json
@@ -104,7 +105,7 @@ SniperLog = "Sniper" # 35 Magenta
 # ///////////////////////////////////////////////////////////////
 # Luna Variables
 
-lunaversion = '2.1.0h2'
+lunaversion = '2.1.1'
 
 cooldown = []
 whitelisted_users = {}
@@ -115,15 +116,11 @@ antiraid = False
 copycat = None
 
 # ///////////////////////////////////////////////////////////////
-# Def
+# Pastebin
 
 updateurldec = urllib.request.urlopen('https://pastebin.com/raw/mt9DERP6')
 for line in updateurldec:
 	updateurl = line.decode().strip()
-
-motddec = urllib.request.urlopen('https://pastebin.com/raw/RLBf3BqB')
-for line in motddec:
-	motd = line.decode().strip()
 
 # ///////////////////////////////////////////////////////////////
 # Def
@@ -820,7 +817,6 @@ def configgiveaway_sniper(newmode):
 	giveaway_blocked_words = data.get('giveaway_blocked_words')
 	giveaway_server_joiner = data.get('giveaway_server_joiner')
 	data = {
-		"slotbotsniper": f"{newmode}",
 		"delay_in_minutes": f"{delay_in_minutes}",
 		"giveaway_blocked_words": f"{giveaway_blocked_words}",
 		"giveaway_server_joiner": f"{giveaway_server_joiner}"
@@ -1505,13 +1501,6 @@ def privnotetoast():
 	return privnote
 
 
-def slotbottoast():
-	with open('data/toasts.json') as f:
-		config = json.load(f)
-	slotbot = config.get('slotbot')
-	return slotbot
-
-
 def selfbottoast():
 	with open('data/toasts.json') as f:
 		config = json.load(f)
@@ -1578,7 +1567,6 @@ def configtoasttoasts(newmode):
 	nitro = config.get('nitro')
 	giveaway = config.get('giveaway')
 	privnote = config.get('privnote')
-	slotbot = config.get('slotbot')
 	selfbot = config.get('selfbot')
 	pings = config.get('pings')
 	ghostpings = config.get('ghostpings')
@@ -1593,7 +1581,6 @@ def configtoasttoasts(newmode):
 		"nitro": f"{nitro}",
 		"giveaway": f"{giveaway}",
 		"privnote": f"{privnote}",
-		"slotbot": f"{slotbot}",
 		"selfbot": f"{selfbot}",
 		"pings": f"{pings}",
 		"ghostpings": f"{ghostpings}",
@@ -1614,7 +1601,6 @@ def configtoastlogin(newmode):
 	nitro = config.get('nitro')
 	giveaway = config.get('giveaway')
 	privnote = config.get('privnote')
-	slotbot = config.get('slotbot')
 	selfbot = config.get('selfbot')
 	pings = config.get('pings')
 	ghostpings = config.get('ghostpings')
@@ -1629,7 +1615,6 @@ def configtoastlogin(newmode):
 		"nitro": f"{nitro}",
 		"giveaway": f"{giveaway}",
 		"privnote": f"{privnote}",
-		"slotbot": f"{slotbot}",
 		"selfbot": f"{selfbot}",
 		"pings": f"{pings}",
 		"ghostpings": f"{ghostpings}",
@@ -1650,7 +1635,6 @@ def configtoastnitro(newmode):
 	login = config.get('login')
 	giveaway = config.get('giveaway')
 	privnote = config.get('privnote')
-	slotbot = config.get('slotbot')
 	selfbot = config.get('selfbot')
 	pings = config.get('pings')
 	ghostpings = config.get('ghostpings')
@@ -1665,7 +1649,6 @@ def configtoastnitro(newmode):
 		"nitro": f"{newmode}",
 		"giveaway": f"{giveaway}",
 		"privnote": f"{privnote}",
-		"slotbot": f"{slotbot}",
 		"selfbot": f"{selfbot}",
 		"pings": f"{pings}",
 		"ghostpings": f"{ghostpings}",
@@ -1686,7 +1669,6 @@ def configtoastgiveaway(newmode):
 	login = config.get('login')
 	nitro = config.get('nitro')
 	privnote = config.get('privnote')
-	slotbot = config.get('slotbot')
 	selfbot = config.get('selfbot')
 	pings = config.get('pings')
 	ghostpings = config.get('ghostpings')
@@ -1701,7 +1683,6 @@ def configtoastgiveaway(newmode):
 		"nitro": f"{nitro}",
 		"giveaway": f"{newmode}",
 		"privnote": f"{privnote}",
-		"slotbot": f"{slotbot}",
 		"selfbot": f"{selfbot}",
 		"pings": f"{pings}",
 		"ghostpings": f"{ghostpings}",
@@ -1722,7 +1703,6 @@ def configtoastprivnote(newmode):
 	login = config.get('login')
 	nitro = config.get('nitro')
 	giveaway = config.get('giveaway')
-	slotbot = config.get('slotbot')
 	selfbot = config.get('selfbot')
 	pings = config.get('pings')
 	ghostpings = config.get('ghostpings')
@@ -1737,43 +1717,6 @@ def configtoastprivnote(newmode):
 		"nitro": f"{nitro}",
 		"giveaway": f"{giveaway}",
 		"privnote": f"{newmode}",
-		"slotbot": f"{slotbot}",
-		"selfbot": f"{selfbot}",
-		"pings": f"{pings}",
-		"ghostpings": f"{ghostpings}",
-		"friendevents": f"{friendevents}",
-		"guildevents": f"{guildevents}",
-		"roleupdates": f"{roleupdates}",
-		"nickupdates": f"{nickupdates}",
-		"protection": f"{protection}"
-	}
-	with open("data/toasts.json", "w") as f:
-		f.write(json.dumps(data, indent=4))
-
-
-def configtoastslotbot(newmode):
-	with open('data/toasts.json') as f:
-		config = json.load(f)
-	toasts = config.get('toasts')
-	login = config.get('login')
-	nitro = config.get('nitro')
-	giveaway = config.get('giveaway')
-	privnote = config.get('privnote')
-	selfbot = config.get('selfbot')
-	pings = config.get('pings')
-	ghostpings = config.get('ghostpings')
-	friendevents = config.get('friendevents')
-	guildevents = config.get('guildevents')
-	roleupdates = config.get('roleupdates')
-	nickupdates = config.get('nickupdates')
-	protection = config.get('protection')
-	data = {
-		"toasts": f"{toasts}",
-		"login": f"{login}",
-		"nitro": f"{nitro}",
-		"giveaway": f"{giveaway}",
-		"privnote": f"{privnote}",
-		"slotbot": f"{newmode}",
 		"selfbot": f"{selfbot}",
 		"pings": f"{pings}",
 		"ghostpings": f"{ghostpings}",
@@ -1795,7 +1738,6 @@ def configtoastselfbot(newmode):
 	nitro = config.get('nitro')
 	giveaway = config.get('giveaway')
 	privnote = config.get('privnote')
-	slotbot = config.get('slotbot')
 	pings = config.get('pings')
 	ghostpings = config.get('ghostpings')
 	friendevents = config.get('friendevents')
@@ -1809,7 +1751,6 @@ def configtoastselfbot(newmode):
 		"nitro": f"{nitro}",
 		"giveaway": f"{giveaway}",
 		"privnote": f"{privnote}",
-		"slotbot": f"{slotbot}",
 		"selfbot": f"{newmode}",
 		"pings": f"{pings}",
 		"ghostpings": f"{ghostpings}",
@@ -1831,7 +1772,6 @@ def configtoastpings(newmode):
 	nitro = config.get('nitro')
 	giveaway = config.get('giveaway')
 	privnote = config.get('privnote')
-	slotbot = config.get('slotbot')
 	selfbot = config.get('selfbot')
 	ghostpings = config.get('ghostpings')
 	friendevents = config.get('friendevents')
@@ -1845,7 +1785,6 @@ def configtoastpings(newmode):
 		"nitro": f"{nitro}",
 		"giveaway": f"{giveaway}",
 		"privnote": f"{privnote}",
-		"slotbot": f"{slotbot}",
 		"selfbot": f"{selfbot}",
 		"pings": f"{newmode}",
 		"ghostpings": f"{ghostpings}",
@@ -1867,7 +1806,6 @@ def configtoastghostpings(newmode):
 	nitro = config.get('nitro')
 	giveaway = config.get('giveaway')
 	privnote = config.get('privnote')
-	slotbot = config.get('slotbot')
 	selfbot = config.get('selfbot')
 	pings = config.get('pings')
 	friendevents = config.get('friendevents')
@@ -1881,7 +1819,6 @@ def configtoastghostpings(newmode):
 		"nitro": f"{nitro}",
 		"giveaway": f"{giveaway}",
 		"privnote": f"{privnote}",
-		"slotbot": f"{slotbot}",
 		"selfbot": f"{selfbot}",
 		"pings": f"{pings}",
 		"ghostpings": f"{newmode}",
@@ -1903,7 +1840,6 @@ def configtoastfriendevents(newmode):
 	nitro = config.get('nitro')
 	giveaway = config.get('giveaway')
 	privnote = config.get('privnote')
-	slotbot = config.get('slotbot')
 	selfbot = config.get('selfbot')
 	pings = config.get('pings')
 	ghostpings = config.get('ghostpings')
@@ -1917,7 +1853,6 @@ def configtoastfriendevents(newmode):
 		"nitro": f"{nitro}",
 		"giveaway": f"{giveaway}",
 		"privnote": f"{privnote}",
-		"slotbot": f"{slotbot}",
 		"selfbot": f"{selfbot}",
 		"pings": f"{pings}",
 		"ghostpings": f"{ghostpings}",
@@ -1939,7 +1874,6 @@ def configtoastguildevents(newmode):
 	nitro = config.get('nitro')
 	giveaway = config.get('giveaway')
 	privnote = config.get('privnote')
-	slotbot = config.get('slotbot')
 	selfbot = config.get('selfbot')
 	pings = config.get('pings')
 	ghostpings = config.get('ghostpings')
@@ -1953,7 +1887,6 @@ def configtoastguildevents(newmode):
 		"nitro": f"{nitro}",
 		"giveaway": f"{giveaway}",
 		"privnote": f"{privnote}",
-		"slotbot": f"{slotbot}",
 		"selfbot": f"{selfbot}",
 		"pings": f"{pings}",
 		"ghostpings": f"{ghostpings}",
@@ -1975,7 +1908,6 @@ def configtoastroleupdates(newmode):
 	nitro = config.get('nitro')
 	giveaway = config.get('giveaway')
 	privnote = config.get('privnote')
-	slotbot = config.get('slotbot')
 	selfbot = config.get('selfbot')
 	pings = config.get('pings')
 	ghostpings = config.get('ghostpings')
@@ -1989,7 +1921,6 @@ def configtoastroleupdates(newmode):
 		"nitro": f"{nitro}",
 		"giveaway": f"{giveaway}",
 		"privnote": f"{privnote}",
-		"slotbot": f"{slotbot}",
 		"selfbot": f"{selfbot}",
 		"pings": f"{pings}",
 		"ghostpings": f"{ghostpings}",
@@ -2011,7 +1942,6 @@ def configtoastnickupdates(newmode):
 	nitro = config.get('nitro')
 	giveaway = config.get('giveaway')
 	privnote = config.get('privnote')
-	slotbot = config.get('slotbot')
 	selfbot = config.get('selfbot')
 	pings = config.get('pings')
 	ghostpings = config.get('ghostpings')
@@ -2025,7 +1955,6 @@ def configtoastnickupdates(newmode):
 		"nitro": f"{nitro}",
 		"giveaway": f"{giveaway}",
 		"privnote": f"{privnote}",
-		"slotbot": f"{slotbot}",
 		"selfbot": f"{selfbot}",
 		"pings": f"{pings}",
 		"ghostpings": f"{ghostpings}",
@@ -2047,7 +1976,6 @@ def configtoastprotection(newmode):
 	nitro = config.get('nitro')
 	giveaway = config.get('giveaway')
 	privnote = config.get('privnote')
-	slotbot = config.get('slotbot')
 	selfbot = config.get('selfbot')
 	pings = config.get('pings')
 	ghostpings = config.get('ghostpings')
@@ -2061,7 +1989,6 @@ def configtoastprotection(newmode):
 		"nitro": f"{nitro}",
 		"giveaway": f"{giveaway}",
 		"privnote": f"{privnote}",
-		"slotbot": f"{slotbot}",
 		"selfbot": f"{selfbot}",
 		"pings": f"{pings}",
 		"ghostpings": f"{ghostpings}",
@@ -2074,6 +2001,48 @@ def configtoastprotection(newmode):
 	with open("data/toasts.json", "w") as f:
 		f.write(json.dumps(data, indent=4))
 
+# ///////////////////////////////////////////////////////////////
+
+def notificationmention():
+	with open('data/notify.json') as f:
+		config = json.load(f)
+	pings = config.get('pings')
+	return pings
+
+# ///////////////////////////////////////////////////////////////
+
+def configmention(newmode):
+	with open('data/notify.json') as f:
+		config = json.load(f)
+	nitro = config.get('nitro')
+	unknown_nitro = config.get('unknown-nitro')
+	giveaway = config.get('giveaway')
+	privnote = config.get('privnote')
+	selfbot = config.get('selfbot')
+	unknown_selfbot = config.get('unknown-selfbot')
+	ghostpings = config.get('ghostpings')
+	friendevents = config.get('friendevents')
+	guildevents = config.get('guildevents')
+	roleupdates = config.get('roleupdates')
+	nickupdates = config.get('nickupdates')
+	protection = config.get('protection')
+	data = {
+		"nitro": f"{nitro}",
+		"unknown-nitro": f"{unknown_nitro}",
+		"giveaway": f"{giveaway}",
+		"privnote": f"{privnote}",
+		"selfbot": f"{selfbot}",
+		"unknown-selfbot": f"{unknown_selfbot}",
+		"pings": f"{newmode}",
+		"ghostpings": f"{ghostpings}",
+		"friendevents": f"{friendevents}",
+		"guildevents": f"{guildevents}",
+		"roleupdates": f"{roleupdates}",
+		"nickupdates": f"{nickupdates}",
+		"protection": f"{protection}"
+	}
+	with open("data/notify.json", "w") as f:
+		f.write(json.dumps(data, indent=4))
 
 # ///////////////////////////////////////////////////////////////
 
@@ -2198,6 +2167,7 @@ async def on_ready():
 	with open("config.json") as f:
 		config = json.load(f)
 	prefix = config.get('prefix')
+	token = config.get('token')
 	Clear()
 	Title(f"Luna | {lunaversion}")
 	Logo()
@@ -2385,41 +2355,6 @@ async def on_ready():
 # ///////////////////////////////////////////////////////////////
 # FileCheck
 
-if file_exist('./data/nitro.json'):
-	with open('data/nitro.json') as f:
-		nitrosn = json.load(f)
-	nitro_sniper_check = nitrosn.get('nitrosniper')
-	if nitro_sniper_check == "None":
-		data = {
-			"nitrosniper": "on",
-			"api": "canary"
-		}
-		with open("data/nitro.json", "w") as f:
-			f.write(json.dumps(data, indent=4))
-	else:
-		pass
-else:
-	pass
-
-if file_exist('./data/giveawayjoiner.json'):
-	with open('data/giveawayjoiner.json') as f:
-		data = json.load(f)
-	giveaway_blocked_words = data.get('giveaway_blocked_words')
-	if giveaway_blocked_words == "['ban', 'kick', 'selfbot', 'self bot', 'test', 'check']":
-		data = {
-			"giveawayjoiner": "on",
-			"delay_in_minutes": "1",
-			"giveaway_blocked_words": ["ban", "kick", "selfbot", "self bot", "test", "check"],
-			"giveaway_server_joiner": "on"
-		}
-		with open("data/giveawayjoiner.json", "w") as f:
-			f.write(json.dumps(data, indent=4))
-	else:
-		pass
-else:
-	pass
-
-
 def FileCheck():
 	if file_exist('config.json') and file_exist('./data/themes/luna.json') and file_exist(
 			'./data/giveawaybots.json') and file_exist('./data/giveawayjoiner.json') and file_exist(
@@ -2456,8 +2391,8 @@ def FileCheck():
 				"title": "Luna",
 				"titleurl": "",
 				"footer": "Team Luna",
-				"footer_iconurl": "https://cdn.discordapp.com/attachments/878593887113986048/878593949332291584/Luna2.png",
-				"imageurl": "https://cdn.discordapp.com/attachments/878593887113986048/878593954352885770/Icon.gif",
+				"footer_iconurl": "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png",
+				"imageurl": "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png",
 				"large_imageurl": "",
 				"hexcolor": "#2f3553",
 				"author": "",
@@ -2562,7 +2497,6 @@ def FileCheck():
 				"unknown-nitro": "on",
 				"giveaway": "on",
 				"privnote": "on",
-				"slotbot": "on",
 				"selfbot": "on",
 				"unknown-selfbot": "on",
 				"pings": "on",
@@ -2623,7 +2557,6 @@ def FileCheck():
 				"nitro": "on",
 				"giveaway": "on",
 				"privnote": "on",
-				"slotbot": "on",
 				"selfbot": "on",
 				"pings": "on",
 				"ghostpings": "on",
@@ -3102,12 +3035,20 @@ class OnMessage(commands.Cog, name="on message"):
 			if message.author == self.bot.user:
 				return
 			else:
-				print("")
-				printsniper("You have been mentioned.")
-				printsniper(f"Server  | {message.guild}")
-				printsniper(f"Channel | {message.channel}")
-				printsniper(f"Author  | {message.author}")
-				print("")
+				with open('data/notify.json') as f:
+					config = json.load(f)
+				pings = config.get('pings')
+				if pings == "on":
+					if pingstoast() == "on" and alltoasts() == "on":
+						toaster.show_toast(toasttitle(), f"You have been mentioned.\nServer:  {message.guild}\nChannel: {message.channel}\nAuthor:  {message.author}", icon_path="data/resources/luna.ico", duration=5, threaded=True)
+					print("")
+					printsniper("You have been mentioned.")
+					printsniper(f"Server  | {message.guild}")
+					printsniper(f"Channel | {message.channel}")
+					printsniper(f"Author  | {message.author}")
+					print("")
+				else:
+					return
 			
 			#///////////////////////////////////////////////////////////////
 			# Selfbot Detection - Embed
@@ -3121,21 +3062,27 @@ class OnMessage(commands.Cog, name="on message"):
 					global cooldown
 					if embed is not None and cooldown.count(message.author.id) == 0 and not ("https://" or "http://" or "cdn.discordapp.com" or ".png" or ".gif" or "www.") in message.content:
 						cooldown.append(message.author.id)
-						try:
-							if selfbottoast() == "on" and alltoasts() == "on":
-								toaster.show_toast(toasttitle(), f"Selfbot Detected.\nServer:  {message.guild}\nChannel: {message.channel}\nAuthor:  {message.author}", icon_path="data/resources/luna.ico", duration=5, threaded=True)
-						except Exception:
+						with open('data/selfbotdetection.json') as f:
+							slot = json.load(f)
+						selfbotdetection = slot.get('selfbotdetection')
+						if selfbotdetection == "on":
+							try:
+								if selfbottoast() == "on" and alltoasts() == "on":
+									toaster.show_toast(toasttitle(), f"Selfbot Detected.\nServer:  {message.guild}\nChannel: {message.channel}\nAuthor:  {message.author}", icon_path="data/resources/luna.ico", duration=5, threaded=True)
+							except Exception:
+								pass
+							datetime.now(tz=None)
+							dateTimeObj = datetime.now()
+							timestampStr = dateTimeObj.strftime("%H:%M")
+							print(f"\n{timestampStr} | {bcolors.SNIPERLOG}{SelfbotLog}{bcolors.RESET} | Selfbot Detected."
+								f"\n{timestampStr} | {bcolors.SNIPERLOG}{SelfbotLog}{bcolors.RESET} | Server  | {message.guild}"
+								f"\n{timestampStr} | {bcolors.SNIPERLOG}{SelfbotLog}{bcolors.RESET} | Channel | {message.channel}"
+								f"\n{timestampStr} | {bcolors.SNIPERLOG}{SelfbotLog}{bcolors.RESET} | Author  | {message.author}"
+								"\n")
+							await asyncio.sleep(120)
+							cooldown.remove(message.author.id)
+						else:
 							pass
-						datetime.now(tz=None)
-						dateTimeObj = datetime.now()
-						timestampStr = dateTimeObj.strftime("%H:%M")
-						print(f"\n{timestampStr} | {bcolors.SNIPERLOG}{SelfbotLog}{bcolors.RESET} | Selfbot Detected."
-							f"\n{timestampStr} | {bcolors.SNIPERLOG}{SelfbotLog}{bcolors.RESET} | Server  | {message.guild}"
-							f"\n{timestampStr} | {bcolors.SNIPERLOG}{SelfbotLog}{bcolors.RESET} | Channel | {message.channel}"
-							f"\n{timestampStr} | {bcolors.SNIPERLOG}{SelfbotLog}{bcolors.RESET} | Author  | {message.author}"
-							"\n")
-						await asyncio.sleep(120)
-						cooldown.remove(message.author.id)
 					else:
 						pass
 
@@ -3511,7 +3458,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 			config = json.load(f)
 		prefix = config.get('prefix')
 
-		embed = discord.Embed(title="General tools", description=f"{descriptionvar()}```\n{prefix}poll <question>\nCreate a poll\n\n{prefix}cpoll <option1> <option2> <question>\nCreate a poll\n\n{prefix}hiddenping <channel_id> <user_id> <message>\nHide the ping\n\n{prefix}hiddeneveryone <channel_id> <message>\nHide @everyone\n\n{prefix}hiddeninvite <channel_id> <invite> <message>\nhide the invite\n\n{prefix}hiddenurl <channel_id> <url> <message>\nHide the url\n\n{prefix}channels [guild_id]\nShow all the channels\n\n{prefix}firstmsg [#channel]\nThe first message\n\n{prefix}compareservers <serverid1> <serverid2>\nMembers in the same server\n\n{prefix}bots\nShow all bots\n\n{prefix}guildicon\nShow the guild icon\n\n{prefix}guildbanner\nShow the guild banner\n\n{prefix}tts <language> <text>\nText to speech```", color=hexcolorvar())
+		embed = discord.Embed(title="General tools", description=f"{descriptionvar()}```\n{prefix}note <name> <text>\nCreate a note\n\n{prefix}notes\nShow notes and note control\n\n{prefix}poll <question>\nCreate a poll\n\n{prefix}cpoll <option1> <option2> <question>\nCreate a poll\n\n{prefix}hiddenping <channel_id> <user_id> <message>\nHide the ping\n\n{prefix}hiddeneveryone <channel_id> <message>\nHide @everyone\n\n{prefix}hiddeninvite <channel_id> <invite> <message>\nhide the invite\n\n{prefix}hiddenurl <channel_id> <url> <message>\nHide the url\n\n{prefix}channels [guild_id]\nShow all the channels\n\n{prefix}firstmsg [#channel]\nThe first message\n\n{prefix}compareservers <serverid1> <serverid2>\nMembers in the same server\n\n{prefix}bots\nShow all bots\n\n{prefix}guildicon\nShow the guild icon\n\n{prefix}guildbanner\nShow the guild banner\n\n{prefix}tts <language> <text>\nText to speech```", color=hexcolorvar())
 		embed.set_thumbnail(url=imagevar())
 		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -3558,51 +3505,72 @@ class HelpCog(commands.Cog, name="Help commands"):
 					description = "Abusive commands")
 	async def abuse(self, ctx):
 		await ctx.message.delete()
+		if riskmode() == "on":
+			with open("config.json", "r") as f:
+				config = json.load(f)
+			prefix = config.get('prefix')
 
-		with open("config.json", "r") as f:
-			config = json.load(f)
-		prefix = config.get('prefix')
-
-		embed = discord.Embed(title="Abusive commands", description=f"{descriptionvar()}```\n{prefix}purgehack        » Clean a channel without permissions\n{prefix}spam <delay> <amount> <message> » Spam a message\n{prefix}spamghostping <delay> <amount> <@member> » Spam ghostping someone\n{prefix}mpreact <emoji>  » Reacts to the latest 20 messages\n{prefix}junknick         » Pure junk nickname\n{prefix}dmall <message>  » DM a message to everyone\n{prefix}sendall <message> » Send a message in all channels```", color=hexcolorvar())
-		embed.set_thumbnail(url=imagevar())
-		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
-		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
-		embed.set_image(url=largeimagevar())
-		await send(ctx, embed)
+			embed = discord.Embed(title="Abusive commands", description=f"{descriptionvar()}```\n{prefix}purgehack        » Clean a channel without permissions\n{prefix}spam <delay> <amount> <message> » Spam a message\n{prefix}spamghostping <delay> <amount> <@member> » Spam ghostping someone\n{prefix}mpreact <emoji>  » Reacts to the latest 20 messages\n{prefix}junknick         » Pure junk nickname\n{prefix}dmall <message>  » DM a message to everyone\n{prefix}sendall <message> » Send a message in all channels```", color=hexcolorvar())
+			embed.set_thumbnail(url=imagevar())
+			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+			embed.set_image(url=largeimagevar())
+			await send(ctx, embed)
+		else:
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
+			embed.set_thumbnail(url=imagevar())
+			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+			embed.set_image(url=largeimagevar())
+			await send(ctx, embed)
 
 	@commands.command(name = "raid",
 					usage="",
 					description = "Raiding servers")
 	async def raid(self, ctx):
 		await ctx.message.delete()
+		if riskmode() == "on":
+			with open("config.json", "r") as f:
+				config = json.load(f)
+			prefix = config.get('prefix')
 
-		with open("config.json", "r") as f:
-			config = json.load(f)
-		prefix = config.get('prefix')
-
-		embed = discord.Embed(title="Raid commands", description=f"{descriptionvar()}```\n{prefix}tokencheck\nCheck the tokens.txt for valid tokens\n\n{prefix}raidjoin <invitelink>\nRaid the server with tokens\n\n{prefix}proxyjoin <invitelink>\nRaid the server with tokens using proxies\n\n{prefix}raidspam <channel_id> <amount> <message>\nSpam the channel with tokens\n\n{prefix}proxyspam <channel_id> <amount> <message>\nSpam the channel with tokens using proxies\n\n{prefix}raidleave <server_id>\nLeave the server with raided tokens\n\n{prefix}proxyleave <server_id>\nLeave the server with raided tokens using proxies\n\n{prefix}raidreact <channel_id> <message_id> <emoji>\nLeave the server with raided tokens\n\n{prefix}proxyreact <channel_id> <message_id> <emoji>\nLeave the server with raided tokens```", color=hexcolorvar())
-		embed.set_thumbnail(url=imagevar())
-		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
-		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
-		embed.set_image(url=largeimagevar())
-		await send(ctx, embed)
+			embed = discord.Embed(title="Raid commands", description=f"{descriptionvar()}```\n{prefix}tokencheck\nCheck the tokens.txt for valid tokens\n\n{prefix}raidjoin <invitelink>\nRaid the server with tokens\n\n{prefix}proxyjoin <invitelink>\nRaid the server with tokens using proxies\n\n{prefix}raidspam <channel_id> <amount> <message>\nSpam the channel with tokens\n\n{prefix}proxyspam <channel_id> <amount> <message>\nSpam the channel with tokens using proxies\n\n{prefix}raidleave <server_id>\nLeave the server with raided tokens\n\n{prefix}proxyleave <server_id>\nLeave the server with raided tokens using proxies\n\n{prefix}raidreact <channel_id> <message_id> <emoji>\nLeave the server with raided tokens\n\n{prefix}proxyreact <channel_id> <message_id> <emoji>\nLeave the server with raided tokens```", color=hexcolorvar())
+			embed.set_thumbnail(url=imagevar())
+			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+			embed.set_image(url=largeimagevar())
+			await send(ctx, embed)
+		else:
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
+			embed.set_thumbnail(url=imagevar())
+			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+			embed.set_image(url=largeimagevar())
+			await send(ctx, embed)
 
 	@commands.command(name = "nuking",
 					usage="",
 					description = "Account nuking")
 	async def nuking(self, ctx):
 		await ctx.message.delete()
+		if riskmode() == "on":
+			with open("config.json", "r") as f:
+				config = json.load(f)
+			prefix = config.get('prefix')
 
-		with open("config.json", "r") as f:
-			config = json.load(f)
-		prefix = config.get('prefix')
-
-		embed = discord.Embed(title="Nuking commands", description=f"{descriptionvar()}```\n{prefix}fucktoken <token>\nChange settings on the token\n\n{prefix}massban <guild_id>\nMassban a guild\n\n{prefix}masskick <guild_id>\nMasskick a guild\n\n{prefix}masschannels <guild_id> <amount> <name>\nMass create channels\n\n{prefix}massroles <guild_id> <amount> <name>\nMass create roles\n\n{prefix}massdelchannels <guild_id>\nMass delete channels\n\n{prefix}massdelroles <guild_id>\nMass delete roles\n\n{prefix}annihilate <guild_id> <channel_name> <role_name>\nTotally annihilate a guild```", color=hexcolorvar())
-		embed.set_thumbnail(url=imagevar())
-		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
-		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
-		embed.set_image(url=largeimagevar())
-		await send(ctx, embed)
+			embed = discord.Embed(title="Nuking commands", description=f"{descriptionvar()}```\n{prefix}fucktoken <token>\nChange settings on the token\n\n{prefix}massban <guild_id>\nMassban a guild\n\n{prefix}masskick <guild_id>\nMasskick a guild\n\n{prefix}masschannels <guild_id> <amount> <name>\nMass create channels\n\n{prefix}massroles <guild_id> <amount> <name>\nMass create roles\n\n{prefix}massdelchannels <guild_id>\nMass delete channels\n\n{prefix}massdelroles <guild_id>\nMass delete roles\n\n{prefix}annihilate <guild_id> <channel_name> <role_name>\nTotally annihilate a guild```", color=hexcolorvar())
+			embed.set_thumbnail(url=imagevar())
+			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+			embed.set_image(url=largeimagevar())
+			await send(ctx, embed)
+		else:
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
+			embed.set_thumbnail(url=imagevar())
+			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+			embed.set_image(url=largeimagevar())
+			await send(ctx, embed)
 
 
 	@commands.command(name = "protection",
@@ -3640,8 +3608,6 @@ class HelpCog(commands.Cog, name="Help commands"):
 		embed.set_image(url=largeimagevar())
 		await send(ctx, embed)
 
-# {prefix}help [command]   »
-
 	@commands.command(name = "settings",
 					usage="",
 					description = "Settings")
@@ -3662,6 +3628,12 @@ class HelpCog(commands.Cog, name="Help commands"):
 		footer = customi.get('footer')
 		hexcolor = customi.get('hexcolor')
 		author = customi.get('author')
+		with open('data/selfbotdetection.json') as f:
+			slot = json.load(f)
+		selfbotdetection = slot.get('selfbotdetection')
+		with open('data/notify.json') as f:
+			config = json.load(f)
+		pings = config.get('pings')
 
 		if title == "":
 			title = "None"
@@ -3672,7 +3644,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 		if author == "":
 			author = "None"
 
-		embed = discord.Embed(title="Settings", description=f"{descriptionvar()}```\nYour current settings\n\nError logging     » {errorlog}\nAuto delete timer » {deletetimer}\nRiskmode          » {riskmode}\nTheme             » {(themesvar[:-5])}\nDescription       » {description}\n``````\nYour current theme settings\n\nTheme             » {title}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\n{prefix}prefix <newprefix> » Change the prefix\n{prefix}themes           » Themes\n{prefix}customize        » Theme customization\n{prefix}embedmode        » Embed mode\n{prefix}textmode         » Text mode\n{prefix}indentmode       » Indent mode\n{prefix}sniper           » Sniper settings\n{prefix}giveaway         » Giveaway settings\n{prefix}notifications    » Toast notifications\n{prefix}errorlog <console/message> » Errorlog\n{prefix}deletetimer <seconds> » Delete timer\n{prefix}afkmessage <text> » Afk message\n{prefix}riskmode <on/off> » Enable abusive mode\n{prefix}description <on/off> » <> | []\n{prefix}selfbotdetection <on/off> » SB detection\n{prefix}password <new_password> » Change password```", color=hexcolorvar())
+		embed = discord.Embed(title="Settings", description=f"{descriptionvar()}```\nYour current settings\n\nError logging     » {errorlog}\nAuto delete timer » {deletetimer}\nRiskmode          » {riskmode}\nTheme             » {(themesvar[:-5])}\nDescription       » {description}\nSelfbot detection » {selfbotdetection}\nMention notify    » {pings}\n``````\nYour current theme settings\n\nTheme             » {title}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\n{prefix}prefix <newprefix> » Change the prefix\n{prefix}themes           » Themes\n{prefix}customize        » Theme customization\n{prefix}embedmode        » Embed mode\n{prefix}textmode         » Text mode\n{prefix}indentmode       » Indent mode\n{prefix}sniper           » Sniper settings\n{prefix}giveaway         » Giveaway settings\n{prefix}notifications    » Toast notifications\n{prefix}errorlog <console/message> » Errorlog\n{prefix}deletetimer <seconds> » Delete timer\n{prefix}afkmessage <text> » Afk message\n{prefix}riskmode <on/off> » Enable abusive mode\n{prefix}description <on/off> » <> | []\n{prefix}selfbotdetection <on/off> » SB detection\n{prefix}password <new_password> » Change password```", color=hexcolorvar())
 		embed.set_thumbnail(url=imagevar())
 		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -3811,22 +3783,24 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 			user = ctx.author
 
 		if user.id == 406907871998246924:
-			special = "\n\nSpecial: Founder / Head Dev @ Team Lolicon"
-		elif user.id == 717120702158864415 or user.id == 465275771523563531 or user.id == 663516459837685770 or user.id == 288433475831332894:
-			special = "\n\nSpecial: Member of Team Lolicon"
-		elif user.id == 429333655610064899 or user.id == 510711456153731083:
-			special = "\n\nSpecial: Lolicon Beta"
+			special = "\n\nSpecial » Founder / Head Dev @ Team Luna"
+		elif user.id == 707355480422350848 or user.id == 663516459837685770:
+			special = "\n\nSpecial » Developer @ Team Luna"
+		elif user.id == 288433475831332894 or user.id == 465275771523563531:
+			special = "\n\nSpecial » Member @ Team Luna"
+		elif user.id == 203906692834918401 or user.id == 699099683603349654 or user.id == 319759781315215360:
+			special = "\n\nSpecial » Luna Beta"
 		elif user.id == 254994687444779008:
-			special = "\n\nSpecial: First Lolicon Customer"
+			special = "\n\nSpecial » First Luna Customer"
 		else:
 			special = ""
 
 		date_format = "%a, %d %b %Y %I:%M %p"
 		members = sorted(ctx.guild.members, key=lambda m: m.joined_at)
-		role_string = ' '.join([r.mention for r in user.roles][1:])
+		role_string = ', '.join([r.name for r in user.roles][1:])
 		perm_string = ', '.join([str(p[0]).replace("_", " ").title()for p in user.guild_permissions if p[1]])
 
-		embed = discord.Embed(description=f"{user.mention}\n\nJoined: {user.joined_at.strftime(date_format)}\nJoin position: {members.index(user) + 1}\nRegistered: {user.created_at.strftime(date_format)}\n\nRoles Amount: {len(user.roles) - 1}\nRoles: {role_string}\n\nPermissions: {perm_string}{special}", color=hexcolorvar())
+		embed = discord.Embed(description=f"User » {user.mention}\n```User information\n\nJoined » {user.joined_at.strftime(date_format)}\nJoin position » {members.index(user) + 1}\nRegistered » {user.created_at.strftime(date_format)}\n``````\nUser server information\n\nRoles Amount » {len(user.roles) - 1}\nRoles\n\n{role_string}\n\nPermissions\n\n{perm_string}{special}```", color=hexcolorvar())
 		embed.set_thumbnail(url=user.avatar_url)
 		embed.set_footer(text=f"ID: {user.id}")
 		embed.set_author(name=str(user), icon_url=user.avatar_url)
@@ -4720,7 +4694,7 @@ class ImageCog(commands.Cog, name="Image commands"):
 			embed.set_image(url=largeimagevar())
 			await send(ctx, embed)
 		except discord.HTTPException as e:
-			printerror(f"{e}")
+			printerror(f"```\n{e}```")
 
 	@commands.command(name = "setav",
 					usage="<url>",
@@ -4747,7 +4721,7 @@ class ImageCog(commands.Cog, name="Image commands"):
 			embed.set_image(url=largeimagevar())
 			await send(ctx, embed)
 		except discord.HTTPException as e:
-			printerror(f"{e}")
+			printerror(f"```\n{e}```")
 
 	@commands.command(name = "invisav",
 					usage="",
@@ -4775,7 +4749,7 @@ class ImageCog(commands.Cog, name="Image commands"):
 			embed.set_image(url=largeimagevar())
 			await send(ctx, embed)
 		except discord.HTTPException as e:
-			printerror(f"{e}")
+			printerror(f"```\n{e}```")
 
 	# ///////////////////////////////////////////////////////////////
 	# Fun image commands
@@ -5677,6 +5651,190 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
 
+	@commands.command(name = "note",
+					aliases=['newnote'],
+					usage="<name> <text>",
+					description = "Create a note")
+	async def note(self, ctx, name:str, *, text:str):
+		await ctx.message.delete()
+
+		if not os.path.exists('data/notes'):
+			os.makedirs('data/notes')
+
+		if os.path.exists(f"data/notes/{name}.txt"):
+			if errorlog() == "console":
+				printerror(f"A note already exists with the name » {bcolors.LIGHTMAGENTA}{name}{bcolors.RESET}")
+			else:
+				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nA note already exists with the name » {name}```", color=0xff0000)
+				embed.set_thumbnail(url=imagevar())
+				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+				embed.set_image(url=largeimagevar())
+				await send(ctx, embed)
+		else:
+			file = open(f"data/notes/{name}.txt", "w")
+			file.write(str(text))
+			file.close()
+			printmessage(f"Created note » {bcolors.LIGHTMAGENTA}{name}{bcolors.RESET}")
+			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nCreated note » {name}```", color=hexcolorvar())
+			embed.set_thumbnail(url=imagevar())
+			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+			embed.set_image(url=largeimagevar())
+			await send(ctx, embed)
+
+	@commands.command(name = "editnote",
+					usage="<name> <newname>",
+					description = "Edit the note name")
+	async def editnote(self, ctx, name:str, themename:str):
+		await ctx.message.delete()
+
+		if not os.path.exists('data/notes'):
+			os.makedirs('data/notes')
+
+		if not os.path.exists(f"data/notes/{name}.txt"):
+			if errorlog() == "console":
+				printerror(f"No note exists with the name » {bcolors.LIGHTMAGENTA}{name}{bcolors.RESET}")
+			else:
+				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nNo note exists with the name » {name}```", color=0xff0000)
+				embed.set_thumbnail(url=imagevar())
+				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+				embed.set_image(url=largeimagevar())
+				await send(ctx, embed)
+		else:
+			os.rename(f"data/notes/{name}.txt",f"data/notes/{themename}.txt")
+			printmessage(f"Edited note {name} to » {bcolors.LIGHTMAGENTA}{themename}{bcolors.RESET}")
+			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nEdited note {name} to » {themename}```", color=hexcolorvar())
+			embed.set_thumbnail(url=imagevar())
+			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+			embed.set_image(url=largeimagevar())
+			await send(ctx, embed)
+
+	@commands.command(name = "delnote",
+					usage="<name>",
+					description = "Delete a note")
+	async def delnote(self, ctx, name:str):
+		await ctx.message.delete()
+
+		if not os.path.exists('data/notes'):
+			os.makedirs('data/notes')
+
+		if os.path.exists(f"data/notes/{name}" + ".txt"):
+			os.remove(f"data/notes/{name}" + ".txt")
+			printmessage(f"Deleted note » {bcolors.LIGHTMAGENTA}{name}{bcolors.RESET}")
+
+			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nDeleted note » {name}```", color=hexcolorvar())
+			embed.set_thumbnail(url=imagevar())
+			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+			embed.set_image(url=largeimagevar())
+			await send(ctx, embed)
+		else:
+			if errorlog() == "console":
+				printerror(f"There is no note called » {bcolors.LIGHTMAGENTA}{name}{bcolors.RESET}")
+			else:
+				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nThere is no note called » {name}```", color=0xff0000)
+				embed.set_thumbnail(url=imagevar())
+				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+				embed.set_image(url=largeimagevar())
+				await send(ctx, embed)
+
+	@commands.command(name = "sendnote",
+					usage="<name>",
+					description = "Send the note")
+	async def sendnote(self, ctx, name:str):
+		await ctx.message.delete()
+
+		if not os.path.exists('data/notes'):
+			os.makedirs('data/notes')
+
+		if not os.path.exists(f"data/notes/{name}.txt"):
+			if errorlog() == "console":
+				printerror(f"No note exists with the name » {bcolors.LIGHTMAGENTA}{name}{bcolors.RESET}")
+			else:
+				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nNo note exists with the name » {name}```", color=0xff0000)
+				embed.set_thumbnail(url=imagevar())
+				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+				embed.set_image(url=largeimagevar())
+				await send(ctx, embed)
+		else:
+			if name.endswith('.txt'):
+				name = name[:-4]
+			await ctx.send(file=discord.File(f"data/notes/{name}.txt"))
+
+	@commands.command(name = "shownote",
+					usage="<name>",
+					description = "Send the content of the note")
+	async def shownote(self, ctx, name:str):
+		await ctx.message.delete()
+
+		if not os.path.exists('data/notes'):
+			os.makedirs('data/notes')
+
+		if not os.path.exists(f"data/notes/{name}.txt"):
+			if errorlog() == "console":
+				printerror(f"No note exists with the name » {bcolors.LIGHTMAGENTA}{name}{bcolors.RESET}")
+			else:
+				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nNo note exists with the name » {name}```", color=0xff0000)
+				embed.set_thumbnail(url=imagevar())
+				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+				embed.set_image(url=largeimagevar())
+				await send(ctx, embed)
+		else:
+			file = open(f"data/notes/{name}" + ".txt", "r")
+			file_data = file.read()
+			if file_data == "":
+				if errorlog() == "console":
+					printerror(f"The note is empty")
+				else:
+					embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nThe note is empty```", color=0xff0000)
+					embed.set_thumbnail(url=imagevar())
+					embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+					embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+					embed.set_image(url=largeimagevar())
+					await send(ctx, embed)
+			else:
+				embed = discord.Embed(title="Notes", description=f"```\nContent of {name}.txt ↴\n\n{str(file_data)}```", color=hexcolorvar())
+				embed.set_thumbnail(url=imagevar())
+				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+				embed.set_image(url=largeimagevar())
+				await send(ctx, embed)
+
+	@commands.command(name = "notes",
+					usage="",
+					description = "Show all notes")
+	async def notes(self, ctx):
+		await ctx.message.delete()
+
+		if not os.path.exists('data/notes'):
+			os.makedirs('data/notes')
+
+		path_to_text = 'data/notes/'
+		text_files = [pos_txt for pos_txt in os.listdir(path_to_text) if pos_txt.endswith('.txt')]
+
+		with open("config.json", "r") as f:
+			config = json.load(f)
+		prefix = config.get('prefix')
+
+		if text_files == []:
+			stringedit = "None"
+		else:
+			string = f"{text_files}"
+			stringedit = string.replace(',', f"\n{prefix}shownote").replace("'", "").replace('[', f"{prefix}shownote ").replace(']', "").replace('.txt', "")
+
+		embed = discord.Embed(title="Notes", description=f"{descriptionvar()}```\nNote control\n\n{prefix}note <name> <text> » Create a note\n{prefix}editnote <name> <newname> » Edit note name\n{prefix}delnote <name>   » Delete a note\n{prefix}sendnote <name>  » Send the note\n``````\nAvailable notes\n\n{stringedit}```", color=hexcolorvar())
+		embed.set_thumbnail(url=imagevar())
+		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+		embed.set_image(url=largeimagevar())
+		await send(ctx, embed)
+
 	@commands.command(name = "poll",
 					usage="<question>",
 					description = "Create a poll")
@@ -5727,7 +5885,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 		charTT = "||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||"
 		await channel.send(message + charTT + user)
 
-		embed = discord.Embed(title=f"Hidden Ping", description=f"Ping sent!\n\nChannel ID: {cchannel}\nChannel Name: {channel.name}\nUser ID: {user_id}\nUser Name: {cuser.name}#{cuser.discriminator}\nMessage: {message}", color=hexcolorvar())
+		embed = discord.Embed(title=f"Hidden Ping", description=f"```\nPing sent!\n\nChannel ID        » {channel_id}\nChannel Name      » {cchannel.name}\nUser Name         » {cuser.name}#{cuser.discriminator}\nUser ID           » {user_id}\nMessage           » {message}```", color=hexcolorvar())
 		embed.set_thumbnail(url=imagevar())
 		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -5748,7 +5906,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 		charTT = "||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||"
 		await channel.send(message + charTT + user)
 
-		embed = discord.Embed(title=f"Hidden Everyone", description=f"Ping sent!\n\nChannel ID: {channel_id}\nChannel Name: {cchannel.name}\nMessage: {message}", color=hexcolorvar())
+		embed = discord.Embed(title=f"Hidden Everyone", description=f"```\nPing sent!\n\nChannel ID        » {channel_id}\nChannel Name      » {cchannel.name}\nMessage           » {message}```", color=hexcolorvar())
 		embed.set_thumbnail(url=imagevar())
 		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -5767,7 +5925,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 		charTT = "||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||"
 		await channel.send(message + charTT + invite)
 
-		embed = discord.Embed(title=f"Hidden Ping", description=f"Ping sent!\n\nChannel ID: {cchannel}\nChannel Name: {channel.name}\nInvite: {invite}\nMessage: {message}", color=hexcolorvar())
+		embed = discord.Embed(title=f"Hidden Ping", description=f"```\nPing sent!\n\nChannel ID        » {channel_id}\nChannel Name      » {cchannel.name}\nInvite            » {invite}\nMessage           » {message}```", color=hexcolorvar())
 		embed.set_thumbnail(url=imagevar())
 		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -5786,7 +5944,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 		charTT = "||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||"
 		await channel.send(message + charTT + url)
 
-		embed = discord.Embed(title=f"Hidden Ping", description=f"Ping sent!\n\nChannel ID: {cchannel}\nChannel Name: {channel.name}\nURL: {url}\nMessage: {message}", color=hexcolorvar())
+		embed = discord.Embed(title=f"Hidden Ping", description=f"```\nPing sent!\n\nChannel ID        » {channel_id}\nChannel Name      » {cchannel.name}\nURL               » {url}\nMessage           » {message}```", color=hexcolorvar())
 		embed.set_thumbnail(url=imagevar())
 		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -5843,7 +6001,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 				output += "{}\n".format(str(member.mention))
 				count += 1
 
-		embed = discord.Embed(title=f"Members in the same server: {count}", url=titleurlvar(), description=f"**{server_1}** - **{server_2}**\n\n{output}", color=hexcolorvar())
+		embed = discord.Embed(title=f"```\nMembers in the same server » {count}```", url=titleurlvar(), description=f"```\n{server_1} - {server_2}\n``````\n{output}```", color=hexcolorvar())
 		embed.set_thumbnail(url=imagevar())
 		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -5957,7 +6115,7 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 					else:
 						try:
 							j = resp.json()
-							embed = discord.Embed(title=f"IP: {ip}", url=titleurlvar(), description=f'```\nCity\n{j["city"]}\n``````\nRegion\n{j["region"]}\n``````\nCountry\n{j["country"]}\n``````\nCoordinates\n{j["loc"]}\n``````\nPostal\n{j["postal"]}\n``````\nTimezone\n{j["timezone"]}\n``````\nOrganization\n{j["org"]}```', color=hexcolorvar())
+							embed = discord.Embed(title=f"IP » {ip}", url=titleurlvar(), description=f'```\nCity\n{j["city"]}\n``````\nRegion\n{j["region"]}\n``````\nCountry\n{j["country"]}\n``````\nCoordinates\n{j["loc"]}\n``````\nPostal\n{j["postal"]}\n``````\nTimezone\n{j["timezone"]}\n``````\nOrganization\n{j["org"]}```', color=hexcolorvar())
 							embed.set_thumbnail(url=imagevar())
 							embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 							embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -5965,7 +6123,7 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 							await send(ctx, embed)
 						except discord.HTTPException:
 							await ctx.send(
-								f'**{ip} Info**\n\nCity: {j["city"]}\nRegion: {j["region"]}\nCountry: {j["country"]}\nCoordinates: {j["loc"]}\nPostal: {j["postal"]}\nTimezone: {j["timezone"]}\nOrganization: {j["org"]}')
+								f'```IP\n{ip}\n\nCity\n{j["city"]}\n``````\nRegion\n{j["region"]}\n``````\nCountry\n{j["country"]}\n``````\nCoordinates\n{j["loc"]}\n``````\nPostal\n{j["postal"]}\n``````\nTimezone\n{j["timezone"]}\n``````\nOrganization\n{j["org"]}```')
 			except Exception as e:
 				await ctx.send(f"Error: {e}")				
 
@@ -6117,7 +6275,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 				file = open("data/invites.txt", "w") 
 				file.write("Put the invites of the servers you want to join here one after another") 
 				file.close()
-				embed = discord.Embed(title="Server Joiner", url=titleurlvar(), description=f"No invites.txt has been found, so it has been created.\nPut all your invites there that you want to join.", color=hexcolorvar())
+				embed = discord.Embed(title="Server Joiner", url=titleurlvar(), description=f"```\nNo invites.txt has been found, so it has been created.\nPut all your invites there that you want to join.```", color=hexcolorvar())
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6126,7 +6284,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 				return
 
 			if os.stat("data/invites.txt").st_size == 0:
-				embed = discord.Embed(title="Server Joiner", url=titleurlvar(), description=f"invites.txt is empty...", color=hexcolorvar())
+				embed = discord.Embed(title="Server Joiner", url=titleurlvar(), description=f"```\ninvites.txt is empty...```", color=hexcolorvar())
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6143,7 +6301,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 					config = json.load(f)
 				token = config.get('token')
 
-				embed = discord.Embed(title="Server Joiner", url=titleurlvar(), description=f"Found **{line_count}** invites in invites.txt\nJoining provided invites...", color=hexcolorvar())
+				embed = discord.Embed(title="Server Joiner", url=titleurlvar(), description=f"```\nFound {line_count} invites in invites.txt\nJoining provided invites...```", color=hexcolorvar())
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6163,7 +6321,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 							printerror(f"Failed to join {invite}")
 							pass
 		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6183,7 +6341,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 				file = open("data/invites.txt", "w") 
 				file.write("Put the invites of the servers you want to join here one after another") 
 				file.close()
-				embed = discord.Embed(title="Server Joiner [PROXY]", url=titleurlvar(), description=f"No invites.txt has been found, so it has been created.\nPut all your invites there that you want to join.", color=hexcolorvar())
+				embed = discord.Embed(title="Server Joiner [PROXY]", url=titleurlvar(), description=f"```\nNo invites.txt has been found, so it has been created.\nPut all your invites there that you want to join.```", color=hexcolorvar())
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6192,7 +6350,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 				return
 
 			if os.stat("data/invites.txt").st_size == 0:
-				embed = discord.Embed(title="Server Joiner [PROXY]", url=titleurlvar(), description=f"invites.txt is empty...", color=hexcolorvar())
+				embed = discord.Embed(title="Server Joiner [PROXY]", url=titleurlvar(), description=f"```\ninvites.txt is empty...```", color=hexcolorvar())
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6217,7 +6375,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 					proxy = _proxy.split('\n')[0]
 					proxylist.append(proxy)
 
-				embed = discord.Embed(title="Server Joiner [PROXY]", url=titleurlvar(), description=f"Found **{line_count}** invites in invites.txt\nJoining provided invites...", color=hexcolorvar())
+				embed = discord.Embed(title="Server Joiner [PROXY]", url=titleurlvar(), description=f"```\nFound {line_count} invites in invites.txt\nJoining provided invites...```", color=hexcolorvar())
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6237,7 +6395,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 							printerror(f"[PROXY] Failed to join {invite}")
 							pass
 		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6306,14 +6464,14 @@ class UtilsCog(commands.Cog, name="Util commands"):
 			try:
 				game = discord.Activity(type=0, name=f"{status}")
 				await self.bot.change_presence(activity=game)
-				embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"Status changed to: **Playing {status}**", color=hexcolorvar())
+				embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nStatus changed to » Playing {status}```", color=hexcolorvar())
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
 				embed.set_image(url=largeimagevar())
 				await send(ctx, embed)
 			except Exception as e:
-				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"{e}", color=hexcolorvar())
+				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\n{e}```", color=hexcolorvar())
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6332,14 +6490,14 @@ class UtilsCog(commands.Cog, name="Util commands"):
 			try:
 				game = discord.Activity(type=1, name=f"{status}", url=streamurl())
 				await self.bot.change_presence(activity=game)
-				embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"Status changed to: **Streaming {status}**", color=hexcolorvar())
+				embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nStatus changed to » Streaming {status}```", color=hexcolorvar())
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
 				embed.set_image(url=largeimagevar())
 				await send(ctx, embed)
 			except Exception as e:
-				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"{e}", color=hexcolorvar())
+				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\n{e}```", color=hexcolorvar())
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6358,14 +6516,14 @@ class UtilsCog(commands.Cog, name="Util commands"):
 			try:
 				game = discord.Activity(type=2, name=f"{status}")
 				await self.bot.change_presence(activity=game)
-				embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"Status changed to: **Listening {status}**", color=hexcolorvar())
+				embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nStatus changed to » Listening {status}```", color=hexcolorvar())
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
 				embed.set_image(url=largeimagevar())
 				await send(ctx, embed)
 			except Exception as e:
-				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"{e}", color=hexcolorvar())
+				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\n{e}```", color=hexcolorvar())
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6383,14 +6541,14 @@ class UtilsCog(commands.Cog, name="Util commands"):
 			try:
 				game = discord.Activity(type=3, name=f"{status}")
 				await self.bot.change_presence(activity=game)
-				embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"Status changed to: **Watching {status}**", color=hexcolorvar())
+				embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nStatus changed to » Watching {status}```", color=hexcolorvar())
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
 				embed.set_image(url=largeimagevar())
 				send(ctx, embed)
 			except Exception as e:
-				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"{e}", color=hexcolorvar())
+				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\n{e}```", color=hexcolorvar())
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6404,7 +6562,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 	async def stopactivity(self, ctx):
 		await ctx.message.delete()
 		await self.bot.change_presence(activity=None, status=discord.Status.dnd)
-		embed = discord.Embed(title=titlevar(), url=titleurlvar(), description="Stopped activity", color=hexcolorvar())
+		embed = discord.Embed(title=titlevar(), url=titleurlvar(), description="```\nStopped activity```", color=hexcolorvar())
 		embed.set_thumbnail(url=imagevar())
 		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6418,7 +6576,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 		await ctx.message.delete()
 		try:
 			if amount is None:
-				embed = discord.Embed(title="Error", url=titleurlvar(), description="Invalid amount", color=hexcolorvar())
+				embed = discord.Embed(title="Error", url=titleurlvar(), description="```\nInvalid amount```", color=hexcolorvar())
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6437,7 +6595,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 					else:
 						pass
 			except Exception as e:
-				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"{e}", color=hexcolorvar())
+				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\n{e}```", color=hexcolorvar())
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6497,7 +6655,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 			afkstatus += 1
 			printmessage(f"AFK Mode: {bcolors.LIGHTMAGENTA}on{bcolors.RESET}")
 
-			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"AFK mode: **on**", color=hexcolorvar())
+			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nAFK mode » on```", color=hexcolorvar())
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6508,7 +6666,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 			afkstatus -= 1
 			printmessage(f"AFK Mode: {bcolors.LIGHTMAGENTA}off{bcolors.RESET}")
 
-			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"AFK mode: **off**", color=hexcolorvar())
+			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nAFK mode » off```", color=hexcolorvar())
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6531,7 +6689,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 		await ctx.message.delete()
 
 		code = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
-		embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"Password generated:\n{code}", color=hexcolorvar())
+		embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nPassword generated ↴\n\n{code}```", color=hexcolorvar())
 		embed.set_thumbnail(url=imagevar())
 		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6574,7 +6732,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 		try:
 			request.post('https://discordapp.com/api/v6/hypesquad/online', headers=headers, json=payload)
 			printmessage(f"Successfully set your hypesquad house to {house}")
-			embed = discord.Embed(title="Hypesquad", url=titleurlvar(), description=f"Successfully set your hypesquad house to {house}", color=hexcolorvar())
+			embed = discord.Embed(title="Hypesquad", url=titleurlvar(), description=f"```\nSuccessfully set your hypesquad house to {house}```", color=hexcolorvar())
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6584,7 +6742,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 			if errorlog() == "console":
 				printerror("Failed to set your hypesquad house")
 			else:
-				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Failed to set your hypesquad house", color=0xff0000)
+				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nFailed to set your hypesquad house```", color=0xff0000)
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6662,7 +6820,7 @@ bot.add_cog(UtilsCog(bot))
 class AbuseCog(commands.Cog, name="Abusive commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
-		
+
 	@commands.command(name = "purgehack",
 					usage="",
 					description = "Purge a channel without permissions")
@@ -6678,9 +6836,9 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 			await ctx.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
 		else:
 			if errorlog() == "console":
-				printerror("Riskmode is disabled")
+				printerror("```\nRiskmode is disabled```")
 			else:
-				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6704,9 +6862,9 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 				await ctx.send(f"Error: {e}")
 		else:
 			if errorlog() == "console":
-				printerror("Riskmode is disabled")
+				printerror("```\nRiskmode is disabled```")
 			else:
-				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6731,9 +6889,9 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 				await ctx.send(f"Error: {e}")
 		else:
 			if errorlog() == "console":
-				printerror("Riskmode is disabled")
+				printerror("```\nRiskmode is disabled```")
 			else:
-				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6751,9 +6909,9 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 				await message.add_reaction(emoji)
 		else:
 			if errorlog() == "console":
-				printerror("Riskmode is disabled")
+				printerror("```\nRiskmode is disabled```")
 			else:
-				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6781,9 +6939,9 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 					await send(ctx, embed)
 		else:
 			if errorlog() == "console":
-				printerror("Riskmode is disabled")
+				printerror("```\nRiskmode is disabled```")
 			else:
-				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6817,9 +6975,9 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 			await send(ctx, embed)
 		else:
 			if errorlog() == "console":
-				printerror("Riskmode is disabled")
+				printerror("```\nRiskmode is disabled```")
 			else:
-				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6840,9 +6998,9 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 				pass
 		else:
 			if errorlog() == "console":
-				printerror("Riskmode is disabled")
+				printerror("```\nRiskmode is disabled```")
 			else:
-				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6867,7 +7025,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 		file.close()
 
 		if os.stat("data/tokens.txt").st_size == 0:
-			embed = discord.Embed(title="Tokencheck", url=titleurlvar(), description=f"tokens.txt is empty...", color=hexcolorvar())
+			embed = discord.Embed(title="Tokencheck", url=titleurlvar(), description=f"```\ntokens.txt is empty...```", color=hexcolorvar())
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6878,7 +7036,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 		if mode() == 2:
 			sent = await ctx.send(f"```ini\n[ Tokencheck ]\n\nDetected {line_count} tokens.\nChecking tokens...\n\n[ {footervar()} ]```")
 		else:
-			embed = discord.Embed(title="Tokencheck", url=titleurlvar(), description=f"Detected **{line_count}** tokens.\nChecking tokens...", color=hexcolorvar())
+			embed = discord.Embed(title="Tokencheck", url=titleurlvar(), description=f"```\nDetected {line_count} tokens.\nChecking tokens...```", color=hexcolorvar())
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -6926,47 +7084,6 @@ class RaidCog(commands.Cog, name="Raid commands"):
 	async def raidjoin(self, ctx, invitelink:str):
 		await ctx.message.delete()
 		if riskmode() == "on":
-		# link = "https://discord.com/api/v6/invites/" + invitelink.split("/")[-1]
-		# joined = 0
-		# failed = 0
-
-		# if mode() == 2:
-		# 	sent = await ctx.send(f"```ini\n[ Raid Join ]\n\nRaiding...\n\n[ {footervar()} ]```")
-		# else:
-		# 	embed = discord.Embed(title="Raid Join", url=titleurlvar(), description=f"Raiding...", color=hexcolorvar())
-		# 	embed.set_thumbnail(url=imagevar())
-		# 	embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
-		# 	embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
-		# 	embed.set_image(url=largeimagevar())
-		# 	sent = await ctx.send(embed=embed)
-
-		# with open("data/tokens.txt","r") as f:
-		# 	tokens = f.read().splitlines()
-		# 	for token in tokens:
-		# 		headers = {"Content-Type": "application/json", 
-        #            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11",
-        #            "Authorization" : token}
-				
-		# 		response = post(link, headers=headers).status_code
-		# 		if response > 199 and response < 300:
-		# 			joined += 1
-		# 		else:
-		# 			failed += 1
-
-		# if mode() == 2:
-		# 	await sent.edit(content=f"```ini\n[ Raid Join ]\n\nAccounts that joined: "+str(joined)+"\nAccounts that could not join: "+str(failed)+f"\n\n[ {footervar()} ]```")
-		# 	await asyncio.sleep(deletetimer())
-		# 	await sent.delete() 
-		# else:
-		# 	embed = discord.Embed(title="Raid Join", url=titleurlvar(), description="Accounts that joined: **"+str(joined)+"**\nAccounts that could not join: **"+str(failed)+"**", color=hexcolorvar())
-		# 	embed.set_thumbnail(url=imagevar())
-		# 	embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
-		# 	embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
-		# 	embed.set_image(url=largeimagevar())
-		# 	await sent.edit(embed=embed)
-		# 	await asyncio.sleep(deletetimer())
-		# 	await sent.delete()
-
 			tokens = open('data/tokens.txt', 'r')
 			for _token in tokens:
 				_token = _token.split('\n')
@@ -6979,7 +7096,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 					printerror(f"{_token} failed to join {invitelink}")
 					pass
 		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7013,7 +7130,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 					printerror(f"[PROXY] {_token} failed to join {invitelink}")
 					pass
 		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7040,7 +7157,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 					printerror(f"{_token} failed to send {message}")
 					pass
 		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7076,7 +7193,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 					printerror(f"{_token} failed to send {message}")
 					pass
 		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7102,7 +7219,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 					printerror(f"{_token} failed to leave {server_id}")
 					pass
 		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7136,7 +7253,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 					printerror(f"[PROXY] {_token} failed to leave {server_id}")
 					pass
 		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7161,7 +7278,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 					printerror(f"{_token} failed to react on {message_id}")
 					pass
 		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7194,7 +7311,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 					printerror(f"{_token} failed to react on {message_id}")
 					pass
 		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7228,7 +7345,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 			except Exception:
 				pass
 		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7266,7 +7383,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 			except Exception:
 				return
 		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7296,7 +7413,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 						printerror(f"Failed to ban {bcolors.COMMANDVAR}{member}{bcolors.RESET}")
 			printmessage(f"Finished banning in {bcolors.COMMANDVAR}{elapsed}{bcolors.RESET}ms")
 		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7326,7 +7443,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 						printerror(f"Failed to kick {bcolors.COMMANDVAR}{member}{bcolors.RESET}")
 			printmessage(f"Finished kicking in {bcolors.COMMANDVAR}{elapsed}{bcolors.RESET}ms")
 		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7352,7 +7469,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 					printerror(f"Failed to create channel {bcolors.COMMANDVAR}{name}{bcolors.RESET}")
 			printmessage(f"Finished creating channels in {bcolors.COMMANDVAR}{elapsed}{bcolors.RESET}ms")
 		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7378,7 +7495,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 					printerror(f"Failed to create role {bcolors.COMMANDVAR}{name}{bcolors.RESET}")
 			printmessage(f"Finished creating roles in {bcolors.COMMANDVAR}{elapsed}{bcolors.RESET}ms")
 		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7405,7 +7522,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 					printerror(f"Failed to delete channel {bcolors.COMMANDVAR}{channel}{bcolors.RESET}")
 			printmessage(f"Finished deleting channels in {bcolors.COMMANDVAR}{elapsed}{bcolors.RESET}ms")
 		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7433,7 +7550,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 					printerror(f"Failed to delete role {bcolors.COMMANDVAR}{role}{bcolors.RESET}")
 			printmessage(f"Finished deleting roles in {bcolors.COMMANDVAR}{elapsed}{bcolors.RESET}ms")
 		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7496,7 +7613,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 			printmessage(f"Finished banning in {bcolors.COMMANDVAR}{elapsed}{bcolors.RESET}ms")
 			printmessage(f"Finished annihilating in {bcolors.COMMANDVAR}{elapsed}{bcolors.RESET}ms")
 		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"Riskmode is disabled", color=0xff0000)
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7687,16 +7804,10 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		prefix = config.get('prefix')
 		themesvar = config.get('theme')
 
-		cog = self.bot.get_cog('Theme commands')
-		commands = cog.get_commands()
-		helptext = ""
-		for command in commands:
-			helptext+=f"{prefix}{command.name} {command.usage} » {command.description}\n"
-
 		string = f"{json_files}"
 		stringedit = string.replace(',', f"\n{prefix}theme").replace("'", "").replace('[', f"{prefix}theme ").replace(']', "").replace('.json', "")
 
-		embed = discord.Embed(title="Themes", description=f"{descriptionvar()}```\nCurrent theme     » {(themesvar[:-5])}\n``````\nTheme control\n\n{prefix}newtheme <name>  » Create a theme\n{prefix}edittheme <newname> » Edit current theme name\n{prefix}deltheme <name>  » Delete a theme\n{prefix}sendtheme        » Send the current theme file\n{prefix}communitythemes  » Show themes made by the community\n``````\nAvailable themes\n\n{stringedit}```", color=hexcolorvar())
+		embed = discord.Embed(title="Themes", description=f"{descriptionvar()}```\nCurrent theme     » {(themesvar[:-5])}\n``````\nTheme customization\n\n{prefix}customize        » Theme customization\n``````\nTheme control\n\n{prefix}newtheme <name>  » Create a theme\n{prefix}edittheme <newname> » Edit current theme name\n{prefix}deltheme <name>  » Delete a theme\n{prefix}sendtheme        » Send the current theme file\n{prefix}communitythemes  » Community made themes\n``````\nAvailable themes\n\n{stringedit}```", color=hexcolorvar())
 		embed.set_thumbnail(url=imagevar())
 		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7851,7 +7962,6 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		nitro = notif.get('nitro')
 		giveaway = notif.get('giveaway')
 		privnote = notif.get('privnote')
-		slotbot = notif.get('slotbot')
 		selfbot = notif.get('selfbot')
 		pings = notif.get('pings')
 		ghostpings = notif.get('ghostpings')
@@ -7865,13 +7975,14 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		helptext = ""
 		for command in commands:
 			helptext+=f"**{prefix}{command.name} {command.usage}** » {command.description}\n"
-		embed = discord.Embed(title="Toast notifications", description=f"{descriptionvar()}Toasts: **{toasts}**\nLogin toasts: **{login}**\nNitro toasts: **{nitro}**\nGiveaway toasts: **{giveaway}**\nPrivnote toasts: **{privnote}**\nSlotbot toasts: **{slotbot}**\nSelfbot toasts: **{selfbot}**\nPing toasts: **{pings}**\nGhostping toasts: **{ghostpings}**\nFriendevent toasts: **{friendevents}**\nGuildevent toasts: **{guildevents}**\nNickname toasts: **{nickupdates}**\nProtection toasts: **{protection}**\n\n{helptext}", color=hexcolorvar())
+		embed = discord.Embed(title="Toast notifications", description=f"{descriptionvar()}```\nToast configuration\n\nToasts            » {toasts}\nLogin toasts      » {login}\nNitro toasts      » {nitro}\nGiveaway toasts   » {giveaway}\nPrivnote toasts   » {privnote}\nSelfbot toasts    » {selfbot}\nPing toasts       » {pings}\nGhostping toasts  » {ghostpings}\nFriendevent toast » {friendevents}\nGuildevent toasts » {guildevents}\nNickname toasts   » {nickupdates}\nProtection toasts » {protection}\n``````\nToast control\n\n{prefix}toasts <on/off>  » Toasts\n{prefix}logintoasts <on/off> » Login toasts\n{prefix}nitrotoasts <on/off> » Nitro toasts\n{prefix}giveawaytoasts <on/off> » Giveaway toasts\n{prefix}privnotetoasts <on/off> » Privnote toasts\n{prefix}selfbottoasts <on/off> » Selfbot toasts\n{prefix}pingtoasts <on/off> » Ping toasts\n{prefix}ghostpingtoasts <on/off> » Ghostping toasts\n{prefix}friendtoasts <on/off> » Griendevent toasts\n{prefix}guildtoasts <on/off> » Guildevent toasts\n{prefix}roletoasts <on/off> » Roleupdate toasts\n{prefix}nicktoasts <on/off> » Nicknameupdate toasts\n{prefix}protectiontoasts <on/off> » Protection toasts```", color=hexcolorvar())
 		embed.set_thumbnail(url=imagevar())
 		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
 		embed.set_image(url=largeimagevar())
 		await send(ctx, embed)
-	
+
+
 	@commands.command(name = "errorlog",
 					usage="<console/message>",
 					description = "Switch errorlog")
@@ -7915,7 +8026,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 	async def deletetimer(self, ctx, seconds:int):
 		await ctx.message.delete()
 
-		embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"Auto delete timer: **{seconds} seconds**", color=hexcolorvar())
+		embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nAuto delete timer » {seconds} seconds```", color=hexcolorvar())
 		embed.set_thumbnail(url=imagevar())
 		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7931,7 +8042,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 	async def afkmessage(self, ctx, *, afkmessage):
 		await ctx.message.delete()
 
-		embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"AFK message: **{afkmessage}**", color=hexcolorvar())
+		embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nAFK message » {afkmessage}```", color=hexcolorvar())
 		embed.set_thumbnail(url=imagevar())
 		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7949,7 +8060,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 
 		if mode == "on":
 
-			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"Riskmode: **on**", color=hexcolorvar())
+			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nRiskmode » on```", color=hexcolorvar())
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7961,7 +8072,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 
 		elif mode == "off":
 
-			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"Riskmode: **off**", color=hexcolorvar())
+			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nRiskmode » off```", color=hexcolorvar())
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7986,27 +8097,64 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 
 		if mode == "on":
 
-			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"Selfbot detection: **on**", color=hexcolorvar())
+			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nSelfbot detection » on```", color=hexcolorvar())
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
 			embed.set_image(url=largeimagevar())
 			await send(ctx, embed)
 
-			printmessage(f"Selfbot detection: {bcolors.LIGHTMAGENTA}on{bcolors.RESET}")
+			printmessage(f"Selfbot detection » {bcolors.LIGHTMAGENTA}on{bcolors.RESET}")
 			configselfbot_detection("on")
 
 		elif mode == "off":
 
-			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"Selfbot detection: **off**", color=hexcolorvar())
+			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nSelfbot detection » off```", color=hexcolorvar())
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
 			embed.set_image(url=largeimagevar())
 			await send(ctx, embed)
 
-			printmessage(f"Selfbot detection: {bcolors.LIGHTMAGENTA}off{bcolors.RESET}")
+			printmessage(f"Selfbot detection » {bcolors.LIGHTMAGENTA}off{bcolors.RESET}")
 			configselfbot_detection("off")
+		else:
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nThat mode does not exist!\nOnly on or off```", color=0xff0000)
+			embed.set_thumbnail(url=imagevar())
+			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+			embed.set_image(url=largeimagevar())
+			await send(ctx, embed)
+
+	@commands.command(name = "mention",
+					usage="<on/off>",
+					description = "Turn mention notification on or off")
+	async def mention(self, ctx, mode:str):
+		await ctx.message.delete()
+
+		if mode == "on":
+
+			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nMention notification » on```", color=hexcolorvar())
+			embed.set_thumbnail(url=imagevar())
+			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+			embed.set_image(url=largeimagevar())
+			await send(ctx, embed)
+
+			printmessage(f"Mention notification » {bcolors.LIGHTMAGENTA}on{bcolors.RESET}")
+			configmention("on")
+
+		elif mode == "off":
+
+			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nMention notification » off```*", color=hexcolorvar())
+			embed.set_thumbnail(url=imagevar())
+			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+			embed.set_image(url=largeimagevar())
+			await send(ctx, embed)
+
+			printmessage(f"Mention notification » {bcolors.LIGHTMAGENTA}off{bcolors.RESET}")
+			configmention("off")
 		else:
 			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nThat mode does not exist!\nOnly on or off```", color=0xff0000)
 			embed.set_thumbnail(url=imagevar())
@@ -8387,7 +8535,7 @@ class CustomCog(commands.Cog, name="Custom commands"):
 		file.close()
 	try:
 		directory = "data\\custom\\custom.py"
-		file = open(directory, "rb")
+		file = open(directory, "r")
 		file_data = file.read()
 		if "sys.modules" in str(file_data):
 			print("Tampering attempt detected.")
@@ -8559,6 +8707,15 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 	async def ctitleurl(self, ctx, newtitleurl:str):
 		await ctx.message.delete()
 
+		if not newtitleurl.startswith("https://"):
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nNot a valid URL. Needs to start with \"https://\"```", color=0xff0000)
+			embed.set_thumbnail(url=imagevar())
+			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+			embed.set_image(url=largeimagevar())
+			await send(ctx, embed)
+			return
+
 		printmessage(f"Changed title url to: {bcolors.LIGHTMAGENTA}{newtitleurl}{bcolors.RESET}")
 		if newtitleurl == "None":
 			configselfbottitleurl("")
@@ -8597,6 +8754,15 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 	async def cfootericon(self, ctx, newfootericonurl:str):
 		await ctx.message.delete()
 
+		if not newfootericonurl.startswith("https://"):
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nNot a valid URL. Needs to start with \"https://\"```", color=0xff0000)
+			embed.set_thumbnail(url=imagevar())
+			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+			embed.set_image(url=largeimagevar())
+			await send(ctx, embed)
+			return
+
 		printmessage(f"Changed footer icon url to: {bcolors.LIGHTMAGENTA}{newfootericonurl}{bcolors.RESET}")
 		if newfootericonurl == "None":
 			configselfbotfooter_iconurl("")
@@ -8615,6 +8781,15 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 					description = "Customize the thumbnail image")
 	async def cimageurl(self, ctx, newimageurl:str):
 		await ctx.message.delete()
+
+		if not newimageurl.startswith("https://"):
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nNot a valid URL. Needs to start with \"https://\"```", color=0xff0000)
+			embed.set_thumbnail(url=imagevar())
+			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+			embed.set_image(url=largeimagevar())
+			await send(ctx, embed)
+			return
 
 		printmessage(f"Changed thumbnail url to: {bcolors.LIGHTMAGENTA}{newimageurl}{bcolors.RESET}")
 		if newimageurl == "None":
@@ -8635,6 +8810,15 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 	async def clargeimage(self, ctx, newimageurl:str):
 		await ctx.message.delete()
 
+		if not newimageurl.startswith("https://"):
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nNot a valid URL. Needs to start with \"https://\"```", color=0xff0000)
+			embed.set_thumbnail(url=imagevar())
+			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+			embed.set_image(url=largeimagevar())
+			await send(ctx, embed)
+			return
+
 		printmessage(f"Changed image url to: {bcolors.LIGHTMAGENTA}{newimageurl}{bcolors.RESET}")
 		if newimageurl == "None":
 			configselfbotlarge_imageurl("")
@@ -8653,6 +8837,15 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 					description = "Customize the hexadecimal color")
 	async def chexcolor(self, ctx, newhexcolor:str):
 		await ctx.message.delete()
+
+		if len(newhexcolor) < 6:
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nNot a valid HEX color code.```", color=0xff0000)
+			embed.set_thumbnail(url=imagevar())
+			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+			embed.set_image(url=largeimagevar())
+			await send(ctx, embed)
+			return
 
 		printmessage(f"Changed hexcolor to: {bcolors.LIGHTMAGENTA}{newhexcolor}{bcolors.RESET}")
 		if newhexcolor == "None":
@@ -8692,6 +8885,15 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 	async def cauthoricon(self, ctx, newauthoriconurl:str):
 		await ctx.message.delete()
 
+		if not newauthoriconurl.startswith("https://"):
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nNot a valid URL. Needs to start with \"https://\"```", color=0xff0000)
+			embed.set_thumbnail(url=imagevar())
+			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+			embed.set_image(url=largeimagevar())
+			await send(ctx, embed)
+			return
+
 		printmessage(f"Changed author icon url to: {bcolors.LIGHTMAGENTA}{newauthoriconurl}{bcolors.RESET}")
 		if newauthoriconurl == "None":
 			configselfbotauthor_iconurl("")
@@ -8710,6 +8912,15 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 					description = "Customize the author url")
 	async def cauthorurl(self, ctx, newauthorurl:str):
 		await ctx.message.delete()
+
+		if not newauthorurl.startswith("https://"):
+			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nNot a valid URL. Needs to start with \"https://\"```", color=0xff0000)
+			embed.set_thumbnail(url=imagevar())
+			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
+			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
+			embed.set_image(url=largeimagevar())
+			await send(ctx, embed)
+			return
 
 		printmessage(f"Changed author url to: {bcolors.LIGHTMAGENTA}{newauthorurl}{bcolors.RESET}")
 		if newauthorurl == "None":
@@ -8935,8 +9146,8 @@ class OnMember(commands.Cog, name="on member events"):
 							member.guild.id].keys():
 						return
 					else:
-						await guild.ban(member, reason="Lolicon Anti-Raid")
-						await guild.ban(i.user, reason="Lolicon Anti-Raid")
+						await guild.ban(member, reason="Luna Anti-Raid")
+						await guild.ban(i.user, reason="Luna Anti-Raid")
 			except Exception as e:
 				print(e)
 
@@ -8951,7 +9162,7 @@ class OnMember(commands.Cog, name="on member events"):
 						print('not banned')
 					else:
 						print('banned')
-						await guild.ban(i.user, reason="Lolicon Anti-Raid")
+						await guild.ban(i.user, reason="Luna Anti-Raid")
 			except Exception as e:
 				print(e)
 
@@ -9035,7 +9246,7 @@ class ThemeCog(commands.Cog, name="Theme command"):
 
 		if os.path.exists(f"data/themes/{theme}" + ".json"):
 
-			printmessage(f"Changed theme to: {bcolors.LIGHTMAGENTA}{theme}{bcolors.RESET}")
+			printmessage(f"Changed theme to » {bcolors.LIGHTMAGENTA}{theme}{bcolors.RESET}")
 			configtheme(f"{theme}")
 			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nChanged theme to » {theme}```", color=hexcolorvar())
 			embed.set_thumbnail(url=imagevar())
@@ -9045,7 +9256,7 @@ class ThemeCog(commands.Cog, name="Theme command"):
 			await send(ctx, embed)
 		else:
 			if errorlog() == "console":
-				printerror(f"There is no theme called: {bcolors.LIGHTMAGENTA}{theme}{bcolors.RESET}")
+				printerror(f"There is no theme called » {bcolors.LIGHTMAGENTA}{theme}{bcolors.RESET}")
 			else:
 				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nThere is no theme called » {theme}```", color=0xff0000)
 				embed.set_thumbnail(url=imagevar())
@@ -9079,13 +9290,13 @@ class ThemesCog(commands.Cog, name="Theme commands"):
 		else:
 			printmessage(f"Created theme: {bcolors.LIGHTMAGENTA}{themename}{bcolors.RESET}")
 			data = {
-				"title": "Lolicon",
+				"title": "Luna",
 				"titleurl": "",
-				"footer": "Lolicon",
-				"footer_iconurl": "https://cdn.discordapp.com/attachments/848299943172505611/868676317174980608/LoliconRe.png",
-				"imageurl": "https://cdn.discordapp.com/attachments/848299943172505611/868676317174980608/LoliconRe.png",
+				"footer": "Team Luna",
+				"footer_iconurl": "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png",
+				"imageurl": "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png",
 				"large_imageurl": "",
-				"hexcolor": "#bd93f9",
+				"hexcolor": "#2f3553",
 				"author": "",
 				"author_iconurl": "",
 				"authorurl": "",
@@ -9113,7 +9324,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
 
 		if os.path.exists(f"data/themes/{themename}.json"):
 			if errorlog() == "console":
-				printerror(f"A theme already exists with the name: {bcolors.LIGHTMAGENTA}{themename}{bcolors.RESET}")
+				printerror(f"A theme already exists with the name » {bcolors.LIGHTMAGENTA}{themename}{bcolors.RESET}")
 			else:
 				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nA theme already exists with the name » {themename}```", color=0xff0000)
 				embed.set_thumbnail(url=imagevar())
@@ -9122,7 +9333,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
 				embed.set_image(url=largeimagevar())
 				await send(ctx, embed)
 		else:
-			printmessage(f"Edited theme name to: {bcolors.LIGHTMAGENTA}{themename}{bcolors.RESET}")
+			printmessage(f"Edited theme name to » {bcolors.LIGHTMAGENTA}{themename}{bcolors.RESET}")
 			os.rename(f"data/themes/{themesvar}",f"data/themes/{themename}.json")
 			configtheme(f"{themename}")
 			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nEdited theme name to » {themename}```", color=hexcolorvar())
@@ -9146,7 +9357,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
 			if errorlog() == "console":
 				printerror(f"You cant delete the theme you are currently using.")
 			else:
-				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nThere is no theme called » {themename}```", color=0xff0000)
+				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nYou cant delete the theme you are currently using » {themename}```", color=0xff0000)
 				embed.set_thumbnail(url=imagevar())
 				embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 				embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -9156,7 +9367,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
 
 		if os.path.exists(f"data/themes/{themename}" + ".json"):
 			os.remove(f"data/themes/{themename}" + ".json")
-			printmessage(f"Deleted theme: {bcolors.LIGHTMAGENTA}{themename}{bcolors.RESET}")
+			printmessage(f"Deleted theme » {bcolors.LIGHTMAGENTA}{themename}{bcolors.RESET}")
 
 			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nDeleted theme » {themename}```", color=hexcolorvar())
 			embed.set_thumbnail(url=imagevar())
@@ -9166,7 +9377,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
 			await send(ctx, embed)
 		else:
 			if errorlog() == "console":
-				printerror(f"There is no theme called: {bcolors.LIGHTMAGENTA}{themename}{bcolors.RESET}")
+				printerror(f"There is no theme called » {bcolors.LIGHTMAGENTA}{themename}{bcolors.RESET}")
 			else:
 				embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nThere is no theme called » {themename}```", color=0xff0000)
 				embed.set_thumbnail(url=imagevar())
@@ -9196,7 +9407,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
 			config = json.load(f)
 		prefix = config.get('prefix')
 
-		embed = discord.Embed(title="Community Themes", url=titleurlvar(), description=f"{descriptionvar()}```\n{prefix}preview <theme>  » Preview a theme\n``````\n{prefix}install luna     » Luna theme\n{prefix}install chill    » Chill theme\n{prefix}install midnight » Midnight theme\n{prefix}install vaporwave » Vaporwave theme\n{prefix}install sweetrevenge » Sweetrevenge theme\n{prefix}install error    » Error theme```", color=hexcolorvar())
+		embed = discord.Embed(title="Community Themes", url=titleurlvar(), description=f"{descriptionvar()}```\n{prefix}preview <theme>  » Preview a theme\n``````\n{prefix}install luna     » Luna theme\n{prefix}install lunaanimated » Luna theme\n{prefix}install chill    » Chill theme\n{prefix}install midnight » Midnight theme\n{prefix}install vaporwave » Vaporwave theme\n{prefix}install sweetrevenge » Sweetrevenge theme\n{prefix}install error    » Error theme```", color=hexcolorvar())
 		embed.set_thumbnail(url=imagevar())
 		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -9222,6 +9433,19 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 		notfound = False
 		
 		if theme == "luna":
+			title= "Luna"
+			titleurl= ""
+			footer= "Team Luna"
+			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png"
+			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png"
+			large_imageurl= ""
+			hexcolor= 0x2f3553
+			author= ""
+			author_iconurl= ""
+			authorurl= ""
+			description= True
+			madeby="Nshout"
+		elif theme == "lunaanimated":
 			title= "Luna"
 			titleurl= ""
 			footer= "Team Luna"
@@ -9339,6 +9563,19 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Luna"
 			titleurl= ""
 			footer= "Team Luna"
+			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png"
+			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png"
+			large_imageurl= ""
+			hexcolor= "#2f3553"
+			author= ""
+			author_iconurl= ""
+			authorurl= ""
+			description= True
+			madeby="Nshout"
+		elif theme == "lunaanimated":
+			title= "Luna"
+			titleurl= ""
+			footer= "Team Luna"
 			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593949332291584/Luna2.png"
 			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593954352885770/Icon.gif"
 			large_imageurl= ""
@@ -9446,7 +9683,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			json.dump(data, studs, indent=4)
 		configtheme(f"{theme}")
 
-		embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nInstalled theme {theme} and changed to it\nThis theme was made by {madeby}```", color=hexcolorvar())
+		embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nInstalled theme {theme} and changed to it.\nThis theme was made by {madeby}```", color=hexcolorvar())
 		embed.set_thumbnail(url=imagevar())
 		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -9670,41 +9907,6 @@ class ToastsCog(commands.Cog, name="Toast commands"):
 			configtoastprivnote("off")
 
 			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nPrivnote toasts » off```", color=hexcolorvar())
-			embed.set_thumbnail(url=imagevar())
-			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
-			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
-			embed.set_image(url=largeimagevar())
-			await send(ctx, embed)
-		else:
-			embed = discord.Embed(title="Error", url=titleurlvar(), description=f"```\nThat mode does not exist!\nOnly on or off```", color=0xff0000)
-			embed.set_thumbnail(url=imagevar())
-			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
-			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
-			embed.set_image(url=largeimagevar())
-			await send(ctx, embed)
-
-	@commands.command(name = "slotbottoasts",
-					usage="<on/off>",
-					description = "Turn slotbot toasts on or off")
-	async def slotbottoasts(self, ctx, mode:str):
-		await ctx.message.delete()
-
-		if mode == "on":
-			printmessage(f"Slotbot toasts: {bcolors.LIGHTMAGENTA}on{bcolors.RESET}")
-			configtoastslotbot("on")
-
-			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nSlotbot toasts » on```", color=hexcolorvar())
-			embed.set_thumbnail(url=imagevar())
-			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
-			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
-			embed.set_image(url=largeimagevar())
-			await send(ctx, embed)
-
-		elif mode == "off":
-			printmessage(f"Slotbot toasts: {bcolors.LIGHTMAGENTA}off{bcolors.RESET}")
-			configtoastslotbot("off")
-
-			embed = discord.Embed(title=titlevar(), url=titleurlvar(), description=f"```\nSlotbot toasts » off```", color=hexcolorvar())
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 			embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -10399,7 +10601,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 	@commands.command(name = "restart",
 					usage="",
 					aliases=['reboot'],
-					description = "Restart Lolicon")
+					description = "Restart Luna")
 	async def restart(self, ctx):
 		await ctx.message.delete()
 
