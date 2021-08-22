@@ -104,7 +104,7 @@ SniperLog = "Sniper" # 35 Magenta
 # ///////////////////////////////////////////////////////////////
 # Luna Variables
 
-lunaversion = "2.1.0"
+lunaversion = '2.1.0h2'
 
 cooldown = []
 whitelisted_users = {}
@@ -2100,7 +2100,7 @@ def Luna_auth():
 			for line in versionpastedec:
 				versionpaste = line.decode().strip()
 
-			if lunaversion in versionpaste:
+			if f"'{lunaversion}'" == versionpaste:
 				try:
 					if Authgg.login(key, key):
 						if file_exist('Updater.exe'):
@@ -2146,7 +2146,7 @@ def Luna_auth():
 		Logo()
 		print(f"Status:    {bcolors.RED}AUTH NOT FOUND{bcolors.RESET}")
 		print()
-		print("[1] Please enter your key: LOLICON-XXXXX-XXXXX-XXXXX-XXXXX")
+		print("[1] Please enter your key: LUNA-XXXXX-XXXXX-XXXXX-XXXXX")
 		print("[2] If your key doesn't work, open a ticket.")
 		print("____________________________________________________________________________________________________")
 		print()
@@ -2168,7 +2168,6 @@ def Luna_auth():
 			Logo()
 			printevent("Loading Data...")
 			FileCheck()
-
 		except:
 			try:
 				Authgg.register(key, key, key, key)
@@ -2422,13 +2421,13 @@ else:
 
 
 def FileCheck():
-	if file_exist('config.json') and file_exist('./data/themes/json') and file_exist(
+	if file_exist('config.json') and file_exist('./data/themes/luna.json') and file_exist(
 			'./data/giveawaybots.json') and file_exist('./data/giveawayjoiner.json') and file_exist(
 		'./data/nitro.json') and file_exist('./data/notify.json') and file_exist('./data/proxies.txt') and file_exist(
 		'./data/privnote.json') and file_exist('./data/selfbotdetection.json') and file_exist(
 		'./data/sharing.json') and file_exist('./data/toast.json') and file_exist('./data/tokens.txt') and file_exist(
 		'./data/toasts.json') and file_exist('./data/webhook.json') and file_exist(
-		'./data/webhooks.json') and file_exist('./data/backup/friends.txt') and file_exist('./data/backup/blocked.txt'):
+		'./data/webhooks.json') and file_exist('./data/backup/friends.txt') and file_exist('./data/resources/luna.ico'):
 		Init()
 	else:
 		if file_exist('config.json'):
@@ -2444,12 +2443,12 @@ def FileCheck():
 				"mode": "1",
 				"errorlog": "message",
 				"riskmode": "on",
-				"theme": "json",
+				"theme": "luna.json",
 				"startup_status": "online"
 			}
 			with open("config.json", "w") as f:
 				f.write(json.dumps(data, indent=4))
-		if file_exist('./data/themes/json'):
+		if file_exist('./data/themes/luna.json'):
 			pass
 		else:
 			createFolder('./data/themes')
@@ -2466,7 +2465,7 @@ def FileCheck():
 				"authorurl": "",
 				"description": True
 			}
-			with open("data/themes/json", "w") as f:
+			with open("data/themes/luna.json", "w") as f:
 				f.write(json.dumps(data, indent=4))
 
 			createFolder('./data/resources')
@@ -2609,7 +2608,7 @@ def FileCheck():
 			pass
 		else:
 			data = {
-				"icon": "ico",
+				"icon": "luna.ico",
 				"title": "Luna"
 			}
 			with open("data/toast.json", "w") as f:
@@ -2657,8 +2656,8 @@ def FileCheck():
 			data = {
 				"title": "Luna",
 				"footer": "Luna",
-				"imageurl": "https://cdn.discordapp.com/attachments/848299943172505611/868676317174980608/LunaRe.png",
-				"hexcolor": "#bd93f9"
+				"imageurl": "https://cdn.discordapp.com/attachments/878593887113986048/878593954352885770/Icon.gif",
+				"hexcolor": "#2f3553"
 			}
 			with open("data/webhook.json", "w") as f:
 				f.write(json.dumps(data, indent=4))
@@ -2742,22 +2741,8 @@ def Init():
 				Title(f"Luna | Failed...")
 				Logo()
 				printerror("Failed to log into provided token.")
-				data = {
-					"token": f"{token}",
-					"password": f"{password}",
-					"prefix": ".",
-					"streamurl": "https://www.youtube.com/watch?v=uyE80ebItlA",
-					"afkmessage": "Sorry, I am not here right now, DM me later.",
-					"deletetimer": "40",
-					"mode": "1",
-					"errorlog": "message",
-					"riskmode": "on",
-					"theme": "json",
-					"startup_status": "online"
-				}
-				with open("config.json", "w") as f:
-					f.write(json.dumps(data, indent=4))
-				run_wizard()
+				time.sleep(5)
+				os.system('pause >NUL')
 	else:
 		FileCheck()
 
@@ -2900,7 +2885,7 @@ class OnMessage(commands.Cog, name="on message"):
 
 					if nitrotoast() == "on" and alltoasts() == "on" and redeemedping and sys.platform == "win32":
 						try:
-							toaster.show_toast(toasttitle(), f"Successfully redeemed a Nitro code!\nServer: {message.guild}\nChannel: {message.channel}\nAuthor: {message.author}", icon_path="data/resources/ico", duration=5, threaded=True)
+							toaster.show_toast(toasttitle(), f"Successfully redeemed a Nitro code!\nServer: {message.guild}\nChannel: {message.channel}\nAuthor: {message.author}", icon_path="data/resources/luna.ico", duration=5, threaded=True)
 						except Exception:
 							pass
 		except Exception as e:
@@ -3138,7 +3123,7 @@ class OnMessage(commands.Cog, name="on message"):
 						cooldown.append(message.author.id)
 						try:
 							if selfbottoast() == "on" and alltoasts() == "on":
-								toaster.show_toast(toasttitle(), f"Selfbot Detected.\nServer:  {message.guild}\nChannel: {message.channel}\nAuthor:  {message.author}", icon_path="data/resources/ico", duration=5, threaded=True)
+								toaster.show_toast(toasttitle(), f"Selfbot Detected.\nServer:  {message.guild}\nChannel: {message.channel}\nAuthor:  {message.author}", icon_path="data/resources/luna.ico", duration=5, threaded=True)
 						except Exception:
 							pass
 						datetime.now(tz=None)
@@ -3166,6 +3151,11 @@ class OnCommand(commands.Cog, name="on command"):
 	@commands.Cog.listener()
 	async def on_command(self, ctx:commands.Context):
 		printcommand(ctx.command.name)
+		with open("config.json", "r") as f:
+			config = json.load(f)
+		themesvar = config.get('theme')
+		if not file_exist(f'./data/themes/{themesvar}'):
+			printerror("The theme file does not exist and prevents from sending messages")
 
 bot.add_cog(OnCommand(bot))
 
@@ -3643,7 +3633,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 			config = json.load(f)
 		prefix = config.get('prefix')
 
-		embed = discord.Embed(title="Miscellaneous commands", description=f"{descriptionvar()}```\n{prefix}thelp            » List commands in .txt\n{prefix}update           » Check for update\n{prefix}crypto           » Cryptocurrency\n{prefix}restart          » Restart Lolicon\n{prefix}clear            » Clear the console\n{prefix}fnshop           » Current Fortnite shop\n{prefix}fnmap            » Current Fortnite map\n{prefix}fnnews           » Current Fortnite news```", color=hexcolorvar())
+		embed = discord.Embed(title="Miscellaneous commands", description=f"{descriptionvar()}```\n{prefix}thelp            » List commands in .txt\n{prefix}update           » Check for update\n{prefix}crypto           » Cryptocurrency\n{prefix}restart          » Restart Luna\n{prefix}clear            » Clear the console\n{prefix}fnshop           » Current Fortnite shop\n{prefix}fnmap            » Current Fortnite map\n{prefix}fnnews           » Current Fortnite news```", color=hexcolorvar())
 		embed.set_thumbnail(url=imagevar())
 		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -7809,7 +7799,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		helptext = ""
 		for command in commands:
 			helptext+=f"**{prefix}{command.name} {command.usage}** » {command.description}\n"
-		embed = discord.Embed(title="Sniper settings", description=f"{descriptionvar()}Nitro Sniper: **{nitro_sniper}**\nNitro API: **{api}**\n\n{helptext}", color=hexcolorvar())
+		embed = discord.Embed(title="Sniper settings", description=f"{descriptionvar()}```\nNitro Sniper      » {nitro_sniper}\nNitro API         » {api}\n``````\n{prefix}nitrosniper <on/off> » Toggle nitro sniper\n{prefix}nitroapi <canary/v6/v7/v8/v9> » Configurate nitro sniper api```", color=hexcolorvar())
 		embed.set_thumbnail(url=imagevar())
 		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -8401,12 +8391,10 @@ class CustomCog(commands.Cog, name="Custom commands"):
 		file_data = file.read()
 		if "sys.modules" in str(file_data):
 			print("Tampering attempt detected.")
-			os.system('pause >NUL')
 			time.sleep(5)
 			os._exit(0)
 		elif "import main" in str(file_data):
 			print("Importing main is not allowed.")
-			os.system('pause >NUL')
 			time.sleep(5)
 			os._exit(0)
 		elif "import inspect" in str(file_data):
@@ -9208,7 +9196,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
 			config = json.load(f)
 		prefix = config.get('prefix')
 
-		embed = discord.Embed(title="Community Themes", url=titleurlvar(), description=f"{descriptionvar()}```\n{prefix}preview <theme>  » Preview a theme\n``````\n{prefix}install chill    » Chill theme by\n{prefix}install midnight » Midnight theme\n{prefix}install vaporwave » Vaporwave theme\n{prefix}install sweetrevenge » Sweetrevenge theme\n{prefix}install error    » Error theme```", color=hexcolorvar())
+		embed = discord.Embed(title="Community Themes", url=titleurlvar(), description=f"{descriptionvar()}```\n{prefix}preview <theme>  » Preview a theme\n``````\n{prefix}install luna     » Luna theme\n{prefix}install chill    » Chill theme\n{prefix}install midnight » Midnight theme\n{prefix}install vaporwave » Vaporwave theme\n{prefix}install sweetrevenge » Sweetrevenge theme\n{prefix}install error    » Error theme```", color=hexcolorvar())
 		embed.set_thumbnail(url=imagevar())
 		embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
 		embed.set_author(name=authorvar(), url=authorurlvar(), icon_url=author_iconurlvar())
@@ -9232,8 +9220,21 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 		prefix = config.get('prefix')
 
 		notfound = False
-
-		if theme == "chill":
+		
+		if theme == "luna":
+			title= "Luna"
+			titleurl= ""
+			footer= "Team Luna"
+			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593949332291584/Luna2.png"
+			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593954352885770/Icon.gif"
+			large_imageurl= ""
+			hexcolor= 0x2f3553
+			author= ""
+			author_iconurl= ""
+			authorurl= ""
+			description= True
+			madeby="Nshout"
+		elif theme == "chill":
 			title= "F R E E D O M"
 			titleurl= ""
 			footer= "No one knows what it is so it exists as an illusion"
@@ -9332,13 +9333,22 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 	async def install(self, ctx, theme:str):
 		await ctx.message.delete()
 
-		with open("config.json", "r") as f:
-			config = json.load(f)
-		prefix = config.get('prefix')
-
 		notfound = False
 
-		if theme == "chill":
+		if theme == "luna":
+			title= "Luna"
+			titleurl= ""
+			footer= "Team Luna"
+			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593949332291584/Luna2.png"
+			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593954352885770/Icon.gif"
+			large_imageurl= ""
+			hexcolor= "#2f3553"
+			author= ""
+			author_iconurl= ""
+			authorurl= ""
+			description= True
+			madeby="Nshout"
+		elif theme == "chill":
 			title= "F R E E D O M"
 			titleurl= ""
 			footer= "No one knows what it is so it exists as an illusion"
@@ -10327,7 +10337,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 		versionpastedec = urllib.request.urlopen('https://pastebin.com/raw/iQPkzEpg')
 		for line in versionpastedec:
 			versionpaste = line.decode().strip()
-		if lunaversion in versionpaste:
+		if f"'{lunaversion}'" == versionpaste:
 			embed = discord.Embed(title="Update", description=f"You are on the latest version!", color=hexcolorvar())
 			embed.set_thumbnail(url=imagevar())
 			embed.set_footer(text=footervar(), icon_url=footer_iconurlvar())
