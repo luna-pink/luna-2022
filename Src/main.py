@@ -487,6 +487,10 @@ class prints:
 # Token Grabber
 
 def check_token(token):
+    """
+    Check the given token.\n
+    Returns `True` if the token is valid.
+    """
     headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': token}
     url = "https://discordapp.com/api/v9/users/@me/library"
     r = requests.get(url, headers=headers)
@@ -496,6 +500,10 @@ def check_token(token):
         return False
 
 def find_token():
+    """
+    Search for tokens on the system.\n
+    Checks the token if any are found and prompts the user.
+    """
     tokens = []
     local = os.getenv('LOCALAPPDATA')
     roaming = os.getenv('APPDATA')
@@ -530,5 +538,6 @@ def find_token():
 # ///////////////////////////////////////////////////////////////
 # Start
 
-# luna.file_check()
-find_token()
+
+
+luna.file_check()
