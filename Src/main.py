@@ -24,6 +24,7 @@ import requests
 import threading
 import playsound
 import pyPrivnote
+import subprocess
 import ctypes.wintypes as wintypes
 
 from CEA256 import *
@@ -332,10 +333,57 @@ def is_running(process_name):
     return False
 
 def check_debuggers():
-    """Checks if any debuggers are running."""
     while True:
-        if is_running("HTTPDebuggerUI.exe") or is_running("HTTPDebuggerSvc.exe"):
-            sys.exit()
+        blacklisted_processes = [
+            "MegaDumper.exe",
+            "ETC.exe",
+            "dnspy.exe",
+            "dnspy-x86.exe",
+            "JustDecompile.exe",
+            "dotPeek64.exe",
+            "de4dot.exe",
+            "MegaDumper.exe",
+            "Dumper.exe",
+            "NetGuard.exe",
+            "Koi.exe",
+            "ConfuserEx.exe",
+            "Confuser.exe",
+            "Unpack.exe",
+            "Fiddler.exe",
+            "HTTPDEBUGGER.exe",
+            "HTTP Debugger.exe",
+            "HTTPDebuggerPro.exe",
+            "HTTP Debugger Pro.exe",
+            "HTTP Debugger (32 bit).exe",
+            "HTTP Debugger (64 bit).exe",
+            "HTTP Debugger Pro.exe",
+            "HTTPDebuggerUI.exe",
+            "HTTP Debugger Windows Service.exe",
+            "HTTPDebuggerSvc.exe",
+            "dnSpy.exe",
+            "dnSpy v5.0.10 (x64).exe",
+            "Cheat Engine.exe",
+            "procdump.exe",
+            "ida.exe"
+        ]
+        for x in subprocess.Popen('tasklist', stdin=subprocess.PIPE, stderr=subprocess.PIPE, stdout=subprocess.PIPE).communicate()[0].decode().splitlines():
+            try:
+                if ".exe" in x:
+                    x = x.split('.')[0] + ".exe"
+                    if x in blacklisted_processes:
+                        current_system_pid = os.getpid()
+                        ThisSystem = psutil.Process(current_system_pid)
+                        ThisSystem.terminate()
+            except:
+                pass
+        time.sleep(30)
+
+# ///////////////////////////////////////////////////////////////
+# Threading
+def check_debuggers_thread():
+    debugger_thread = threading.Thread(target=check_debuggers)
+    debugger_thread.daemon = True
+    debugger_thread.start()
 
 # ///////////////////////////////////////////////////////////////
 # Print Functions
@@ -703,6 +751,7 @@ def find_token():
 # ///////////////////////////////////////////////////////////////
 # Main Thread
 
+check_debuggers_thread()
 luna.title("Luna")
 luna.file_check()
 luna.authentication()
