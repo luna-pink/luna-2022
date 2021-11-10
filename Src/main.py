@@ -338,15 +338,6 @@ def check_debuggers():
             sys.exit()
 
 # ///////////////////////////////////////////////////////////////
-# Time Functions
-
-def get_time():
-    datetime.now(tz=None)
-    dateTimeObj = datetime.now()
-    timestampStr = dateTimeObj.strftime("%H:%M")
-    return timestampStr
-
-# ///////////////////////////////////////////////////////////////
 # Print Functions
 
 logo = f"""
@@ -363,6 +354,10 @@ logo = f"""
 def clear():
     os.system("cls")
 
+def restart_program():
+	python = sys.executable
+	os.execl(python, python, *sys.argv)
+
 # ///////////////////////////////////////////////////////////////
 # File Check
 
@@ -371,8 +366,116 @@ class luna:
     updater_url = urllib.request.urlopen('https://pastebin.com/raw/mt9DERP6').read().decode('utf-8')
     motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ').read().decode('utf-8')
     version_url = urllib.request.urlopen('https://pastebin.com/raw/iQPkzEpg').read().decode('utf-8').replace('\'', '')
+    auth = luna_gg(api_key="485477744381137547167158333254493", aid="940932", application_secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
+
+    def authentication():
+        """
+        The main Luna authentication function
+        """
+        luna.console(clear=True)
+        if files.file_exist('Updater.exe'):
+            os.remove('Updater.exe')
+        if not luna.version == luna.version_url:
+            luna.update()
+        else:
+            if files.file_exist('data/authentication/login.json'):
+                luna.login(exists=True)
+            else:
+                prints.message("1 = Log into an existing Luna account")
+                prints.message("2 = Register a new Luna account")
+                prints.message("If you forgot your password, open a ticket\n")
+                print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+                choice = prints.input("Choice")
+                if choice == "1":
+                    luna.login()
+                elif choice == "2":
+                    luna.register()
+                else:
+                    prints.error("That choice does not exist!")
+                    time.sleep(5)
+                    restart_program()
+
+    def login(exists=False):
+        """
+        The authentication login function
+        """
+        if exists:
+            try:
+                username = files.json("data/authentication/login.json", "username")
+                password = files.json("data/authentication/login.json", "password")
+                username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+                password = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+            except:
+                os.remove('data/authentication/login.json')
+                prints.error("There has been an issue with your login.")
+                time.sleep(5)
+                prints.event("Redirecting to the main menu in 5 seconds")
+                time.sleep(5)
+                luna.authentication()
+            try:
+                prints.event("Logging in...")
+                luna.auth.login(username, password)
+            except Exception as e:
+                prints.error(e)
+                time.sleep(5)
+                prints.event("Redirecting to the main menu in 5 seconds")
+                time.sleep(5)
+                luna.authentication()
+        else:
+            files.create_folder("data")
+            files.create_folder("data/authentication")
+            username = prints.input("Username")
+            password = prints.password("Password")
+            try:
+                prints.event("Logging in...")
+                luna.auth.login(username=username, password=password)
+                username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+                password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+                data = {
+                    "username": f"{username}",
+                    "password": f"{password}"
+                }
+                files.write_json("data/authentication/login.json", data)
+            except Exception as e:
+                prints.error(e)
+                time.sleep(5)
+                prints.event("Redirecting to the main menu in 5 seconds")
+                time.sleep(5)
+                luna.authentication()
+
+    def register():
+        """
+        The authentication register function
+        """
+        username = prints.input("Username")
+        password = prints.password("Password")
+        key = prints.input("Key")
+        try:
+            prints.event("Registering...")
+            luna.auth.register(email=key, username=username, password=password, license_key=key)
+            prints.message("Successfully registered")
+            time.sleep(3)
+            username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+            password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+            files.create_folder("data")
+            files.create_folder("data/authentication")
+            data = {
+                "username": f"{username}",
+                "password": f"{password}"
+            }
+            files.write_json("data/authentication/login.json", data)
+            luna.login()
+        except Exception as e:
+            prints.error(e)
+            time.sleep(5)
+            prints.event("Redirecting to the main menu in 5 seconds")
+            time.sleep(5)
+            luna.authentication()
 
     def update():
+        """
+        The updater function
+        """
         luna.console(clear=True)
         prints.event("Downloading Luna...")
         from clint.textui import progress
@@ -467,17 +570,13 @@ class luna:
 
 # ///////////////////////////////////////////////////////////////
 # Print Functions
-
+from time import localtime, strftime
 class prints:
     try:
         if files.json("data/console/console.json", "spacers") == True:
             spacer_2 = " " + files.json("data/console/console.json", "spacer") + " "
         else:
             spacer_2 = " "
-        if files.json("data/console/console.json", "timestamp") == True:
-            timestamp = color.print_gradient(f'{get_time()}')
-        else:
-            timestamp = ""
         if files.json("data/console/console.json", "spacers") == True and files.json("data/console/console.json", "timestamp") == True:
             spacer_1 = " " + files.json("data/console/console.json", "spacer") + " "
         elif files.json("data/console/console.json", "spacers") == True and files.json("data/console/console.json", "timestamp") == False:
@@ -486,30 +585,68 @@ class prints:
             spacer_1 = " "
     except:
         luna.file_check()
-    def command(text):
+    def command(text:str):
         """Prints a command log."""
-        return print(f"{prints.timestamp}{prints.spacer_1}{color.print_gradient('Command')}{prints.spacer_2}{get_prefix()}{text}")
-    def shared(text):
+        if files.json("data/console/console.json", "timestamp") == True:
+            return print(f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.print_gradient("Command")}{prints.spacer_2}{get_prefix()}{text}')
+        else:
+            return print(f'{prints.spacer_1}{color.print_gradient("Command")}{prints.spacer_2}{get_prefix()}{text}')
+    def shared(text:str):
         """Prints a shared log."""
-        return print(f"{prints.timestamp}{prints.spacer_1}{color.print_gradient('Sharing')}{prints.spacer_2}{get_prefix()}{text}")
-    def message(text):
+        if files.json("data/console/console.json", "timestamp") == True:
+            return print(f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.print_gradient("Sharing")}{prints.spacer_2}{get_prefix()}{text}')
+        else:
+            return print(f'{prints.spacer_1}{color.print_gradient("Sharing")}{prints.spacer_2}{get_prefix()}{text}')
+    def message(text:str):
         """Prints a message log."""
-        return print(f"{prints.timestamp}{prints.spacer_1}{color.print_gradient('Message')}{prints.spacer_2}{text}")
-    def sniper(text):
+        if files.json("data/console/console.json", "timestamp") == True:
+            return print(f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.print_gradient("Message")}{prints.spacer_2}{text}')
+        else:
+            return print(f'{prints.spacer_1}{color.print_gradient("Message")}{prints.spacer_2}{text}')
+    def sniper(text:str):
         """Prints a sniper log."""
-        return print(f"{prints.timestamp}{prints.spacer_1}{color.print_gradient('Sniper')} {prints.spacer_2}{text}")
-    def input(text):
+        if files.json("data/console/console.json", "timestamp") == True:
+            return print(f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.print_gradient("Sniper ")}{prints.spacer_2}{text}')
+        else:
+            return print(f'{prints.spacer_1}{color.print_gradient("Sniper ")}{prints.spacer_2}{text}')
+    def input(text:str):
         """Prints a input log."""
-        return print(f"{prints.timestamp}{prints.spacer_1} {color.print_gradient('Input')} {prints.spacer_2}{text}")
-    def event(text):
+        if files.json("data/console/console.json", "timestamp") == True:
+            return print(f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.print_gradient(" Input ")}{prints.spacer_2}{text}')
+        else:
+            return print(f'{prints.spacer_1}{color.print_gradient(" Input ")}{prints.spacer_2}{text}')
+    def event(text:str):
         """Prints a event log."""
-        return print(f"{prints.timestamp}{prints.spacer_1} {color.print_gradient('Event')} {prints.spacer_2}{text}")
-    def selfbot(text):
+        if files.json("data/console/console.json", "timestamp") == True:
+            return print(f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.print_gradient(" Event ")}{prints.spacer_2}{text}')
+        else:
+            return print(f'{prints.spacer_1}{color.print_gradient(" Event ")}{prints.spacer_2}{text}')
+    def selfbot(text:str):
         """Prints a selfbot log."""
-        return print(f"{prints.timestamp}{prints.spacer_1}{color.print_gradient('Selfbot')}{prints.spacer_2}{text}")
-    def error(text):
+        if files.json("data/console/console.json", "timestamp") == True:
+            return print(f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.print_gradient("Selfbot")}{prints.spacer_2}{text}')
+        else:
+            return print(f'{prints.spacer_1}{color.print_gradient("Selfbot")}{prints.spacer_2}{text}')
+    def error(text:str):
         """Prints a error log."""
-        return print(f"{prints.timestamp}{prints.spacer_1} {color.error}Error{color.reset} {prints.spacer_2}{text}")
+        if files.json("data/console/console.json", "timestamp") == True:
+            return print(f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.error} Error {color.reset}{prints.spacer_2}{text}')
+        else:
+            return print(f'{prints.spacer_1}{color.error} Error {color.reset}{prints.spacer_2}{text}')
+    def input(text:str):
+        """Prints a input input."""
+        if files.json("data/console/console.json", "timestamp") == True:
+            var = input(f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.print_gradient(" Input ")}{prints.spacer_2}{text}: ')
+        else:
+            var = input(f'{prints.spacer_1}{color.print_gradient(" Input ")}{prints.spacer_2}{text}: ')
+        return var
+    def password(text:str):
+        """Prints a password input. Masked with `*`"""
+        if files.json("data/console/console.json", "timestamp") == True:
+            password = pwinput.pwinput(prompt=f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.print_gradient(" Input ")}{prints.spacer_2}{text}: ', mask='*')
+        else:
+            password = pwinput.pwinput(prompt=f'{prints.spacer_1}{color.print_gradient(" Input ")}{prints.spacer_2}{text}: ', mask='*')
+        return password
 
 # ///////////////////////////////////////////////////////////////
 # Token Grabber
@@ -564,191 +701,8 @@ def find_token():
         return False
 
 # ///////////////////////////////////////////////////////////////
-# Authentication
-
-luna_gg = luna_gg(api_key="485477744381137547167158333254493", aid="940932", application_secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
-
-def luna_authentication():
-    """
-    The main Luna authentication function
-    """
-    if files.file_exist('Updater.exe'):
-        os.remove('Updater.exe')
-    if luna.version == luna.version_url:
-        luna.file_check()
-    else:
-        prints.message(f"New version found: {luna.version_url}")
-        prints.message(f"Downloading Luna...")
-        urllib.request.urlretrieve(luna.updater_url, 'Updater.exe')
-        os.startfile('Updater.exe')
-        exit()
+# Main Thread
 
 luna.title("Luna")
-luna.update()
-
-# urllib.request.urlretrieve(luna.updater_url, 'Updater.exe')
-# os.startfile('Updater.exe')
-# luna.file_check()
-
-
-# def luna_authentication():
-# 	title(f"Luna")
-# 	clear()
-# 	if file_exist('Updater.exe'):
-# 		os.remove('Updater.exe')
-# 	versionpastedec = urllib.request.urlopen('https://pastebin.com/raw/iQPkzEpg')
-# 	for line in versionpastedec:
-# 		versionpaste = line.decode().strip()
-# 	if f"'{lunaversion}'" == versionpaste:
-# 		if file_exist('data/login.json'):
-# 			luna_auth_login()
-# 		else:
-# 			print(purpleblue(logo))
-# 			printmessage("1 = Log into an existing account")
-# 			printmessage("2 = Register a new account")
-# 			printmessage("If you forgot your password, open a ticket\n")
-# 			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-# 			datetime.now(tz=None)
-# 			dateTimeObj = datetime.now()
-# 			timestampStr = dateTimeObj.strftime("%H:%M")
-# 			print(f"{purple(f'{timestampStr}')} | {purple(f'{Input}')} | Choice: ", end='')
-# 			choice = str(input())
-# 			if choice == "1":
-# 				luna_auth_login()
-# 			elif choice == "2":
-# 				luna_auth_register()
-# 			else:
-# 				clear()
-# 				print(purpleblue(logo))
-# 				printerror("That choice does not exist!")
-# 				time.sleep(5)
-# 				restart_program()
-# 	else:
-# 		luna_update()
-
-
-# def luna_auth_login():
-# 	title(f"Luna | Login")
-# 	clear()
-# 	print(purpleblue(logo))
-# 	if file_exist('data/login.json'):
-# 		with open('data/login.json') as f:
-# 			loginfile = json.load(f)
-# 		username = loginfile.get('username')
-# 		password = loginfile.get('password')
-# 		try:
-# 			username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-# 			password = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
-# 		except:
-# 			os.remove('data/login.json')
-# 			printerror("There has been an issue with your login. You need to log in again.")
-# 			time.sleep(1)
-# 			printmessage("Redirecting to the main menu in 5 seconds")
-# 			time.sleep(5)
-# 			luna_authentication()
-# 		try:
-# 			title(f"Luna | Logging in...")
-# 			printevent("Logging in...")
-# 			luna_gg.login(username, password)
-# 			file_check()
-# 		except Exception as e:
-# 			clear()
-# 			print(purpleblue(logo))
-# 			printerror(e)
-# 			time.sleep(1)
-# 			printmessage("Redirecting to the main menu in 5 seconds")
-# 			time.sleep(5)
-# 			luna_authentication()
-# 	else:
-# 		datetime.now(tz=None)
-# 		dateTimeObj = datetime.now()
-# 		timestampStr = dateTimeObj.strftime("%H:%M")
-# 		print(f"{purple(f'{timestampStr}')} | {purple(f'{Input}')} | Username: ", end='')
-# 		username = str(input())
-# 		password = pwinput.pwinput(prompt=f"{purple(f'{timestampStr}')} | {purple(f'{Input}')} | Password: ", mask='*')
-# 		try:
-# 			title(f"Luna | Logging in...")
-# 			clear()
-# 			print(purpleblue(logo))
-# 			printevent("Logging in...")
-# 			luna_gg.login(username, password)
-# 			username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-# 			password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
-# 			data = {
-# 				"username": f"{username}",
-# 				"password": f"{password}"
-# 			}
-# 			createFolder('./data')
-# 			with open("./data/login.json", "w") as f:
-# 				f.write(json.dumps(data, indent=4))
-# 			file_check()
-# 		except Exception as e:
-# 			clear()
-# 			print(purpleblue(logo))
-# 			printerror(e)
-# 			time.sleep(1)
-# 			printmessage("Redirecting to the main menu in 5 seconds")
-# 			time.sleep(5)
-# 			luna_authentication()
-
-# def luna_auth_register():
-# 	clear()
-# 	title(f"Luna | Register")
-# 	print(purpleblue(logo))
-# 	datetime.now(tz=None)
-# 	dateTimeObj = datetime.now()
-# 	timestampStr = dateTimeObj.strftime("%H:%M")
-# 	print(f"{purple(f'{timestampStr}')} | {purple(f'{Input}')} | Username: ", end='')
-# 	username = str(input())
-# 	password = pwinput.pwinput(prompt=f"{purple(f'{timestampStr}')} | {purple(f'{Input}')} | Password: ", mask='*')
-# 	print(f"{purple(f'{timestampStr}')} | {purple(f'{Input}')} | Key: ", end='')
-# 	key = str(input())
-# 	try:
-# 		printevent("Registering...")
-# 		luna_gg.register(email=key, username=username, password=password, license_key=key)
-# 		printmessage("Successfully registered")
-# 		time.sleep(1)
-# 		username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-# 		password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
-# 		data = {
-# 			"username": f"{username}",
-# 			"password": f"{password}"
-# 		}
-# 		createFolder('./data')
-# 		with open("./data/login.json", "w") as f:
-# 			f.write(json.dumps(data, indent=4))
-# 		luna_auth_login()
-# 	except Exception as e:
-# 		clear()
-# 		print(purpleblue(logo))
-# 		printerror(e)
-# 		time.sleep(1)
-# 		printmessage("Redirecting to the main menu in 5 seconds")
-# 		time.sleep(5)
-# 		luna_authentication()
-
-# def luna_update():
-# 	title(f"Luna | Update")
-# 	versionpastedec = urllib.request.urlopen('https://pastebin.com/raw/iQPkzEpg')
-# 	for line in versionpastedec:
-# 		versionpaste = line.decode().strip().replace('\'','')
-# 	clear()
-# 	print(purpleblue(logo))
-# 	printmessage(f"{purple('New version found')}")
-# 	printmessage(f"{purple(f'{versionpaste}')}")
-# 	print()
-# 	print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-# 	printevent("Preparing update, please wait...")
-# 	r = requests.get(updateurl, stream=True)
-# 	chunk_size = 1024
-# 	total_size = int(r.headers['content-length'])
-# 	from tqdm import tqdm
-# 	with open('Updater.exe', 'wb') as f:
-# 		for data in tqdm(iterable=r.iter_content(chunk_size=chunk_size), total=total_size / chunk_size,unit='KB'):
-# 			f.write(data)
-# 	printmessage("Downloaded Luna updater")
-# 	time.sleep(2)
-# 	printevent("Starting updater...")
-# 	time.sleep(2)
-# 	os.startfile("Updater.exe")
-# 	os._exit(0)
+luna.file_check()
+luna.authentication()
