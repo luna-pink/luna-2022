@@ -367,6 +367,28 @@ def clear():
 # File Check
 
 class luna:
+    version = '2.1.1'
+    updater_url = urllib.request.urlopen('https://pastebin.com/raw/mt9DERP6').read().decode('utf-8')
+    motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ').read().decode('utf-8')
+    version_url = urllib.request.urlopen('https://pastebin.com/raw/iQPkzEpg').read().decode('utf-8').replace('\'', '')
+
+    def update():
+        luna.console(clear=True)
+        prints.event("Downloading Luna...")
+        from clint.textui import progress
+        r = requests.get(luna.updater_url, stream=True)
+        with open('Updater.exe', 'wb') as f:
+            total_length = int(r.headers.get('content-length'))
+            for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1):
+                if chunk:
+                    f.write(chunk)
+                    f.flush()
+            f.close()
+        time.sleep(5)
+        prints.event("Starting Updater.exe...")
+        os.startfile('Updater.exe')
+        exit()
+
     def console(menu = False, clear = False):
         """
         Print the console design of Luna.\n
@@ -395,6 +417,12 @@ class luna:
         except:
             luna.file_check()
         print(color.logo_gradient(f"""{logo_variable}"""))
+
+    def title(text):
+        ctypes.windll.kernel32.SetConsoleTitleW(text)
+
+# ///////////////////////////////////////////////////////////////
+# File Check
 
     def file_check():
         """Run a check for the files, create if needed."""
@@ -536,8 +564,191 @@ def find_token():
         return False
 
 # ///////////////////////////////////////////////////////////////
-# Start
+# Authentication
+
+luna_gg = luna_gg(api_key="485477744381137547167158333254493", aid="940932", application_secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
+
+def luna_authentication():
+    """
+    The main Luna authentication function
+    """
+    if files.file_exist('Updater.exe'):
+        os.remove('Updater.exe')
+    if luna.version == luna.version_url:
+        luna.file_check()
+    else:
+        prints.message(f"New version found: {luna.version_url}")
+        prints.message(f"Downloading Luna...")
+        urllib.request.urlretrieve(luna.updater_url, 'Updater.exe')
+        os.startfile('Updater.exe')
+        exit()
+
+luna.title("Luna")
+luna.update()
+
+# urllib.request.urlretrieve(luna.updater_url, 'Updater.exe')
+# os.startfile('Updater.exe')
+# luna.file_check()
 
 
+# def luna_authentication():
+# 	title(f"Luna")
+# 	clear()
+# 	if file_exist('Updater.exe'):
+# 		os.remove('Updater.exe')
+# 	versionpastedec = urllib.request.urlopen('https://pastebin.com/raw/iQPkzEpg')
+# 	for line in versionpastedec:
+# 		versionpaste = line.decode().strip()
+# 	if f"'{lunaversion}'" == versionpaste:
+# 		if file_exist('data/login.json'):
+# 			luna_auth_login()
+# 		else:
+# 			print(purpleblue(logo))
+# 			printmessage("1 = Log into an existing account")
+# 			printmessage("2 = Register a new account")
+# 			printmessage("If you forgot your password, open a ticket\n")
+# 			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+# 			datetime.now(tz=None)
+# 			dateTimeObj = datetime.now()
+# 			timestampStr = dateTimeObj.strftime("%H:%M")
+# 			print(f"{purple(f'{timestampStr}')} | {purple(f'{Input}')} | Choice: ", end='')
+# 			choice = str(input())
+# 			if choice == "1":
+# 				luna_auth_login()
+# 			elif choice == "2":
+# 				luna_auth_register()
+# 			else:
+# 				clear()
+# 				print(purpleblue(logo))
+# 				printerror("That choice does not exist!")
+# 				time.sleep(5)
+# 				restart_program()
+# 	else:
+# 		luna_update()
 
-luna.file_check()
+
+# def luna_auth_login():
+# 	title(f"Luna | Login")
+# 	clear()
+# 	print(purpleblue(logo))
+# 	if file_exist('data/login.json'):
+# 		with open('data/login.json') as f:
+# 			loginfile = json.load(f)
+# 		username = loginfile.get('username')
+# 		password = loginfile.get('password')
+# 		try:
+# 			username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+# 			password = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+# 		except:
+# 			os.remove('data/login.json')
+# 			printerror("There has been an issue with your login. You need to log in again.")
+# 			time.sleep(1)
+# 			printmessage("Redirecting to the main menu in 5 seconds")
+# 			time.sleep(5)
+# 			luna_authentication()
+# 		try:
+# 			title(f"Luna | Logging in...")
+# 			printevent("Logging in...")
+# 			luna_gg.login(username, password)
+# 			file_check()
+# 		except Exception as e:
+# 			clear()
+# 			print(purpleblue(logo))
+# 			printerror(e)
+# 			time.sleep(1)
+# 			printmessage("Redirecting to the main menu in 5 seconds")
+# 			time.sleep(5)
+# 			luna_authentication()
+# 	else:
+# 		datetime.now(tz=None)
+# 		dateTimeObj = datetime.now()
+# 		timestampStr = dateTimeObj.strftime("%H:%M")
+# 		print(f"{purple(f'{timestampStr}')} | {purple(f'{Input}')} | Username: ", end='')
+# 		username = str(input())
+# 		password = pwinput.pwinput(prompt=f"{purple(f'{timestampStr}')} | {purple(f'{Input}')} | Password: ", mask='*')
+# 		try:
+# 			title(f"Luna | Logging in...")
+# 			clear()
+# 			print(purpleblue(logo))
+# 			printevent("Logging in...")
+# 			luna_gg.login(username, password)
+# 			username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+# 			password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+# 			data = {
+# 				"username": f"{username}",
+# 				"password": f"{password}"
+# 			}
+# 			createFolder('./data')
+# 			with open("./data/login.json", "w") as f:
+# 				f.write(json.dumps(data, indent=4))
+# 			file_check()
+# 		except Exception as e:
+# 			clear()
+# 			print(purpleblue(logo))
+# 			printerror(e)
+# 			time.sleep(1)
+# 			printmessage("Redirecting to the main menu in 5 seconds")
+# 			time.sleep(5)
+# 			luna_authentication()
+
+# def luna_auth_register():
+# 	clear()
+# 	title(f"Luna | Register")
+# 	print(purpleblue(logo))
+# 	datetime.now(tz=None)
+# 	dateTimeObj = datetime.now()
+# 	timestampStr = dateTimeObj.strftime("%H:%M")
+# 	print(f"{purple(f'{timestampStr}')} | {purple(f'{Input}')} | Username: ", end='')
+# 	username = str(input())
+# 	password = pwinput.pwinput(prompt=f"{purple(f'{timestampStr}')} | {purple(f'{Input}')} | Password: ", mask='*')
+# 	print(f"{purple(f'{timestampStr}')} | {purple(f'{Input}')} | Key: ", end='')
+# 	key = str(input())
+# 	try:
+# 		printevent("Registering...")
+# 		luna_gg.register(email=key, username=username, password=password, license_key=key)
+# 		printmessage("Successfully registered")
+# 		time.sleep(1)
+# 		username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+# 		password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+# 		data = {
+# 			"username": f"{username}",
+# 			"password": f"{password}"
+# 		}
+# 		createFolder('./data')
+# 		with open("./data/login.json", "w") as f:
+# 			f.write(json.dumps(data, indent=4))
+# 		luna_auth_login()
+# 	except Exception as e:
+# 		clear()
+# 		print(purpleblue(logo))
+# 		printerror(e)
+# 		time.sleep(1)
+# 		printmessage("Redirecting to the main menu in 5 seconds")
+# 		time.sleep(5)
+# 		luna_authentication()
+
+# def luna_update():
+# 	title(f"Luna | Update")
+# 	versionpastedec = urllib.request.urlopen('https://pastebin.com/raw/iQPkzEpg')
+# 	for line in versionpastedec:
+# 		versionpaste = line.decode().strip().replace('\'','')
+# 	clear()
+# 	print(purpleblue(logo))
+# 	printmessage(f"{purple('New version found')}")
+# 	printmessage(f"{purple(f'{versionpaste}')}")
+# 	print()
+# 	print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+# 	printevent("Preparing update, please wait...")
+# 	r = requests.get(updateurl, stream=True)
+# 	chunk_size = 1024
+# 	total_size = int(r.headers['content-length'])
+# 	from tqdm import tqdm
+# 	with open('Updater.exe', 'wb') as f:
+# 		for data in tqdm(iterable=r.iter_content(chunk_size=chunk_size), total=total_size / chunk_size,unit='KB'):
+# 			f.write(data)
+# 	printmessage("Downloaded Luna updater")
+# 	time.sleep(2)
+# 	printevent("Starting updater...")
+# 	time.sleep(2)
+# 	os.startfile("Updater.exe")
+# 	os._exit(0)
