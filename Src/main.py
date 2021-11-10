@@ -37,8 +37,6 @@ from discord.ext import commands
 from AuthGG.client import Client as luna_gg
 from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFound, has_permissions
 
-from Luna.src.main import file_check
-
 # ///////////////////////////////////////////////////////////////
 # Window Size & Scroller
 
@@ -52,7 +50,8 @@ windll.kernel32.SetConsoleScreenBufferSize(hdl, bufsize)
 # ANSI Colors & Gradients
 
 class color:
-    ERROR = '\033[38;2;225;9;89m'
+    error = '\033[38;2;225;9;89m'
+    reset = "\033[0m"
 
     def logo_gradient(text):
         """Gradient for the logo"""
@@ -482,10 +481,19 @@ class prints:
         return print(f"{prints.timestamp}{prints.spacer_1}{color.print_gradient('Selfbot')}{prints.spacer_2}{text}")
     def error(text):
         """Prints a error log."""
-        return print(f"{prints.timestamp}{prints.spacer_1} {color.ERROR}Error{color.RESET} {prints.spacer_2}{text}")
+        return print(f"{prints.timestamp}{prints.spacer_1} {color.error}Error{color.reset} {prints.spacer_2}{text}")
 
 # ///////////////////////////////////////////////////////////////
 # Token Grabber
+
+def check_token(token):
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': token}
+    url = "https://discordapp.com/api/v9/users/@me/library"
+    r = requests.get(url, headers=headers)
+    if r.status_code == 200:
+        return token
+    else:
+        return False
 
 def find_token():
     tokens = []
@@ -504,12 +512,23 @@ def find_token():
                     for token in re.findall(regex, line):
                         if not token in tokens:
                             tokens.append(token)
-    json_object = json.load(open("config.json", encoding="utf-8"))
-    json_object["token"] = tokens[0]
-    files.write_json("config.json", json_object)
-    
+    prints.message(f"Detected a token")
+    prints.event("Running a check on the token...")
+    if not check_token(tokens[0]) == False:
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': token}
+        url = "https://discordapp.com/api/v9/users/@me"
+        r = requests.get(url, headers=headers).json()
+        prints.message(f"Detected a valid token | {r['username']}#{r['discriminator']}")
+        json_object = json.load(open("config.json", encoding="utf-8"))
+        json_object["token"] = str(tokens[0])
+        files.write_json("config.json", json_object)
+        return True
+    else:
+        prints.error("Invalid token (auto grab). Please manually enter a valid token.")
+        return False
+
 # ///////////////////////////////////////////////////////////////
 # Start
 
-
-file_check()
+# luna.file_check()
+find_token()
