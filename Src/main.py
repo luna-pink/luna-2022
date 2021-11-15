@@ -56,7 +56,7 @@ class color:
 
     def logo_gradient(text):
         """Gradient for the logo"""
-        gradient = files.json("data/console/console.json", "logo_gradient")
+        gradient = files.json("Luna/console/console.json", "logo_gradient", documents=True)
         match gradient:
             case "1":
                 return color.purple_blue(f"""{text}""")
@@ -77,7 +77,7 @@ class color:
 
     def print_gradient(text):
         """Gradient for the console"""
-        gradient = files.json("data/console/console.json", "print_gradient")
+        gradient = files.json("Luna/console/console.json", "print_gradient", documents=True)
         match gradient:
             case "1":
                 return color.purple(f"{text}")
@@ -270,17 +270,26 @@ class color:
 # File Functions
 
 class files:
-    def file_exist(file_name):
+    def documents():
+        return os.path.expanduser("~/Documents")
+    def file_exist(file_name, documents=False):
         """Checks if a file exists"""
-        return os.path.exists(file_name)
+        if documents:
+            return os.path.exists(os.path.join(files.documents(), file_name))
+        else:
+            return os.path.exists(file_name)
     def write_file(path, content):
         """Writes a file"""
         with open(path, 'w') as f:
             f.write(content)
-    def write_json(path, content):
+    def write_json(path, content, documents=False):
         """Writes a json file"""
-        with open(path, "w") as f:
-            f.write(json.dumps(content, indent=4))
+        if documents:
+            with open(os.path.join(files.documents(), path), "w") as f:
+                f.write(json.dumps(content, indent=4))
+        else:
+            with open(path, "w") as f:
+                f.write(json.dumps(content, indent=4))
     def read_file(path):
         """Reads a file"""
         with open(path, 'r', encoding="utf-8") as f:
@@ -292,13 +301,28 @@ class files:
     def delete_file(path):
         """Deletes a file"""
         os.remove(path)
-    def create_folder(path):
+    def create_folder(path, documents=False):
         """Creates a folder"""
-        if not os.path.exists(path):
-            os.makedirs(path)
-    def json(file_name, value):
+        if documents:
+            if not os.path.exists(os.path.join(files.documents(), path)):
+                os.makedirs(os.path.join(files.documents(), path))
+        else:
+            if not os.path.exists(path):
+                os.makedirs(path)
+    def json(file_name, value, documents=False):
         """Reads a json file"""
-        return json.load(open(file_name, encoding="utf-8"))[value]
+        if documents:
+            return json.load(open(os.path.join(files.documents(), file_name), encoding="utf-8"))[value]
+        else:
+            return json.load(open(file_name, encoding="utf-8"))[value]
+    def remove(path, documents=False):
+        """Removes a file"""
+        if documents:
+            if os.path.exists(os.path.join(files.documents(), path)):
+                os.remove(os.path.join(files.documents(), path))
+        else:
+            if os.path.exists(path):
+                os.remove(path)
 
 class path:
     def console():
@@ -426,7 +450,7 @@ class luna:
         if not luna.version == luna.version_url:
             luna.update()
         else:
-            if files.file_exist('data/authentication/login.json'):
+            if files.file_exist('Luna/auth.json', documents=True):
                 luna.login(exists=True)
             else:
                 prints.message("1 = Log into an existing Luna account")
@@ -449,12 +473,12 @@ class luna:
         """
         if exists:
             try:
-                username = files.json("data/authentication/login.json", "username")
-                password = files.json("data/authentication/login.json", "password")
+                username = files.json("Luna/auth.json", "username", documents=True)
+                password = files.json("Luna/auth.json", "password", documents=True)
                 username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
                 password = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
             except:
-                os.remove('data/authentication/login.json')
+                files.remove('Luna/auth.json', documents=True)
                 prints.error("There has been an issue with your login.")
                 time.sleep(5)
                 prints.event("Redirecting to the main menu in 5 seconds")
@@ -463,6 +487,7 @@ class luna:
             try:
                 prints.event("Logging in...")
                 luna.auth.login(username, password)
+                print("success")
             except Exception as e:
                 prints.error(e)
                 time.sleep(5)
@@ -470,8 +495,6 @@ class luna:
                 time.sleep(5)
                 luna.authentication()
         else:
-            files.create_folder("data")
-            files.create_folder("data/authentication")
             username = prints.input("Username")
             password = prints.password("Password")
             try:
@@ -483,7 +506,7 @@ class luna:
                     "username": f"{username}",
                     "password": f"{password}"
                 }
-                files.write_json("data/authentication/login.json", data)
+                files.write_json("Luna/auth.json", data, documents=True)
             except Exception as e:
                 prints.error(e)
                 time.sleep(5)
@@ -505,13 +528,11 @@ class luna:
             time.sleep(3)
             username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
             password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
-            files.create_folder("data")
-            files.create_folder("data/authentication")
             data = {
                 "username": f"{username}",
                 "password": f"{password}"
             }
-            files.write_json("data/authentication/login.json", data)
+            files.write_json("Luna/auth.json", data, documents=True)
             luna.login()
         except Exception as e:
             prints.error(e)
@@ -549,23 +570,26 @@ class luna:
         if clear:
             os.system("cls")
         try:
-            logo_variable = files.json("data/console/console.json", "logo")
+            logo_variable = files.json("Luna/console/console.json", "logo", documents=True)
             if logo_variable == "luna" or logo_variable == "luna.txt":
                 logo_variable = logo
             else:
                 ending = ".txt"
                 if ".txt" in logo_variable:
                     ending = ""
-                if not files.file_exist(f"data/console/{logo_variable}{ending}"):
+                if not files.file_exist(f"Luna/console/{logo_variable}{ending}", documents=True):
                     logo_variable = logo
-                if files.json("data/console/console.json", "center") == True:
+                if files.json("Luna/console/console.json", "center", documents=True) == True:
                     logo_text = ""
-                    for line in files.read_file(f"data/console/{logo_variable}{ending}").splitlines():
+                    for line in files.read_file(f"console/{logo_variable}{ending}", documents=True).splitlines():
                         logo_text += line.center(os.get_terminal_size().columns) + "\n"
                         logo_variable = logo_text
                 else:
-                    logo_variable = files.read_file(f"data/console/{logo_variable}{ending}")
-        except:
+                    logo_variable = files.read_file(f"Luna/console/{logo_variable}{ending}", documents=True)
+        except Exception as e:
+            prints.error(e)
+            prints.message("Running a file check in 5 seconds")
+            time.sleep(5)
             luna.file_check()
         print(color.logo_gradient(f"""{logo_variable}"""))
 
@@ -578,10 +602,34 @@ class luna:
     def file_check():
         """Run a check for the files, create if needed."""
         clear()
-        if not files.file_exist("config.json"):
+
+        # ///////////////////////////////////////////////////////////////
+        # Folders
+
+        if not files.file_exist("Luna/data", documents=True):
+            files.create_folder("Luna/data", documents=True)
+
+        if not files.file_exist(os.path.join(files.documents(), "Luna/console")):
+            files.create_folder(os.path.join(files.documents(), "Luna/console"))
+        
+        if not files.file_exist(os.path.join(files.documents(), "Luna/themes")):
+            files.create_folder(os.path.join(files.documents(), "Luna/themes"))
+
+        if not files.file_exist(os.path.join(files.documents(), "Luna/snipers")):
+            files.create_folder(os.path.join(files.documents(), "Luna/snipers"))
+
+        # ///////////////////////////////////////////////////////////////
+        # Json Files
+
+        if not files.file_exist(os.path.join(files.documents(), "Luna/discord.json")):
             data = {
                 "token": "token-here",
                 "password": "password-here",
+            }
+            files.write_json(os.path.join(files.documents(), "Luna/discord.json"), data)
+
+        if not files.file_exist(os.path.join(files.documents(), "Luna/config.json")):
+            data = {
                 "prefix": ".",
                 "streamurl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
                 "afkmessage": "I am not here right now, DM me later.",
@@ -592,15 +640,9 @@ class luna:
                 "theme": "luna.json",
                 "startup_status": "online"
             }
-            files.write_json("config.json", data)
+            files.write_json(os.path.join(files.documents(), "Luna/config.json"), data)
 
-        if not files.file_exist("data/"):
-            files.create_folder("data/")
-
-        if not files.file_exist("data/console/"):
-            files.create_folder("data/console/")
-
-        if not files.file_exist("data/console/console.json"):
+        if not files.file_exist(os.path.join(files.documents(), "Luna/console/console.json")):
             data = {
                 "logo": "luna",
                 "logo_gradient": "1",
@@ -611,7 +653,7 @@ class luna:
                 "timestamp": True,
                 "mode": "1"
             }
-            files.write_json("data/console/console.json", data)
+            files.write_json(os.path.join(files.documents(), "Luna/console/console.json"), data)
 
         luna.console()
         prints.event("Checking files...")
@@ -621,13 +663,13 @@ class luna:
 from time import localtime, strftime
 class prints:
     try:
-        if files.json("data/console/console.json", "spacers") == True:
-            spacer_2 = " " + files.json("data/console/console.json", "spacer") + " "
+        if files.json("Luna/console/console.json", "spacers", documents=True) == True:
+            spacer_2 = " " + files.json("Luna/console/console.json", "spacer", documents=True) + " "
         else:
             spacer_2 = " "
-        if files.json("data/console/console.json", "spacers") == True and files.json("data/console/console.json", "timestamp") == True:
-            spacer_1 = " " + files.json("data/console/console.json", "spacer") + " "
-        elif files.json("data/console/console.json", "spacers") == True and files.json("data/console/console.json", "timestamp") == False:
+        if files.json("Luna/console/console.json", "spacers", documents=True) == True and files.json("Luna/console/console.json", "timestamp", documents=True) == True:
+            spacer_1 = " " + files.json("Luna/console/console.json", "spacer", documents=True) + " "
+        elif files.json("Luna/console/console.json", "spacers", documents=True) == True and files.json("Luna/console/console.json", "timestamp", documents=True) == False:
             spacer_1 = ""
         else:
             spacer_1 = " "
@@ -635,66 +677,77 @@ class prints:
         luna.file_check()
     def command(text:str):
         """Prints a command log."""
-        if files.json("data/console/console.json", "timestamp") == True:
+        if files.json("Luna/console/console.json", "timestamp", documents=True) == True:
             return print(f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.print_gradient("Command")}{prints.spacer_2}{get_prefix()}{text}')
         else:
             return print(f'{prints.spacer_1}{color.print_gradient("Command")}{prints.spacer_2}{get_prefix()}{text}')
     def shared(text:str):
         """Prints a shared log."""
-        if files.json("data/console/console.json", "timestamp") == True:
+        if files.json("Luna/console/console.json", "timestamp", documents=True) == True:
             return print(f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.print_gradient("Sharing")}{prints.spacer_2}{get_prefix()}{text}')
         else:
             return print(f'{prints.spacer_1}{color.print_gradient("Sharing")}{prints.spacer_2}{get_prefix()}{text}')
     def message(text:str):
         """Prints a message log."""
-        if files.json("data/console/console.json", "timestamp") == True:
+        if files.json("Luna/console/console.json", "timestamp", documents=True) == True:
             return print(f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.print_gradient("Message")}{prints.spacer_2}{text}')
         else:
             return print(f'{prints.spacer_1}{color.print_gradient("Message")}{prints.spacer_2}{text}')
     def sniper(text:str):
         """Prints a sniper log."""
-        if files.json("data/console/console.json", "timestamp") == True:
+        if files.json("Luna/console/console.json", "timestamp", documents=True) == True:
             return print(f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.print_gradient("Sniper ")}{prints.spacer_2}{text}')
         else:
             return print(f'{prints.spacer_1}{color.print_gradient("Sniper ")}{prints.spacer_2}{text}')
     def input(text:str):
         """Prints a input log."""
-        if files.json("data/console/console.json", "timestamp") == True:
+        if files.json("Luna/console/console.json", "timestamp", documents=True) == True:
             return print(f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.print_gradient(" Input ")}{prints.spacer_2}{text}')
         else:
             return print(f'{prints.spacer_1}{color.print_gradient(" Input ")}{prints.spacer_2}{text}')
     def event(text:str):
         """Prints a event log."""
-        if files.json("data/console/console.json", "timestamp") == True:
+        if files.json("Luna/console/console.json", "timestamp", documents=True) == True:
             return print(f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.print_gradient(" Event ")}{prints.spacer_2}{text}')
         else:
             return print(f'{prints.spacer_1}{color.print_gradient(" Event ")}{prints.spacer_2}{text}')
     def selfbot(text:str):
         """Prints a selfbot log."""
-        if files.json("data/console/console.json", "timestamp") == True:
+        if files.json("Luna/console/console.json", "timestamp", documents=True) == True:
             return print(f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.print_gradient("Selfbot")}{prints.spacer_2}{text}')
         else:
             return print(f'{prints.spacer_1}{color.print_gradient("Selfbot")}{prints.spacer_2}{text}')
     def error(text:str):
         """Prints a error log."""
-        if files.json("data/console/console.json", "timestamp") == True:
+        if files.json("Luna/console/console.json", "timestamp", documents=True) == True:
             return print(f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.error} Error {color.reset}{prints.spacer_2}{text}')
         else:
             return print(f'{prints.spacer_1}{color.error} Error {color.reset}{prints.spacer_2}{text}')
     def input(text:str):
         """Prints a input input."""
-        if files.json("data/console/console.json", "timestamp") == True:
+        if files.json("Luna/console/console.json", "timestamp", documents=True) == True:
             var = input(f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.print_gradient(" Input ")}{prints.spacer_2}{text}: ')
         else:
             var = input(f'{prints.spacer_1}{color.print_gradient(" Input ")}{prints.spacer_2}{text}: ')
         return var
     def password(text:str):
         """Prints a password input. Masked with `*`"""
-        if files.json("data/console/console.json", "timestamp") == True:
+        if files.json("Luna/console/console.json", "timestamp", documents=True) == True:
             password = pwinput.pwinput(prompt=f'{strftime("%H:%M", localtime())}{prints.spacer_1}{color.print_gradient(" Input ")}{prints.spacer_2}{text}: ', mask='*')
         else:
             password = pwinput.pwinput(prompt=f'{prints.spacer_1}{color.print_gradient(" Input ")}{prints.spacer_2}{text}: ', mask='*')
         return password
+
+# ///////////////////////////////////////////////////////////////
+# Wiazrd
+
+def wizard():
+    """Luna Wizard"""
+    if files.json("Luna/discord.json", "token", documents=True) == "token-here":
+        luna.console(clear=True)
+        prints.message("First time setup")
+        find_token()
+
 
 # ///////////////////////////////////////////////////////////////
 # Token Grabber
@@ -733,7 +786,7 @@ def find_token():
                     for token in re.findall(regex, line):
                         if not token in tokens:
                             tokens.append(token)
-    prints.message(f"Detected a token")
+    prints.message("Detected a token")
     prints.event("Running a check on the token...")
     if not check_token(tokens[0]) == False:
         headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': token}
@@ -741,12 +794,17 @@ def find_token():
         r = requests.get(url, headers=headers).json()
         prints.message(f"Detected a valid token | {r['username']}#{r['discriminator']}")
         json_object = json.load(open("config.json", encoding="utf-8"))
-        json_object["token"] = str(tokens[0])
-        files.write_json("config.json", json_object)
+        json_object["token"] = str(Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(tokens[0]))
+        files.write_json(os.path.join(files.documents(), "Luna/discord.json"), json_object)
         return True
     else:
         prints.error("Invalid token (auto grab). Please manually enter a valid token.")
         return False
+
+# ///////////////////////////////////////////////////////////////
+# Rest
+
+
 
 # ///////////////////////////////////////////////////////////////
 # Main Thread
@@ -755,3 +813,4 @@ check_debuggers_thread()
 luna.title("Luna")
 luna.file_check()
 luna.authentication()
+wizard()
