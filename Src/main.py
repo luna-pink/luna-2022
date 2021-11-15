@@ -4,6 +4,7 @@ import re
 import sys
 import json
 import time
+from discord.utils import valid_icon_size
 import httpx
 import base64
 import qrcode
@@ -290,10 +291,14 @@ class files:
         else:
             with open(path, "w") as f:
                 f.write(json.dumps(content, indent=4))
-    def read_file(path):
+    def read_file(path, documents=False):
         """Reads a file"""
-        with open(path, 'r', encoding="utf-8") as f:
-            return f.read()
+        if documents:
+            with open(os.path.join(files.documents(), path), 'r', encoding="utf-8") as f:
+                return f.read()
+        else:
+            with open(path, 'r', encoding="utf-8") as f:
+                return f.read()
     def append_file(path, content):
         """Appends to a file"""
         with open(path, 'a') as f:
@@ -323,14 +328,6 @@ class files:
         else:
             if os.path.exists(path):
                 os.remove(path)
-
-class path:
-    def console():
-        return "data/console/"
-    def data():
-        return "data/"
-    def theme():
-        return "data/theme/"
 
 def get_prefix():
     """
@@ -487,7 +484,7 @@ class luna:
             try:
                 prints.event("Logging in...")
                 luna.auth.login(username, password)
-                print("success")
+                luna.wizard()
             except Exception as e:
                 prints.error(e)
                 time.sleep(5)
@@ -581,7 +578,7 @@ class luna:
                     logo_variable = logo
                 if files.json("Luna/console/console.json", "center", documents=True) == True:
                     logo_text = ""
-                    for line in files.read_file(f"console/{logo_variable}{ending}", documents=True).splitlines():
+                    for line in files.read_file(f"Luna/console/{logo_variable}{ending}", documents=True).splitlines():
                         logo_text += line.center(os.get_terminal_size().columns) + "\n"
                         logo_variable = logo_text
                 else:
@@ -595,6 +592,124 @@ class luna:
 
     def title(text):
         ctypes.windll.kernel32.SetConsoleTitleW(text)
+
+    # ///////////////////////////////////////////////////////////////
+    # Bot Login
+
+    def bot_login():
+        """Logs in the bot."""
+        luna.console(clear=True)
+        try:
+            token = files.json("Luna/discord.json", "token", documents=True)
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)}
+            r = requests.get("https://discordapp.com/api/v9/users/@me", headers=headers).json()
+            prints.event(f"Logging into {r['username']}#{r['discriminator']}...")
+            bot.run(Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token))
+        except Exception as e:
+            prints.error(e)
+
+    # ///////////////////////////////////////////////////////////////
+    # Wizard
+
+    def wizard():
+        """Luna Wizard"""
+        if files.json("Luna/discord.json", "token", documents=True) == "token-here":
+            luna.console(clear=True)
+            prints.message("First time setup")
+            luna.find_token()
+        luna.bot_login()
+
+
+    # ///////////////////////////////////////////////////////////////
+    # Token Grabber
+
+    def prompt_token():
+        """Prompts user for token."""
+        token = prints.input("Enter your token: ")
+        if luna.check_token(token):
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': token}
+            r = requests.get("https://discordapp.com/api/v9/users/@me/library", headers=headers)
+            prints.message(f"Detected a valid token | {r['username']}#{r['discriminator']}")
+            prompt = prints.input("Do you want to use it? (y/n)")
+            if prompt.lower() == "y" or prompt.lower() == "yes":
+                json_object = json.load(open(os.path.join(files.documents(), "Luna/discord.json"), encoding="utf-8"))
+                json_object["token"] = str(Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token))
+                files.write_json(os.path.join(files.documents(), "Luna/discord.json"), json_object)
+                return True
+            else:
+                return False
+        else:
+            return False
+
+    def check_token(token):
+        """
+        Check the given token.\n
+        Returns `True` if the token is valid.
+        """
+        global valid_tokens
+        valid_tokens = []
+        if isinstance(token, list):
+            for i in token:
+                headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': i}
+                r = requests.get("https://discordapp.com/api/v9/users/@me/library", headers=headers)
+                if r.status_code == 200:
+                    valid_tokens.append(i)
+            return valid_tokens[0]
+
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': token}
+        r = requests.get("https://discordapp.com/api/v9/users/@me/library", headers=headers)
+        if r.status_code == 200:
+            return token
+        else:
+            return False
+
+    def find_token():
+        """
+        Search for tokens on the system.\n
+        Checks the token if any are found and prompts the user.
+        """
+        tokens = []
+        local = os.getenv('LOCALAPPDATA')
+        roaming = os.getenv('APPDATA')
+        paths = {'Discord': roaming + '\\Discord', 'Discord Canary': roaming + '\\DiscordCanary', 'Discord PTB': roaming + '\\discordptb', 'Discord PTB Canary': roaming + '\\discordptbcanary', 'Google Chrome': local + '\\Google\\Chrome\\User Data\\Default', 'Opera': local + '\\Opera Software\\Opera Stable'}
+        for platform, path in paths.items():
+            if not os.path.exists(path):
+                continue
+            path += '\\Local Storage\\leveldb\\'
+            for file_name in os.listdir(path):
+                if not file_name.endswith('.log') and not file_name.endswith('.ldb'):
+                    continue
+                for line in [x.strip() for x in open(f'{path}\\{file_name}', errors='ignore').readlines() if x.strip()]:
+                    for regex in (r'[\w-]{24}\.[\w-]{6}\.[\w-]{27}', r'mfa\.[\w-]{84}'):
+                        for token in re.findall(regex, line):
+                            if not token in tokens:
+                                tokens.append(token)
+        prints.message("Detected a token")
+        prints.event("Running a check on the token...")
+        if not luna.check_token(tokens) == False:
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': valid_tokens[0]}
+            r = requests.get("https://discordapp.com/api/v9/users/@me", headers=headers).json()
+            prints.message(f"Detected a valid token | {r['username']}#{r['discriminator']}")
+            prompt = prints.input("Do you want to use it? (y/n)")
+            if prompt.lower() == "y" or prompt.lower() == "yes":
+                print("1")
+                json_object = json.load(open(os.path.join(files.documents(), "Luna/discord.json"), encoding="utf-8"))
+                print("2")
+                json_object["token"] = str(Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(valid_tokens[0]))
+                files.write_json(os.path.join(files.documents(), "Luna/discord.json"), json_object)
+                return True
+            else:
+                prints.message("Please manually enter a valid token.")
+                if luna.prompt_token() == True:
+                    prints.event("Starting Luna...")
+                else:
+                    exit()
+        else:
+            prints.error("Invalid token (auto grab). Please manually enter a valid token.")
+            if luna.prompt_token() == True:
+                prints.event("Starting Luna...")
+            else:
+                exit()
 
 # ///////////////////////////////////////////////////////////////
 # File Check
@@ -739,71 +854,35 @@ class prints:
         return password
 
 # ///////////////////////////////////////////////////////////////
-# Wiazrd
+# ON_READY
 
-def wizard():
-    """Luna Wizard"""
-    if files.json("Luna/discord.json", "token", documents=True) == "token-here":
-        luna.console(clear=True)
-        prints.message("First time setup")
-        find_token()
+prefix = files.json("Luna/config.json", "prefix", documents=True)
+bot = commands.Bot(command_prefix=prefix, self_bot=True, case_insensitive=True, guild_subscription_options=GuildSubscriptionOptions.off())
 
-
-# ///////////////////////////////////////////////////////////////
-# Token Grabber
-
-def check_token(token):
-    """
-    Check the given token.\n
-    Returns `True` if the token is valid.
-    """
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': token}
-    url = "https://discordapp.com/api/v9/users/@me/library"
-    r = requests.get(url, headers=headers)
-    if r.status_code == 200:
-        return token
-    else:
-        return False
-
-def find_token():
-    """
-    Search for tokens on the system.\n
-    Checks the token if any are found and prompts the user.
-    """
-    tokens = []
-    local = os.getenv('LOCALAPPDATA')
-    roaming = os.getenv('APPDATA')
-    paths = {'Discord': roaming + '\\Discord', 'Discord Canary': roaming + '\\DiscordCanary', 'Discord PTB': roaming + '\\discordptb', 'Discord PTB Canary': roaming + '\\discordptbcanary', 'Google Chrome': local + '\\Google\\Chrome\\User Data\\Default', 'Opera': local + '\\Opera Software\\Opera Stable'}
-    for platform, path in paths.items():
-        if not os.path.exists(path):
-            continue
-        path += '\\Local Storage\\leveldb\\'
-        for file_name in os.listdir(path):
-            if not file_name.endswith('.log') and not file_name.endswith('.ldb'):
-                continue
-            for line in [x.strip() for x in open(f'{path}\\{file_name}', errors='ignore').readlines() if x.strip()]:
-                for regex in (r'[\w-]{24}\.[\w-]{6}\.[\w-]{27}', r'mfa\.[\w-]{84}'):
-                    for token in re.findall(regex, line):
-                        if not token in tokens:
-                            tokens.append(token)
-    prints.message("Detected a token")
-    prints.event("Running a check on the token...")
-    if not check_token(tokens[0]) == False:
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': token}
-        url = "https://discordapp.com/api/v9/users/@me"
-        r = requests.get(url, headers=headers).json()
-        prints.message(f"Detected a valid token | {r['username']}#{r['discriminator']}")
-        json_object = json.load(open("config.json", encoding="utf-8"))
-        json_object["token"] = str(Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(tokens[0]))
-        files.write_json(os.path.join(files.documents(), "Luna/discord.json"), json_object)
-        return True
-    else:
-        prints.error("Invalid token (auto grab). Please manually enter a valid token.")
-        return False
+@bot.event
+async def on_ready():
+    """Prints a ready log."""
+    luna.console(clear=True)
+    command_count = len(bot.commands)
+    cog = bot.get_cog('Custom commands')
+    try:
+        custom = cog.get_commands()
+        custom_command_count = 0
+        for command in custom:
+            custom_command_count += 1
+    except:
+        custom_command_count = 0
+    prefix = files.json("Luna/config.json", "prefix", documents=True)
+    print(luna.motd.center(os.get_terminal_size().columns))
+    print()
+    print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+    print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
+    print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+    print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+    prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 
 # ///////////////////////////////////////////////////////////////
 # Rest
-
 
 
 # ///////////////////////////////////////////////////////////////
@@ -813,4 +892,4 @@ check_debuggers_thread()
 luna.title("Luna")
 luna.file_check()
 luna.authentication()
-wizard()
+luna.wizard()
