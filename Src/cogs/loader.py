@@ -3,12 +3,14 @@ from discord.ext import commands
 import time
 import os
 
+def documents():
+	return os.path.expanduser("~/Documents")
+
 class CustomCog(commands.Cog, name="Custom commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
 	try:
-		directory = "data\\custom\\custom.py"
-		file = open(directory, "r")
+		file = open(os.path.join(documents(), "Luna/custom/custom.py"), "r")
 		file_data = file.read()
 		if "sys.modules" in str(file_data):
 			print("Tampering attempt detected")
@@ -25,7 +27,7 @@ class CustomCog(commands.Cog, name="Custom commands"):
 		exec(file_data)
 	except Exception as e:
 		print(e)
-        os.system('pause')
+		os.system('pause')
 
 def setup(bot:commands.Bot):
 	bot.add_cog(CustomCog(bot))
