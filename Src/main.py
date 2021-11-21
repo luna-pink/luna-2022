@@ -612,6 +612,9 @@ class luna:
         """Logs in the bot."""
         luna.console(clear=True)
         try:
+            for filename in os.listdir("Cogs"):
+                if filename.endswith(".py"):
+                    bot.load_extension(f"Cogs.{filename[:-3]}")
             token = files.json("Luna/discord.json", "token", documents=True)
             headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)}
             r = requests.get("https://discordapp.com/api/v9/users/@me", headers=headers).json()
@@ -895,6 +898,8 @@ async def example(self, luna, *, text):
 
         if not files.file_exist("Luna/notifications/toasts.json", documents=True):
             data = {
+                "toasts": "on",
+                "login": "on",
 				"nitro": "on",
 				"giveaway": "on",
 				"privnote": "on",
@@ -1136,10 +1141,64 @@ class config:
         json_object["password"] = password
         files.write_json(os.path.join(files.documents(), f"Luna/discord.json"), json_object)
 
-    def selfbot_sniper(new_value):
-        json_object = json.load(open(os.path.join(files.documents(), f"Luna/snipers/selfbot.json"), encoding="utf-8"))
-        json_object["sniper"] = new_value
-        files.write_json(os.path.join(files.documents(), f"Luna/snipers/selfbot.json"), json_object)
+    # ///////////////////////////////////////////////////////////////
+    # File overwrite (Snipers)
+
+    class nitro:
+
+        def sniper(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), f"Luna/snipers/nitro.json"), encoding="utf-8"))
+            json_object["sniper"] = new_value
+            files.write_json(os.path.join(files.documents(), f"Luna/snipers/nitro.json"), json_object)
+        
+    class privnote:
+
+        def sniper(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), f"Luna/snipers/privnote.json"), encoding="utf-8"))
+            json_object["sniper"] = new_value
+            files.write_json(os.path.join(files.documents(), f"Luna/snipers/privnote.json"), json_object)
+
+    class selfbot:
+
+        def sniper(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), f"Luna/snipers/selfbot.json"), encoding="utf-8"))
+            json_object["sniper"] = new_value
+            files.write_json(os.path.join(files.documents(), f"Luna/snipers/selfbot.json"), json_object)
+
+    class giveaway:
+
+        def joiner(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), f"Luna/snipers/giveaway.json"), encoding="utf-8"))
+            json_object["joiner"] = new_value
+            files.write_json(os.path.join(files.documents(), f"Luna/snipers/giveaway.json"), json_object)
+
+        def delay_in_minutes(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), f"Luna/snipers/giveaway.json"), encoding="utf-8"))
+            json_object["delay_in_minutes"] = new_value
+            files.write_json(os.path.join(files.documents(), f"Luna/snipers/giveaway.json"), json_object)
+
+        def blocked_words(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), f"Luna/snipers/giveaway.json"), encoding="utf-8"))
+            json_object["blocked_words"] = new_value
+            files.write_json(os.path.join(files.documents(), f"Luna/snipers/giveaway.json"), json_object)
+
+        def guild_joiner(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), f"Luna/snipers/giveaway.json"), encoding="utf-8"))
+            json_object["guild_joiner"] = new_value
+            files.write_json(os.path.join(files.documents(), f"Luna/snipers/giveaway.json"), json_object)
+
+    # ///////////////////////////////////////////////////////////////
+    # File overwrite (Sharing)
+
+    def share(new_value):
+        json_object = json.load(open(os.path.join(files.documents(), f"Luna/sharing.json"), encoding="utf-8"))
+        json_object["share"] = new_value
+        files.write_json(os.path.join(files.documents(), f"Luna/sharing.json"), json_object)
+
+    def user_id(new_value):
+        json_object = json.load(open(os.path.join(files.documents(), f"Luna/sharing.json"), encoding="utf-8"))
+        json_object["user_id"] = new_value
+        files.write_json(os.path.join(files.documents(), f"Luna/sharing.json"), json_object)
 
     # ///////////////////////////////////////////////////////////////
     # File overwrite (Themes)
@@ -1219,6 +1278,237 @@ class config:
         json_object = json.load(open(os.path.join(files.documents(), f"Luna/themes/{theme}"), encoding="utf-8"))
         json_object["description"] = newdescription
         files.write_json(os.path.join(files.documents(), f"Luna/themes/{theme}"), json_object)
+
+    # ///////////////////////////////////////////////////////////////
+    # File overwrite (Toasts)
+
+    class toast:
+        # ///////////////////////////////////////////////////////////////
+        # toast.json
+
+        def icon(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/notifications/toast.json"), encoding="utf-8"))
+            json_object["icon"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/notifications/toast.json"), json_object)
+
+        def title(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/notifications/toast.json"), encoding="utf-8"))
+            json_object["title"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/notifications/toast.json"), json_object)
+
+        # ///////////////////////////////////////////////////////////////
+        # toasts.json
+
+        def toasts(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/notifications/toasts.json"), encoding="utf-8"))
+            json_object["toasts"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/notifications/toasts.json"), json_object)
+
+        def login(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/notifications/toasts.json"), encoding="utf-8"))
+            json_object["login"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/notifications/toasts.json"), json_object)
+
+        def nitro(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/notifications/toasts.json"), encoding="utf-8"))
+            json_object["nitro"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/notifications/toasts.json"), json_object)
+
+        def giveaway(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/notifications/toasts.json"), encoding="utf-8"))
+            json_object["nitro"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/notifications/toasts.json"), json_object)
+
+        def privnote(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/notifications/toasts.json"), encoding="utf-8"))
+            json_object["privnote"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/notifications/toasts.json"), json_object)
+
+        def selfbot(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/notifications/toasts.json"), encoding="utf-8"))
+            json_object["selfbot"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/notifications/toasts.json"), json_object)
+
+        def pings(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/notifications/toasts.json"), encoding="utf-8"))
+            json_object["pings"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/notifications/toasts.json"), json_object)
+
+        def ghostpings(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/notifications/toasts.json"), encoding="utf-8"))
+            json_object["ghostpings"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/notifications/toasts.json"), json_object)
+
+        def friendevents(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/notifications/toasts.json"), encoding="utf-8"))
+            json_object["friendevents"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/notifications/toasts.json"), json_object)
+
+        def guildevents(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/notifications/toasts.json"), encoding="utf-8"))
+            json_object["guildevents"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/notifications/toasts.json"), json_object)
+
+        def roleupdates(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/notifications/toasts.json"), encoding="utf-8"))
+            json_object["roleupdates"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/notifications/toasts.json"), json_object)
+
+        def nickupdates(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/notifications/toasts.json"), encoding="utf-8"))
+            json_object["nickupdates"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/notifications/toasts.json"), json_object)
+
+        def protection(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/notifications/toasts.json"), encoding="utf-8"))
+            json_object["protection"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/notifications/toasts.json"), json_object)
+
+    # ///////////////////////////////////////////////////////////////
+    # File overwrite (Webhooks)
+
+    class webhook:
+        # ///////////////////////////////////////////////////////////////
+        # webhook.json
+
+        def title(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/webhook.json"), encoding="utf-8"))
+            json_object["title"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/webhook.json"), json_object)
+
+        def footer(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/webhook.json"), encoding="utf-8"))
+            json_object["footer"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/webhook.json"), json_object)
+
+        def imageurl(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/webhook.json"), encoding="utf-8"))
+            json_object["imageurl"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/webhook.json"), json_object)
+
+        def hexcolor(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/webhook.json"), encoding="utf-8"))
+            json_object["hexcolor"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/webhook.json"), json_object)
+
+        # ///////////////////////////////////////////////////////////////
+        # webhooks.json
+
+        def nitro(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), encoding="utf-8"))
+            json_object["nitro"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), json_object)
+
+        def giveaway(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), encoding="utf-8"))
+            json_object["nitro"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), json_object)
+
+        def privnote(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), encoding="utf-8"))
+            json_object["privnote"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), json_object)
+
+        def selfbot(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), encoding="utf-8"))
+            json_object["selfbot"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), json_object)
+
+        def pings(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), encoding="utf-8"))
+            json_object["pings"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), json_object)
+
+        def ghostpings(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), encoding="utf-8"))
+            json_object["ghostpings"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), json_object)
+
+        def friendevents(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), encoding="utf-8"))
+            json_object["friendevents"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), json_object)
+
+        def guildevents(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), encoding="utf-8"))
+            json_object["guildevents"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), json_object)
+
+        def roleupdates(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), encoding="utf-8"))
+            json_object["roleupdates"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), json_object)
+
+        def nickupdates(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), encoding="utf-8"))
+            json_object["nickupdates"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), json_object)
+
+        def protection(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), encoding="utf-8"))
+            json_object["protection"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/webhooks.json"), json_object)
+
+        # ///////////////////////////////////////////////////////////////
+        # url.json
+
+        def nitro_url(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/url.json"), encoding="utf-8"))
+            json_object["nitro"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/url.json"), json_object)
+
+        def giveaway_url(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/url.json"), encoding="utf-8"))
+            json_object["giveaway"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/url.json"), json_object)
+
+        def privnote_url(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/url.json"), encoding="utf-8"))
+            json_object["privnote"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/url.json"), json_object)
+
+        def selfbot_url(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/url.json"), encoding="utf-8"))
+            json_object["selfbot"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/url.json"), json_object)
+
+        def pings_url(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/url.json"), encoding="utf-8"))
+            json_object["pings"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/url.json"), json_object)
+
+        def ghostpings_url(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/url.json"), encoding="utf-8"))
+            json_object["ghostpings"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/url.json"), json_object)
+
+        def friendevents_url(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/url.json"), encoding="utf-8"))
+            json_object["friendevents"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/url.json"), json_object)
+
+        def guildevents_url(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/url.json"), encoding="utf-8"))
+            json_object["guildevents"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/url.json"), json_object)
+
+        def roleupdates_url(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/url.json"), encoding="utf-8"))
+            json_object["roleupdates"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/url.json"), json_object)
+
+        def nickupdates_url(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/url.json"), encoding="utf-8"))
+            json_object["nickupdates"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/url.json"), json_object)
+
+        def protection_url(new_value):
+            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/url.json"), encoding="utf-8"))
+            json_object["protection"] = new_value
+            files.write_json(os.path.join(files.documents(), "Luna/webhooks/url.json"), json_object)
+
+# ///////////////////////////////////////////////////////////////
+# Get values
 
 class configs:
 
@@ -7307,7 +7597,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         await luna.message.delete()
         if mode == "on" or mode == "off":
             prints.message(f"Selfbot detection » {color.purple(f'{mode}')}")
-            config.selfbot_sniper(mode)
+            config.selfbot.sniper(mode)
             await embed_builder(luna, description=f"```\nSelfbot detection » {mode}```")
         else:
             await mode_error(luna, "on or off")
@@ -7319,7 +7609,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         await luna.message.delete()
         if mode == "on" or mode == "off":
             prints.message(f"Mention notification » {color.purple(f'{mode}')}")
-            config_mention(mode)
+            config.toast.pings(mode)
             await embed_builder(luna, description=f"```\nMention notification » {mode}```")
         else:
             await mode_error(luna, "on or off")
@@ -7340,10 +7630,19 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         await luna.message.delete()
         if mode == "online" or mode == "idle" or mode == "dnd" or mode == "offline":
             prints.message(f"Startup status » {color.purple(f'{mode}')}")
-            config_startupstatus(mode)
+            config.startup_status(mode)
             await embed_builder(luna, description=f"```\nStartup status » {mode}```")
         else:
             await mode_error(luna, "online, idle, dnd or offline")
+
+    @commands.command(name = "reload",
+                    usage="",
+                    description = "Reload custom commands")
+    async def reload(self, luna, mode:str):
+        await luna.message.delete()
+        bot.reload_extension(f"cogs.custom")
+        prints.message(f"Reloaded custom commands")
+        await embed_builder(luna, description=f"```\nReloaded custom commands```")
 
 bot.add_cog(SettingsCog(bot))
 
@@ -7358,7 +7657,7 @@ class ShareCog(commands.Cog, name="Share commands"):
         await luna.message.delete()
         if mode == "on" or mode == "off":
             prints.message(f"Share » {color.purple(f'{mode}')}")
-            config_share(mode)
+            config.share(mode)
             await embed_builder(luna, description=f"```\nShare » {mode}```")
         else:
             await mode_error(luna, "on or off")
@@ -7376,7 +7675,7 @@ class ShareCog(commands.Cog, name="Share commands"):
         if user == self.bot.user:
             await error_builder(luna, description=f"```\nYou can't use share on yourself```")
             return
-        config_share_userid(user.id)
+        config.user_id(user.id)
         prints.message(f"Share user set to » {color.purple(f'{user}')}")
         await embed_builder(luna, description=f"```\nShare user set to » {user}```")
 
@@ -7385,7 +7684,7 @@ class ShareCog(commands.Cog, name="Share commands"):
                     description = "Share member to none")
     async def sharenone(self, luna):
         await luna.message.delete()
-        config_share_userid("")
+        config.user_id("")
         prints.message(f"Share user set to » None")
         await embed_builder(luna, description=f"```\nShare user set to » None```")
 
@@ -7519,14 +7818,14 @@ class GiveawayCog(commands.Cog, name="Giveaway settings"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
         
-	@commands.command(name = "giveawaysniper",
+	@commands.command(name = "giveawayjoiner",
 					usage="<on/off>",
 					description = "Giveaway sniper")
-	async def giveawaysniper(self, luna, mode:str):
+	async def giveawayjoiner(self, luna, mode:str):
 		await luna.message.delete()
 		if mode == "on" or mode == "off":
 			prints.message(f"Giveaway sniper » {color.purple(f'{mode}')}")
-			config_giveaway_sniperjoiner(mode)
+			config.giveaway.joiner(mode)
 			await embed_builder(luna, description=f"```\nGiveaway sniper » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
@@ -7538,55 +7837,21 @@ class GiveawayCog(commands.Cog, name="Giveaway settings"):
 		await luna.message.delete()
 		await embed_builder(luna, description=f"```\nGiveaway joiner delay » {minute} minute/s```")
 		prints.message(f"Auto delete timer » {color.purple(minute)}")
-		config_giveaway_sniperdelay(f"{minute}")
+		config.giveaway.delay_in_minutes(f"{minute}")
 
-	@commands.command(name = "giveawayserver",
+	@commands.command(name = "giveawayguild",
 					usage="<on/off>",
 					description = "Giveaway server joiner")
-	async def giveawayserver(self, luna, mode:str):
+	async def giveawayguild(self, luna, mode:str):
 		await luna.message.delete()
 		if mode == "on" or mode == "off":
 			prints.message(f"Server joiner » {color.purple(f'{mode}')}")
-			config_giveaway_sniperjoiner(mode)
+			config.giveaway.guild_joiner(mode)
 			await embed_builder(luna, description=f"```\nServer joiner » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
 
 bot.add_cog(GiveawayCog(bot))
-
-class CustomCog(commands.Cog, name="Custom commands"):
-	def __init__(self, bot:commands.bot):
-		self.bot = bot
-        
-	if file_exist('./data/custom/custom.py'):
-		pass
-	else:
-		createFolder('./data/custom')
-		file = open("data/custom/custom.py", "w")
-		file.write("# Its as simple as writing commands for cogs! (Note: You need to use \"self\") #")
-		file.close()
-	try:
-		directory = "data\\custom\\custom.py"
-		file = open(directory, "r")
-		file_data = file.read()
-		if "sys.modules" in str(file_data):
-			print("Tampering attempt detected.")
-			time.sleep(5)
-			os._exit(0)
-		elif "import main" in str(file_data):
-			print("Importing main is not allowed.")
-			time.sleep(5)
-			os._exit(0)
-		elif "import inspect" in str(file_data):
-			print("Importing inspect is not allowed.")
-			time.sleep(5)
-			os._exit(0)
-		exec(file_data)
-	except Exception as e:
-		print(e)
-
-bot.add_cog(CustomCog(bot))
-
 class CryptoCog(commands.Cog, name="Cryptocurrency commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
@@ -8249,39 +8514,27 @@ class SniperCog(commands.Cog, name="Sniper settings"):
 		await luna.message.delete()
 		if mode == "on" or mode == "off":
 			prints.message(f"Nitro sniper » {color.purple(f'{mode}')}")
-			config_nitro_sniper(mode)
+			config.nitro.sniper(mode)
 			await embed_builder(luna, description=f"```\nNitro sniper api » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
 
-	@commands.command(name = "nitroapi",
-					usage="<canary/v6/v7/v8/v9>",
-					description = "Sniper API")
-	async def nitroapi(self, luna, mode:str):
-		await luna.message.delete()
-		if mode == "canary" or mode == "v6" or mode == "v7" or mode == "v8" or mode == "v9":
-			prints.message(f"Nitro sniper charge » {color.purple(f'{mode}')}")
-			config_nitro_sniperapi(mode)
-			await embed_builder(luna, description=f"```\nNitro sniper api » {mode}```")
-		else:
-			await mode_error(luna, "\"canary\", \"v6\", \"v7\", \"v8\" or \"v9\"")
-
-	@commands.command(name = "snipercharge",
-					usage="<on/off>",
-					description = "Sniper visual charge")
-	async def snipercharge(self, luna, mode:str):
-		await luna.message.delete()
-		global chargesniper
-		if mode == "on" or mode == "off":
-			prints.message(f"Nitro sniper charge » {color.purple(f'{mode}')}")
-			config_toast_toasts(mode)
-			if mode == "on":
-				chargesniper = True
-			elif mode == "off":
-				chargesniper = False
-			await embed_builder(luna, description=f"```\nNitro sniper charge » {mode}```")
-		else:
-			await mode_error(luna, "on or off")
+	# @commands.command(name = "snipercharge",
+	# 				usage="<on/off>",
+	# 				description = "Sniper visual charge")
+	# async def snipercharge(self, luna, mode:str):
+	# 	await luna.message.delete()
+	# 	global chargesniper
+	# 	if mode == "on" or mode == "off":
+	# 		prints.message(f"Nitro sniper charge » {color.purple(f'{mode}')}")
+	# 		config_toast_toasts(mode)
+	# 		if mode == "on":
+	# 			chargesniper = True
+	# 		elif mode == "off":
+	# 			chargesniper = False
+	# 		await embed_builder(luna, description=f"```\nNitro sniper charge » {mode}```")
+	# 	else:
+	# 		await mode_error(luna, "on or off")
 
 bot.add_cog(SniperCog(bot))
 
@@ -8296,7 +8549,7 @@ class ThemeCog(commands.Cog, name="Theme command"):
 		await luna.message.delete()
 		theme = theme.replace('.json','')
 		if os.path.exists(f"data/themes/{theme}" + ".json"):
-			config_theme_set(theme)
+			config.theme(theme)
 			await embed_builder(luna, description=f"```\nChanged theme to » {theme}```")
 		else:
 			await error_builder(luna, description=f"```\nThere is no theme called » {theme}```")
@@ -8332,7 +8585,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
 			}
 			with open(f"data/themes/{themename}.json", "w") as studs:
 				json.dump(data, studs, indent=4)
-			config_theme_set(f"{themename}")
+			config.theme(f"{themename}")
 			await embed_builder(luna, description=f"```\nCreated theme » {themename}```")
 
 	@commands.command(name = "edittheme",
@@ -8349,7 +8602,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
 		else:
 			prints.message(f"Edited theme name to » {color.purple(f'{themename}')}")
 			os.rename(f"data/themes/{themesvar}",f"data/themes/{themename}.json")
-			config_theme_set(f"{themename}")
+			config.theme(f"{themename}")
 			await embed_builder(luna, description=f"```\nEdited theme name to » {themename}```")
         
 	@commands.command(name = "deltheme",
@@ -8815,7 +9068,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 		}
 		with open(f"data/themes/{theme}.json", "w") as studs:
 			json.dump(data, studs, indent=4)
-		config_theme_set(f"{theme}")
+		config.theme(f"{theme}")
 		await embed_builder(luna, description=f"```\nInstalled theme {theme} and applied it\nThis theme was made by {madeby}```")
 
 bot.add_cog(CommunitythemesCog(bot))
@@ -8831,7 +9084,7 @@ class ToastCog(commands.Cog, name="Toast customization"):
 		await luna.message.delete()
 		if newicon.endswith(".ico"):
 			prints.message(f"Changed toast icon to » {color.purple(f'{newicon}')}")
-			config_toast_icon(f"{newicon}")
+			config.toast.icon(f"{newicon}")
 			await embed_builder(luna, description=f"```\nChanged toast icon to » {newicon}```")
 		else:
 			await error_builder(luna, description=f"```\nNot a valid icon file (.ico)```")
@@ -8843,9 +9096,9 @@ class ToastCog(commands.Cog, name="Toast customization"):
 		await luna.message.delete()
 		prints.message(f"Changed toast title to » {color.purple(f'{newtitle}')}")
 		if newtitle == "None":
-			config_toast_title("")
+			config.toast.title("")
 		else:
-			config_toast_title(f"{newtitle}")
+			config.toast.title(f"{newtitle}")
 		await embed_builder(luna, description=f"```\nChanged toast title to » {newtitle}```")
 
 bot.add_cog(ToastCog(bot))
@@ -8861,7 +9114,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
 		await luna.message.delete()
 		if mode == "on" or mode == "off":
 			prints.message(f"Toasts » {color.purple(f'{mode}')}")
-			config_toast_toasts(mode)
+			config.toast.toasts(mode)
 			await embed_builder(luna, description=f"```\nToasts » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
@@ -8873,7 +9126,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
 		await luna.message.delete()
 		if mode == "on" or mode == "off":
 			prints.message(f"Login toasts » {color.purple(f'{mode}')}")
-			config_toast_login(mode)
+			config.toast.login(mode)
 			await embed_builder(luna, description=f"```\nLogin toasts » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
@@ -8885,7 +9138,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
 		await luna.message.delete()
 		if mode == "on" or mode == "off":
 			prints.message(f"Nitro sniper toasts » {color.purple(f'{mode}')}")
-			config_toast_nitro(mode)
+			config.toast.nitro(mode)
 			await embed_builder(luna, description=f"```\nNitro sniper toasts » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
@@ -8897,7 +9150,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
 		await luna.message.delete()
 		if mode == "on" or mode == "off":
 			prints.message(f"Giveaway toasts » {color.purple(f'{mode}')}")
-			config_toast_giveaway(mode)
+			config.toast.giveaway(mode)
 			await embed_builder(luna, description=f"```\nGiveaway toasts » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
@@ -8909,7 +9162,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
 		await luna.message.delete()
 		if mode == "on" or mode == "off":
 			prints.message(f"Privnote toasts » {color.purple(f'{mode}')}")
-			config_toast_privnote(mode)
+			config.toast.privnote(mode)
 			await embed_builder(luna, description=f"```\nPrivnote toasts » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
@@ -8921,7 +9174,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
 		await luna.message.delete()
 		if mode == "on" or mode == "off":
 			prints.message(f"Selfbot toasts » {color.purple(f'{mode}')}")
-			config_toast_selfbot(mode)
+			config.toast.selfbot(mode)
 			await embed_builder(luna, description=f"```\nSelfbot toasts » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
@@ -8933,7 +9186,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
 		await luna.message.delete()
 		if mode == "on" or mode == "off":
 			prints.message(f"Pings toasts » {color.purple(f'{mode}')}")
-			config_toast_pings(mode)
+			config.toast.pings(mode)
 			await embed_builder(luna, description=f"```\nPings toasts » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
@@ -8945,7 +9198,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
 		await luna.message.delete()
 		if mode == "on" or mode == "off":
 			prints.message(f"Ghostping toasts » {color.purple(f'{mode}')}")
-			config_toast_ghostpings(mode)
+			config.toast.ghostpings(mode)
 			await embed_builder(luna, description=f"```\nGhostping toasts » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
@@ -8957,7 +9210,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
 		await luna.message.delete()
 		if mode == "on" or mode == "off":
 			prints.message(f"Friend event toasts » {color.purple(f'{mode}')}")
-			config_toast_friendevents(mode)
+			config.toast.friendevents(mode)
 			await embed_builder(luna, description=f"```\nFriend event toasts » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
@@ -8969,7 +9222,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
 		await luna.message.delete()
 		if mode == "on" or mode == "off":
 			prints.message(f"Guild event toasts » {color.purple(f'{mode}')}")
-			config_toast_guildevents(mode)
+			config.toast.guildevents(mode)
 			await embed_builder(luna, description=f"```\nGuild event toasts » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
@@ -8981,7 +9234,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
 		await luna.message.delete()
 		if mode == "on" or mode == "off":
 			prints.message(f"Role update toasts » {color.purple(f'{mode}')}")
-			config_toast_roleupdates(mode)
+			config.toast.roleupdates(mode)
 			await embed_builder(luna, description=f"```\nRole update toasts » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
@@ -8993,7 +9246,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
 		await luna.message.delete()
 		if mode == "on" or mode == "off":
 			prints.message(f"Nickname update toasts » {color.purple(f'{mode}')}")
-			config_toast_nickupdates(mode)
+			config.toast.nickupdates(mode)
 			await embed_builder(luna, description=f"```\nNickname update toasts » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
@@ -9005,7 +9258,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
 		await luna.message.delete()
 		if mode == "on" or mode == "off":
 			prints.message(f"Protection toasts » {color.purple(f'{mode}')}")
-			config_toast_protections(mode)
+			config.toast.protection(mode)
 			await embed_builder(luna, description=f"```\nProtection toasts » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
@@ -9092,9 +9345,9 @@ class WebhookCog(commands.Cog, name="Webhook customisation"):
 		await luna.message.delete()
 		prints.message(f"Changed webhook title to » {color.purple(f'{newtitle}')}")
 		if newtitle == "None":
-			config_webhook_title("")
+			config.we("")
 		else:
-			config_webhook_title(f"{newtitle}")
+			config.webhook.title(f"{newtitle}")
 		await embed_builder(luna, description=f"```\nChanged webhook title to » {newtitle}```")
 
 	@commands.command(name = "wfooter",
@@ -9105,9 +9358,9 @@ class WebhookCog(commands.Cog, name="Webhook customisation"):
 
 		prints.message(f"Changed webhook footer to » {color.purple(f'{newfooter}')}")
 		if newfooter == "None":
-			config_webhook_footer("")
+			config.webhook.footer("")
 		else:
-			config_webhook_footer(f"{newfooter}")
+			config.webhook.footer(f"{newfooter}")
 		await embed_builder(luna, description=f"```\nChanged webhook footer to » {newfooter}```")
 
 	@commands.command(name = "wimage",
@@ -9118,9 +9371,9 @@ class WebhookCog(commands.Cog, name="Webhook customisation"):
 
 		prints.message(f"Changed webhook thumbnail url to » {color.purple(f'{newimageurl}')}")
 		if newimageurl == "None":
-			config_webhook_image("")
+			config.webhook.imageurl("")
 		else:
-			config_webhook_image(f"{newimageurl}")
+			config.webhook.imageurl(f"{newimageurl}")
 		await embed_builder(luna, description=f"```\nChanged webhook thumbnail url to » {newimageurl}```")
 
 	@commands.command(name = "whexcolor",
@@ -9131,9 +9384,9 @@ class WebhookCog(commands.Cog, name="Webhook customisation"):
 
 		prints.message(f"Changed webhook color to » {color.purple(f'{newhexcolor}')}")
 		if newhexcolor == "None":
-			config_webhook_hexcolor("")
+			config.webhook.hexcolor("")
 		else:
-			config_webhook_hexcolor(f"{newhexcolor}")
+			config.webhook.hexcolor(f"{newhexcolor}")
 		await embed_builder(luna, description=f"```\nChanged webhook color to » {newhexcolor}```")
 
 	@commands.command(name = "wmatch",
@@ -9151,10 +9404,10 @@ class WebhookCog(commands.Cog, name="Webhook customisation"):
 		imageurl = theme.get('imageurl')
 		hexcolor = theme.get('hexcolor')
 		prints.message(f"Matched webhook to » {color.purple(f'{themesvar[:-5]}')}")
-		config_webhook_title(f"{title}")
-		config_webhook_footer(f"{footer}")
-		config_webhook_image(f"{imageurl}")
-		config_webhook_hexcolor(f"{hexcolor}")
+		config.webhook.title(f"{title}")
+		config.webhook.footer(f"{footer}")
+		config.webhook.imageurl(f"{imageurl}")
+		config.webhook.hexcolor(f"{hexcolor}")
 		await embed_builder(luna, description=f"```\nMatched webhook to » {themesvar[:-5]}```")
 
 bot.add_cog(WebhookCog(bot))
@@ -9397,20 +9650,24 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 					description = "Clear the console")
 	async def clear(self, luna):
 		await luna.message.delete()
-		motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ')
-		for line in motd:
-			motd = line.decode().strip()
-		with open("config.json", "r") as f:
-			config = json.load(f)
-		prefix = config.get('prefix')
-		clear()
-		print(purpleblue(logo))
-		print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-		print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
-		print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-		print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-		commandcount = len(bot.commands)
-		prints.message(f"{motd} {commandcount} commands.")
+		luna.console(clear=True)
+        command_count = len(bot.commands)
+        cog = bot.get_cog('Custom commands')
+        try:
+            custom = cog.get_commands()
+            custom_command_count = 0
+            for command in custom:
+                custom_command_count += 1
+        except:
+            custom_command_count = 0
+        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        print(luna.motd.center(os.get_terminal_size().columns))
+        print()
+        print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+        print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
+        print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+        print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+        prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 
 	@commands.command(name = "covid",
 					aliases=['corona'],
