@@ -28,7 +28,7 @@ import ctypes.wintypes as wintypes
 
 from CEA256 import *
 from gtts import gTTS
-from os import system
+from os import name, system
 from discord import *
 from ctypes import windll
 from notifypy import Notify
@@ -442,7 +442,7 @@ privacy = False
 copycat = None
 chargesniper = False
 
-version = '3.0.0h1'
+version = '3.0.1'
 updater_url = urllib.request.urlopen('https://pastebin.com/raw/mt9DERP6').read().decode('utf-8')
 motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ').read().decode('utf-8')
 version_url = urllib.request.urlopen('https://pastebin.com/raw/iQPkzEpg').read().decode('utf-8').replace('\'', '')
@@ -655,7 +655,11 @@ class luna:
 		if luna.check_token(token):
 			headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': token}
 			r = requests.get("https://discordapp.com/api/v9/users/@me/library", headers=headers)
-			prints.message(f"Detected a valid token | {r['username']}#{r['discriminator']}")
+			if token.startswith("mfa"):
+				_2fa = " » 2FA Active"
+			else:
+				_2fa = ""
+			prints.message(f"Detected a valid token » {r['username']}#{r['discriminator']}{_2fa}")
 			prompt = prints.input("Do you want to use it? (y/n)")
 			if prompt.lower() == "y" or prompt.lower() == "yes":
 				json_object = json.load(open(os.path.join(files.documents(), "Luna/discord.json"), encoding="utf-8"))
@@ -715,7 +719,11 @@ class luna:
 			if not luna.check_token(tokens) == False:
 				headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': valid_tokens[0]}
 				r = requests.get("https://discordapp.com/api/v9/users/@me", headers=headers).json()
-				prints.message(f"Found a valid token | {r['username']}#{r['discriminator']}")
+				if token.startswith("mfa"):
+					_2fa = " » 2FA Active"
+				else:
+					_2fa = ""
+				prints.message(f"Detected a valid token » {r['username']}#{r['discriminator']}{_2fa}")
 				prompt = prints.input("Do you want to use it? (y/n)")
 				if prompt.lower() == "y" or prompt.lower() == "yes":
 					print("1")
@@ -1143,11 +1151,21 @@ class notify:
 		except Exception as e:
 			pass
 
-	def webhook(url="", description="", error=False):
+	def webhook(url="", description="", name="", error=False):
 		"""Create a webhook notification"""
 		try:
 			if url == "":
-				prints.error("The url can't be empty")
+				prints.error(f"The webhook url can't be empty » {name} » Has been cleared")
+				json_object = json.load(open(os.path.join(files.documents(), f"Luna/webhooks/url.json"), encoding="utf-8"))
+				json_object[f"{name}"] = "webhook-url-here"
+				files.write_json(os.path.join(files.documents(), f"Luna/webhooks/url.json"), json_object)
+				return
+			elif not "https://discord.com/api/webhooks/" in url:
+				prints.error(f"Invalid webhook url » {name} » Has been cleared")
+				json_object = json.load(open(os.path.join(files.documents(), f"Luna/webhooks/url.json"), encoding="utf-8"))
+				json_object[f"{name}"] = "webhook-url-here"
+				files.write_json(os.path.join(files.documents(), f"Luna/webhooks/url.json"), json_object)
+				return
 			hook = dhooks.Webhook(url=url, avatar_url=webhook.image_url())
 			color = 0x000000
 			if error == True:
@@ -2029,7 +2047,7 @@ async def on_ready():
 	if files.json("Luna/notifications/toasts.json", "login", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
 		notify.toast(message=f"Logged into {bot.user}")
 	if files.json("Luna/webhooks/webhooks.json", "login", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
-		notify.webhook(url=webhook.login_url(), description=f"Logged into {bot.user}")
+		notify.webhook(url=webhook.login_url(), name="login", description=f"Logged into {bot.user}")
 	luna.console(clear=True)
 	command_count = len(bot.commands)
 	cog = bot.get_cog('Custom commands')
@@ -2091,10 +2109,10 @@ class OnMessage(commands.Cog, name="on message"):
 					if files.json("Luna/notifications/toasts.json", "nitro", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
 						notify.toast(message=f"Redeemed a nitro code\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
 					if files.json("Luna/webhooks/webhooks.json", "nitro", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.nitro_url() == "webhook-url-here":
-						notify.webhook(url=webhook.nitro_url(), description=f"Redeemed a nitro code\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
+						notify.webhook(url=webhook.nitro_url(), name="nitro", description=f"Redeemed a nitro code\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
 		except Exception as e:
 			prints.error(e)
-
+			
 		giveaway_joiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
 		delay_in_minutes = int(files.json("Luna/snipers/giveaway.json", "delay_in_minutes", documents=True))
 		giveaway_blocked_words = files.json("Luna/snipers/giveaway.json", "blocked_words", documents=True)
@@ -2130,7 +2148,7 @@ class OnMessage(commands.Cog, name="on message"):
 						if files.json("Luna/notifications/toasts.json", "giveaway", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
 							notify.toast(message=f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}")
 						if files.json("Luna/webhooks/webhooks.json", "giveaway", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
-							notify.webhook(url=webhook.giveaway_url(), description=f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}")
+							notify.webhook(url=webhook.giveaway_url(), name="giveaway", description=f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}")
 						found_something_blacklisted = 1
 				try:
 					for embed in message.embeds:
@@ -2148,7 +2166,7 @@ class OnMessage(commands.Cog, name="on message"):
 									if files.json("Luna/notifications/toasts.json", "giveaway", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
 										notify.toast(message=f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}")
 									if files.json("Luna/webhooks/webhooks.json", "giveaway", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
-										notify.webhook(url=webhook.giveaway_url(), description=f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}")
+										notify.webhook(url=webhook.giveaway_url(), name="giveaway", description=f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}")
 									found_something_blacklisted = 1
 									break
 							except:
@@ -2194,7 +2212,7 @@ class OnMessage(commands.Cog, name="on message"):
 						if files.json("Luna/notifications/toasts.json", "giveaway", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
 							notify.toast(message=f"Giveaway found\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}")
 						if files.json("Luna/webhooks/webhooks.json", "giveaway", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
-							notify.webhook(url=webhook.giveaway_url(), description=f"Giveaway found\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}")
+							notify.webhook(url=webhook.giveaway_url(), name="giveaway", description=f"Giveaway found\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}")
 					except Exception as e:
 						prints.error(e)
 						return
@@ -2218,7 +2236,7 @@ class OnMessage(commands.Cog, name="on message"):
 							if files.json("Luna/notifications/toasts.json", "giveaway", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
 								notify.toast(message=f"Joined giveaway\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}")
 							if files.json("Luna/webhooks/webhooks.json", "giveaway", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
-								notify.webhook(url=webhook.giveaway_url(), description=f"Joined giveaway\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}")
+								notify.webhook(url=webhook.giveaway_url(), name="giveaway", description=f"Joined giveaway\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}")
 					except Exception:
 						pass
 
@@ -2231,7 +2249,7 @@ class OnMessage(commands.Cog, name="on message"):
 				if files.json("Luna/notifications/toasts.json", "giveaway", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
 					notify.toast(message=f"Won giveaway\nServer »  {message.guild}\nChannel » {message.channel}")
 				if files.json("Luna/webhooks/webhooks.json", "giveaway", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
-					notify.webhook(url=webhook.giveaway_url(), description=f"Won giveaway\nServer »  {message.guild}\nChannel » {message.channel}")
+					notify.webhook(url=webhook.giveaway_url(), name="giveaway", description=f"Won giveaway\nServer »  {message.guild}\nChannel » {message.channel}")
 		if giveaway_joiner == "on" and message.author.bot:
 			if "joining" in str(message.content).lower() and guild_joiner == "on":
 				try:
@@ -2244,7 +2262,7 @@ class OnMessage(commands.Cog, name="on message"):
 							if files.json("Luna/notifications/toasts.json", "giveaway", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
 								notify.toast(message=f"Joined guild\nInvite » discord.gg/{code}")
 							if files.json("Luna/webhooks/webhooks.json", "giveaway", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
-								notify.webhook(url=webhook.giveaway_url(), description=f"Joined guild\nInvite » discord.gg/{code}")
+								notify.webhook(url=webhook.giveaway_url(), name="giveaway", description=f"Joined guild\nInvite » discord.gg/{code}")
 							await asyncio.sleep(5)
 				except Exception:
 					pass
@@ -2326,7 +2344,7 @@ class OnMessage(commands.Cog, name="on message"):
 			if files.json("Luna/notifications/toasts.json", "pings", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
 				notify.toast(message=f"You have been mentioned\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
 			if files.json("Luna/webhooks/webhooks.json", "pings", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.pings_url() == "webhook-url-here":
-				notify.webhook(url=webhook.pings_url(), description=f"You have been mentioned\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
+				notify.webhook(url=webhook.pings_url(), name="pings", description=f"You have been mentioned\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
 			if files.json("Luna/notifications/console.json", "pings", documents=True) == "on":
 				print()
 				prints.sniper(f"{color.purple('You have been mentioned')}")
@@ -2351,7 +2369,7 @@ class OnMessage(commands.Cog, name="on message"):
 							if files.json("Luna/notifications/toasts.json", "selfbot", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
 								notify.toast(message=f"Selfbot Detected\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
 							if files.json("Luna/webhooks/webhooks.json", "selfbot", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.selfbot_url() == "webhook-url-here":
-								notify.webhook(url=webhook.selfbot_url(), description=f"Selfbot Detected\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
+								notify.webhook(url=webhook.selfbot_url(), name="selfbot", description=f"Selfbot Detected\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
 							print()
 							prints.sniper(f"{color.purple('Selfbot Detected')}")
 							prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
@@ -2401,7 +2419,7 @@ class OnDelete(commands.Cog, name="on delete"):
 				if files.json("Luna/notifications/toasts.json", "ghostpings", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
 					notify.toast(message=f"You have been ghostpinged\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
 				if files.json("Luna/webhooks/webhooks.json", "ghostpings", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.ghostping_url() == "webhook-url-here":
-					notify.webhook(url=webhook.ghostping_url(), description=f"You have been ghostpinged\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
+					notify.webhook(url=webhook.ghostping_url(), name="ghostpings", description=f"You have been ghostpinged\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
 				print()
 				prints.sniper(f"{color.purple('You have been ghostpinged')}")
 				prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
@@ -2424,7 +2442,7 @@ class OnTyping(commands.Cog, name="on typing"):
 			if files.json("Luna/notifications/toasts.json", "friendevents", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
 				notify.toast(message=f"{member} is typing")
 			if files.json("Luna/webhooks/webhooks.json", "friendevents", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.friendevents_url() == "webhook-url-here":
-				notify.webhook(url=webhook.friendevents_url(), description=f"{member} is typing")
+				notify.webhook(url=webhook.friendevents_url(), name="friendevents", description=f"{member} is typing")
 			
 
 
@@ -5778,567 +5796,493 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 bot.add_cog(NettoolCog(bot))
 
 class UtilsCog(commands.Cog, name="Util commands"):
-    def __init__(self, bot:commands.bot):
-        self.bot = bot
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
 
-    @commands.command(name = "serverjoiner",
-                    aliases=['joinservers', 'jservers', 'joinserver', 'joininvites'],
-                    usage="",
-                    description = "Join all invites in data/invites.txt")
-    async def serverjoiner(self, luna):
-        await luna.message.delete()
-        if configs.risk_mode() == "on":
+	@commands.command(name = "serverjoiner",
+					aliases=['joinservers', 'jservers', 'joinserver', 'joininvites'],
+					usage="",
+					description = "Join all invites in data/invites.txt")
+	async def serverjoiner(self, luna):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			if os.stat(os.path.join(files.documents(), "Luna/invites.txt")).st_size == 0:
+				await embed_builder(luna, title="Server Joiner", description=f"```\ninvites.txt is empty...```")
+				return
+			else:
+				file = open(os.path.join(files.documents(), "Luna/invites.txt"), "r")
+				nonempty_lines = [line.strip("\n") for line in file if line != "\n"]
+				line_count = len(nonempty_lines)
+				file.close()
+				await embed_builder(luna, title="Server Joiner", description=f"```\nFound {line_count} invites in invites.txt\nJoining provided invites...```")
+				with open(os.path.join(files.documents(), "Luna/invites.txt"),"r+") as f:
+					for line in f:
+						invite = line.strip("\n")
+						invite = invite.replace('https://discord.gg/', '').replace('https://discord.com/invite/', '').replace('Put the invites of the servers you want to join here one after another', '')
+						try:
+							async with httpx.AsyncClient() as client:
+								await client.post(f'https://discord.com/api/v9/invites/{invite}', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+								prints.event(f"Joined {invite}")
+								await asyncio.sleep(0.5)
+						except Exception as e:
+							prints.error(f"Failed to join {invite}")
+							prints.error(e)
+							pass
+		else:
+			await error_builder(luna, description="Riskmode is disabled")
 
-            if files.file_exist('Luna/invites.txt', documents=True):
-                pass
-            else:
-                if configs.risk_mode() == "on":
-                    file = open(os.path.join(files.documents(), "Luna/invites.txt"), "w") 
-                    file.write("Put the invites of the servers you want to join here one after another") 
-                    file.close()
-                    embed = discord.Embed(title="Server Joiner", url=theme.title_url(), description=f"```\nNo invites.txt has been found, so it has been created.\nPut all your invites there that you want to join.```", color=theme.hex_color())
-                    embed.set_thumbnail(url=theme.image_url())
-                    embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                    embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                    embed.set_image(url=theme.large_image_url())
-                    await send(luna, embed)
-                    return
+	@commands.command(name = "proxyserverjoiner",
+					usage="",
+					description = "Join all invites in data/invites.txt using proxies")
+	async def proxyserverjoiner(self, luna):
+		await luna.message.delete()
+		proxies = open(os.path.join(files.documents(), "Luna/raiding/proxies.txt"), 'r')
+		proxylist = []
+		for p, _proxy in enumerate(proxies):
+			proxy = _proxy.split('\n')[0]
+			proxylist.append(proxy)
+		if configs.risk_mode() == "on":
+			if os.stat(os.path.join(files.documents(), "Luna/invites.txt")).st_size == 0:
+				await embed_builder(luna, title="Server Joiner", description=f"```\ninvites.txt is empty...```")
+				return
+			else:
+				file = open(os.path.join(files.documents(), "Luna/invites.txt"), "r")
+				nonempty_lines = [line.strip("\n") for line in file if line != "\n"]
+				line_count = len(nonempty_lines)
+				file.close()
+				await embed_builder(luna, title="Server Joiner", description=f"```\nFound {line_count} invites in invites.txt\nJoining provided invites...```")
+				with open(os.path.join(files.documents(), "Luna/invites.txt"),"r+") as f:
+					for line in f:
+						invite = line.strip("\n")
+						invite = invite.replace('https://discord.gg/', '').replace('https://discord.com/invite/', '').replace('Put the invites of the servers you want to join here one after another', '')
+						try:
+							async with httpx.AsyncClient() as client:
+								await client.post(f'https://discord.com/api/v9/invites/{invite}', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'}, proxies={'http://': f'http://{proxylist[p]}'})
+								prints.event(f"Joined {invite}")
+								await asyncio.sleep(0.5)
+						except Exception as e:
+							prints.error(f"Failed to join {invite}")
+							prints.error(e)
+							pass
+		else:
+			await error_builder(luna, description="Riskmode is disabled")
 
-                if os.stat(os.path.join(files.documents(), "Luna/invites.txt")).st_size == 0:
-                    embed = discord.Embed(title="Server Joiner", url=theme.title_url(), description=f"```\ninvites.txt is empty...```", color=theme.hex_color())
-                    embed.set_thumbnail(url=theme.image_url())
-                    embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                    embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                    embed.set_image(url=theme.large_image_url())
-                    await send(luna, embed)
-                    return
-                else:
-                    file = open(os.path.join(files.documents(), "Luna/invites.txt"), "r")
-                    nonempty_lines = [line.strip("\n") for line in file if line != "\n"]
-                    line_count = len(nonempty_lines)
-                    file.close()
+	@commands.command(name = "addemoji",
+					usage="<emoji_name> <image_url>",
+					description = "Add an emoji")
+	@has_permissions(manage_emojis=True)
+	async def addemoji(self, luna, emoji_name, image_url=None):
+		await luna.message.delete()
+		if luna.message.attachments:
+			image = await luna.message.attachments[0].read()
+		elif image_url:
+			async with aiohttp.ClientSession() as session:
+				async with session.get(image_url) as resp:
+					image = await resp.read()
+		await luna.guild.create_custom_emoji(name=emoji_name, image=image)
+		embed = discord.Embed(title="Emoji Added", url=theme.title_url(), description=f"{emoji_name}", color=theme.hex_color())
+		embed.set_thumbnail(url=image_url)
+		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+		embed.set_image(url=theme.large_image_url())
+		await send(luna, embed)
 
-                    with open('./config.json') as f:
-                        config = json.load(f)
-                    token = config.get('token')
+	@commands.command(name = "editemoji",
+					usage="<emoji> <new_name>",
+					description = "Edit an emoji")
+	@has_permissions(manage_emojis=True)
+	async def editemoji(self, luna, emoji: discord.Emoji, new_name):
+		await luna.message.delete()
+		oldname = emoji.name
+		await emoji.edit(name=new_name)
+		embed = discord.Embed(title="Emoji Edited", url=theme.title_url(), description=f"{oldname} to {new_name}", color=theme.hex_color())
+		embed.set_thumbnail(url=emoji.url)
+		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+		embed.set_image(url=theme.large_image_url())
+		await send(luna, embed)
 
-                    embed = discord.Embed(title="Server Joiner", url=theme.title_url(), description=f"```\nFound {line_count} invites in invites.txt\nJoining provided invites...```", color=theme.hex_color())
-                    embed.set_thumbnail(url=theme.image_url())
-                    embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                    embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                    embed.set_image(url=theme.large_image_url())
-                    await send(luna, embed)
+	@commands.command(name = "delemoji",
+					usage="<emoji>",
+					description = "Delete an emoji")
+	@has_permissions(manage_emojis=True)
+	async def delemoji(self, luna, emoji: discord.Emoji):
+		await luna.message.delete()
+		name = emoji.name
+		emojiurl = emoji.url
+		await emoji.delete()
+		embed = discord.Embed(title="Emoji Deleted", url=theme.title_url(), description=f"{name}", color=theme.hex_color())
+		embed.set_thumbnail(url=emojiurl)
+		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+		embed.set_image(url=theme.large_image_url())
+		await send(luna, embed)
 
-                    with open(os.path.join(files.documents(), "Luna/invites.txt"),"r+") as f:
-                        for line in f:
-                            invite = line.strip("\n")
-                            invite = invite.replace('https://discord.gg/', '')
-                            try:
-                                async with httpx.AsyncClient() as client:
-                                    await client.post(f'https://canary.discord.com/api/v8/invites/{invite}', headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
-                                    prints.event(f"Joined {invite}")
-                                    await asyncio.sleep(0.5)
-                            except Exception:
-                                prints.error(f"Failed to join {invite}")
-                                pass
-        else:
-            embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-            embed.set_thumbnail(url=theme.image_url())
-            embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-            embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-            embed.set_image(url=theme.large_image_url())
-            await send(luna, embed)
-
-    @commands.command(name = "proxyserverjoiner",
-                    usage="",
-                    description = "Join all invites in data/invites.txt using proxies")
-    async def proxyserverjoiner(self, luna):
-        await luna.message.delete()
-        if configs.risk_mode() == "on":
-
-            if files.file_exist('Luna/invites.txt', documents=True):
-                pass
-            else:
-                file = open(os.path.join(files.documents(), "Luna/invites.txt"), "w") 
-                file.write("Put the invites of the servers you want to join here one after another") 
-                file.close()
-                embed = discord.Embed(title="Server Joiner [PROXY]", url=theme.title_url(), description=f"```\nNo invites.txt has been found, so it has been created.\nPut all your invites there that you want to join.```", color=theme.hex_color())
-                embed.set_thumbnail(url=theme.image_url())
-                embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                embed.set_image(url=theme.large_image_url())
-                await send(luna, embed)
-                return
-
-            if os.stat(os.path.join(files.documents(), "Luna/invites.txt")).st_size == 0:
-                embed = discord.Embed(title="Server Joiner [PROXY]", url=theme.title_url(), description=f"```\ninvites.txt is empty...```", color=theme.hex_color())
-                embed.set_thumbnail(url=theme.image_url())
-                embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                embed.set_image(url=theme.large_image_url())
-                await send(luna, embed)
-                return
-            else:
-                file = open(os.path.join(files.documents(), "Luna/invites.txt"), "r")
-                nonempty_lines = [line.strip("\n") for line in file if line != "\n"]
-                line_count = len(nonempty_lines)
-                file.close()
-
-                with open('./config.json') as f:
-                    config = json.load(f)
-                token = config.get('token')
-
-                proxies = open(os.path.join(files.documents(), "Luna/raiding/proxies.txt"), 'r')
-            
-                proxylist = []
-                
-                for p, _proxy in enumerate(proxies):
-                    proxy = _proxy.split('\n')[0]
-                    proxylist.append(proxy)
-
-                embed = discord.Embed(title="Server Joiner [PROXY]", url=theme.title_url(), description=f"```\nFound {line_count} invites in invites.txt\nJoining provided invites...```", color=theme.hex_color())
-                embed.set_thumbnail(url=theme.image_url())
-                embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                embed.set_image(url=theme.large_image_url())
-                await send(luna, embed)
-
-                with open(os.path.join(files.documents(), "Luna/invites.txt"),"r+") as f:
-                    for line in f:
-                        invite = line.strip("\n")
-                        invite = invite.replace('https://discord.gg/', '')
-                        try:
-                            async with httpx.AsyncClient() as client:
-                                await client.post(f'https://canary.discord.com/api/v8/invites/{invite}', headers={'authorization': token, 'user-agent': 'Mozilla/5.0'}, proxies={'http://': f'http://{proxylist[p]}'})
-                                prints.event(f"[PROXY] Joined {invite}")
-                                await asyncio.sleep(0.5)
-                        except Exception:
-                            prints.error(f"[PROXY] Failed to join {invite}")
-                            pass
-        else:
-            embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-            embed.set_thumbnail(url=theme.image_url())
-            embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-            embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-            embed.set_image(url=theme.large_image_url())
-            await send(luna, embed)
-
-    @commands.command(name = "addemoji",
-                    usage="<emoji_name> <image_url>",
-                    description = "Add an emoji")
-    @has_permissions(manage_emojis=True)
-    async def addemoji(self, luna, emoji_name, image_url=None):
-        await luna.message.delete()
-        if luna.message.attachments:
-            image = await luna.message.attachments[0].read()
-        elif image_url:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(image_url) as resp:
-                    image = await resp.read()
-        await luna.guild.create_custom_emoji(name=emoji_name, image=image)
-        embed = discord.Embed(title="Emoji Added", url=theme.title_url(), description=f"{emoji_name}", color=theme.hex_color())
-        embed.set_thumbnail(url=image_url)
-        embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-        embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-        embed.set_image(url=theme.large_image_url())
-        await send(luna, embed)
-
-    @commands.command(name = "editemoji",
-                    usage="<emoji> <new_name>",
-                    description = "Edit an emoji")
-    @has_permissions(manage_emojis=True)
-    async def editemoji(self, luna, emoji: discord.Emoji, new_name):
-        await luna.message.delete()
-        oldname = emoji.name
-        await emoji.edit(name=new_name)
-        embed = discord.Embed(title="Emoji Edited", url=theme.title_url(), description=f"{oldname} to {new_name}", color=theme.hex_color())
-        embed.set_thumbnail(url=emoji.url)
-        embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-        embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-        embed.set_image(url=theme.large_image_url())
-        await send(luna, embed)
-
-    @commands.command(name = "delemoji",
-                    usage="<emoji>",
-                    description = "Delete an emoji")
-    @has_permissions(manage_emojis=True)
-    async def delemoji(self, luna, emoji: discord.Emoji):
-        await luna.message.delete()
-        name = emoji.name
-        emojiurl = emoji.url
-        await emoji.delete()
-        embed = discord.Embed(title="Emoji Deleted", url=theme.title_url(), description=f"{name}", color=theme.hex_color())
-        embed.set_thumbnail(url=emojiurl)
-        embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-        embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-        embed.set_image(url=theme.large_image_url())
-        await send(luna, embed)
-	
-    @commands.command(name = "stealemoji",
-                    aliases = ['stealemojis'],
-                    usage="<guild_id>",
-                    description = "Steal all emojis from a guild")
-    @has_permissions(manage_emojis=True)
-    async def stealemoji(self, luna, guild_id):
-        await luna.message.delete()
-        if not os.path.exists('data/emojis'):
-            os.makedirs('data/emojis')
-        guild_id = int(guild_id)
-        try:
-            guildhit = self.bot.get_guild(guild_id)
-        except Exception as e:
-            if configs.error_log() == "console":
-                prints.error(f"{e}")
-            else:
-                embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\n{e}```", color=theme.hex_color())
-                embed.set_thumbnail(url=theme.image_url())
-                embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                embed.set_image(url=theme.large_image_url())
-                await send(luna, embed)
-            return
+	@commands.command(name = "stealemoji",
+					aliases = ['stealemojis'],
+					usage="<guild_id>",
+					description = "Steal all emojis from a guild")
+	@has_permissions(manage_emojis=True)
+	async def stealemoji(self, luna, guild_id):
+		await luna.message.delete()
+		if not os.path.exists('data/emojis'):
+			os.makedirs('data/emojis')
+		guild_id = int(guild_id)
+		try:
+			guildhit = self.bot.get_guild(guild_id)
+		except Exception as e:
+			if configs.error_log() == "console":
+				prints.error(f"{e}")
+			else:
+				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\n{e}```", color=theme.hex_color())
+				embed.set_thumbnail(url=theme.image_url())
+				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+				embed.set_image(url=theme.large_image_url())
+				await send(luna, embed)
+			return
 
 
-    @commands.command(name = 'playing', 
-                usage="<text>", 
-                description = "Change your activity to playing.")
-    async def playing(self, luna, *, status: str = None):
-        await luna.message.delete()
-        if status is None:
-            prints.error("You didnt put a text to play")
-        else:
-            try:
-                game = discord.Activity(type=0, name=f"{status}")
-                await self.bot.change_presence(activity=game)
-                embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nStatus changed to » Playing {status}```", color=theme.hex_color())
-                embed.set_thumbnail(url=theme.image_url())
-                embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                embed.set_image(url=theme.large_image_url())
-                await send(luna, embed)
-            except Exception as e:
-                if configs.error_log() == "console":
-                    prints.error(f"{e}")
-                else:
-                    embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\n{e}```", color=theme.hex_color())
-                    embed.set_thumbnail(url=theme.image_url())
-                    embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                    embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                    embed.set_image(url=theme.large_image_url())
-                    await send(luna, embed)
+	@commands.command(name = 'playing', 
+				usage="<text>", 
+				description = "Change your activity to playing.")
+	async def playing(self, luna, *, status: str = None):
+		await luna.message.delete()
+		if status is None:
+			prints.error("You didnt put a text to play")
+		else:
+			try:
+				game = discord.Activity(type=0, name=f"{status}")
+				await self.bot.change_presence(activity=game)
+				embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nStatus changed to » Playing {status}```", color=theme.hex_color())
+				embed.set_thumbnail(url=theme.image_url())
+				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+				embed.set_image(url=theme.large_image_url())
+				await send(luna, embed)
+			except Exception as e:
+				if configs.error_log() == "console":
+					prints.error(f"{e}")
+				else:
+					embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\n{e}```", color=theme.hex_color())
+					embed.set_thumbnail(url=theme.image_url())
+					embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+					embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+					embed.set_image(url=theme.large_image_url())
+					await send(luna, embed)
 
 
-    @commands.command(name = 'streaming', 
-                usage="<text>", 
-                description = "Change your activity to streaming.")
-    async def streaming(self, luna, *, status: str = None):
-        await luna.message.delete()
-        if status is None:
-            prints.error("You didnt put a text to stream")
-        else:
-            try:
-                game = discord.Activity(type=1, name=f"{status}", url=configs.stream_url())
-                await self.bot.change_presence(activity=game)
-                embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nStatus changed to » Streaming {status}```", color=theme.hex_color())
-                embed.set_thumbnail(url=theme.image_url())
-                embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                embed.set_image(url=theme.large_image_url())
-                await send(luna, embed)
-            except Exception as e:
-                if configs.error_log() == "console":
-                    prints.error(f"{e}")
-                else:
-                    embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\n{e}```", color=theme.hex_color())
-                    embed.set_thumbnail(url=theme.image_url())
-                    embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                    embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                    embed.set_image(url=theme.large_image_url())
-                    await send(luna, embed)
+	@commands.command(name = 'streaming', 
+				usage="<text>", 
+				description = "Change your activity to streaming.")
+	async def streaming(self, luna, *, status: str = None):
+		await luna.message.delete()
+		if status is None:
+			prints.error("You didnt put a text to stream")
+		else:
+			try:
+				game = discord.Activity(type=1, name=f"{status}", url=configs.stream_url())
+				await self.bot.change_presence(activity=game)
+				embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nStatus changed to » Streaming {status}```", color=theme.hex_color())
+				embed.set_thumbnail(url=theme.image_url())
+				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+				embed.set_image(url=theme.large_image_url())
+				await send(luna, embed)
+			except Exception as e:
+				if configs.error_log() == "console":
+					prints.error(f"{e}")
+				else:
+					embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\n{e}```", color=theme.hex_color())
+					embed.set_thumbnail(url=theme.image_url())
+					embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+					embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+					embed.set_image(url=theme.large_image_url())
+					await send(luna, embed)
 
 
-    @commands.command(name = 'listening', 
-                usage="<text>", 
-                description = "Change your activity to listening.")
-    async def listening(self, luna, *, status: str = None):
-        await luna.message.delete()
-        if status is None:
-            prints.error("You didnt put a text to listen to")
-        else:
-            try:
-                game = discord.Activity(type=2, name=f"{status}")
-                await self.bot.change_presence(activity=game)
-                embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nStatus changed to » Listening {status}```", color=theme.hex_color())
-                embed.set_thumbnail(url=theme.image_url())
-                embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                embed.set_image(url=theme.large_image_url())
-                await send(luna, embed)
-            except Exception as e:
-                if configs.error_log() == "console":
-                    prints.error(f"{e}")
-                else:
-                    embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\n{e}```", color=theme.hex_color())
-                    embed.set_thumbnail(url=theme.image_url())
-                    embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                    embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                    embed.set_image(url=theme.large_image_url())
-                    await send(luna, embed)
+	@commands.command(name = 'listening', 
+				usage="<text>", 
+				description = "Change your activity to listening.")
+	async def listening(self, luna, *, status: str = None):
+		await luna.message.delete()
+		if status is None:
+			prints.error("You didnt put a text to listen to")
+		else:
+			try:
+				game = discord.Activity(type=2, name=f"{status}")
+				await self.bot.change_presence(activity=game)
+				embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nStatus changed to » Listening {status}```", color=theme.hex_color())
+				embed.set_thumbnail(url=theme.image_url())
+				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+				embed.set_image(url=theme.large_image_url())
+				await send(luna, embed)
+			except Exception as e:
+				if configs.error_log() == "console":
+					prints.error(f"{e}")
+				else:
+					embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\n{e}```", color=theme.hex_color())
+					embed.set_thumbnail(url=theme.image_url())
+					embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+					embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+					embed.set_image(url=theme.large_image_url())
+					await send(luna, embed)
 
-    @commands.command(name = 'watching', 
-                usage="<text>", 
-                description = "Change your activity to watching.")
-    async def watching(self, luna, *, status: str = None):
-        await luna.message.delete()
-        if status is None:
-            prints.error("You didnt put a text to watch")
-        else:
-            try:
-                game = discord.Activity(type=3, name=f"{status}")
-                await self.bot.change_presence(activity=game)
-                embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nStatus changed to » Watching {status}```", color=theme.hex_color())
-                embed.set_thumbnail(url=theme.image_url())
-                embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                embed.set_image(url=theme.large_image_url())
-                send(luna, embed)
-            except Exception as e:
-                if configs.error_log() == "console":
-                    prints.error(f"{e}")
-                else:
-                    embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\n{e}```", color=theme.hex_color())
-                    embed.set_thumbnail(url=theme.image_url())
-                    embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                    embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                    embed.set_image(url=theme.large_image_url())
-                    await send(luna, embed)
+	@commands.command(name = 'watching', 
+				usage="<text>", 
+				description = "Change your activity to watching.")
+	async def watching(self, luna, *, status: str = None):
+		await luna.message.delete()
+		if status is None:
+			prints.error("You didnt put a text to watch")
+		else:
+			try:
+				game = discord.Activity(type=3, name=f"{status}")
+				await self.bot.change_presence(activity=game)
+				embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nStatus changed to » Watching {status}```", color=theme.hex_color())
+				embed.set_thumbnail(url=theme.image_url())
+				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+				embed.set_image(url=theme.large_image_url())
+				send(luna, embed)
+			except Exception as e:
+				if configs.error_log() == "console":
+					prints.error(f"{e}")
+				else:
+					embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\n{e}```", color=theme.hex_color())
+					embed.set_thumbnail(url=theme.image_url())
+					embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+					embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+					embed.set_image(url=theme.large_image_url())
+					await send(luna, embed)
 
-    @commands.command(name = 'stopactivity', 
-                usage="", 
-                aliases=["stopstreaming", "stopstatus", "stoplistening", "stopplaying", "stopwatching"],
-                description = "Stop your activity.")
-    async def stopactivity(self, luna):
-        await luna.message.delete()
-        await self.bot.change_presence(activity=None, status=discord.Status.dnd)
-        embed = discord.Embed(title=theme.title(), url=theme.title_url(), description="```\nStopped activity```", color=theme.hex_color())
-        embed.set_thumbnail(url=theme.image_url())
-        embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-        embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-        embed.set_image(url=theme.large_image_url())
-        await send(luna, embed)
+	@commands.command(name = 'stopactivity', 
+				usage="", 
+				aliases=["stopstreaming", "stopstatus", "stoplistening", "stopplaying", "stopwatching"],
+				description = "Stop your activity.")
+	async def stopactivity(self, luna):
+		await luna.message.delete()
+		await self.bot.change_presence(activity=None, status=discord.Status.dnd)
+		embed = discord.Embed(title=theme.title(), url=theme.title_url(), description="```\nStopped activity```", color=theme.hex_color())
+		embed.set_thumbnail(url=theme.image_url())
+		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+		embed.set_image(url=theme.large_image_url())
+		await send(luna, embed)
 
-    @commands.command(name = "clean",
-                    usage="<amount>",
-                    description = "Clean your messages")
-    async def clean(self, luna, amount: int = None):
-        await luna.message.delete()
-        try:
-            if amount is None:
-                embed = discord.Embed(title="Error", url=theme.title_url(), description="```\nInvalid amount```", color=theme.hex_color())
-                embed.set_thumbnail(url=theme.image_url())
-                embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                embed.set_image(url=theme.large_image_url())
-                await send(luna, embed)
-            else:
-                await luna.channel.purge(limit=amount, before=luna.message, check=is_me)
-        except:
-            try:
-                await asyncio.sleep(1)
-                async for message in luna.message.channel.history(limit=amount):
-                    if message.author == self.bot.user:
-                        await message.delete()
-                    else:
-                        pass
-            except Exception as e:
-                if configs.error_log() == "console":
-                    prints.error(f"{e}")
-                else:
-                    embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\n{e}```", color=theme.hex_color())
-                    embed.set_thumbnail(url=theme.image_url())
-                    embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                    embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                    embed.set_image(url=theme.large_image_url())
-                    await send(luna, embed)
-                return
+	@commands.command(name = "clean",
+					usage="<amount>",
+					description = "Clean your messages")
+	async def clean(self, luna, amount: int = None):
+		await luna.message.delete()
+		try:
+			if amount is None:
+				embed = discord.Embed(title="Error", url=theme.title_url(), description="```\nInvalid amount```", color=theme.hex_color())
+				embed.set_thumbnail(url=theme.image_url())
+				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+				embed.set_image(url=theme.large_image_url())
+				await send(luna, embed)
+			else:
+				await luna.channel.purge(limit=amount, before=luna.message, check=is_me)
+		except:
+			try:
+				await asyncio.sleep(1)
+				async for message in luna.message.channel.history(limit=amount):
+					if message.author == self.bot.user:
+						await message.delete()
+					else:
+						pass
+			except Exception as e:
+				if configs.error_log() == "console":
+					prints.error(f"{e}")
+				else:
+					embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\n{e}```", color=theme.hex_color())
+					embed.set_thumbnail(url=theme.image_url())
+					embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+					embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+					embed.set_image(url=theme.large_image_url())
+					await send(luna, embed)
+				return
 
-    @commands.command(name = "textreact",
-                    aliases=['treact'],
-                    usage="<amount>",
-                    description = "Text as reaction")
-    async def textreact(self, luna, messageNo: typing.Optional[int] = 1, *, text):
-        await luna.message.delete()
-        text = (c for c in text.lower())
-        emotes = {
-            "a": "🇦",
-            "b": "🇧",
-            "c": "🇨",
-            "d": "🇩",
-            "e": "🇪",
-            "f": "🇫",
-            "g": "🇬",
-            "h": "🇭",
-            "i": "🇮",
-            "j": "🇯",
-            "k": "🇰",
-            "l": "🇱",
-            "m": "🇲",
-            "n": "🇳",
-            "o": "🇴",
-            "p": "🇵",
-            "q": "🇶",
-            "r": "🇷",
-            "s": "🇸",
-            "t": "🇹",
-            "u": "🇺",
-            "v": "🇻",
-            "w": "🇼",
-            "x": "🇽",
-            "y": "🇾",
-            "z": "🇿",
-        }
-        for i, m in enumerate(await luna.channel.history(limit=100).flatten()):
-            if messageNo == i:
-                for c in text:
-                    await m.add_reaction(f"{emotes[c]}")
-                break
-        
-    @commands.command(name = "afk",
-                    usage="<on/off>",
-                    description = "AFK mode on/off")
-    async def afk(self, luna, mode:str=None):
-        await luna.message.delete()
+	@commands.command(name = "textreact",
+					aliases=['treact'],
+					usage="<amount>",
+					description = "Text as reaction")
+	async def textreact(self, luna, messageNo: typing.Optional[int] = 1, *, text):
+		await luna.message.delete()
+		text = (c for c in text.lower())
+		emotes = {
+			"a": "🇦",
+			"b": "🇧",
+			"c": "🇨",
+			"d": "🇩",
+			"e": "🇪",
+			"f": "🇫",
+			"g": "🇬",
+			"h": "🇭",
+			"i": "🇮",
+			"j": "🇯",
+			"k": "🇰",
+			"l": "🇱",
+			"m": "🇲",
+			"n": "🇳",
+			"o": "🇴",
+			"p": "🇵",
+			"q": "🇶",
+			"r": "🇷",
+			"s": "🇸",
+			"t": "🇹",
+			"u": "🇺",
+			"v": "🇻",
+			"w": "🇼",
+			"x": "🇽",
+			"y": "🇾",
+			"z": "🇿",
+		}
+		for i, m in enumerate(await luna.channel.history(limit=100).flatten()):
+			if messageNo == i:
+				for c in text:
+					await m.add_reaction(f"{emotes[c]}")
+				break
+		
+	@commands.command(name = "afk",
+					usage="<on/off>",
+					description = "AFK mode on/off")
+	async def afk(self, luna, mode:str=None):
+		await luna.message.delete()
 
-        global afkstatus
+		global afkstatus
 
-        if mode == "on" or mode == "off":
-            prints.message(f"AFK Mode » {color.purple(f'{mode}')}")
-            if mode == "on":
-                afkstatus = 1
-            else:
-                afkstatus = 0
-            await embed_builder(luna, description=f"```\nError logging » {mode}```")
-        else:
-            await mode_error(luna, "on or off")
+		if mode == "on" or mode == "off":
+			prints.message(f"AFK Mode » {color.purple(f'{mode}')}")
+			if mode == "on":
+				afkstatus = 1
+			else:
+				afkstatus = 0
+			await embed_builder(luna, description=f"```\nError logging » {mode}```")
+		else:
+			await mode_error(luna, "on or off")
 
-    @commands.command(name = "invisiblenick",
-                    usage="",
-                    description = "Make your nickname invisible")
-    async def invisiblenick(self, luna):
-        await luna.message.delete()
+	@commands.command(name = "invisiblenick",
+					usage="",
+					description = "Make your nickname invisible")
+	async def invisiblenick(self, luna):
+		await luna.message.delete()
 
-        try:
-            name = "‎‎‎‎‎‎‎‏‏‎ ឵឵ ឵឵ ឵឵ ឵឵‎"
-            await luna.message.author.edit(nick=name)
-        except Exception as e:
-            await luna.send(f"Error: {e}")
+		try:
+			name = "‎‎‎‎‎‎‎‏‏‎ ឵឵ ឵឵ ឵឵ ឵឵‎"
+			await luna.message.author.edit(nick=name)
+		except Exception as e:
+			await luna.send(f"Error: {e}")
 
-    @commands.command(name = "hypesquad",
-                    usage="<bravery/brilliance/balance>",
-                    description = "Change Hypesquad house")
-    async def hypesquad(self, luna, house:str):
-        await luna.message.delete()
-        with open('./config.json') as f:
-            config = json.load(f)
-        token = config.get('token')
-        request = requests.session()
-        headers = {
-            'Authorization': token,
-            'Content-Type': 'application/json'
-        }
+	@commands.command(name = "hypesquad",
+					usage="<bravery/brilliance/balance>",
+					description = "Change Hypesquad house")
+	async def hypesquad(self, luna, house:str):
+		await luna.message.delete()
+		with open('./config.json') as f:
+			config = json.load(f)
+		token = config.get('token')
+		request = requests.session()
+		headers = {
+			'Authorization': token,
+			'Content-Type': 'application/json'
+		}
 
-        if house == "bravery":
-            payload = {'house_id': 1}
-        elif house == "brilliance":
-            payload = {'house_id': 2}
-        elif house == "balance":
-            payload = {'house_id': 3}
+		if house == "bravery":
+			payload = {'house_id': 1}
+		elif house == "brilliance":
+			payload = {'house_id': 2}
+		elif house == "balance":
+			payload = {'house_id': 3}
 
-        try:
-            request.post('https://discordapp.com/api/v6/hypesquad/online', headers=headers, json=payload)
-            prints.message(f"Successfully set your hypesquad house to {house}")
-            embed = discord.Embed(title="Hypesquad", url=theme.title_url(), description=f"```\nSuccessfully set your hypesquad house to {house}```", color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
-            embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-            embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-            embed.set_image(url=theme.large_image_url())
-            await send(luna, embed)
-        except:
-            if configs.error_log() == "console":
-                prints.error("Failed to set your hypesquad house")
-            else:
-                embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nFailed to set your hypesquad house```", color=0xff0000)
-                embed.set_thumbnail(url=theme.image_url())
-                embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                embed.set_image(url=theme.large_image_url())
-                await send(luna, embed)
+		try:
+			request.post('https://discordapp.com/api/v6/hypesquad/online', headers=headers, json=payload)
+			prints.message(f"Successfully set your hypesquad house to {house}")
+			embed = discord.Embed(title="Hypesquad", url=theme.title_url(), description=f"```\nSuccessfully set your hypesquad house to {house}```", color=theme.hex_color())
+			embed.set_thumbnail(url=theme.image_url())
+			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+			embed.set_image(url=theme.large_image_url())
+			await send(luna, embed)
+		except:
+			if configs.error_log() == "console":
+				prints.error("Failed to set your hypesquad house")
+			else:
+				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nFailed to set your hypesquad house```", color=0xff0000)
+				embed.set_thumbnail(url=theme.image_url())
+				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+				embed.set_image(url=theme.large_image_url())
+				await send(luna, embed)
 
-    @commands.command(name = "acceptfriends",
-                    usage="",
-                    description = "Accept friend requests")
-    async def acceptfriends(self, luna):
-        await luna.message.delete()
-        for relationship in self.bot.user.relationships:
-            if relationship == discord.RelationshipType.incoming_request:
-                try:
-                    await relationship.accept()
-                    prints.message(f"Accepted {relationship}")
-                except Exception:
-                    pass
-
-
-    @commands.command(name = "ignorefriends",
-                    usage="",
-                    description = "Delete friend requests")
-    async def ignorefriends(self, luna):
-        await luna.message.delete()
-        for relationship in self.bot.user.relationships:
-            if relationship is discord.RelationshipType.incoming_request:
-                relationship.delete()
-                prints.message(f"Deleted {relationship}")
+	@commands.command(name = "acceptfriends",
+					usage="",
+					description = "Accept friend requests")
+	async def acceptfriends(self, luna):
+		await luna.message.delete()
+		for relationship in self.bot.user.relationships:
+			if relationship == discord.RelationshipType.incoming_request:
+				try:
+					await relationship.accept()
+					prints.message(f"Accepted {relationship}")
+				except Exception:
+					pass
 
 
-    @commands.command(name = "delfriends",
-                    usage="",
-                    description = "Delete all friends")
-    async def delfriends(self, luna):
-        await luna.message.delete()
-        for relationship in self.bot.user.relationships:
-            if relationship is discord.RelationshipType.friend:
-                try:
-                    await relationship.delete()
-                    prints.message(f"Deleted {relationship}")
-                except Exception:
-                    pass
+	@commands.command(name = "ignorefriends",
+					usage="",
+					description = "Delete friend requests")
+	async def ignorefriends(self, luna):
+		await luna.message.delete()
+		for relationship in self.bot.user.relationships:
+			if relationship is discord.RelationshipType.incoming_request:
+				relationship.delete()
+				prints.message(f"Deleted {relationship}")
 
 
-    @commands.command(name = "clearblocked",
-                    usage="",
-                    description = "Delete blocked friends")
-    async def clearblocked(self, luna):
-        await luna.message.delete()
-        for relationship in self.bot.user.relationships:
-            if relationship is discord.RelationshipType.blocked:
-                try:
-                    await relationship.delete()
-                    prints.message(f"Deleted {relationship}")
-                except Exception:
-                    pass
+	@commands.command(name = "delfriends",
+					usage="",
+					description = "Delete all friends")
+	async def delfriends(self, luna):
+		await luna.message.delete()
+		for relationship in self.bot.user.relationships:
+			if relationship is discord.RelationshipType.friend:
+				try:
+					await relationship.delete()
+					prints.message(f"Deleted {relationship}")
+				except Exception:
+					pass
 
-    @commands.command(name = "leaveservers",
-                    usage="",
-                    description = "Leave all servers")
-    async def leaveservers(self, luna):
-        await luna.message.delete()
-        try:
-            guilds = requests.get('https://canary.discordapp.com/api/v8/users/@me/guilds', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'}).json()
-            for guild in range(0, len(guilds)):
-                guild_id = guilds[guild]['id']
-                requests.delete(f'https://canary.discordapp.com/api/v8/users/@me/guilds/{guild_id}', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
-                prints.message(f"Left {guild}")
-        except Exception:
-            pass
+
+	@commands.command(name = "clearblocked",
+					usage="",
+					description = "Delete blocked friends")
+	async def clearblocked(self, luna):
+		await luna.message.delete()
+		for relationship in self.bot.user.relationships:
+			if relationship is discord.RelationshipType.blocked:
+				try:
+					await relationship.delete()
+					prints.message(f"Deleted {relationship}")
+				except Exception:
+					pass
+
+	@commands.command(name = "leaveservers",
+					usage="",
+					description = "Leave all servers")
+	async def leaveservers(self, luna):
+		await luna.message.delete()
+		try:
+			guilds = requests.get('https://canary.discordapp.com/api/v8/users/@me/guilds', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'}).json()
+			for guild in range(0, len(guilds)):
+				guild_id = guilds[guild]['id']
+				requests.delete(f'https://canary.discordapp.com/api/v8/users/@me/guilds/{guild_id}', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+				prints.message(f"Left {guild}")
+		except Exception:
+			pass
 
 bot.add_cog(UtilsCog(bot))
 
@@ -8290,7 +8234,7 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 		if len(newhexcolor) < 6:
 			await error_builder(luna, description=f"```\nNot a valid HEX color code```")
 			return
-		prints.message(f"Changed hexcolor to » {color.purple(f'newhexcolor')}")
+		prints.message(f"Changed hexcolor to » {color.purple(f'{newhexcolor}')}")
 		if newhexcolor == "None":
 			config.hex_color("")
 		else:
@@ -9810,7 +9754,7 @@ class WebhookCog(commands.Cog, name="Webhook customisation"):
 		await luna.message.delete()
 		prints.message(f"Changed webhook title to » {color.purple(f'{newtitle}')}")
 		if newtitle == "None":
-			config.we("")
+			config.webhook.title("")
 		else:
 			config.webhook.title(f"{newtitle}")
 		await embed_builder(luna, description=f"```\nChanged webhook title to » {newtitle}```")
@@ -10270,6 +10214,15 @@ async def error_builder(luna, description=""):
         await send(luna, embed)
 
 # ///////////////////////////////////////////////////////////////
+
+# @bot.command(name = "speed", usage="", description = "Command speed test")
+# async def speed(luna):
+# 	sniped_start_time = time.time()
+# 	embed = discord.Embed(title="Help", description=f"This is a speed test", color=0xE10959)
+# 	embed.set_thumbnail(url="https://cdn.discordapp.com/avatars/406907871998246924/70bdf0218ac762d8a7dbf8c8758ec62d.webp?size=4096")
+# 	embed.set_footer(text="Luna", icon_url="https://cdn.discordapp.com/avatars/406907871998246924/70bdf0218ac762d8a7dbf8c8758ec62d.webp?size=4096")
+# 	await luna.send(embed=embed)
+# 	await luna.send(f"It took {'%.3fs' % (time.time() - sniped_start_time)} to send.")
 
 # RPC Main
 # if files.json("Luna/rpc.json", "rich_presence", documents=True) == "on":
