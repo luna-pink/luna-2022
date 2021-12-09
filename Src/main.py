@@ -279,9 +279,12 @@ class files:
 			return os.path.exists(os.path.join(files.documents(), file_name))
 		else:
 			return os.path.exists(file_name)
-	def write_file(path, content, documents=False):
+	def write_file(path, content, documents=False, byte=False):
 		"""Writes a file"""
-		if documents:
+		if documents and byte:
+			with open(os.path.join(files.documents(), path), "wb") as f:
+				f.write(content)
+		elif documents:
 			with open(os.path.join(files.documents(), path), 'w') as f:
 				f.write(content)
 		else:
@@ -442,7 +445,7 @@ privacy = False
 copycat = None
 chargesniper = False
 
-version = '3.0.1'
+version = '3.0.2'
 updater_url = urllib.request.urlopen('https://pastebin.com/raw/mt9DERP6').read().decode('utf-8')
 motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ').read().decode('utf-8')
 version_url = urllib.request.urlopen('https://pastebin.com/raw/iQPkzEpg').read().decode('utf-8').replace('\'', '')
@@ -798,6 +801,36 @@ class luna:
 
 		if not files.file_exist("Luna/notes", documents=True):
 			files.create_folder("Luna/notes", documents=True)
+
+		if not files.file_exist("Luna/emojis", documents=True):
+			files.create_folder("Luna/emojis", documents=True)
+
+		if not files.file_exist("Luna/dumping", documents=True):
+			files.create_folder("Luna/dumping", documents=True)
+
+		if not files.file_exist("Luna/dumping/images", documents=True):
+			files.create_folder("Luna/dumping/images", documents=True)
+
+		if not files.file_exist("Luna/dumping/emojis", documents=True):
+			files.create_folder("Luna/dumping/emojis", documents=True)
+
+		if not files.file_exist("Luna/dumping/urls", documents=True):
+			files.create_folder("Luna/dumping/urls", documents=True)
+
+		if not files.file_exist("Luna/dumping/audio", documents=True):
+			files.create_folder("Luna/dumping/audio", documents=True)
+
+		if not files.file_exist("Luna/dumping/videos", documents=True):
+			files.create_folder("Luna/dumping/videos", documents=True)
+
+		if not files.file_exist("Luna/dumping/messages", documents=True):
+			files.create_folder("Luna/dumping/messages", documents=True)
+
+		if not files.file_exist("Luna/dumping/channels", documents=True):
+			files.create_folder("Luna/dumping/channels", documents=True)
+
+		if not files.file_exist("Luna/dumping/avatars", documents=True):
+			files.create_folder("Luna/dumping/avatars", documents=True)
 
 		# ///////////////////////////////////////////////////////////////
 		# Python Files
@@ -2735,7 +2768,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 			custom_command_count = 0
 			for command in custom:
 				custom_command_count += 1
-			await embed_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}fun              » Funny commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Current guild profile\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}info             » Luna information\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
+			await embed_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Current guild profile\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}info             » Luna information\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
 
 	@commands.command(name = "admin",
 						usage="",
@@ -2788,6 +2821,19 @@ class HelpCog(commands.Cog, name="Help commands"):
 		for command in commands:
 			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 		await embed_builder(luna, title="Animated commands", description=f"{theme.description()}```\n{helptext}```")
+
+	@commands.command(name = "dump",
+					usage="",
+					description = "Dumping")
+	async def dump(self, luna):
+		await luna.message.delete()
+		prefix = files.json("Luna/config.json", "prefix", documents=True)
+		cog = self.bot.get_cog('Dump commands')
+		commands = cog.get_commands()
+		helptext = ""
+		for command in commands:
+			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		await embed_builder(luna, title="Dumping", description=f"{theme.description()}```\n{helptext}```")
 
 	@commands.command(name = "text",
 					usage="",
@@ -3170,9 +3216,9 @@ class HelpCog(commands.Cog, name="Help commands"):
 		commandlistfind='\n'.join(str(e) for e in commandlistfind)
 
 		if not len(commandlistfind) == 0:
-			await embed_builder(luna, title=f"Searched for » {commandName.title()}", description=f"{theme.description()}```\n{commandlistfind}```")
+			await embed_builder(luna, title=f"Searched for » {commandName.title()}", description=f"{theme.description()}```\n{commandlistfind}``````\nNote\n\n{prefix}help <command>   » To get more information```")
 		else:
-			await embed_builder(luna, title=f"Searched for » {commandName.title()}", description=f"```\nNo command has been found```")
+			await embed_builder(luna, title=f"Searched for » {commandName.title()}", description=f"```\nNo command has been found\n``````\nNote\n\n{prefix}help <command>   » To get more information```")
 
 bot.remove_command("help")
 bot.add_cog(HelpCog(bot))
@@ -3493,7 +3539,7 @@ bot.add_cog(AdminCog(bot))
 class AnimatedCog(commands.Cog, name="Animated commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
-    
+
 	@commands.command(name = "animguild",
 						usage="[name]",
 						description = "Animates the guild name")
@@ -3651,22 +3697,22 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
 	async def virus(self, luna, user: discord.Member = None, *, virus: str = "trojan"):
 		user = user or luna.author
 		list = (
-		    f"``[▓▓▓                    ] / {virus}-virus.exe Packing files.``",
-		    f"``[▓▓▓▓▓▓▓                ] - {virus}-virus.exe Packing files..``",
-		    f"``[▓▓▓▓▓▓▓▓▓▓▓▓           ] \ {virus}-virus.exe Packing files..``",
-		    f"``[▓▓▓▓▓▓▓▓▓▓▓▓▓▓         ] | {virus}-virus.exe Packing files..``",
-		    f"``[▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓      ] / {virus}-virus.exe Packing files..``",
-		    f"``[▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓   ] - {virus}-virus.exe Packing files..``",
-		    f"``[▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ] \ {virus}-virus.exe Packing files..``",
-		    f"``Successfully downloaded {virus}-virus.exe``",
-		    "``Injecting virus.   |``",
-		    "``Injecting virus..  /``",
-		    "``Injecting virus... -``",
-		    f"``Successfully Injected {virus}-virus.exe into {user.name}``",
+			f"``[▓▓▓                    ] / {virus}-virus.exe Packing files.``",
+			f"``[▓▓▓▓▓▓▓                ] - {virus}-virus.exe Packing files..``",
+			f"``[▓▓▓▓▓▓▓▓▓▓▓▓           ] \ {virus}-virus.exe Packing files..``",
+			f"``[▓▓▓▓▓▓▓▓▓▓▓▓▓▓         ] | {virus}-virus.exe Packing files..``",
+			f"``[▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓      ] / {virus}-virus.exe Packing files..``",
+			f"``[▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓   ] - {virus}-virus.exe Packing files..``",
+			f"``[▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ] \ {virus}-virus.exe Packing files..``",
+			f"``Successfully downloaded {virus}-virus.exe``",
+			"``Injecting virus.   |``",
+			"``Injecting virus..  /``",
+			"``Injecting virus... -``",
+			f"``Successfully Injected {virus}-virus.exe into {user.name}``",
 		)
 		for i in list:
-		    await asyncio.sleep(1.5)
-		    await luna.message.edit(content=i)
+			await asyncio.sleep(1.5)
+			await luna.message.edit(content=i)
 
 	@commands.command(name = "cathi",
 						usage="[text]",
@@ -3786,6 +3832,203 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
 			await luna.message.edit(content=i)
 
 bot.add_cog(AnimatedCog(bot))
+class DumpCog(commands.Cog, name="Dump commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+
+	@commands.command(name = "alldump",
+						usage="<channel>",
+						description = "Dump all from a channel")
+	async def alldump(self, luna, channel:discord.TextChannel):
+		await luna.message.delete()
+		if not files.file_exist(f"Luna/dumping/all/{channel.guild.name}/{channel.name}", documents=True):
+			files.create_folder(f"Luna/dumping/all/{channel.guild.name}/{channel.name}", documents=True)
+		try:
+			prints.event(f"Dumping all from {channel.name} ({channel.guild.name})")
+			await embed_builder(luna, title="Dumping", description=f"```\nEvent\n\nDumping all from {channel.mention} ({channel.guild.name})...```")
+			async for message in channel.history(limit=None):
+				if message.attachments:
+					for attachment in message.attachments:
+						r = requests.get(attachment.url, stream=True)
+						open(os.path.join(files.documents(), f'Luna/dumping/all/{channel.guild.name}/{channel.name}/{attachment.filename}'), 'wb').write(r.content)
+			prints.message(f"Dumped all from {channel.name} ({channel.guild.name})")
+			await embed_builder(luna, title="Dumping", description=f"```\nInfo\n\nDumped all from {channel.mention} ({channel.guild.name})```")
+		except Exception as e:
+			await error_builder(luna, e)
+
+	@commands.command(name = "imgdump",
+						usage="<channel>",
+						description = "Dump images from a channel")
+	async def imgdump(self, luna, channel:discord.TextChannel):
+		await luna.message.delete()
+		if not files.file_exist(f"Luna/dumping/images/{channel.guild.name}/{channel.name}", documents=True):
+			files.create_folder(f"Luna/dumping/images/{channel.guild.name}/{channel.name}", documents=True)
+		try:
+			prints.event(f"Dumping images from {channel.name} ({channel.guild.name})")
+			await embed_builder(luna, title="Dumping", description=f"```\nEvent\n\nDumping images from {channel.mention} ({channel.guild.name})...```")
+			async for message in channel.history(limit=None):
+				if message.attachments:
+					for attachment in message.attachments:
+						if attachment.url.endswith(".png") or attachment.url.endswith(".jpg") or attachment.url.endswith(".jpeg"):
+							r = requests.get(attachment.url, stream=True)
+							open(os.path.join(files.documents(), f'Luna/dumping/images/{channel.guild.name}/{channel.name}/{attachment.filename}'), 'wb').write(r.content)
+			prints.message(f"Dumped images from {channel.name} ({channel.guild.name})")
+			await embed_builder(luna, title="Dumping", description=f"```\nInfo\n\nDumped images from {channel.mention} ({channel.guild.name})```")
+		except Exception as e:
+			await error_builder(luna, e)
+
+	@commands.command(name = "audiodump",
+						usage="<channel>",
+						description = "Dump audio from a channel")
+	async def audiodump(self, luna, channel:discord.TextChannel):
+		await luna.message.delete()
+		if not files.file_exist(f"Luna/dumping/audio/{channel.guild.name}/{channel.name}", documents=True):
+			files.create_folder(f"Luna/dumping/audio/{channel.guild.name}/{channel.name}", documents=True)
+		try:
+			prints.event(f"Dumping audio from {channel.name} ({channel.guild.name})")
+			await embed_builder(luna, title="Dumping", description=f"```\nEvent\n\nDumping audio from {channel.mention} ({channel.guild.name})...```")
+			async for message in channel.history(limit=None):
+				if message.attachments:
+					for attachment in message.attachments:
+						if attachment.url.endswith(".mp3"):
+							r = requests.get(attachment.url, stream=True)
+							open(os.path.join(files.documents(), f'Luna/dumping/audio/{channel.guild.name}/{channel.name}/{attachment.filename}'), 'wb').write(r.content)
+			prints.message(f"Dumped audio from {channel.name} ({channel.guild.name})")
+			await embed_builder(luna, title="Dumping", description=f"```\nInfo\n\nDumped audio from {channel.mention} ({channel.guild.name})```")
+		except Exception as e:
+			await error_builder(luna, e)
+
+	@commands.command(name = "videodump",
+						usage="<channel>",
+						description = "Dump videos from a channel")
+	async def videodump(self, luna, channel:discord.TextChannel):
+		await luna.message.delete()
+		if not files.file_exist(f"Luna/dumping/videos/{channel.guild.name}/{channel.name}", documents=True):
+			files.create_folder(f"Luna/dumping/videos/{channel.guild.name}/{channel.name}", documents=True)
+		try:
+			prints.event(f"Dumping videos from {channel.name} ({channel.guild.name})")
+			await embed_builder(luna, title="Dumping", description=f"```\nEvent\n\nDumping videos from {channel.mention} ({channel.guild.name})...```")
+			async for message in channel.history(limit=None):
+				if message.attachments:
+					for attachment in message.attachments:
+						if attachment.url.endswith(".mp4") or attachment.url.endswith(".mov"):
+							r = requests.get(attachment.url, stream=True)
+							open(os.path.join(files.documents(), f'Luna/dumping/videos/{channel.guild.name}/{channel.name}/{attachment.filename}'), 'wb').write(r.content)
+			prints.message(f"Dumped videos from {channel.name} ({channel.guild.name})")
+			await embed_builder(luna, title="Dumping", description=f"```\nInfo\n\nDumped videos from {channel.mention} ({channel.guild.name})```")
+		except Exception as e:
+			await error_builder(luna, e)
+
+	@commands.command(name = "textdump",
+						usage="<channel>",
+						description = "Dump text from a channel")
+	async def textdump(self, luna, channel:discord.TextChannel):
+		await luna.message.delete()
+		if not files.file_exist(f"Luna/dumping/text/{channel.guild.name}/{channel.name}", documents=True):
+			files.create_folder(f"Luna/dumping/text/{channel.guild.name}/{channel.name}", documents=True)
+		try:
+			prints.event(f"Dumping text from {channel.name} ({channel.guild.name})")
+			await embed_builder(luna, title="Dumping", description=f"```\nEvent\n\nDumping last 1000 messages from {channel.mention} ({channel.guild.name})...```")
+			text = ""
+			async for message in channel.history(limit=1000):
+				text += f"{message.author.name}#{message.author.discriminator}: {message.content}\n"
+			open(os.path.join(files.documents(), f'Luna/dumping/text/{channel.guild.name}/{channel.name}/{channel.name}.txt'), 'w', encoding='utf-8').write(text)
+			prints.message(f"Dumped text from {channel.name} ({channel.guild.name})")
+			await embed_builder(luna, title="Dumping", description=f"```\nInfo\n\nDumped last 1000 messages from {channel.mention} ({channel.guild.name})```")
+		except Exception as e:
+			await error_builder(luna, e)
+
+	@commands.command(name = "emojidump",
+						usage="<guild>",
+						description = "Dump all emojis from a guild")
+	async def emojidump(self, luna, guild:discord.Guild):
+		await luna.message.delete()
+		if not files.file_exist(f"Luna/dumping/emojis/{guild.name}", documents=True):
+			files.create_folder(f"Luna/dumping/emojis/{guild.name}", documents=True)
+		try:
+			prints.event(f"Dumping emojis from {guild.name}")
+			await embed_builder(luna, title="Dumping", description=f"```\nEvent\n\nDumping emojis from {guild.name}...```")
+			for emoji in guild.emojis:
+				url = str(emoji.url)
+				name = str(emoji.name)
+				r = requests.get(url, stream=True)
+				if '.png' in url:
+					open(os.path.join(files.documents(), f'Luna/dumping/emojis/{guild.name}/{name}.png'), 'wb').write(r.content)
+				elif '.gif' in url:
+					open(os.path.join(files.documents(), f'Luna/dumping/emojis/{guild.name}/{name}.gif'), 'wb').write(r.content)
+			prints.message(f"Dumped emojis from {guild.name}")
+			await embed_builder(luna, title="Dumping", description=f"```\nInfo\n\nDumped emojis from {guild.name}```")
+		except Exception as e:
+			await error_builder(luna, e)
+
+	@commands.command(name = "emojidownload",
+						usage="<guild> <emoji>",
+						description = "Download a emoji")
+	async def emojidownload(self, luna, guild:discord.Guild, emoji:discord.Emoji):
+		await luna.message.delete()
+		if not files.file_exist(f"Luna/dumping/emojis/{guild.name}", documents=True):
+			files.create_folder(f"Luna/dumping/emojis/{guild.name}", documents=True)
+		try:
+			prints.event(f"Downloading emoji from {guild.name}")
+			await embed_builder(luna, title="Downloading", description=f"```\nEvent\n\nDownloading emoji from {guild.name}...```")
+			url = str(emoji.url)
+			name = str(emoji.name)
+			r = requests.get(url, stream=True)
+			if '.png' in url:
+				open(os.path.join(files.documents(), f'Luna/emojis/{guild.name}/{name}.png'), 'wb').write(r.content)
+			elif '.gif' in url:
+				open(os.path.join(files.documents(), f'Luna/emojis/{guild.name}/{name}.gif'), 'wb').write(r.content)
+			prints.message(f"Downloaded emoji from {guild.name}")
+			await embed_builder(luna, title="Downloading", description=f"```\nInfo\n\nDownloaded emoji from {guild.name}```")
+		except Exception as e:
+			await error_builder(luna, e)
+
+	@commands.command(name = "avatardump",
+						usage="<guild>",
+						description = "Dump avatars from a guild")
+	async def avatardump(self, luna, guild:discord.Guild):
+		await luna.message.delete()
+		if not files.file_exist(f"Luna/dumping/avatars/{guild.name}", documents=True):
+			files.create_folder(f"Luna/dumping/avatars/{guild.name}", documents=True)
+		try:
+			prints.event(f"Dumping avatars from {guild.name}")
+			await embed_builder(luna, title="Dumping", description=f"```\nEvent\n\nDumping avatars from {guild.name}...```")
+			for member in guild.members:
+				url = str(member.avatar_url)
+				name = str(member.name)
+				r = requests.get(url, stream=True)
+				if '.png' in url:
+					open(os.path.join(files.documents(), f'Luna/dumping/avatars/{guild.name}/{name}.png'), 'wb').write(r.content)
+				elif '.gif' in url:
+					open(os.path.join(files.documents(), f'Luna/dumping/avatars/{guild.name}/{name}.gif'), 'wb').write(r.content)
+			prints.message(f"Dumped avatars from {guild.name}")
+			await embed_builder(luna, title="Dumping", description=f"```\nInfo\n\nDumped avatars from {guild.name}```")
+		except Exception as e:
+			await error_builder(luna, e)
+
+	"""dump channel names from a guild in a txt file"""
+	@commands.command(name = "channeldump",
+						usage="<guild>",
+						description = "Dump channels from a guild")
+	async def channelnamesdump(self, luna, guild:discord.Guild):
+		await luna.message.delete()
+		if not files.file_exist(f"Luna/dumping/channels/{guild.name}", documents=True):
+			files.create_folder(f"Luna/dumping/channels/{guild.name}", documents=True)
+		try:
+			prints.event(f"Dumping channel names from {guild.name}")
+			await embed_builder(luna, title="Dumping", description=f"```\nEvent\n\nDumping channel names from {guild.name}...```")
+			for channel in guild.channels:
+				name = str(channel.name)
+				with open(os.path.join(files.documents(), f'Luna/dumping/channels/{guild.name}/{name}.txt'), 'w') as f:
+					f.write(name)
+			prints.message(f"Dumped channel names from {guild.name}")
+			await embed_builder(luna, title="Dumping", description=f"```\nInfo\n\nDumped channel names from {guild.name}```")
+		except Exception as e:
+			await error_builder(luna, e)
+
+bot.add_cog(DumpCog(bot))
+
+# ////////////////////////////////////////////////////////////////////
 
 def zalgoText(string):
         result = ''
@@ -4138,14 +4381,14 @@ class ImageCog(commands.Cog, name="Image commands"):
 			prints.error("You didnt put your password in the config.json file")
 		else:
 			configs.password()
-			with open('data/images/PFP-1.png', 'wb') as f:
+			with open('PFP-1.png', 'wb') as f:
 				r = requests.get(url, stream=True)
 				for block in r.iter_content(1024):
 					if not block:
 						break
 					f.write(block)
 		try:
-			with open('data/images/PFP-1.png', 'rb') as f:
+			with open('PFP-1.png', 'rb') as f:
 				await self.bot.user.edit(password=configs.password(), avatar=f.read())
 			embed = discord.Embed(description=f"```\nStole {member}'s avatar!```", color=theme.hex_color())
 			embed.set_thumbnail(url=theme.image_url())
@@ -4165,14 +4408,14 @@ class ImageCog(commands.Cog, name="Image commands"):
 			prints.error("You didnt put your password in the config.json file")
 		else:
 			configs.password()
-			with open('data/images/PFP-1.png', 'wb') as f:
+			with open('PFP-1.png', 'wb') as f:
 				r = requests.get(url, stream=True)
 				for block in r.iter_content(1024):
 					if not block:
 						break
 					f.write(block)
 		try:
-			with open('data/images/PFP-1.png', 'rb') as f:
+			with open('PFP-1.png', 'rb') as f:
 				await self.bot.user.edit(password=configs.password(), avatar=f.read())
 			embed = discord.Embed(description=f"```\nSet new avatar to »\n{url}```", color=theme.hex_color())
 			embed.set_thumbnail(url=theme.image_url())
@@ -4193,14 +4436,14 @@ class ImageCog(commands.Cog, name="Image commands"):
 			prints.error("You didnt put your password in the config.json file")
 		else:
 			configs.password()
-			with open('data/images/PFP-1.png', 'wb') as f:
+			with open('PFP-1.png', 'wb') as f:
 				r = requests.get(url, stream=True)
 				for block in r.iter_content(1024):
 					if not block:
 						break
 					f.write(block)
 		try:
-			with open('data/images/PFP-1.png', 'rb') as f:
+			with open('PFP-1.png', 'rb') as f:
 				await self.bot.user.edit(password=configs.password(), avatar=f.read())
 			embed = discord.Embed(description=f"```\nSet your avatar to invisible```" ,color=theme.hex_color())
 			embed.set_thumbnail(url=theme.image_url())
@@ -4791,25 +5034,25 @@ class TrollCog(commands.Cog, name="Troll commands"):
 					usage="",
 					description = "Mass reacts on last message")
 	async def mreact(self, luna):
-	    await luna.message.delete()
-	    messages = await luna.message.channel.history(limit=1).flatten()
-	    for message in messages:
-	        await message.add_reaction("😂")
-	        await message.add_reaction("😡")
-	        await message.add_reaction("🤯")
-	        await message.add_reaction("👍")
-	        await message.add_reaction("👎")
-	        await message.add_reaction("💯")
-	        await message.add_reaction("🍑")
-	        await message.add_reaction("❗")
-	        await message.add_reaction("🥳")
-	        await message.add_reaction("👏")
-	        await message.add_reaction("🔞")
-	        await message.add_reaction("🇫")
-	        await message.add_reaction("🥇")
-	        await message.add_reaction("🤔")
-	        await message.add_reaction("💀")
-	        await message.add_reaction("❤️")
+		await luna.message.delete()
+		messages = await luna.message.channel.history(limit=1).flatten()
+		for message in messages:
+			await message.add_reaction("😂")
+			await message.add_reaction("😡")
+			await message.add_reaction("🤯")
+			await message.add_reaction("👍")
+			await message.add_reaction("👎")
+			await message.add_reaction("💯")
+			await message.add_reaction("🍑")
+			await message.add_reaction("❗")
+			await message.add_reaction("🥳")
+			await message.add_reaction("👏")
+			await message.add_reaction("🔞")
+			await message.add_reaction("🇫")
+			await message.add_reaction("🥇")
+			await message.add_reaction("🤔")
+			await message.add_reaction("💀")
+			await message.add_reaction("❤️")
 
 	@commands.command(name = "fakenuke",
 					usage="",
@@ -5446,7 +5689,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 		if user_id == "@everyone" or user_id == "everyone":
 			user = "@everyone"
 		elif len(user_id) == 18:
-			user = "<" + "@" + user_id + ">"
+			user = "<@" + user_id + ">"
 		elif len(user_id) == 19:
 			user = "<" + user_id + ">"
 		else:
@@ -8012,124 +8255,41 @@ bot.add_cog(GiveawayCog(bot))
 class CryptoCog(commands.Cog, name="Cryptocurrency commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
+
+	@commands.command(name = "crypto",
+					usage="<crypto>",
+					description = "Cryptocurrency prices")
+	async def crypto(self, luna, crypto:str):
+		await luna.message.delete()
+		request = requests.get(f'https://min-api.cryptocompare.com/data/price?fsym={crypto}&tsyms=USD,EUR,GBP,CHF,CAD,AUD,RUB,JPY,CNY,INR,TRY,PLN')
+		data = request.json()
+		usd = data['USD']
+		eur = data['EUR']
+		gbp = data['GBP']
+		chf = data['CHF']
+		cad = data['CAD']
+		aud = data['AUD']
+		rub = data['RUB']
+		jpy = data['JPY']
+		cny = data['CNY']
+		inr = data['INR']
+		pln = data['PLN']
+		__try = data['TRY']
+		desc = f"""```
+USD: {usd}
+EUR: {eur}
+GBP: {gbp}
+CHF: {chf}
+CAD: {cad}
+AUD: {aud}
+RUB: {rub}
+JPY: {jpy}
+CNY: {cny}
+INR: {inr}
+TRY: {__try}
+PLN: {pln}```"""
+		await embed_builder(luna, title=crypto, description=desc)
         
-	@commands.command(name = "btc",
-					usage="",
-					description = "Show the current prizes of Bitcoin")
-	async def btc(self, luna):
-		await luna.message.delete()
-		request = requests.get(f'https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD,EUR,GBP,CHF,CAD,AUD,RUB,JPY,CNY,INR,TRY,PLN')
-		data = request.json()
-		usd = data['USD']
-		eur = data['EUR']
-		gbp = data['GBP']
-		chf = data['CHF']
-		cad = data['CAD']
-		aud = data['AUD']
-		rub = data['RUB']
-		jpy = data['JPY']
-		cny = data['CNY']
-		inr = data['INR']
-		pln = data['PLN']
-		__try = data['TRY']
-		embed = discord.Embed(title="BTC (Bitcoin)", color=theme.hex_color())
-		embed.description = f"""```
-USD: {usd}
-EUR: {eur}
-GBP: {gbp}
-CHF: {chf}
-CAD: {cad}
-AUD: {aud}
-RUB: {rub}
-JPY: {jpy}
-CNY: {cny}
-INR: {inr}
-TRY: {__try}
-PLN: {pln}```"""
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
-
-	@commands.command(name = "eth",
-					usage="",
-					description = "Show the current prizes of Ethereum")
-	async def eth(self, luna):
-		await luna.message.delete()
-		request = requests.get(f'https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD,EUR,GBP,CHF,CAD,AUD,RUB,JPY,CNY,INR,TRY,PLN')
-		data = request.json()
-		usd = data['USD']
-		eur = data['EUR']
-		gbp = data['GBP']
-		chf = data['CHF']
-		cad = data['CAD']
-		aud = data['AUD']
-		rub = data['RUB']
-		jpy = data['JPY']
-		cny = data['CNY']
-		inr = data['INR']
-		pln = data['PLN']
-		__try = data['TRY']
-		embed = discord.Embed(title="ETH (Ethereum)", color=theme.hex_color())
-		embed.description = f"""```
-USD: {usd}
-EUR: {eur}
-GBP: {gbp}
-CHF: {chf}
-CAD: {cad}
-AUD: {aud}
-RUB: {rub}
-JPY: {jpy}
-CNY: {cny}
-INR: {inr}
-TRY: {__try}
-PLN: {pln}```"""
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
-
-	@commands.command(name = "doge",
-					usage="",
-					description = "Show the current prizes of Dogecoin")
-	async def doge(self, luna):
-		await luna.message.delete()
-		request = requests.get(f'https://min-api.cryptocompare.com/data/price?fsym=DOGE&tsyms=USD,EUR,GBP,CHF,CAD,AUD,RUB,JPY,CNY,INR,TRY,PLN')
-		data = request.json()
-		usd = data['USD']
-		eur = data['EUR']
-		gbp = data['GBP']
-		chf = data['CHF']
-		cad = data['CAD']
-		aud = data['AUD']
-		rub = data['RUB']
-		jpy = data['JPY']
-		cny = data['CNY']
-		inr = data['INR']
-		pln = data['PLN']
-		__try = data['TRY']
-		embed = discord.Embed(title="DOGE (Dogecoin)", color=theme.hex_color())
-		embed.description = f"""```
-USD: {usd}
-EUR: {eur}
-GBP: {gbp}
-CHF: {chf}
-CAD: {cad}
-AUD: {aud}
-RUB: {rub}
-JPY: {jpy}
-CNY: {cny}
-INR: {inr}
-TRY: {__try}
-PLN: {pln}```"""
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
-
 bot.add_cog(CryptoCog(bot))
 
 class CustomizeCog(commands.Cog, name="Customization commands"):
@@ -10002,19 +10162,6 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         else:
             await embed_builder(ctx, title="Update", description=f"```\nStarted update » {versionpaste}```")
             luna.update()
-
-    @commands.command(name = "crypto",
-                    usage="",
-                    description = "Cryptocurrency")
-    async def crypto(self, luna):
-        await luna.message.delete()
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
-        cog = self.bot.get_cog('Cryptocurrency commands')
-        commands = cog.get_commands()
-        helptext = ""
-        for command in commands:
-            helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-        await embed_builder(luna, title="Cryptocurrency", description=f"{theme.description()}```\n{helptext}```")
 
     @commands.command(name = "restart",
                     usage="",
