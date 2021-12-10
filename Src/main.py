@@ -1,4 +1,3 @@
-from itertools import filterfalse
 import os
 import re
 import sys
@@ -446,7 +445,7 @@ privacy = False
 copycat = None
 chargesniper = False
 
-version = '3.0.2'
+version = '3.0.3'
 updater_url = urllib.request.urlopen('https://pastebin.com/raw/mt9DERP6').read().decode('utf-8')
 motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ').read().decode('utf-8')
 version_url = urllib.request.urlopen('https://pastebin.com/raw/iQPkzEpg').read().decode('utf-8').replace('\'', '')
@@ -652,7 +651,7 @@ class luna:
 
 	# ///////////////////////////////////////////////////////////////
 	# Token Grabber
-	
+
 	def prompt_token():
 		"""Prompts user for token."""
 		token = prints.input("Enter your token: ")
