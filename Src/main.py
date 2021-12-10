@@ -1,3 +1,4 @@
+from itertools import filterfalse
 import os
 import re
 import sys
@@ -651,13 +652,13 @@ class luna:
 
 	# ///////////////////////////////////////////////////////////////
 	# Token Grabber
-
+	
 	def prompt_token():
 		"""Prompts user for token."""
 		token = prints.input("Enter your token: ")
 		if luna.check_token(token):
 			headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': token}
-			r = requests.get("https://discordapp.com/api/v9/users/@me/library", headers=headers)
+			r = requests.get("https://discordapp.com/api/v9/users/@me", headers=headers).json()
 			if token.startswith("mfa"):
 				_2fa = " » 2FA Active"
 			else:
@@ -673,7 +674,6 @@ class luna:
 				return False
 		else:
 			return False
-
 	def check_token(token):
 		"""
 		Check the given token.\n
@@ -4006,7 +4006,6 @@ class DumpCog(commands.Cog, name="Dump commands"):
 		except Exception as e:
 			await error_builder(luna, e)
 
-	"""dump channel names from a guild in a txt file"""
 	@commands.command(name = "channeldump",
 						usage="<guild>",
 						description = "Dump channels from a guild")
