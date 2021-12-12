@@ -430,6 +430,7 @@ def check_debuggers():
 
 # ///////////////////////////////////////////////////////////////
 # Threading
+
 def check_debuggers_thread():
     debugger_thread = threading.Thread(target=check_debuggers)
     debugger_thread.daemon = True
@@ -3067,7 +3068,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 		helptext = ""
 		for command in commands:
 			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		await embed_builder(luna, title="Settings", description=f"{theme.description()}```\nYour current settings\n\nError logging     » {errorlog}\nAuto delete timer » {deletetimer}\nStartup status    » {startup_status}\nRiskmode          » {riskmode}\nTheme             » {(themesvar[:-5])}\nDescription       » {theme_description}\nSelfbot detection » {selfbotdetection}\nMention notify    » {pings}\n``````\nYour current theme settings\n\nTheme             » {title}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSettings\n\n{helptext}```")
+		await embed_builder(luna, title="Settings", description=f"{theme.description()}```\nYour current settings\n\nError logging     » {errorlog}\nAuto delete timer » {deletetimer}\nStartup status    » {startup_status}\nRiskmode          » {riskmode}\nTheme             » {(themesvar[:-5])}\nDescription       » {theme_description}\nSelfbot detection » {selfbotdetection}\nMention notify    » {pings}\n``````\nYour current theme settings\n\nTheme             » {(themesvar[:-5])}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSettings\n\n{helptext}```")
 
 	@commands.command(name = "sharing",
 					usage="",
@@ -3139,7 +3140,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 		else:
 			for command in commands:
 				helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		await embed_builder(luna, title="Your custom commands", description=f"{theme.description()}```\n{helptext}```")
+		await embed_builder(luna, title="Your custom commands", description=f"{theme.description()}```\n{helptext}``````\nNote\n\n{prefix}reload           » Reload custom commands```")
 
 	@commands.command(name = "communitycmds",
 					aliases=['ccommands', 'communitycommands', 'community'],
@@ -7812,7 +7813,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		for command in commands:
 			helptext3+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 		
-		embed = discord.Embed(title="Customization", description=f"{theme.description()}```\nYour current theme settings\n\nTheme             » {themevar}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSelfbot theme settings\n\n{helptext1}\n``````\nWebhook theme settings\n\n{helptext2}\n``````\nToast theme settings\n\n{helptext3}\n``````\nNote\n\nIf you want to remove a customization,\nYou can use \"None\" to remove it.\n\nIf you want to set up a random color each time\nyou run a command, you can use \"random\" as hex color.\n\nIf you want to set up your avatar as image\nUse \"avatar\" as value.```", color=theme.hex_color())
+		embed = discord.Embed(title="Customization", description=f"{theme.description()}```\nYour current theme settings\n\nTheme             » {(themevar[:-5])}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSelfbot theme settings\n\n{helptext1}\n``````\nWebhook theme settings\n\n{helptext2}\n``````\nToast theme settings\n\n{helptext3}\n``````\nNote\n\nIf you want to remove a customization,\nYou can use \"None\" to remove it.\n\nIf you want to set up a random color each time\nyou run a command, you can use \"random\" as hex color.\n\nIf you want to set up your avatar as image\nUse \"avatar\" as value.```", color=theme.hex_color())
 		embed.set_thumbnail(url=theme.image_url())
 		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
