@@ -591,7 +591,6 @@ class luna:
 		url = updater_url
 		version = version_url
 		if beta:
-			print(url)
 			prints.message("Beta Build")
 			version = beta_version_url
 		prints.event(f"Downloading Luna {version}...")
