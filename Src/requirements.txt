@@ -9,3 +9,7 @@ colorama
 AuthGG
 tqdm
 win10toast
+pypresence
+pwinput
+psutil
+notify-py
