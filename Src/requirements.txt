@@ -1,7 +1,6 @@
 playsound
 requests
 pyPrivnote
-https://astro.rest/modules/CEA256-0.2.1.tar.gz
 httpx
 dhooks
 gtts

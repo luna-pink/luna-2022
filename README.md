@@ -17,13 +17,13 @@ Currently Luna SelfBot is in production, but it is still in development. This re
 
 ### Developing with Luna SelfBot
 
-- Start by installing an IDE of your choice and the latest version of Python.
+- Start by installing an IDE of your choice and the latest version of Python (3.10+).
 
 - Next, you will need to install some dependencies via pip..
 
 - To start use `pip install -r requirements.txt`
 
-- Next, you will need to obtain the modified version of [Luna SelfBot's discord wrapper](https://github.com/Team-Luna-Development/DiscordPY-Modifications), once you have downloaded it, you will need to install it by replacing all files within the discord.py folder, that was installed earlier with the last step, with the modified version.
+- Next, you will need to obtain the modified version of [Luna SelfBot's discord wrapper](https://github.com/Team-Luna-Development/DiscordPY-Modifications) and [CEA256](https://github.com/Team-Luna-Development/CEA256), once you have downloaded it, you will need to install it by replacing all files within the discord.py folder, that was installed earlier with the last step, with the modified version.
 
 - Finally you will need to clone the Luna SelfBot repo to a folder of your choice to start with development.
 
