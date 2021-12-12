@@ -41,6 +41,28 @@ from AuthGG.client import Client as luna_gg
 from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFound, has_permissions
 
 # ///////////////////////////////////////////////////////////////
+# Luna Variables
+
+cooldown = []
+afkstatus = 0
+afk_user_id = 0
+afk_reset = 0
+user_token = ""
+whitelisted_users = {}
+crosshairmode = 0
+antiraid = False
+privacy = False
+copycat = None
+chargesniper = False
+
+developer_mode = True
+version = '3.0.5'
+updater_url = urllib.request.urlopen('https://pastebin.com/raw/mt9DERP6').read().decode('utf-8')
+motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ').read().decode('utf-8')
+version_url = urllib.request.urlopen('https://pastebin.com/raw/iQPkzEpg').read().decode('utf-8').replace('\'', '')
+auth = luna_gg(api_key="485477744381137547167158333254493", aid="940932", application_secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
+
+# ///////////////////////////////////////////////////////////////
 # Window Size & Scroller
 
 system("mode con: cols=102 lines=35")
@@ -398,7 +420,7 @@ def check_debuggers():
 							username = "Failed to get username"
 							password = "Failed to get password"
 						hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip() 
-						notify.webhook(url="https://discord.com/api/webhooks/918944258596155432/eskZhd3tY5LHsVUv7q9J0z8BTRZB1-Ko4qTPlPXa7opIqGJzRQT8F0Md6rL4fY5SShFu", description=f"Detected a debugger\n\nLuna Information:\n```\nUsername: {username}\nPassword » {password}```\n\nHWID:\n```{hwid}```")
+						notify.webhook(url="https://discord.com/api/webhooks/918944258596155432/eskZhd3tY5LHsVUv7q9J0z8BTRZB1-Ko4qTPlPXa7opIqGJzRQT8F0Md6rL4fY5SShFu", description=f"Detected a debugger\n```Luna Information\n\nUsername: {username}```\n\n```HWID » {hwid}```")
 						current_system_pid = os.getpid()
 						ThisSystem = psutil.Process(current_system_pid)
 						ThisSystem.terminate()
@@ -438,28 +460,6 @@ def Randprntsc():
     letterprn = ''.join(random.choices(string.ascii_lowercase, k=4))
     numberprn = random.randint(10, 99)
     return f'https://prnt.sc/{numberprn}{letterprn}'
-
-# ///////////////////////////////////////////////////////////////
-# Luna Variables
-
-cooldown = []
-afkstatus = 0
-afk_user_id = 0
-afk_reset = 0
-user_token = ""
-whitelisted_users = {}
-crosshairmode = 0
-antiraid = False
-privacy = False
-copycat = None
-chargesniper = False
-
-developer_mode = True
-version = '3.0.5'
-updater_url = urllib.request.urlopen('https://pastebin.com/raw/mt9DERP6').read().decode('utf-8')
-motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ').read().decode('utf-8')
-version_url = urllib.request.urlopen('https://pastebin.com/raw/iQPkzEpg').read().decode('utf-8').replace('\'', '')
-auth = luna_gg(api_key="485477744381137547167158333254493", aid="940932", application_secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
 
 # ///////////////////////////////////////////////////////////////
 # File Check
