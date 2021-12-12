@@ -911,7 +911,7 @@ async def example(self, luna, *, text):
 				"delete_timer": "30",
 				"mode": "1",
 				"error_log": "message",
-				"risk_mode": "on",
+				"risk_mode": "off",
 				"theme": "luna.json",
 				"startup_status": "online"
 			}
