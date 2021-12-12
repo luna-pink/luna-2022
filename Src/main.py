@@ -2119,6 +2119,8 @@ async def on_ready():
 		custom_command_count = 0
 	prefix = files.json("Luna/config.json", "prefix", documents=True)
 	print(motd.center(os.get_terminal_size().columns))
+	if beta:
+		print("Beta Build".center(os.get_terminal_size().columns))
 	print()
 	print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
 	print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
@@ -7498,85 +7500,89 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 
 bot.add_cog(NukingCog(bot))
 class PrivacyCog(commands.Cog, name="Privacy commands"):
-    def __init__(self, bot:commands.bot):
-        self.bot = bot
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
 
-    @commands.command(name = "privacy",
-                    aliases=['streamermode'],
-                    usage="<on/off>",
-                    description = "Privacy mode")
-    async def privacy(self, ctx, mode:str):
-        await ctx.message.delete()
+	@commands.command(name = "privacy",
+					aliases=['streamermode'],
+					usage="<on/off>",
+					description = "Privacy mode")
+	async def privacy(self, ctx, mode:str):
+		await ctx.message.delete()
 
-        global privacy
+		global privacy
 
-        if mode == "on":
-            privacy = True
-            prints.message(f"Privacy mode » {color.purple('on')}")
+		if mode == "on":
+			privacy = True
+			prints.message(f"Privacy mode » {color.purple('on')}")
 
-            embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nPrivacy mode » on```", color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
-            embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-            embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-            embed.set_image(url=theme.large_image_url())
-            await send(ctx, embed)
+			embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nPrivacy mode » on```", color=theme.hex_color())
+			embed.set_thumbnail(url=theme.image_url())
+			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+			embed.set_image(url=theme.large_image_url())
+			await send(ctx, embed)
 
-            luna.console(clear=True)
-            command_count = len(bot.commands)
-            cog = bot.get_cog('Custom commands')
-            try:
-                custom = cog.get_commands()
-                custom_command_count = 0
-                for command in custom:
-                    custom_command_count += 1
-            except:
-                custom_command_count = 0
-            prefix = files.json("Luna/config.json", "prefix", documents=True)
-            print(motd.center(os.get_terminal_size().columns))
-            print()
-            print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-            print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Servers | {color.purple('0')} Friends")
-            print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-            print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-            prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+			luna.console(clear=True)
+			command_count = len(bot.commands)
+			cog = bot.get_cog('Custom commands')
+			try:
+				custom = cog.get_commands()
+				custom_command_count = 0
+				for command in custom:
+					custom_command_count += 1
+			except:
+				custom_command_count = 0
+			prefix = files.json("Luna/config.json", "prefix", documents=True)
+			print(motd.center(os.get_terminal_size().columns))
+			if beta:
+				print("Beta Build".center(os.get_terminal_size().columns))
+			print()
+			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+			print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Servers | {color.purple('0')} Friends")
+			print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 
-        elif mode == "off":
-            privacy = False
-            prints.message(f"Privacy mode » {color.purple('off')}")
+		elif mode == "off":
+			privacy = False
+			prints.message(f"Privacy mode » {color.purple('off')}")
 
-            embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nPrivacy mode » off```", color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
-            embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-            embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-            embed.set_image(url=theme.large_image_url())
-            await send(ctx, embed)
+			embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nPrivacy mode » off```", color=theme.hex_color())
+			embed.set_thumbnail(url=theme.image_url())
+			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+			embed.set_image(url=theme.large_image_url())
+			await send(ctx, embed)
 
-            luna.console(clear=True)
-            command_count = len(bot.commands)
-            cog = bot.get_cog('Custom commands')
-            try:
-                custom = cog.get_commands()
-                custom_command_count = 0
-                for command in custom:
-                    custom_command_count += 1
-            except:
-                custom_command_count = 0
-            prefix = files.json("Luna/config.json", "prefix", documents=True)
-            print(motd.center(os.get_terminal_size().columns))
-            print()
-            print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-            print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
-            print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-            print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-            prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+			luna.console(clear=True)
+			command_count = len(bot.commands)
+			cog = bot.get_cog('Custom commands')
+			try:
+				custom = cog.get_commands()
+				custom_command_count = 0
+				for command in custom:
+					custom_command_count += 1
+			except:
+				custom_command_count = 0
+			prefix = files.json("Luna/config.json", "prefix", documents=True)
+			print(motd.center(os.get_terminal_size().columns))
+			if beta:
+				print("Beta Build".center(os.get_terminal_size().columns))
+			print()
+			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+			print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
+			print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 
-        else:
-            embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nThat mode does not exist!\nOnly on or off```", color=0xff0000)
-            embed.set_thumbnail(url=theme.image_url())
-            embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-            embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-            embed.set_image(url=theme.large_image_url())
-            await send(ctx, embed)
+		else:
+			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nThat mode does not exist!\nOnly on or off```", color=0xff0000)
+			embed.set_thumbnail(url=theme.image_url())
+			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+			embed.set_image(url=theme.large_image_url())
+			await send(ctx, embed)
 
 bot.add_cog(PrivacyCog(bot))
 
@@ -7743,6 +7749,8 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		except:
 			custom_command_count = 0
 		print(motd.center(os.get_terminal_size().columns))
+		if beta:
+			print("Beta Build".center(os.get_terminal_size().columns))
 		print()
 		print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
 		print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
@@ -10189,6 +10197,8 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 			custom_command_count = 0
 		prefix = files.json("Luna/config.json", "prefix", documents=True)
 		print(motd.center(os.get_terminal_size().columns))
+		if beta:
+			print("Beta Build".center(os.get_terminal_size().columns))
 		print()
 		print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
 		print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
