@@ -3150,10 +3150,10 @@ class HelpCog(commands.Cog, name="Help commands"):
 		prefix = files.json("Luna/config.json", "prefix", documents=True)
 		await embed_builder(luna, title="Community commands", description=f"{theme.description()}```\n{prefix}command luna     » Luna```")
 
-	@commands.command(name = "info",
+	@commands.command(name = "about",
 						usage="",
 						description = "Luna information")
-	async def info(self, luna):
+	async def about(self, luna):
 		await luna.message.delete()
 		motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ')
 		for line in motd:
