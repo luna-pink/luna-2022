@@ -66,6 +66,7 @@ version_url = r["version"]
 r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/beta.json").json()
 beta_updater_url = r["updater"]
 beta_version_url = r["version"]
+beta_user = r["beta_user"]
 
 motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ').read().decode('utf-8')
 auth = luna_gg(api_key="485477744381137547167158333254493", aid="940932", application_secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
@@ -479,6 +480,8 @@ class luna:
 		luna.console(clear=True)
 		if files.file_exist('Updater.exe'):
 			os.remove('Updater.exe')
+		if beta:
+			version_url = beta_version_url
 		if not version == version_url and not developer_mode:
 			luna.update()
 		else:
@@ -588,7 +591,7 @@ class luna:
 		url = updater_url
 		version = version_url
 		if beta:
-			url = beta_updater_url
+			print(url)
 			prints.message("Beta Build")
 			version = beta_version_url
 		prints.event(f"Downloading Luna {version}...")
@@ -2121,6 +2124,11 @@ async def on_ready():
 	print(motd.center(os.get_terminal_size().columns))
 	if beta:
 		print("Beta Build".center(os.get_terminal_size().columns))
+		bot_id = str(bot.user.id)
+		if not bot_id in beta_user:
+			prints.message("You are not a beta user, Luna will close in 5 seconds.")
+			time.sleep(5)
+			os._exit(0)
 	print()
 	print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
 	print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
