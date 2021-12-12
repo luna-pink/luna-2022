@@ -606,7 +606,7 @@ class luna:
 		time.sleep(3)
 		prints.event("Starting Updater.exe...")
 		os.startfile('Updater.exe')
-		exit()
+		os._exit(0)
 
 	def console(menu = False, clear = False):
 		"""
@@ -768,13 +768,13 @@ class luna:
 					if luna.prompt_token() == True:
 						prints.event("Starting Luna...")
 					else:
-						exit()
+						os._exit(0)
 			else:
 				prints.error("Failed to find any valid tokens. Please manually enter a valid token.")
 				if luna.prompt_token() == True:
 					prints.event("Starting Luna...")
 				else:
-					exit()
+					os._exit(0)
 		else:
 			prints.error("Failed to find any valid tokens. Please manually enter a valid token.")
 			if luna.prompt_token() == True:
