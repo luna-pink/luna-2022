@@ -9549,6 +9549,7 @@ class WebhookSetupCog(commands.Cog, name="Webhook setup"):
 		await luna.message.delete()
 		try:
 			prints.event("Creating webhooks...")
+			await embed_builder(luna, description="```\nCreating webhooks...```")
 			category = await luna.guild.create_category_channel(name="Luna Webhooks")
 			login = await category.create_text_channel("login")
 			nitro = await category.create_text_channel("nitro")
