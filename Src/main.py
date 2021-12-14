@@ -2527,8 +2527,8 @@ class OnCommand(commands.Cog, name="on command"):
 		self.bot = bot
 		
 	@commands.Cog.listener()
-	async def on_command(self, ctx:commands.Context):
-		prints.command(ctx.command.name)
+	async def on_command(self, luna:commands.Context):
+		prints.command(luna.command.name)
 		theme = files.json("Luna/config.json", "theme", documents=True)
 		try:
 			title = files.json(f"Luna/themes/{theme}", "title", documents=True)
@@ -2536,7 +2536,7 @@ class OnCommand(commands.Cog, name="on command"):
 			if configs.error_log() == "console":
 				prints.error("The theme file was missing and prevented Luna from sending the message\n\nA theme file to fix it has been created")
 			else:
-				await ctx.send("The theme file was missing and prevented Luna from sending the message\n\nA theme file to fix it has been created", delete_after=10)
+				await luna.send("The theme file was missing and prevented Luna from sending the message\n\nA theme file to fix it has been created", delete_after=10)
 			if files.file_exist(f"Luna/themes/luna.json", documents=True):
 				config.theme(theme)
 			else:
@@ -2759,7 +2759,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 			custom_command_count = 0
 			for command in custom:
 				custom_command_count += 1
-			await embed_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Current guild profile\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}about            » Luna information\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
+			await embed_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}game             » Game commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Current guild profile\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}about            » Luna information\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
 
 	@commands.command(name = "admin",
 						usage="",
@@ -2838,6 +2838,19 @@ class HelpCog(commands.Cog, name="Help commands"):
 		for command in commands:
 			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 		await embed_builder(luna, title="Text commands", description=f"{theme.description()}```\n{helptext}```")
+
+	@commands.command(name = "game",
+					usage="",
+					description = "Game commands")
+	async def game(self, luna):
+		await luna.message.delete()
+		prefix = files.json("Luna/config.json", "prefix", documents=True)
+		cog = self.bot.get_cog('Game commands')
+		commands = cog.get_commands()
+		helptext = ""
+		for command in commands:
+			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		await embed_builder(luna, title="Game commands", description=f"{theme.description()}```\n{helptext}```")
 
 	@commands.command(name = "image",
 					usage="",
@@ -5877,11 +5890,10 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
         
-	@commands.command(name = "ping",
-					aliases=['latency'],
+	@commands.command(name = "latency",
 					usage="",
-					description = "Display the latency")
-	async def ping(self, luna):
+					description = "Display Luna's latency")
+	async def latency(self, luna):
 		await luna.message.delete()
 		if configs.mode() == 2:
 			before = time.monotonic()
@@ -5908,6 +5920,20 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
 			embed.set_image(url=theme.large_image_url())
 			await sent.edit(embed=embed)
+
+	@commands.command(name = "ping",
+					usage="<url/ip>",
+					description = "Ping an IP or URL")
+	async def ping(self, luna, *, url:str):
+		await luna.message.delete()
+		await embed_builder(luna, title=f"Ping", description=f"```\nPinging {url}...```")
+		# output = subprocess.Popen(["ping", url], stdout=subprocess.PIPE).communicate()[0]
+		output = subprocess.run(f"ping {url}",text=True,stdout=subprocess.PIPE).stdout.splitlines()
+		values = "".join(output[-1:])[4:].split(", ")
+		minimum = values[0][len("Minimum = "):]
+		maximum = values[1][len("Maximum = "):]
+		average = values[2][len("Average = "):]
+		await embed_builder(luna, title=f"{url}", description=f"```\nMinimum » {minimum}\nMaximum » {maximum}\nAverage » {average}```")
 
 	@commands.command(name = "ip",
 						usage="",
@@ -7241,10 +7267,10 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 			embed.set_image(url=theme.large_image_url())
 			await send(luna, embed)
 
-	@commands.command(name = "fucktoken",
+	@commands.command(name = "messtoken",
 					usage="<token>",
-					description = "Fuck up the token")
-	async def fucktoken(self, luna, token:str):
+					description = "Mess up the token")
+	async def messtoken(self, luna, token:str):
 		await luna.message.delete()
 		if configs.risk_mode() == "on":
 			payload = {
@@ -7518,8 +7544,8 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
 					aliases=['streamermode'],
 					usage="<on/off>",
 					description = "Privacy mode")
-	async def privacy(self, ctx, mode:str):
-		await ctx.message.delete()
+	async def privacy(self, luna, mode:str):
+		await luna.message.delete()
 
 		global privacy
 
@@ -7532,7 +7558,7 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
 			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
 			embed.set_image(url=theme.large_image_url())
-			await send(ctx, embed)
+			await send(luna, embed)
 
 			luna.console(clear=True)
 			command_count = len(bot.commands)
@@ -7564,7 +7590,7 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
 			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
 			embed.set_image(url=theme.large_image_url())
-			await send(ctx, embed)
+			await send(luna, embed)
 
 			luna.console(clear=True)
 			command_count = len(bot.commands)
@@ -7593,7 +7619,7 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
 			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
 			embed.set_image(url=theme.large_image_url())
-			await send(ctx, embed)
+			await send(luna, embed)
 
 bot.add_cog(PrivacyCog(bot))
 
@@ -7635,6 +7661,71 @@ bot.add_cog(ProtectionCog(bot))
 class BackupsCog(commands.Cog, name="Backup commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
+
+	@commands.command(name = "backupserver",
+					usage="",
+					description = "Backup the server")
+	async def backupserver(self, luna):
+		await luna.message.delete()
+		serverName = luna.guild.name
+
+		newGuild = await self.bot.create_guild(serverName)
+		prints.info(f"Created new guild.")
+		newGuildDefaultChannels = await newGuild.fetch_channels()
+		for channel in newGuildDefaultChannels:
+			await channel.delete()
+
+		for channel in luna.guild.channels:
+			if str(channel.type).lower() == "category":
+				try:
+					await newGuild.create_category(channel.name, overwrites=channel.overwrites, position=channel.position)
+					prints.info(f"Created new category » {channel.name}")
+				except:
+					pass
+				
+		for channel in luna.guild.voice_channels:
+			try:
+				cat = ""
+				for category in newGuild.categories:
+					if channel.category.name == category.name:
+						cat = category
+						
+				await newGuild.create_voice_channel(channel.name, category=cat, overwrites=channel.overwrites, topic=channel.topic, slowmode_delay=channel.slowmode_delay, nsfw=channel.nsfw, position=channel.position)
+				prints.info(f"Created new voice channel » {channel.name}")
+			except:
+				pass
+
+		for channel in luna.guild.stage_channels:
+			try:
+				cat = ""
+				for category in newGuild.categories:
+					if channel.category.name == category.name:
+						cat = category                    
+				await newGuild.create_stage_channel(channel.name, category=cat, overwrites=channel.overwrites, topic=channel.topic, slowmode_delay=channel.slowmode_delay, nsfw=channel.nsfw, position=channel.position)
+				prints.info(f"Created new stage channel » {channel.name}")
+			except:
+				pass
+			
+		for channel in luna.guild.text_channels:
+			try:
+				cat = ""
+				for category in newGuild.categories:
+					if channel.category.name == category.name:
+						cat = category                            
+				await newGuild.create_text_channel(channel.name, category=cat, overwrites=channel.overwrites, topic=channel.topic, slowmode_delay=channel.slowmode_delay, nsfw=channel.nsfw, position=channel.position)
+				prints.info(f"Created new text channel » {channel.name}")
+			except:
+				pass
+
+		for role in luna.guild.roles[::-1]:
+			if role.name != "@everyone":
+				try:
+					await newGuild.create_role(name=role.name, color=role.color, permissions=role.permissions, hoist=role.hoist, mentionable=role.mentionable)
+					prints.info(f"Created new role » {role.name}")
+				except:
+					pass
+
+		await luna.send(f"Made a clone of `{luna.guild.name}`.")
 
 	@commands.command(name = "friendsbackup",
 					usage="",
@@ -7746,8 +7837,8 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 	@commands.command(name = "prefix",
 					usage="<prefix>",
 					description = "Change the prefix")
-	async def prefix(self, ctx, newprefix):
-		await ctx.message.delete()
+	async def prefix(self, luna, newprefix):
+		await luna.message.delete()
 		config.prefix(newprefix)
 		luna.console(clear=True)
 		command_count = len(bot.commands)
@@ -7775,7 +7866,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
 			embed.set_image(url=theme.large_image_url())
-			await send(ctx, embed)
+			await send(luna, embed)
 		except Exception as e:
 			print(e)
 
@@ -10154,14 +10245,14 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 	@commands.command(name = "update",
 					usage="",
 					description = "Updates Luna")
-	async def update(self, ctx):
-		await ctx.message.delete()
+	async def update(self, luna):
+		await luna.message.delete()
 		if developer_mode:
-			await embed_builder(ctx, title="Update", description=f"```\nDeveloper mode active! No updates will be downloaded.```")
+			await embed_builder(luna, title="Update", description=f"```\nDeveloper mode active! No updates will be downloaded.```")
 		elif version == version_url:
-			await embed_builder(ctx, title="Update", description=f"```\nYou are on the latest version! ({version})```")
+			await embed_builder(luna, title="Update", description=f"```\nYou are on the latest version! ({version})```")
 		else:
-			await embed_builder(ctx, title="Update", description=f"```\nStarted update » {version}```")
+			await embed_builder(luna, title="Update", description=f"```\nStarted update » {version}```")
 			luna.update()
 
 	@commands.command(name = "restart",
@@ -10194,8 +10285,8 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 					aliases=['cls'],
 					usage="",
 					description = "Clear the console")
-	async def clear(self, ctx):
-		await ctx.message.delete()
+	async def clear(self, luna):
+		await luna.message.delete()
 		luna.console(clear=True)
 		command_count = len(bot.commands)
 		cog = bot.get_cog('Custom commands')
@@ -10235,6 +10326,32 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 		date = info['Date']
 		await embed_builder(luna, title="Covid-19 Statistics", description=f"```Total Confirmed Cases\n{totalconfirmed}``````Total Deaths\n{totaldeaths}``````Total Recovered\n{totalrecovered}``````New Confirmed Cases\n{newconfirmed}``````New Deaths\n{newdeaths}``````New Recovered\n{newrecovered}``````Date\n{date}```")
 
+	typing = False
+
+	@commands.command(name = "typing",
+					usage="<on/off>",
+					description = "Enable or disable typing")
+	async def typing(self, luna, mode:str):
+		await luna.message.delete()
+		if mode == "on":
+			await embed_builder(luna, title="Typing", description=f"```\nTyping enabled```")
+			typing = True
+			while typing:
+				async with luna.typing():
+					await asyncio.sleep(1)
+					if typing == False:
+						break
+		elif mode == "off":
+			await embed_builder(luna, title="Typing", description=f"```\nTyping disabled```")
+			typing = False
+		else:
+			await mode_error(luna, "on or off")
+
+bot.add_cog(MiscCog(bot))
+class GamesCog(commands.Cog, name="Game commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+
 	@commands.command(name = "fnshop",
 					usage="",
 					description = "Current Fortnite shop")
@@ -10257,10 +10374,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 		fortnite = requests.get("https://fortnite-api.com/v2/news/br").json()
 		await embed_builder(luna, title="Fortnite News", large_image=fortnite["data"]["image"])
 
-bot.add_cog(MiscCog(bot))
-
-# ///////////////////////////////////////////////////////////////
-# Functions for message types, it took me 5 hours to make this bullshit
+bot.add_cog(GamesCog(bot))
 
 def convert_to_text(embed: discord.Embed):
 	largeimagevar = theme.large_image_url()
