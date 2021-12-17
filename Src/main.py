@@ -55,9 +55,9 @@ privacy = False
 copycat = None
 chargesniper = False
 
-developer_mode = False
-beta = True
-version = '3.0.5.1'
+developer_mode = True
+beta = False
+version = '3.0.5'
 
 r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/master.json").json()
 updater_url = r["updater"]
@@ -2507,15 +2507,13 @@ class OnTyping(commands.Cog, name="on typing"):
 	def __init__(self, bot:commands.Bot):
 		self.bot = bot
         
-	@commands.Cog.listener()
+	@commands.Cog.listener() 
 	async def on_typing(self, channel, member, when):
 		if member in self.bot.user.friends and isinstance(channel, discord.DMChannel):
 			if files.json("Luna/notifications/toasts.json", "friendevents", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
 				notify.toast(message=f"{member} is typing")
 			if files.json("Luna/webhooks/webhooks.json", "friendevents", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.friendevents_url() == "webhook-url-here":
 				notify.webhook(url=webhook.friendevents_url(), name="friendevents", description=f"{member} is typing")
-			
-
 
 bot.add_cog(OnTyping(bot))
 
@@ -6584,7 +6582,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 				prints.error(f"{e}")
 		else:
 			if configs.error_log() == "console":
-				prints.error("```\nRiskmode is disabled```")
+				prints.error("Riskmode is disabled")
 			else:
 				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 				embed.set_thumbnail(url=theme.image_url())
@@ -6625,7 +6623,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 				await error_builder(luna, description=e)
 		else:
 			if configs.error_log() == "console":
-				prints.error("```\nRiskmode is disabled```")
+				prints.error("Riskmode is disabled")
 			else:
 				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 				embed.set_thumbnail(url=theme.image_url())
@@ -6648,7 +6646,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 				await error_builder(luna, description=e)
 		else:
 			if configs.error_log() == "console":
-				prints.error("```\nRiskmode is disabled```")
+				prints.error("Riskmode is disabled")
 			else:
 				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 				embed.set_thumbnail(url=theme.image_url())
@@ -6700,6 +6698,30 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 				await error_builder(luna, description=e)
 		else:
 			await error_builder(luna, description="Riskmode is disabled")
+
+	@commands.command(name = "spamhentai",
+					usage="",
+					description = "Spam hentai")
+	async def spamhentai(self, luna, delay:int, amount:int):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				for each in range(0, amount):
+					await asyncio.sleep(delay)
+					r = requests.get("https://nekos.life/api/v2/img/classic").json()
+					await luna.send(r['url'])
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			if configs.error_log() == "console":
+				prints.error("Riskmode is disabled")
+			else:
+				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
+				embed.set_thumbnail(url=theme.image_url())
+				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+				embed.set_image(url=theme.large_image_url())
+				await send(luna, embed)
 
 	@commands.command(name = "purgehack",
 					usage="",
@@ -7052,7 +7074,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 				prints.error(f"{e}")
 		else:
 			if configs.error_log() == "console":
-				prints.error("```\nRiskmode is disabled```")
+				prints.error("Riskmode is disabled")
 			else:
 				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 				embed.set_thumbnail(url=theme.image_url())
@@ -7106,7 +7128,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 				prints.error(f"{e}")
 		else:
 			if configs.error_log() == "console":
-				prints.error("```\nRiskmode is disabled```")
+				prints.error("Riskmode is disabled")
 			else:
 				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 				embed.set_thumbnail(url=theme.image_url())
@@ -7725,7 +7747,7 @@ class BackupsCog(commands.Cog, name="Backup commands"):
 				except:
 					pass
 
-		await luna.send(f"Made a clone of `{luna.guild.name}`.")
+		await embed_builder(luna, f"```\nCloned {luna.guild.name}```")
 
 	@commands.command(name = "friendsbackup",
 					usage="",
@@ -7749,13 +7771,7 @@ class BackupsCog(commands.Cog, name="Backup commands"):
 		file = open("data/backup/blocked.txt", "w", encoding='utf-8') 
 		file.write(blockedlist)
 		file.close()
-
-		embed = discord.Embed(title="Friends Backup", description=f"```\nBacked up {friendsamount} friends in data/backup/friends.txt\n``````\nBacked up {blockedamount} blocked users in data/backup/blocked.txt```", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await embed_builder(luna, f"```\nBacked up {friendsamount} friends in data/backup/friends.txt\nBacked up {blockedamount} blocked users in data/backup/blocked.txt```")
 
 bot.add_cog(BackupsCog(bot))
 class WhitelistCog(commands.Cog, name="Whitelist commands"):
@@ -7773,10 +7789,10 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
 			if luna.guild.id not in whitelisted_users.keys():
 				whitelisted_users[luna.guild.id] = {}
 			if user.id in whitelisted_users[luna.guild.id]:
-				await luna.send('That user is already whitelisted')
+				await embed_builder(luna, f"```\n{user.name}#{user.discriminator} is already whitelisted```")
 			else:
 				whitelisted_users[luna.guild.id][user.id] = 0
-				await luna.send("Whitelisted **" + user.name.replace("*", "\*").replace("`", "\`").replace("_", "\_") + "#" + user.discriminator + "**")
+				await embed_builder(luna, f"```\nWhitelisted " + user.name.replace("*", "\*").replace("`", "\`").replace("_", "\_") + "#" + user.discriminator + "```")
 
 	@commands.command(name = "unwhitelist",
 					usage="",
@@ -7792,8 +7808,7 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
 			if user.id in whitelisted_users[luna.guild.id]:
 				whitelisted_users[luna.guild.id].pop(user.id, 0)
 				user2 = self.bot.get_user(user.id)
-				await luna.send(
-					'Successfully unwhitelisted **' + user2.name.replace('*', "\*").replace('`', "\`").replace('_',"\_") + '#' + user2.discriminator + '**')
+				await embed_builder(luna, f"```\nUnwhitelisted " + user.name.replace("*", "\*").replace("`", "\`").replace("_", "\_") + "#" + user.discriminator + "```")
 
 	@commands.command(name = "whitelisted",
 					usage="",
@@ -7805,16 +7820,16 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
 			for key in whitelisted_users:
 				for key2 in whitelisted_users[key]:
 					user = self.bot.get_user(key2)
-					whitelist += '**+ ' + user.name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + "#" + user.discriminator + "** - " + self.bot.get_guild(key).name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + "" + "\n"
-			await luna.send(whitelist)
+					whitelist += '+ ' + user.name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + "#" + user.discriminator + " - " + self.bot.get_guild(key).name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + "" + "\n"
+			await embed_builder(luna, f"```\n{whitelist}```")
 		else:
 			whitelist = "`" + luna.guild.name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + '\'s Whitelisted Users:`\n'
 			for key in self.bot.whitelisted_users:
 				if key == luna.guild.id:
 					for key2 in self.bot.whitelisted_users[luna.guild.id]:
 						user = self.bot.get_user(key2)
-						whitelist += '**+ ' + user.name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + "#" + user.discriminator + " (" + str(user.id) + ")" + "**\n"
-			await luna.send(whitelist)
+						whitelist += '+ ' + user.name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + "#" + user.discriminator + " (" + str(user.id) + ")" + "\n"
+			await embed_builder(luna, f"```\n{whitelist}```")
 
 	@commands.command(name = "clearwhitelist",
 					usage="",
@@ -7822,12 +7837,7 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
 	async def clearwhitelist(self, luna):
 		await luna.message.delete()
 		whitelisted_users.clear()
-		embed = discord.Embed(title="Whitelist", url=theme.title_url(), description="Successfully cleared the whitelist", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await embed_builder(luna, f"```\nCleared the whitelist```")
 
 bot.add_cog(WhitelistCog(bot))
 class SettingsCog(commands.Cog, name="Settings commands"):
@@ -7861,12 +7871,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 		prints.message(f"Prefix changed to {color.purple(f'{newprefix}')}")
 		try:
-			embed = discord.Embed(title="Prefix", url=theme.title_url(), description=f"New prefix: {newprefix}", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+			await embed_builder(luna, f"```\nPrefix changed to {newprefix}```")
 		except Exception as e:
 			print(e)
 
@@ -7888,13 +7893,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		helptext = ""
 		for command in commands:
 			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-
-		embed = discord.Embed(title="Themes", description=f"{theme.description()}```\nCurrent theme     » {(themesvar[:-5])}\n``````\nTheme customization\n\n{prefix}customize        » Theme customization\n``````\nTheme control\n\n{helptext}\n``````\nAvailable themes\n\n{stringedit}```", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await embed_builder(luna, title="Themes", description=f"{theme.description()}```\nCurrent theme     » {(themesvar[:-5])}\n``````\nTheme customization\n\n{prefix}customize        » Theme customization\n``````\nTheme control\n\n{helptext}\n``````\nAvailable themes\n\n{stringedit}```")
 
 	@commands.command(name = "customize",
 					usage="",
@@ -7935,55 +7934,34 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		helptext3 = ""
 		for command in commands:
 			helptext3+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		
-		embed = discord.Embed(title="Customization", description=f"{theme.description()}```\nYour current theme settings\n\nTheme             » {(themevar[:-5])}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSelfbot theme settings\n\n{helptext1}\n``````\nWebhook theme settings\n\n{helptext2}\n``````\nToast theme settings\n\n{helptext3}\n``````\nNote\n\nIf you want to remove a customization,\nYou can use \"None\" to remove it.\n\nIf you want to set up a random color each time\nyou run a command, you can use \"random\" as hex color.\n\nIf you want to set up your avatar as image\nUse \"avatar\" as value.```", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await embed_builder(luna, title="Customization", description=f"{theme.description()}```\nYour current theme settings\n\nTheme             » {(themevar[:-5])}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSelfbot theme settings\n\n{helptext1}\n``````\nWebhook theme settings\n\n{helptext2}\n``````\nToast theme settings\n\n{helptext3}\n``````\nNote\n\nIf you want to remove a customization,\nYou can use \"None\" to remove it.\n\nIf you want to set up a random color each time\nyou run a command, you can use \"random\" as hex color.\n\nIf you want to set up your avatar as image\nUse \"avatar\" as value.```")
 
 	@commands.command(name = "embedmode",
 					usage="",
 					description = "Switch to embed mode")
 	async def embedmode(self, luna):
 		await luna.message.delete()
-
 		config.mode("1")
 		prints.message(f"Switched to {color.purple('embed')} mode")
-
-		embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"Switched to embed mode.", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await embed_builder(luna, title="Embed mode", description=f"```\nSwitched to embed mode.```")
 
 	@commands.command(name = "textmode",
 					usage="",
 					description = "Switch to text mode")
 	async def textmode(self, luna):
 		await luna.message.delete()
-
 		config.mode("2")
 		prints.message(f"Switched to {color.purple('text')} mode")
-
-		sent = await luna.send(f"```ini\n[ {theme.title()} ]\n\nSwitched to text mode.\n\n[ {theme.footer()} ]```")
-		await asyncio.sleep(configs.delete_timer())
-		await sent.delete()
+		await embed_builder(luna, title="Text mode", description=f"```\nSwitched to text mode.```")
 
 	@commands.command(name = "indentmode",
 					usage="",
 					description = "Switch to indent mode")
 	async def indentmode(self, luna):
 		await luna.message.delete()
-
 		config.mode("3")
 		prints.message(f"Switched to {color.purple('indent')} mode")
-
-		sent = await luna.send(f"> **{theme.title()}**\n> \n> ```Switched to indent mode.``` \n> {theme.footer()}")
-		await asyncio.sleep(configs.delete_timer())
-		await sent.delete()
+		await embed_builder(luna, title="Indent mode", description=f"```\nSwitched to indent mode.```")
 
 	@commands.command(name = "sniper",
 					usage="",
@@ -7991,24 +7969,16 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 	async def sniper(self, luna):
 		await luna.message.delete()
 		prefix = files.json("Luna/config.json", "prefix", documents=True)
-
 		with open('data/nitro.json') as f:
 			data = json.load(f)
 		nitro_sniper = data.get('nitrosniper')
 		api = data.get('api')
-
 		cog = self.bot.get_cog('Sniper settings')
 		commands = cog.get_commands()
 		helptext = ""
 		for command in commands:
 			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-
-		embed = discord.Embed(title="Sniper settings", description=f"{theme.description()}```\nYour current settings\n\nNitro Sniper      » {nitro_sniper}\nNitro API         » {api}\n``````\nSettings\n\n{helptext}```", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await embed_builder(luna, title="Sniper settings", description=f"{theme.description()}```\nYour current settings\n\nNitro Sniper      » {nitro_sniper}\nNitro API         » {api}\n``````\nSettings\n\n{helptext}```")
 
 	@commands.command(name = "giveaway",
 					usage="",
@@ -10261,12 +10231,36 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 					description = "Restart Luna")
 	async def restart(self, luna):
 		await luna.message.delete()
-
 		if configs.mode() == 2:
 			sent = await luna.send(f"```ini\n[ Restarting ]\n\nAllow up to 5 seconds\n\n[ {theme.footer()} ]```")
 			await asyncio.sleep(3)
 			await sent.delete()
 		if configs.mode() == 3:
+			sent = await luna.send(f"> **Restarting**\n> \n> Allow up to 5 seconds\n> \n> {theme.footer()}")
+			await asyncio.sleep(3)
+			await sent.delete()
+		else:
+			embed = discord.Embed(title="Restarting", url=theme.title_url(), description=f"```\nAllow up to 5 seconds```", color=theme.hex_color())
+			embed.set_thumbnail(url=theme.image_url())
+			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+			embed.set_image(url=theme.large_image_url())
+			sent = await luna.send(embed=embed)
+			await asyncio.sleep(3)
+			await sent.delete()
+		restart_program()
+
+	@commands.command(name = "shutdown",
+					usage="",
+					description = "Shutdown Luna")
+	async def shutdown(self, luna):
+		await luna.message.delete()
+		if configs.mode() == 2:
+			sent = await luna.send(f"```ini\n[ Restarting ]\n\nShutting down\n\n[ {theme.footer()} ]```")
+			await asyncio.sleep(3)
+			await sent.delete()
+		if configs.mode() == 3:
+			await embed_builder(luna, )
 			sent = await luna.send(f"> **Restarting**\n> \n> Allow up to 5 seconds\n> \n> {theme.footer()}")
 			await asyncio.sleep(3)
 			await sent.delete()
@@ -10426,16 +10420,17 @@ def convert_to_indent(embed: discord.Embed):
 		return embed.image.url
 
 
-async def send(luna, embed):
-    deletetimer = configs.delete_timer()
-    mode = configs.mode()
-
-    if mode == 2:
-        await luna.send(convert_to_text(embed), delete_after=deletetimer)
-    elif mode == 3:
-        await luna.send(convert_to_indent(embed), delete_after=deletetimer)
-    else:
-        await luna.send(embed=embed, delete_after=deletetimer)
+async def send(luna, embed, delete_after=None):
+	deletetimer = configs.delete_timer()
+	if delete_after is not None:
+		deletetimer = delete_after
+	mode = configs.mode()
+	if mode == 2:
+		await luna.send(convert_to_text(embed), delete_after=deletetimer)
+	elif mode == 3:
+		await luna.send(convert_to_indent(embed), delete_after=deletetimer)
+	else:
+		await luna.send(embed=embed, delete_after=deletetimer)
 
 async def mode_error(luna, modes:str):
     if configs.error_log() == "console":
@@ -10448,23 +10443,33 @@ async def mode_error(luna, modes:str):
         embed.set_image(url=theme.large_image_url())
         await send(luna, embed)
 
-async def embed_builder(luna, title=None, description="", color=None, large_image=None, thumbnail=None):
-    if large_image == None:
-        large_image = theme.large_image_url()
-    if color == None:
-        color = theme.hex_color()
-    if thumbnail == None:
-        thumbnail = theme.image_url()
-    elif thumbnail == "None":
-        thumbnail = ""
-    if title == None:
-        title = theme.title()
-    embed = discord.Embed(title=title, url=theme.title_url(), description=description, color=color)
-    embed.set_thumbnail(url=thumbnail)
-    embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-    embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-    embed.set_image(url=large_image)
-    await send(luna, embed)
+async def embed_builder(luna, title=None, description="", color=None, large_image=None, thumbnail=None, delete_after=None):
+	"""
+	Luna's main function for creating embeds with the theme applied.\n
+	Parse `ctx/luna` as first argument. (Important)\n
+	`title="foo"` <- Defines the title. (Optional)\n
+	`description="foo"` <- Defines the description. (Optional)\n
+	`color=0xffffff` <- Defines the hexcolor. (Optional)\n
+	`large_image="url"` <- Defines the large image url. (Optional)\n
+	`thumbnail="url"` <- Defines the thumbnail url. (Optional)\n
+	`delete_after=30` <- Defines the auto delete time after the embed is sent. (Optional)\n
+	"""
+	if large_image == None:
+		large_image = theme.large_image_url()
+	if color == None:
+		color = theme.hex_color()
+	if thumbnail == None:
+		thumbnail = theme.image_url()
+	elif thumbnail == "None":
+		thumbnail = ""
+	if title == None:
+		title = theme.title()
+	embed = discord.Embed(title=title, url=theme.title_url(), description=description, color=color)
+	embed.set_thumbnail(url=thumbnail)
+	embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+	embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+	embed.set_image(url=large_image)
+	await send(luna, embed, delete_after)
 
 async def error_builder(luna, description=""):
     if configs.error_log() == "console":
