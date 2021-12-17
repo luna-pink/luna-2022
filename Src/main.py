@@ -10446,7 +10446,7 @@ async def mode_error(luna, modes:str):
 async def embed_builder(luna, title=None, description="", color=None, large_image=None, thumbnail=None, delete_after=None):
 	"""
 	Luna's main function for creating embeds with the theme applied.\n
-	Parse `ctx/luna` as first argument. (Important)\n
+	Parse `luna = ctx` as first argument. (Important)\n
 	`title="foo"` <- Defines the title. (Optional)\n
 	`description="foo"` <- Defines the description. (Optional)\n
 	`color=0xffffff` <- Defines the hexcolor. (Optional)\n
