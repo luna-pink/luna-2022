@@ -480,8 +480,8 @@ class luna:
 		luna.console(clear=True)
 		if files.file_exist('Updater.exe'):
 			os.remove('Updater.exe')
-		if beta:
-			version_url = beta_version_url
+		# if beta:
+		# 	version_url = beta_version_url
 		if not version == version_url and not developer_mode:
 			luna.update()
 		else:
@@ -564,7 +564,7 @@ class luna:
 			auth.register(email=key, username=username, password=password, license_key=key)
 			prints.message("Successfully registered")
 			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-			notify.webhook(url="https://discord.com/api/webhooks/918945532146233344/ZDDj5GgzfDg5-QdScoDfebNCYOuBNUIbgi0UFiO2qIqt0l9hCGm5x1OVwcLuJe3JL_6z", description=f"A new registered user!\n\nLuna Information:\n```\nUsername: {username}```\n\nHWID:\n```{hwid}```")
+			notify.webhook(url="https://discord.com/api/webhooks/918945532146233344/ZDDj5GgzfDg5-QdScoDfebNCYOuBNUIbgi0UFiO2qIqt0l9hCGm5x1OVwcLuJe3JL_6z", description=f"A new registered user!\n\nLuna Information:\n```\nUsername: {username}```\n\nHWID:\n```\n{hwid}```")
 			time.sleep(3)
 			username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
 			password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
@@ -615,6 +615,7 @@ class luna:
 		`clear = True` if you want to clear (`cls`) the console on print.
 		"""
 		if clear:
+			print("1")
 			os.system("cls")
 		try:
 			logo_variable = files.json("Luna/console/console.json", "logo", documents=True)
@@ -7566,8 +7567,8 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
 					aliases=['streamermode'],
 					usage="<on/off>",
 					description = "Privacy mode")
-	async def privacy(self, luna, mode:str):
-		await luna.message.delete()
+	async def privacy(self, ctx, mode:str):
+		await ctx.message.delete()
 
 		global privacy
 
@@ -7580,7 +7581,7 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
 			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
 			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+			await send(ctx, embed)
 
 			luna.console(clear=True)
 			command_count = len(bot.commands)
@@ -7612,7 +7613,7 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
 			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
 			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+			await send(ctx, embed)
 
 			luna.console(clear=True)
 			command_count = len(bot.commands)
@@ -7641,7 +7642,7 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
 			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
 			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+			await send(ctx, embed)
 
 bot.add_cog(PrivacyCog(bot))
 
@@ -10279,8 +10280,8 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 					aliases=['cls'],
 					usage="",
 					description = "Clear the console")
-	async def clear(self, luna):
-		await luna.message.delete()
+	async def clear(self, ctx):
+		await ctx.message.delete()
 		luna.console(clear=True)
 		command_count = len(bot.commands)
 		cog = bot.get_cog('Custom commands')
