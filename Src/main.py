@@ -56,8 +56,8 @@ copycat = None
 chargesniper = False
 
 developer_mode = False
-beta = True
-version = '3.0.5h1'
+beta = False
+version = '3.0.5'
 
 r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/master.json").json()
 updater_url = r["updater"]
@@ -70,6 +70,9 @@ beta_user = r["beta_user"]
 
 motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ').read().decode('utf-8')
 auth = luna_gg(api_key="485477744381137547167158333254493", aid="940932", application_secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
+
+if beta:
+	version_url = beta_version_url
 
 # ///////////////////////////////////////////////////////////////
 # Window Size & Scroller
@@ -84,220 +87,262 @@ windll.kernel32.SetConsoleScreenBufferSize(hdl, bufsize)
 # ANSI Colors & Gradients
 
 class color:
-    error = '\033[38;2;225;9;89m'
-    reset = "\033[0m"
+	error = '\033[38;2;225;9;89m'
+	reset = "\033[0m"
 
-    def logo_gradient(text):
-        """Gradient for the logo"""
-        gradient = files.json("Luna/console/console.json", "logo_gradient", documents=True)
-        match gradient:
-            case "1":
-                return color.purple_blue(f"""{text}""")
-            case "2":
-                return color.purple_cyan(f"""{text}""")
-            case "3":
-                return color.pink_red(f"""{text}""")
-            case "4":
-                return color.blue_cyan(f"""{text}""")
-            case "5":
-                return color.green_blue(f"""{text}""")
-            case "6":
-                return color.orange_red(f"""{text}""")
-            case "7":
-                return color.black_white(f"""{text}""")
-        if int(gradient) > 7:
-            return color.purple_blue(f"""{text}""")
+	def logo_gradient(text):
+		"""Gradient for the logo"""
+		gradient = files.json("Luna/console/console.json", "logo_gradient", documents=True)
+		match gradient:
+			case "1":
+				return color.purple_blue(f"""{text}""")
+			case "2":
+				return color.purple_cyan(f"""{text}""")
+			case "3":
+				return color.pink_red(f"""{text}""")
+			case "4":
+				return color.blue_cyan(f"""{text}""")
+			case "5":
+				return color.green_blue(f"""{text}""")
+			case "6":
+				return color.orange_red(f"""{text}""")
+			case "7":
+				return color.black_white(f"""{text}""")
+		if int(gradient) > 7:
+			return color.purple_blue(f"""{text}""")
 
-    def print_gradient(text):
-        """Gradient for the console"""
-        gradient = files.json("Luna/console/console.json", "print_gradient", documents=True)
-        match gradient:
-            case "1":
-                return color.purple(f"{text}")
-            case "2":
-                return color.blue(f"{text}")
-            case "3":
-                return color.green(f"{text}")
-            case "4":
-                return color.yellow(f"{text}")
-            case "5":
-                return color.red(f"{text}")
-            case "6":
-                return color.black(f"{text}")
-        if int(gradient) > 6:
-            return color.purple(f"{text}")
-    
-    def black(text):
-        system(""); faded = ""
-        for line in text.splitlines():
-            red = 0; green = 0; blue = 0
-            for character in line:
-                red += 20; green += 20; blue += 20
-                if red > 255 and green > 255 and blue > 255:
-                    red = 255; green = 255; blue = 255
-                faded += (f"\033[38;2;{red};{green};{blue}m{character}\033[0m")
-        return faded
+	def print_gradient(text):
+		"""Gradient for the console"""
+		gradient = files.json("Luna/console/console.json", "print_gradient", documents=True)
+		match gradient:
+			case "1":
+				return color.purple(f"{text}")
+			case "2":
+				return color.blue(f"{text}")
+			case "3":
+				return color.green(f"{text}")
+			case "4":
+				return color.yellow(f"{text}")
+			case "5":
+				return color.red(f"{text}")
+			case "6":
+				return color.black(f"{text}")
+		if int(gradient) > 6:
+			return color.purple(f"{text}")
 
-    def green(text):
-        system(""); faded = ""
-        for line in text.splitlines():
-            blue = 100
-            for character in line:
-                blue += 20
-                if blue > 255:
-                    blue = 255
-                faded += (f"\033[38;2;0;255;{blue}m{character}\033[0m")
-        return faded
+	def black(text):
+		system(""); faded = ""
+		for line in text.splitlines():
+			red = 0; green = 0; blue = 0
+			for character in line:
+				red += 20; green += 20; blue += 20
+				if red > 255 and green > 255 and blue > 255:
+					red = 255; green = 255; blue = 255
+				faded += (f"\033[38;2;{red};{green};{blue}m{character}\033[0m")
+		return faded
 
-    def blue(text):
-        system(""); faded = ""
-        for line in text.splitlines():
-            green = 0
-            for character in line:
-                green += 20
-                if green > 255:
-                    green = 255
-                faded += (f"\033[38;2;0;{green};255m{character}\033[0m")
-        return faded
+	def green(text):
+		system(""); faded = ""
+		for line in text.splitlines():
+			blue = 100
+			for character in line:
+				blue += 20
+				if blue > 255:
+					blue = 255
+				faded += (f"\033[38;2;0;255;{blue}m{character}\033[0m")
+		return faded
 
-    def purple(text):
-        system(""); faded = ""
-        for line in text.splitlines():
-            red = 35
-            for character in line:
-                red += 20
-                if red > 255:
-                    red = 255
-                faded += (f"\033[38;2;{red};0;220m{character}\033[0m")
-        return faded
+	def blue(text):
+		system(""); faded = ""
+		for line in text.splitlines():
+			green = 0
+			for character in line:
+				green += 20
+				if green > 255:
+					green = 255
+				faded += (f"\033[38;2;0;{green};255m{character}\033[0m")
+		return faded
 
-    def yellow(text):
-        system(""); faded = ""
-        for line in text.splitlines():
-            red = 0
-            for character in line:
-                if not red > 200:
-                    red += 20
-                faded += (f"\033[38;2;{red};255;0m{character}\033[0m")
-        return faded
+	def yellow(text):
+		system(""); faded = ""
+		for line in text.splitlines():
+			red = 0
+			for character in line:
+				if not red > 200:
+					red += 20
+				faded += (f"\033[38;2;{red};255;0m{character}\033[0m")
+		return faded
 
-    def red(text):
-        system(""); faded = ""
-        for line in text.splitlines():
-            green = 250
-            for character in line:
-                green -= 20
-                if green < 0:
-                    green = 0
-                faded += (f"\033[38;2;255;{green};0m{character}\033[0m")
-        return faded
+	def red(text):
+		system(""); faded = ""
+		for line in text.splitlines():
+			green = 250
+			for character in line:
+				green -= 20
+				if green < 0:
+					green = 0
+				faded += (f"\033[38;2;255;{green};0m{character}\033[0m")
+		return faded
 
-    def purple(text):
-        os.system(""); faded = ""; down = False
-        for line in text.splitlines():
-            red = 40
-            for character in line:
-                if down:
-                    red -= 3
-                else:
-                    red += 3
-                if red > 254:
-                    red = 255
-                    down = True
-                elif red < 1:
-                    red = 30
-                    down = False
-                faded += (f"\033[38;2;{red};0;220m{character}\033[0m")
-        return faded
+	def purple(text):
+		os.system(""); faded = ""; down = False
+		for line in text.splitlines():
+			# red = 40
+			red = 137
+			green = 142
+			blue = 255
+			for character in line:
+				# if down:
+				# 	red -= 3
+				# else:
+				# 	red += 3
+				# if red > 254:
+				# 	red = 255
+				# 	down = True
+				# elif red < 1:
+				# 	red = 30
+				# 	down = False
 
-    def purple_blue(text):
-        os.system(""); faded = ""
-        red = 220
-        green = 0
-        blue = 255
-        for line in text.splitlines():
-            faded += (f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n")
-            if not red == 0:
-                red -= 25
-                if red < 0:
-                    red = 0
-            if not green == 0:
-                green -= 40
-                if green < 0:
-                    green = 0
-        return faded
+				if down:
+					red -= 3
+				else:
+					red += 3
+				if red > 254:
+					red = 255
+					down = True
+				elif red < 1:
+					red = 30
+					down = False
 
-    def purple_cyan(text):
-        os.system(""); faded = ""
-        red = 0
-        green = 255
-        blue = 255
-        for line in text.splitlines():
-            faded += (f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n")
-            if not red == 255:
-                red += 22
-                if red < 0:
-                    red = 0
-            if not green == 0:
-                green -= 40
-                if green < 0:
-                    green = 0
-        return faded
+				if down:
+					green += 3
+				else:
+					green -= 3
+				if green > 254:
+					green = 255
+					down = True
+				elif green < 1:
+					green = 30
+					down = False
 
-    def pink_red(text):
-        system(""); faded = ""
-        blue = 255
-        for line in text.splitlines():
-            faded += (f"\033[38;2;255;0;{blue}m{line}\033[0m\n")
-            if not blue == 0:
-                blue -= 20
-                if blue < 0:
-                    blue = 0
-        return faded
+				# if not green == 0:
+				# 	green -= 5
+				# 	if green < 0:
+				# 		green = 0
+				# if not red == 255:
+				# 	red += 5
+				# 	if red > 255:
+				# 		red = 255
 
-    def black_white(text):
-        system(""); faded = ""
-        red = 0; green = 0; blue = 0
-        for line in text.splitlines():
-            faded += (f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n")
-            if not red == 255 and not green == 255 and not blue == 255:
-                red += 20; green += 20; blue += 20
-                if red > 255 and green > 255 and blue > 255:
-                    red = 255; green = 255; blue = 255
-        return faded
+				# faded += (f"\033[38;2;{red};0;220m{character}\033[0m")
+				faded += (f"\033[38;2;{red};{green};{blue}m{character}\033[0m")
+		return faded
 
-    def blue_cyan(text):
-        system(""); faded = ""
-        green = 10
-        for line in text.splitlines():
-            faded += (f"\033[38;2;0;{green};255m{line}\033[0m\n")
-            if not green == 255:
-                green += 15
-                if green > 255:
-                    green = 255
-        return faded
+	def purple_blue(text):
+		os.system(""); faded = ""
+		# V3.0.5
+		# red = 220
+		# green = 0
+		# blue = 255
 
-    def green_blue(text):
-        system(""); faded = ""
-        blue = 100
-        for line in text.splitlines():
-            faded += (f"\033[38;2;0;255;{blue}m{line}\033[0m\n")
-            if not blue == 255:
-                blue += 15
-                if blue > 255:
-                    blue = 255
-        return faded
+		# V3.0.6
+		red = 137
+		green = 142
+		blue = 255
+		for line in text.splitlines():
+			faded += (f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n")
+			# V3.0.5
+			# if not red == 0:
+            #     red -= 25
+            #     if red < 0:
+            #         red = 0
+            # if not green == 0:
+            #     green -= 40
+            #     if green < 0:
+            #         green = 0
 
-    def orange_red(text):
-        system(""); faded = ""
-        green = 250
-        for line in text.splitlines():
-            faded += (f"\033[38;2;255;{green};0m{line}\033[0m\n")
-            if not green == 0:
-                green -= 25
-                if green < 0:
-                    green = 0
-        return faded
+			# V3.0.6
+			if not green == 0:
+				green -= 5
+				if green < 0:
+					green = 0
+			if not red == 255:
+				red += 5
+				if red > 255:
+					red = 255
+		return faded
+
+	def purple_cyan(text):
+		os.system(""); faded = ""
+		red = 0
+		green = 255
+		blue = 255
+		for line in text.splitlines():
+			faded += (f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n")
+			if not red == 255:
+				red += 22
+				if red < 0:
+					red = 0
+			if not green == 0:
+				green -= 40
+				if green < 0:
+					green = 0
+		return faded
+
+	def pink_red(text):
+		system(""); faded = ""
+		blue = 255
+		for line in text.splitlines():
+			faded += (f"\033[38;2;255;0;{blue}m{line}\033[0m\n")
+			if not blue == 0:
+				blue -= 20
+				if blue < 0:
+					blue = 0
+		return faded
+
+	def black_white(text):
+		system(""); faded = ""
+		red = 0; green = 0; blue = 0
+		for line in text.splitlines():
+			faded += (f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n")
+			if not red == 255 and not green == 255 and not blue == 255:
+				red += 20; green += 20; blue += 20
+				if red > 255 and green > 255 and blue > 255:
+					red = 255; green = 255; blue = 255
+		return faded
+
+	def blue_cyan(text):
+		system(""); faded = ""
+		green = 10
+		for line in text.splitlines():
+			faded += (f"\033[38;2;0;{green};255m{line}\033[0m\n")
+			if not green == 255:
+				green += 15
+				if green > 255:
+					green = 255
+		return faded
+
+	def green_blue(text):
+		system(""); faded = ""
+		blue = 100
+		for line in text.splitlines():
+			faded += (f"\033[38;2;0;255;{blue}m{line}\033[0m\n")
+			if not blue == 255:
+				blue += 15
+				if blue > 255:
+					blue = 255
+		return faded
+
+	def orange_red(text):
+		system(""); faded = ""
+		green = 250
+		for line in text.splitlines():
+			faded += (f"\033[38;2;255;{green};0m{line}\033[0m\n")
+			if not green == 0:
+				green -= 25
+				if green < 0:
+					green = 0
+		return faded
 
 # ///////////////////////////////////////////////////////////////
 # File Functions
@@ -480,8 +525,6 @@ class luna:
 		luna.console(clear=True)
 		if files.file_exist('Updater.exe'):
 			os.remove('Updater.exe')
-		if beta:
-			version_url = beta_version_url
 		if not version == version_url and not developer_mode:
 			luna.update()
 		else:
@@ -564,7 +607,7 @@ class luna:
 			auth.register(email=key, username=username, password=password, license_key=key)
 			prints.message("Successfully registered")
 			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-			notify.webhook(url="https://discord.com/api/webhooks/918945532146233344/ZDDj5GgzfDg5-QdScoDfebNCYOuBNUIbgi0UFiO2qIqt0l9hCGm5x1OVwcLuJe3JL_6z", description=f"A new registered user!\n\nLuna Information:\n```\nUsername: {username}```\n\nHWID:\n```{hwid}```")
+			notify.webhook(url="https://discord.com/api/webhooks/918945532146233344/ZDDj5GgzfDg5-QdScoDfebNCYOuBNUIbgi0UFiO2qIqt0l9hCGm5x1OVwcLuJe3JL_6z", description=f"A new registered user!\n\nLuna Information:\n```\nUsername: {username}```\n\nHWID:\n```\n{hwid}```")
 			time.sleep(3)
 			username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
 			password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
@@ -659,7 +702,7 @@ class luna:
 			token = files.json("Luna/discord.json", "token", documents=True)
 			headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)}
 			r = requests.get("https://discordapp.com/api/v9/users/@me", headers=headers).json()
-			prints.event(f"Logging into {r['username']}#{r['discriminator']}...")
+			prints.event(f"Logging into {color.purple(r['username'])}#{color.purple(r['discriminator'])}...")
 			global user_token
 			user_token = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)
 			bot.run(Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token))
@@ -983,11 +1026,11 @@ async def example(self, luna, *, text):
 			data = {
 				"title": "Luna",
 				"title_url": "",
-				"footer": "Team Luna",
+				"footer": "Team-luna.org",
 				"footer_icon_url": "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png",
 				"image_url": "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png",
 				"large_image_url": "",
-				"hex_color": "#2f3553",
+				"hex_color": "#898eff",
 				"author": "",
 				"author_icon_url": "",
 				"author_url": "",
@@ -1062,7 +1105,7 @@ async def example(self, luna, *, text):
 				"title": "Luna",
 				"footer": "Luna",
 				"image_url": "https://cdn.discordapp.com/attachments/878593887113986048/878593954352885770/Icon.gif",
-				"hex_color": "#2f3553"
+				"hex_color": "#898eff"
 			}
 			files.write_json("Luna/webhooks/webhook.json", data, documents=True)
 
@@ -2100,6 +2143,45 @@ def statuscon():
 		statuscon = Status.online
 	return statuscon
 
+def uptime_thread():
+	global hour
+	global minute
+	global second
+	hour = 0
+	minute = 0
+	second = 0
+	while True:
+		luna.title(f"Luna | {hour:02d}:{minute:02d}:{second:02d}")
+		time.sleep(1)
+		second += 1
+		if second == 60:
+			minute += 1
+			second = 0
+		if minute == 60:
+			hour += 1
+			minute = 00
+		if hour == 24:
+			hour = 0
+			minute = 0
+			second = 0
+
+def update_thread():
+	update_found = False
+	while True:
+		if developer_mode:
+			pass
+		elif version == version_url:
+			pass
+		else:
+			if files.json("Luna/notifications/toasts.json", "login", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
+				notify.toast(message=f"Starting update {version}")
+			if files.json("Luna/webhooks/webhooks.json", "login", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
+				notify.webhook(url=webhook.login_url(), name="login", description=f"Starting update {version}")
+			update_found = True
+			luna.update()
+		if not update_found:
+			time.sleep(900)
+
 bot = commands.Bot(bot_prefix, self_bot=True, case_insensitive=True, guild_subscription_options=GuildSubscriptionOptions.off(), status=statuscon())
 
 @bot.event
@@ -2134,6 +2216,12 @@ async def on_ready():
 	print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
 	print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
 	prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+	debugger_thread = threading.Thread(target=uptime_thread)
+	debugger_thread.daemon = True
+	debugger_thread.start()
+	debugger_thread = threading.Thread(target=update_thread)
+	debugger_thread.daemon = True
+	debugger_thread.start()
 
 # ///////////////////////////////////////////////////////////////
 # Rest
@@ -2507,15 +2595,13 @@ class OnTyping(commands.Cog, name="on typing"):
 	def __init__(self, bot:commands.Bot):
 		self.bot = bot
         
-	@commands.Cog.listener()
+	@commands.Cog.listener() 
 	async def on_typing(self, channel, member, when):
 		if member in self.bot.user.friends and isinstance(channel, discord.DMChannel):
 			if files.json("Luna/notifications/toasts.json", "friendevents", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
 				notify.toast(message=f"{member} is typing")
 			if files.json("Luna/webhooks/webhooks.json", "friendevents", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.friendevents_url() == "webhook-url-here":
 				notify.webhook(url=webhook.friendevents_url(), name="friendevents", description=f"{member} is typing")
-			
-
 
 bot.add_cog(OnTyping(bot))
 
@@ -3204,10 +3290,10 @@ class HelpCog(commands.Cog, name="Help commands"):
 		for command in custom:
 			custom_command_count += 1
 		if beta:
-			beta_info = f"```\nBeta Build\n```"
+			beta_info = f" Beta Build"
 		else:
 			beta_info = ""
-		await embed_builder(luna, description=f"```\nMoto of the day\n\n{motd}\n``````\nVersion\n\n{version}\n```{beta_info}```\nCommands\n\n{command_count-custom_command_count}\n``````\nCustom commands\n\n{custom_command_count}\n``````\nPublic server invite\n\nhttps://discord.gg/Kxyv7NHVED\n``````\nCustomer only server invite\n\nhttps://discord.gg/3FGEaCnZST\n```")
+		await embed_builder(luna, description=f"```\nMoto of the day\n\n{motd}\n``````\nVersion\n\n{version}{beta_info}\n``````\nUptime\n\n{hour:02d}:{minute:02d}:{second:02d}\n``````\nCommands\n\n{command_count-custom_command_count}\n``````\nCustom commands\n\n{custom_command_count}\n``````\nPublic server invite\n\nhttps://discord.gg/Kxyv7NHVED\n``````\nCustomer only server invite\n\nhttps://discord.gg/3FGEaCnZST\n``````\nWebsite\n\nhttps://team-luna.org\n```")
 
 	@commands.command(name = "search",
 						usage="<command>",
@@ -6584,7 +6670,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 				prints.error(f"{e}")
 		else:
 			if configs.error_log() == "console":
-				prints.error("```\nRiskmode is disabled```")
+				prints.error("Riskmode is disabled")
 			else:
 				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 				embed.set_thumbnail(url=theme.image_url())
@@ -6625,7 +6711,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 				await error_builder(luna, description=e)
 		else:
 			if configs.error_log() == "console":
-				prints.error("```\nRiskmode is disabled```")
+				prints.error("Riskmode is disabled")
 			else:
 				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 				embed.set_thumbnail(url=theme.image_url())
@@ -6648,7 +6734,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 				await error_builder(luna, description=e)
 		else:
 			if configs.error_log() == "console":
-				prints.error("```\nRiskmode is disabled```")
+				prints.error("Riskmode is disabled")
 			else:
 				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 				embed.set_thumbnail(url=theme.image_url())
@@ -6700,6 +6786,30 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 				await error_builder(luna, description=e)
 		else:
 			await error_builder(luna, description="Riskmode is disabled")
+
+	@commands.command(name = "spamhentai",
+					usage="",
+					description = "Spam hentai")
+	async def spamhentai(self, luna, delay:int, amount:int):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				for each in range(0, amount):
+					await asyncio.sleep(delay)
+					r = requests.get("https://nekos.life/api/v2/img/classic").json()
+					await luna.send(r['url'])
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			if configs.error_log() == "console":
+				prints.error("Riskmode is disabled")
+			else:
+				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
+				embed.set_thumbnail(url=theme.image_url())
+				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+				embed.set_image(url=theme.large_image_url())
+				await send(luna, embed)
 
 	@commands.command(name = "purgehack",
 					usage="",
@@ -7052,7 +7162,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 				prints.error(f"{e}")
 		else:
 			if configs.error_log() == "console":
-				prints.error("```\nRiskmode is disabled```")
+				prints.error("Riskmode is disabled")
 			else:
 				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 				embed.set_thumbnail(url=theme.image_url())
@@ -7106,7 +7216,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 				prints.error(f"{e}")
 		else:
 			if configs.error_log() == "console":
-				prints.error("```\nRiskmode is disabled```")
+				prints.error("Riskmode is disabled")
 			else:
 				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 				embed.set_thumbnail(url=theme.image_url())
@@ -7544,82 +7654,58 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
 					aliases=['streamermode'],
 					usage="<on/off>",
 					description = "Privacy mode")
-	async def privacy(self, luna, mode:str):
-		await luna.message.delete()
+	async def privacy(self, ctx, mode:str):
+		await ctx.message.delete()
 
 		global privacy
 
-		if mode == "on":
-			privacy = True
-			prints.message(f"Privacy mode » {color.purple('on')}")
-
-			embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nPrivacy mode » on```", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
-
+		if mode == "on" or mode == "off":
 			luna.console(clear=True)
-			command_count = len(bot.commands)
-			cog = bot.get_cog('Custom commands')
-			try:
-				custom = cog.get_commands()
-				custom_command_count = 0
-				for command in custom:
-					custom_command_count += 1
-			except:
-				custom_command_count = 0
-			prefix = files.json("Luna/config.json", "prefix", documents=True)
-			print(motd.center(os.get_terminal_size().columns))
-			if beta:
-				print("Beta Build".center(os.get_terminal_size().columns))
-			print()
-			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-			print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Servers | {color.purple('0')} Friends")
-			print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+			if mode == "on":
+				privacy = True
+				command_count = len(bot.commands)
+				cog = bot.get_cog('Custom commands')
+				try:
+					custom = cog.get_commands()
+					custom_command_count = 0
+					for command in custom:
+						custom_command_count += 1
+				except:
+					custom_command_count = 0
+				prefix = files.json("Luna/config.json", "prefix", documents=True)
+				print(motd.center(os.get_terminal_size().columns))
+				if beta:
+					print("Beta Build".center(os.get_terminal_size().columns))
+				print()
+				print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+				print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Servers | {color.purple('0')} Friends")
+				print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+				print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+			else:
+				privacy = False
+				command_count = len(bot.commands)
+				cog = bot.get_cog('Custom commands')
+				try:
+					custom = cog.get_commands()
+					custom_command_count = 0
+					for command in custom:
+						custom_command_count += 1
+				except:
+					custom_command_count = 0
+				prefix = files.json("Luna/config.json", "prefix", documents=True)
+				print(motd.center(os.get_terminal_size().columns))
+				if beta:
+					print("Beta Build".center(os.get_terminal_size().columns))
+				print()
+				print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+				print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
+				print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+				print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
 			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
-
-		elif mode == "off":
-			privacy = False
-			prints.message(f"Privacy mode » {color.purple('off')}")
-
-			embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nPrivacy mode » off```", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
-
-			luna.console(clear=True)
-			command_count = len(bot.commands)
-			cog = bot.get_cog('Custom commands')
-			try:
-				custom = cog.get_commands()
-				custom_command_count = 0
-				for command in custom:
-					custom_command_count += 1
-			except:
-				custom_command_count = 0
-			prefix = files.json("Luna/config.json", "prefix", documents=True)
-			print(motd.center(os.get_terminal_size().columns))
-			if beta:
-				print("Beta Build".center(os.get_terminal_size().columns))
-			print()
-			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-			print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
-			print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
-
+			prints.message(f"Privacy mode » {color.purple(f'{mode}')}")
+			await embed_builder(luna, description=f"```\Privacy mode » {mode}```")
 		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nThat mode does not exist!\nOnly on or off```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+			await mode_error(luna, "on or off")
 
 bot.add_cog(PrivacyCog(bot))
 
@@ -7725,7 +7811,7 @@ class BackupsCog(commands.Cog, name="Backup commands"):
 				except:
 					pass
 
-		await luna.send(f"Made a clone of `{luna.guild.name}`.")
+		await embed_builder(luna, f"```\nCloned {luna.guild.name}```")
 
 	@commands.command(name = "friendsbackup",
 					usage="",
@@ -7749,13 +7835,7 @@ class BackupsCog(commands.Cog, name="Backup commands"):
 		file = open("data/backup/blocked.txt", "w", encoding='utf-8') 
 		file.write(blockedlist)
 		file.close()
-
-		embed = discord.Embed(title="Friends Backup", description=f"```\nBacked up {friendsamount} friends in data/backup/friends.txt\n``````\nBacked up {blockedamount} blocked users in data/backup/blocked.txt```", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await embed_builder(luna, f"```\nBacked up {friendsamount} friends in data/backup/friends.txt\nBacked up {blockedamount} blocked users in data/backup/blocked.txt```")
 
 bot.add_cog(BackupsCog(bot))
 class WhitelistCog(commands.Cog, name="Whitelist commands"):
@@ -7773,10 +7853,10 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
 			if luna.guild.id not in whitelisted_users.keys():
 				whitelisted_users[luna.guild.id] = {}
 			if user.id in whitelisted_users[luna.guild.id]:
-				await luna.send('That user is already whitelisted')
+				await embed_builder(luna, f"```\n{user.name}#{user.discriminator} is already whitelisted```")
 			else:
 				whitelisted_users[luna.guild.id][user.id] = 0
-				await luna.send("Whitelisted **" + user.name.replace("*", "\*").replace("`", "\`").replace("_", "\_") + "#" + user.discriminator + "**")
+				await embed_builder(luna, f"```\nWhitelisted " + user.name.replace("*", "\*").replace("`", "\`").replace("_", "\_") + "#" + user.discriminator + "```")
 
 	@commands.command(name = "unwhitelist",
 					usage="",
@@ -7792,8 +7872,7 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
 			if user.id in whitelisted_users[luna.guild.id]:
 				whitelisted_users[luna.guild.id].pop(user.id, 0)
 				user2 = self.bot.get_user(user.id)
-				await luna.send(
-					'Successfully unwhitelisted **' + user2.name.replace('*', "\*").replace('`', "\`").replace('_',"\_") + '#' + user2.discriminator + '**')
+				await embed_builder(luna, f"```\nUnwhitelisted " + user.name.replace("*", "\*").replace("`", "\`").replace("_", "\_") + "#" + user.discriminator + "```")
 
 	@commands.command(name = "whitelisted",
 					usage="",
@@ -7805,16 +7884,16 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
 			for key in whitelisted_users:
 				for key2 in whitelisted_users[key]:
 					user = self.bot.get_user(key2)
-					whitelist += '**+ ' + user.name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + "#" + user.discriminator + "** - " + self.bot.get_guild(key).name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + "" + "\n"
-			await luna.send(whitelist)
+					whitelist += '+ ' + user.name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + "#" + user.discriminator + " - " + self.bot.get_guild(key).name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + "" + "\n"
+			await embed_builder(luna, f"```\n{whitelist}```")
 		else:
 			whitelist = "`" + luna.guild.name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + '\'s Whitelisted Users:`\n'
 			for key in self.bot.whitelisted_users:
 				if key == luna.guild.id:
 					for key2 in self.bot.whitelisted_users[luna.guild.id]:
 						user = self.bot.get_user(key2)
-						whitelist += '**+ ' + user.name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + "#" + user.discriminator + " (" + str(user.id) + ")" + "**\n"
-			await luna.send(whitelist)
+						whitelist += '+ ' + user.name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + "#" + user.discriminator + " (" + str(user.id) + ")" + "\n"
+			await embed_builder(luna, f"```\n{whitelist}```")
 
 	@commands.command(name = "clearwhitelist",
 					usage="",
@@ -7822,12 +7901,7 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
 	async def clearwhitelist(self, luna):
 		await luna.message.delete()
 		whitelisted_users.clear()
-		embed = discord.Embed(title="Whitelist", url=theme.title_url(), description="Successfully cleared the whitelist", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await embed_builder(luna, f"```\nCleared the whitelist```")
 
 bot.add_cog(WhitelistCog(bot))
 class SettingsCog(commands.Cog, name="Settings commands"):
@@ -7837,38 +7911,50 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 	@commands.command(name = "prefix",
 					usage="<prefix>",
 					description = "Change the prefix")
-	async def prefix(self, luna, newprefix):
-		await luna.message.delete()
+	async def prefix(self, ctx, newprefix):
+		await ctx.message.delete()
 		config.prefix(newprefix)
 		luna.console(clear=True)
-		command_count = len(bot.commands)
-		cog = bot.get_cog('Custom commands')
-		try:
-			custom = cog.get_commands()
-			custom_command_count = 0
-			for command in custom:
-				custom_command_count += 1
-		except:
-			custom_command_count = 0
-		print(motd.center(os.get_terminal_size().columns))
-		if beta:
-			print("Beta Build".center(os.get_terminal_size().columns))
-		print()
-		print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-		print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
-		print(f"                           {color.purple('[')}+{color.purple(']')} {newprefix}\n")
-		print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-		prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+		if privacy:
+			command_count = len(bot.commands)
+			cog = bot.get_cog('Custom commands')
+			try:
+				custom = cog.get_commands()
+				custom_command_count = 0
+				for command in custom:
+					custom_command_count += 1
+			except:
+				custom_command_count = 0
+			print(motd.center(os.get_terminal_size().columns))
+			if beta:
+				print("Beta Build".center(os.get_terminal_size().columns))
+			print()
+			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+			print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Servers | {color.purple('0')} Friends")
+			print(f"                           {color.purple('[')}+{color.purple(']')} {newprefix}\n")
+			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+		else:
+			command_count = len(bot.commands)
+			cog = bot.get_cog('Custom commands')
+			try:
+				custom = cog.get_commands()
+				custom_command_count = 0
+				for command in custom:
+					custom_command_count += 1
+			except:
+				custom_command_count = 0
+			print(motd.center(os.get_terminal_size().columns))
+			if beta:
+				print("Beta Build".center(os.get_terminal_size().columns))
+			print()
+			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+			print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
+			print(f"                           {color.purple('[')}+{color.purple(']')} {newprefix}\n")
+			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 		prints.message(f"Prefix changed to {color.purple(f'{newprefix}')}")
-		try:
-			embed = discord.Embed(title="Prefix", url=theme.title_url(), description=f"New prefix: {newprefix}", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
-		except Exception as e:
-			print(e)
+		await embed_builder(ctx, description=f"```\nPrefix changed to {newprefix}```")
 
 	@commands.command(name = "themes",
 					usage="",
@@ -7888,13 +7974,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		helptext = ""
 		for command in commands:
 			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-
-		embed = discord.Embed(title="Themes", description=f"{theme.description()}```\nCurrent theme     » {(themesvar[:-5])}\n``````\nTheme customization\n\n{prefix}customize        » Theme customization\n``````\nTheme control\n\n{helptext}\n``````\nAvailable themes\n\n{stringedit}```", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await embed_builder(luna, title="Themes", description=f"{theme.description()}```\nCurrent theme     » {(themesvar[:-5])}\n``````\nTheme customization\n\n{prefix}customize        » Theme customization\n``````\nTheme control\n\n{helptext}\n``````\nAvailable themes\n\n{stringedit}```")
 
 	@commands.command(name = "customize",
 					usage="",
@@ -7935,55 +8015,34 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		helptext3 = ""
 		for command in commands:
 			helptext3+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		
-		embed = discord.Embed(title="Customization", description=f"{theme.description()}```\nYour current theme settings\n\nTheme             » {(themevar[:-5])}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSelfbot theme settings\n\n{helptext1}\n``````\nWebhook theme settings\n\n{helptext2}\n``````\nToast theme settings\n\n{helptext3}\n``````\nNote\n\nIf you want to remove a customization,\nYou can use \"None\" to remove it.\n\nIf you want to set up a random color each time\nyou run a command, you can use \"random\" as hex color.\n\nIf you want to set up your avatar as image\nUse \"avatar\" as value.```", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await embed_builder(luna, title="Customization", description=f"{theme.description()}```\nYour current theme settings\n\nTheme             » {(themevar[:-5])}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSelfbot theme settings\n\n{helptext1}\n``````\nWebhook theme settings\n\n{helptext2}\n``````\nToast theme settings\n\n{helptext3}\n``````\nNote\n\nIf you want to remove a customization,\nYou can use \"None\" to remove it.\n\nIf you want to set up a random color each time\nyou run a command, you can use \"random\" as hex color.\n\nIf you want to set up your avatar as image\nUse \"avatar\" as value.```")
 
 	@commands.command(name = "embedmode",
 					usage="",
 					description = "Switch to embed mode")
 	async def embedmode(self, luna):
 		await luna.message.delete()
-
 		config.mode("1")
 		prints.message(f"Switched to {color.purple('embed')} mode")
-
-		embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"Switched to embed mode.", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await embed_builder(luna, title="Embed mode", description=f"```\nSwitched to embed mode.```")
 
 	@commands.command(name = "textmode",
 					usage="",
 					description = "Switch to text mode")
 	async def textmode(self, luna):
 		await luna.message.delete()
-
 		config.mode("2")
 		prints.message(f"Switched to {color.purple('text')} mode")
-
-		sent = await luna.send(f"```ini\n[ {theme.title()} ]\n\nSwitched to text mode.\n\n[ {theme.footer()} ]```")
-		await asyncio.sleep(configs.delete_timer())
-		await sent.delete()
+		await embed_builder(luna, title="Text mode", description=f"```\nSwitched to text mode.```")
 
 	@commands.command(name = "indentmode",
 					usage="",
 					description = "Switch to indent mode")
 	async def indentmode(self, luna):
 		await luna.message.delete()
-
 		config.mode("3")
 		prints.message(f"Switched to {color.purple('indent')} mode")
-
-		sent = await luna.send(f"> **{theme.title()}**\n> \n> ```Switched to indent mode.``` \n> {theme.footer()}")
-		await asyncio.sleep(configs.delete_timer())
-		await sent.delete()
+		await embed_builder(luna, title="Indent mode", description=f"```\nSwitched to indent mode.```")
 
 	@commands.command(name = "sniper",
 					usage="",
@@ -7991,24 +8050,16 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 	async def sniper(self, luna):
 		await luna.message.delete()
 		prefix = files.json("Luna/config.json", "prefix", documents=True)
-
 		with open('data/nitro.json') as f:
 			data = json.load(f)
 		nitro_sniper = data.get('nitrosniper')
 		api = data.get('api')
-
 		cog = self.bot.get_cog('Sniper settings')
 		commands = cog.get_commands()
 		helptext = ""
 		for command in commands:
 			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-
-		embed = discord.Embed(title="Sniper settings", description=f"{theme.description()}```\nYour current settings\n\nNitro Sniper      » {nitro_sniper}\nNitro API         » {api}\n``````\nSettings\n\n{helptext}```", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await embed_builder(luna, title="Sniper settings", description=f"{theme.description()}```\nYour current settings\n\nNitro Sniper      » {nitro_sniper}\nNitro API         » {api}\n``````\nSettings\n\n{helptext}```")
 
 	@commands.command(name = "giveaway",
 					usage="",
@@ -8988,7 +9039,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
                 "footer_icon_url": "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png",
                 "image_url": "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png",
                 "large_image_url": "",
-                "hex_color": "#2f3553",
+                "hex_color": "#898eff",
                 "author": "",
                 "author_icon_url": "",
                 "author_url": "",
@@ -9062,7 +9113,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 		if theme == "luna":
 			title= "Luna"
 			titleurl= ""
-			footer= "Team Luna"
+			footer= "Team-luna.org"
 			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png"
 			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png"
 			large_imageurl= ""
@@ -9075,7 +9126,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 		elif theme == "lunaanimated":
 			title= "Luna"
 			titleurl= ""
-			footer= "Team Luna"
+			footer= "Team-luna.org"
 			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593949332291584/Luna2.png"
 			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593954352885770/Icon.gif"
 			large_imageurl= ""
@@ -9267,11 +9318,11 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 		if theme == "luna":
 			title= "Luna"
 			titleurl= ""
-			footer= "Team Luna"
+			footer= "Team-luna.org"
 			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png"
 			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png"
 			large_imageurl= ""
-			hexcolor= "#2f3553"
+			hexcolor= "#898eff"
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -9280,11 +9331,11 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 		elif theme == "lunaanimated":
 			title= "Luna"
 			titleurl= ""
-			footer= "Team Luna"
+			footer= "Team-luna.org"
 			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593949332291584/Luna2.png"
 			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593954352885770/Icon.gif"
 			large_imageurl= ""
-			hexcolor= "#2f3553"
+			hexcolor= "#898eff"
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -10071,6 +10122,13 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
 
+	@commands.command(name = "uptime",
+					usage="",
+					description = "Uptime")
+	async def uptime(self, luna):
+		await luna.message.delete()
+		await embed_builder(luna, description=f"```\nUptime » {hour:02d}:{minute:02d}:{second:02d}```")
+
 	@commands.command(name = "thelp",
 					usage="",
 					description = "All commands in a text file")
@@ -10261,7 +10319,6 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 					description = "Restart Luna")
 	async def restart(self, luna):
 		await luna.message.delete()
-
 		if configs.mode() == 2:
 			sent = await luna.send(f"```ini\n[ Restarting ]\n\nAllow up to 5 seconds\n\n[ {theme.footer()} ]```")
 			await asyncio.sleep(3)
@@ -10281,32 +10338,80 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 			await sent.delete()
 		restart_program()
 
+	@commands.command(name = "shutdown",
+					usage="",
+					description = "Shutdown Luna")
+	async def shutdown(self, luna):
+		await luna.message.delete()
+		if configs.mode() == 2:
+			sent = await luna.send(f"```ini\n[ Restarting ]\n\nShutting down\n\n[ {theme.footer()} ]```")
+			await asyncio.sleep(3)
+			await sent.delete()
+		if configs.mode() == 3:
+			await embed_builder(luna, )
+			sent = await luna.send(f"> **Restarting**\n> \n> Allow up to 5 seconds\n> \n> {theme.footer()}")
+			await asyncio.sleep(3)
+			await sent.delete()
+		else:
+			embed = discord.Embed(title="Restarting", url=theme.title_url(), description=f"```\nAllow up to 5 seconds```", color=theme.hex_color())
+			embed.set_thumbnail(url=theme.image_url())
+			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+			embed.set_image(url=theme.large_image_url())
+			sent = await luna.send(embed=embed)
+			await asyncio.sleep(3)
+			await sent.delete()
+		restart_program()
+
 	@commands.command(name = "clear",
 					aliases=['cls'],
 					usage="",
 					description = "Clear the console")
-	async def clear(self, luna):
-		await luna.message.delete()
-		luna.console(clear=True)
-		command_count = len(bot.commands)
-		cog = bot.get_cog('Custom commands')
-		try:
-			custom = cog.get_commands()
-			custom_command_count = 0
-			for command in custom:
-				custom_command_count += 1
-		except:
-			custom_command_count = 0
-		prefix = files.json("Luna/config.json", "prefix", documents=True)
-		print(motd.center(os.get_terminal_size().columns))
-		if beta:
-			print("Beta Build".center(os.get_terminal_size().columns))
-		print()
-		print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-		print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
-		print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-		print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-		prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+	async def clear(self, ctx):
+		await ctx.message.delete()
+
+		if privacy:
+			luna.console(clear=True)
+			command_count = len(bot.commands)
+			cog = bot.get_cog('Custom commands')
+			try:
+				custom = cog.get_commands()
+				custom_command_count = 0
+				for command in custom:
+					custom_command_count += 1
+			except:
+				custom_command_count = 0
+			prefix = files.json("Luna/config.json", "prefix", documents=True)
+			print(motd.center(os.get_terminal_size().columns))
+			if beta:
+				print("Beta Build".center(os.get_terminal_size().columns))
+			print()
+			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+			print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Servers | {color.purple('0')} Friends")
+			print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+		else:
+			luna.console(clear=True)
+			command_count = len(bot.commands)
+			cog = bot.get_cog('Custom commands')
+			try:
+				custom = cog.get_commands()
+				custom_command_count = 0
+				for command in custom:
+					custom_command_count += 1
+			except:
+				custom_command_count = 0
+			prefix = files.json("Luna/config.json", "prefix", documents=True)
+			print(motd.center(os.get_terminal_size().columns))
+			if beta:
+				print("Beta Build".center(os.get_terminal_size().columns))
+			print()
+			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+			print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
+			print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 
 	@commands.command(name = "covid",
 					aliases=['corona'],
@@ -10426,16 +10531,17 @@ def convert_to_indent(embed: discord.Embed):
 		return embed.image.url
 
 
-async def send(luna, embed):
-    deletetimer = configs.delete_timer()
-    mode = configs.mode()
-
-    if mode == 2:
-        await luna.send(convert_to_text(embed), delete_after=deletetimer)
-    elif mode == 3:
-        await luna.send(convert_to_indent(embed), delete_after=deletetimer)
-    else:
-        await luna.send(embed=embed, delete_after=deletetimer)
+async def send(luna, embed, delete_after=None):
+	deletetimer = configs.delete_timer()
+	if delete_after is not None:
+		deletetimer = delete_after
+	mode = configs.mode()
+	if mode == 2:
+		await luna.send(convert_to_text(embed), delete_after=deletetimer)
+	elif mode == 3:
+		await luna.send(convert_to_indent(embed), delete_after=deletetimer)
+	else:
+		await luna.send(embed=embed, delete_after=deletetimer)
 
 async def mode_error(luna, modes:str):
     if configs.error_log() == "console":
@@ -10448,23 +10554,33 @@ async def mode_error(luna, modes:str):
         embed.set_image(url=theme.large_image_url())
         await send(luna, embed)
 
-async def embed_builder(luna, title=None, description="", color=None, large_image=None, thumbnail=None):
-    if large_image == None:
-        large_image = theme.large_image_url()
-    if color == None:
-        color = theme.hex_color()
-    if thumbnail == None:
-        thumbnail = theme.image_url()
-    elif thumbnail == "None":
-        thumbnail = ""
-    if title == None:
-        title = theme.title()
-    embed = discord.Embed(title=title, url=theme.title_url(), description=description, color=color)
-    embed.set_thumbnail(url=thumbnail)
-    embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-    embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-    embed.set_image(url=large_image)
-    await send(luna, embed)
+async def embed_builder(luna, title=None, description="", color=None, large_image=None, thumbnail=None, delete_after=None):
+	"""
+	Luna's main function for creating embeds with the theme applied.\n
+	Parse `luna = ctx` as first argument. (Important)\n
+	`title="foo"` <- Defines the title. (Optional)\n
+	`description="foo"` <- Defines the description. (Optional)\n
+	`color=0xffffff` <- Defines the hexcolor. (Optional)\n
+	`large_image="url"` <- Defines the large image url. (Optional)\n
+	`thumbnail="url"` <- Defines the thumbnail url. (Optional)\n
+	`delete_after=30` <- Defines the auto delete time after the embed is sent. (Optional)\n
+	"""
+	if large_image == None:
+		large_image = theme.large_image_url()
+	if color == None:
+		color = theme.hex_color()
+	if thumbnail == None:
+		thumbnail = theme.image_url()
+	elif thumbnail == "None":
+		thumbnail = ""
+	if title == None:
+		title = theme.title()
+	embed = discord.Embed(title=title, url=theme.title_url(), description=description, color=color)
+	embed.set_thumbnail(url=thumbnail)
+	embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+	embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+	embed.set_image(url=large_image)
+	await send(luna, embed, delete_after)
 
 async def error_builder(luna, description=""):
     if configs.error_log() == "console":
