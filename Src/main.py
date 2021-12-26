@@ -55,8 +55,8 @@ privacy = False
 copycat = None
 chargesniper = False
 
-developer_mode = True
-beta = True
+developer_mode = False
+beta = False
 version = '3.0.5'
 
 r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/master.json").json()
