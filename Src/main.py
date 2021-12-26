@@ -6236,6 +6236,16 @@ class UtilsCog(commands.Cog, name="Util commands"):
 		else:
 			await error_builder(luna, description="Riskmode is disabled")
 
+	@commands.command(name = "emojis",
+					usage="",
+					description = "List all emojis")
+	async def emojis(self, luna):
+		await luna.message.delete()
+		server = luna.message.guild
+		emojis = [e.name for e in server.emojis]
+		emojis = '\n'.join(emojis)
+		await embed_builder(luna, title="Emojis", description=f"```\n{emojis}```")
+
 	@commands.command(name = "addemoji",
 					usage="<emoji_name> <image_url>",
 					description = "Add an emoji")
