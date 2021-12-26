@@ -6242,6 +6242,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 	async def countdown(self, luna, number:int):
 		for count in range(number, 0, -1):
 			await luna.send(count)
+			await asyncio.sleep(1)
 
 	@commands.command(name = "countup",
 					usage="<number>",
@@ -6249,6 +6250,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 	async def countup(self, luna, number:int):
 		for count in range(0, number):
 			await luna.send(count)
+			await asyncio.sleep(1)
 
 	@commands.command(name = "emojis",
 					usage="",
