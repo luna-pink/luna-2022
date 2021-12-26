@@ -6236,6 +6236,20 @@ class UtilsCog(commands.Cog, name="Util commands"):
 		else:
 			await error_builder(luna, description="Riskmode is disabled")
 
+	@commands.command(name = "countdown",
+					usage="<number>",
+					description = "Create a countdown")
+	async def countdown(self, luna, number:int):
+		for count in range(number, 0, -1):
+			await luna.send(count)
+
+	@commands.command(name = "countup",
+					usage="<number>",
+					description = "Create a countup")
+	async def countup(self, luna, number:int):
+		for count in range(0, number):
+			await luna.send(count)
+
 	@commands.command(name = "emojis",
 					usage="",
 					description = "List all emojis")
