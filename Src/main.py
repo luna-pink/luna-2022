@@ -57,7 +57,7 @@ chargesniper = False
 
 developer_mode = False
 beta = False
-version = '3.0.5'
+version = '3.0.5h1'
 
 r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/master.json").json()
 updater_url = r["updater"]
@@ -631,11 +631,23 @@ class luna:
 		Uses the link for the Updater.exe from `updater_url` or `beta_update_url`\n
 		"""
 		luna.console(clear=True)
+
+		r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/master.json").json()
+		updater_url = r["updater"]
+		version_url = r["version"]
+
+		r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/beta.json").json()
+		beta_updater_url = r["updater"]
+		beta_version_url = r["version"]
+
+		if beta:
+			version_url = beta_version_url
 		url = updater_url
 		version = version_url
 		if beta:
 			prints.message("Beta Build")
 			version = beta_version_url
+			url = beta_updater_url
 		prints.event(f"Downloading Luna {version}...")
 		from clint.textui import progress
 		r = requests.get(url, stream=True)
@@ -2168,6 +2180,14 @@ def uptime_thread():
 def update_thread():
 	update_found = False
 	while True:
+		r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/master.json").json()
+		version_url = r["version"]
+
+		r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/beta.json").json()
+		beta_version_url = r["version"]
+
+		if beta:
+			version_url = beta_version_url
 		if developer_mode:
 			pass
 		elif version == version_url:
