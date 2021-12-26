@@ -2165,6 +2165,23 @@ def uptime_thread():
 			minute = 0
 			second = 0
 
+def update_thread():
+	update_found = False
+	while True:
+		if developer_mode:
+			pass
+		elif version == version_url:
+			pass
+		else:
+			if files.json("Luna/notifications/toasts.json", "login", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
+				notify.toast(message=f"Starting update {version}")
+			if files.json("Luna/webhooks/webhooks.json", "login", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
+				notify.webhook(url=webhook.login_url(), name="login", description=f"Starting update {version}")
+			update_found = True
+			luna.update()
+		if not update_found:
+			time.sleep(900)
+
 bot = commands.Bot(bot_prefix, self_bot=True, case_insensitive=True, guild_subscription_options=GuildSubscriptionOptions.off(), status=statuscon())
 
 @bot.event
@@ -2200,6 +2217,9 @@ async def on_ready():
 	print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
 	prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 	debugger_thread = threading.Thread(target=uptime_thread)
+	debugger_thread.daemon = True
+	debugger_thread.start()
+	debugger_thread = threading.Thread(target=update_thread)
 	debugger_thread.daemon = True
 	debugger_thread.start()
 
