@@ -56,7 +56,7 @@ copycat = None
 chargesniper = False
 
 developer_mode = True
-beta = False
+beta = True
 version = '3.0.5'
 
 r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/master.json").json()
@@ -71,6 +71,9 @@ beta_user = r["beta_user"]
 motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ').read().decode('utf-8')
 auth = luna_gg(api_key="485477744381137547167158333254493", aid="940932", application_secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
 
+if beta:
+	version_url = beta_version_url
+
 # ///////////////////////////////////////////////////////////////
 # Window Size & Scroller
 
@@ -84,220 +87,262 @@ windll.kernel32.SetConsoleScreenBufferSize(hdl, bufsize)
 # ANSI Colors & Gradients
 
 class color:
-    error = '\033[38;2;225;9;89m'
-    reset = "\033[0m"
+	error = '\033[38;2;225;9;89m'
+	reset = "\033[0m"
 
-    def logo_gradient(text):
-        """Gradient for the logo"""
-        gradient = files.json("Luna/console/console.json", "logo_gradient", documents=True)
-        match gradient:
-            case "1":
-                return color.purple_blue(f"""{text}""")
-            case "2":
-                return color.purple_cyan(f"""{text}""")
-            case "3":
-                return color.pink_red(f"""{text}""")
-            case "4":
-                return color.blue_cyan(f"""{text}""")
-            case "5":
-                return color.green_blue(f"""{text}""")
-            case "6":
-                return color.orange_red(f"""{text}""")
-            case "7":
-                return color.black_white(f"""{text}""")
-        if int(gradient) > 7:
-            return color.purple_blue(f"""{text}""")
+	def logo_gradient(text):
+		"""Gradient for the logo"""
+		gradient = files.json("Luna/console/console.json", "logo_gradient", documents=True)
+		match gradient:
+			case "1":
+				return color.purple_blue(f"""{text}""")
+			case "2":
+				return color.purple_cyan(f"""{text}""")
+			case "3":
+				return color.pink_red(f"""{text}""")
+			case "4":
+				return color.blue_cyan(f"""{text}""")
+			case "5":
+				return color.green_blue(f"""{text}""")
+			case "6":
+				return color.orange_red(f"""{text}""")
+			case "7":
+				return color.black_white(f"""{text}""")
+		if int(gradient) > 7:
+			return color.purple_blue(f"""{text}""")
 
-    def print_gradient(text):
-        """Gradient for the console"""
-        gradient = files.json("Luna/console/console.json", "print_gradient", documents=True)
-        match gradient:
-            case "1":
-                return color.purple(f"{text}")
-            case "2":
-                return color.blue(f"{text}")
-            case "3":
-                return color.green(f"{text}")
-            case "4":
-                return color.yellow(f"{text}")
-            case "5":
-                return color.red(f"{text}")
-            case "6":
-                return color.black(f"{text}")
-        if int(gradient) > 6:
-            return color.purple(f"{text}")
-    
-    def black(text):
-        system(""); faded = ""
-        for line in text.splitlines():
-            red = 0; green = 0; blue = 0
-            for character in line:
-                red += 20; green += 20; blue += 20
-                if red > 255 and green > 255 and blue > 255:
-                    red = 255; green = 255; blue = 255
-                faded += (f"\033[38;2;{red};{green};{blue}m{character}\033[0m")
-        return faded
+	def print_gradient(text):
+		"""Gradient for the console"""
+		gradient = files.json("Luna/console/console.json", "print_gradient", documents=True)
+		match gradient:
+			case "1":
+				return color.purple(f"{text}")
+			case "2":
+				return color.blue(f"{text}")
+			case "3":
+				return color.green(f"{text}")
+			case "4":
+				return color.yellow(f"{text}")
+			case "5":
+				return color.red(f"{text}")
+			case "6":
+				return color.black(f"{text}")
+		if int(gradient) > 6:
+			return color.purple(f"{text}")
 
-    def green(text):
-        system(""); faded = ""
-        for line in text.splitlines():
-            blue = 100
-            for character in line:
-                blue += 20
-                if blue > 255:
-                    blue = 255
-                faded += (f"\033[38;2;0;255;{blue}m{character}\033[0m")
-        return faded
+	def black(text):
+		system(""); faded = ""
+		for line in text.splitlines():
+			red = 0; green = 0; blue = 0
+			for character in line:
+				red += 20; green += 20; blue += 20
+				if red > 255 and green > 255 and blue > 255:
+					red = 255; green = 255; blue = 255
+				faded += (f"\033[38;2;{red};{green};{blue}m{character}\033[0m")
+		return faded
 
-    def blue(text):
-        system(""); faded = ""
-        for line in text.splitlines():
-            green = 0
-            for character in line:
-                green += 20
-                if green > 255:
-                    green = 255
-                faded += (f"\033[38;2;0;{green};255m{character}\033[0m")
-        return faded
+	def green(text):
+		system(""); faded = ""
+		for line in text.splitlines():
+			blue = 100
+			for character in line:
+				blue += 20
+				if blue > 255:
+					blue = 255
+				faded += (f"\033[38;2;0;255;{blue}m{character}\033[0m")
+		return faded
 
-    def purple(text):
-        system(""); faded = ""
-        for line in text.splitlines():
-            red = 35
-            for character in line:
-                red += 20
-                if red > 255:
-                    red = 255
-                faded += (f"\033[38;2;{red};0;220m{character}\033[0m")
-        return faded
+	def blue(text):
+		system(""); faded = ""
+		for line in text.splitlines():
+			green = 0
+			for character in line:
+				green += 20
+				if green > 255:
+					green = 255
+				faded += (f"\033[38;2;0;{green};255m{character}\033[0m")
+		return faded
 
-    def yellow(text):
-        system(""); faded = ""
-        for line in text.splitlines():
-            red = 0
-            for character in line:
-                if not red > 200:
-                    red += 20
-                faded += (f"\033[38;2;{red};255;0m{character}\033[0m")
-        return faded
+	def yellow(text):
+		system(""); faded = ""
+		for line in text.splitlines():
+			red = 0
+			for character in line:
+				if not red > 200:
+					red += 20
+				faded += (f"\033[38;2;{red};255;0m{character}\033[0m")
+		return faded
 
-    def red(text):
-        system(""); faded = ""
-        for line in text.splitlines():
-            green = 250
-            for character in line:
-                green -= 20
-                if green < 0:
-                    green = 0
-                faded += (f"\033[38;2;255;{green};0m{character}\033[0m")
-        return faded
+	def red(text):
+		system(""); faded = ""
+		for line in text.splitlines():
+			green = 250
+			for character in line:
+				green -= 20
+				if green < 0:
+					green = 0
+				faded += (f"\033[38;2;255;{green};0m{character}\033[0m")
+		return faded
 
-    def purple(text):
-        os.system(""); faded = ""; down = False
-        for line in text.splitlines():
-            red = 40
-            for character in line:
-                if down:
-                    red -= 3
-                else:
-                    red += 3
-                if red > 254:
-                    red = 255
-                    down = True
-                elif red < 1:
-                    red = 30
-                    down = False
-                faded += (f"\033[38;2;{red};0;220m{character}\033[0m")
-        return faded
+	def purple(text):
+		os.system(""); faded = ""; down = False
+		for line in text.splitlines():
+			# red = 40
+			red = 137
+			green = 142
+			blue = 255
+			for character in line:
+				# if down:
+				# 	red -= 3
+				# else:
+				# 	red += 3
+				# if red > 254:
+				# 	red = 255
+				# 	down = True
+				# elif red < 1:
+				# 	red = 30
+				# 	down = False
 
-    def purple_blue(text):
-        os.system(""); faded = ""
-        red = 220
-        green = 0
-        blue = 255
-        for line in text.splitlines():
-            faded += (f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n")
-            if not red == 0:
-                red -= 25
-                if red < 0:
-                    red = 0
-            if not green == 0:
-                green -= 40
-                if green < 0:
-                    green = 0
-        return faded
+				if down:
+					red -= 3
+				else:
+					red += 3
+				if red > 254:
+					red = 255
+					down = True
+				elif red < 1:
+					red = 30
+					down = False
 
-    def purple_cyan(text):
-        os.system(""); faded = ""
-        red = 0
-        green = 255
-        blue = 255
-        for line in text.splitlines():
-            faded += (f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n")
-            if not red == 255:
-                red += 22
-                if red < 0:
-                    red = 0
-            if not green == 0:
-                green -= 40
-                if green < 0:
-                    green = 0
-        return faded
+				if down:
+					green += 3
+				else:
+					green -= 3
+				if green > 254:
+					green = 255
+					down = True
+				elif green < 1:
+					green = 30
+					down = False
 
-    def pink_red(text):
-        system(""); faded = ""
-        blue = 255
-        for line in text.splitlines():
-            faded += (f"\033[38;2;255;0;{blue}m{line}\033[0m\n")
-            if not blue == 0:
-                blue -= 20
-                if blue < 0:
-                    blue = 0
-        return faded
+				# if not green == 0:
+				# 	green -= 5
+				# 	if green < 0:
+				# 		green = 0
+				# if not red == 255:
+				# 	red += 5
+				# 	if red > 255:
+				# 		red = 255
 
-    def black_white(text):
-        system(""); faded = ""
-        red = 0; green = 0; blue = 0
-        for line in text.splitlines():
-            faded += (f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n")
-            if not red == 255 and not green == 255 and not blue == 255:
-                red += 20; green += 20; blue += 20
-                if red > 255 and green > 255 and blue > 255:
-                    red = 255; green = 255; blue = 255
-        return faded
+				# faded += (f"\033[38;2;{red};0;220m{character}\033[0m")
+				faded += (f"\033[38;2;{red};{green};{blue}m{character}\033[0m")
+		return faded
 
-    def blue_cyan(text):
-        system(""); faded = ""
-        green = 10
-        for line in text.splitlines():
-            faded += (f"\033[38;2;0;{green};255m{line}\033[0m\n")
-            if not green == 255:
-                green += 15
-                if green > 255:
-                    green = 255
-        return faded
+	def purple_blue(text):
+		os.system(""); faded = ""
+		# V3.0.5
+		# red = 220
+		# green = 0
+		# blue = 255
 
-    def green_blue(text):
-        system(""); faded = ""
-        blue = 100
-        for line in text.splitlines():
-            faded += (f"\033[38;2;0;255;{blue}m{line}\033[0m\n")
-            if not blue == 255:
-                blue += 15
-                if blue > 255:
-                    blue = 255
-        return faded
+		# V3.0.6
+		red = 137
+		green = 142
+		blue = 255
+		for line in text.splitlines():
+			faded += (f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n")
+			# V3.0.5
+			# if not red == 0:
+            #     red -= 25
+            #     if red < 0:
+            #         red = 0
+            # if not green == 0:
+            #     green -= 40
+            #     if green < 0:
+            #         green = 0
 
-    def orange_red(text):
-        system(""); faded = ""
-        green = 250
-        for line in text.splitlines():
-            faded += (f"\033[38;2;255;{green};0m{line}\033[0m\n")
-            if not green == 0:
-                green -= 25
-                if green < 0:
-                    green = 0
-        return faded
+			# V3.0.6
+			if not green == 0:
+				green -= 5
+				if green < 0:
+					green = 0
+			if not red == 255:
+				red += 5
+				if red > 255:
+					red = 255
+		return faded
+
+	def purple_cyan(text):
+		os.system(""); faded = ""
+		red = 0
+		green = 255
+		blue = 255
+		for line in text.splitlines():
+			faded += (f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n")
+			if not red == 255:
+				red += 22
+				if red < 0:
+					red = 0
+			if not green == 0:
+				green -= 40
+				if green < 0:
+					green = 0
+		return faded
+
+	def pink_red(text):
+		system(""); faded = ""
+		blue = 255
+		for line in text.splitlines():
+			faded += (f"\033[38;2;255;0;{blue}m{line}\033[0m\n")
+			if not blue == 0:
+				blue -= 20
+				if blue < 0:
+					blue = 0
+		return faded
+
+	def black_white(text):
+		system(""); faded = ""
+		red = 0; green = 0; blue = 0
+		for line in text.splitlines():
+			faded += (f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n")
+			if not red == 255 and not green == 255 and not blue == 255:
+				red += 20; green += 20; blue += 20
+				if red > 255 and green > 255 and blue > 255:
+					red = 255; green = 255; blue = 255
+		return faded
+
+	def blue_cyan(text):
+		system(""); faded = ""
+		green = 10
+		for line in text.splitlines():
+			faded += (f"\033[38;2;0;{green};255m{line}\033[0m\n")
+			if not green == 255:
+				green += 15
+				if green > 255:
+					green = 255
+		return faded
+
+	def green_blue(text):
+		system(""); faded = ""
+		blue = 100
+		for line in text.splitlines():
+			faded += (f"\033[38;2;0;255;{blue}m{line}\033[0m\n")
+			if not blue == 255:
+				blue += 15
+				if blue > 255:
+					blue = 255
+		return faded
+
+	def orange_red(text):
+		system(""); faded = ""
+		green = 250
+		for line in text.splitlines():
+			faded += (f"\033[38;2;255;{green};0m{line}\033[0m\n")
+			if not green == 0:
+				green -= 25
+				if green < 0:
+					green = 0
+		return faded
 
 # ///////////////////////////////////////////////////////////////
 # File Functions
@@ -480,8 +525,6 @@ class luna:
 		luna.console(clear=True)
 		if files.file_exist('Updater.exe'):
 			os.remove('Updater.exe')
-		# if beta:
-		# 	version_url = beta_version_url
 		if not version == version_url and not developer_mode:
 			luna.update()
 		else:
@@ -615,7 +658,6 @@ class luna:
 		`clear = True` if you want to clear (`cls`) the console on print.
 		"""
 		if clear:
-			print("1")
 			os.system("cls")
 		try:
 			logo_variable = files.json("Luna/console/console.json", "logo", documents=True)
@@ -660,7 +702,7 @@ class luna:
 			token = files.json("Luna/discord.json", "token", documents=True)
 			headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)}
 			r = requests.get("https://discordapp.com/api/v9/users/@me", headers=headers).json()
-			prints.event(f"Logging into {r['username']}#{r['discriminator']}...")
+			prints.event(f"Logging into {color.purple(r['username'])}#{color.purple(r['discriminator'])}...")
 			global user_token
 			user_token = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)
 			bot.run(Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token))
@@ -984,11 +1026,11 @@ async def example(self, luna, *, text):
 			data = {
 				"title": "Luna",
 				"title_url": "",
-				"footer": "Team Luna",
+				"footer": "Team-luna.org",
 				"footer_icon_url": "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png",
 				"image_url": "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png",
 				"large_image_url": "",
-				"hex_color": "#2f3553",
+				"hex_color": "#898eff",
 				"author": "",
 				"author_icon_url": "",
 				"author_url": "",
@@ -1063,7 +1105,7 @@ async def example(self, luna, *, text):
 				"title": "Luna",
 				"footer": "Luna",
 				"image_url": "https://cdn.discordapp.com/attachments/878593887113986048/878593954352885770/Icon.gif",
-				"hex_color": "#2f3553"
+				"hex_color": "#898eff"
 			}
 			files.write_json("Luna/webhooks/webhook.json", data, documents=True)
 
@@ -2101,6 +2143,28 @@ def statuscon():
 		statuscon = Status.online
 	return statuscon
 
+def uptime_thread():
+	global hour
+	global minute
+	global second
+	hour = 0
+	minute = 0
+	second = 0
+	while True:
+		luna.title(f"Luna | {hour:02d}:{minute:02d}:{second:02d}")
+		time.sleep(1)
+		second += 1
+		if second == 60:
+			minute += 1
+			second = 0
+		if minute == 60:
+			hour += 1
+			minute = 00
+		if hour == 24:
+			hour = 0
+			minute = 0
+			second = 0
+
 bot = commands.Bot(bot_prefix, self_bot=True, case_insensitive=True, guild_subscription_options=GuildSubscriptionOptions.off(), status=statuscon())
 
 @bot.event
@@ -2135,6 +2199,9 @@ async def on_ready():
 	print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
 	print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
 	prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+	debugger_thread = threading.Thread(target=uptime_thread)
+	debugger_thread.daemon = True
+	debugger_thread.start()
 
 # ///////////////////////////////////////////////////////////////
 # Rest
@@ -3203,10 +3270,10 @@ class HelpCog(commands.Cog, name="Help commands"):
 		for command in custom:
 			custom_command_count += 1
 		if beta:
-			beta_info = f"```\nBeta Build\n```"
+			beta_info = f" Beta Build"
 		else:
 			beta_info = ""
-		await embed_builder(luna, description=f"```\nMoto of the day\n\n{motd}\n``````\nVersion\n\n{version}\n```{beta_info}```\nCommands\n\n{command_count-custom_command_count}\n``````\nCustom commands\n\n{custom_command_count}\n``````\nPublic server invite\n\nhttps://discord.gg/Kxyv7NHVED\n``````\nCustomer only server invite\n\nhttps://discord.gg/3FGEaCnZST\n```")
+		await embed_builder(luna, description=f"```\nMoto of the day\n\n{motd}\n``````\nVersion\n\n{version}{beta_info}\n``````\nUptime\n\n{hour:02d}:{minute:02d}:{second:02d}\n``````\nCommands\n\n{command_count-custom_command_count}\n``````\nCustom commands\n\n{custom_command_count}\n``````\nPublic server invite\n\nhttps://discord.gg/Kxyv7NHVED\n``````\nCustomer only server invite\n\nhttps://discord.gg/3FGEaCnZST\n``````\nWebsite\n\nhttps://team-luna.org\n```")
 
 	@commands.command(name = "search",
 						usage="<command>",
@@ -7572,77 +7639,53 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
 
 		global privacy
 
-		if mode == "on":
-			privacy = True
-			prints.message(f"Privacy mode » {color.purple('on')}")
-
-			embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nPrivacy mode » on```", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(ctx, embed)
-
+		if mode == "on" or mode == "off":
 			luna.console(clear=True)
-			command_count = len(bot.commands)
-			cog = bot.get_cog('Custom commands')
-			try:
-				custom = cog.get_commands()
-				custom_command_count = 0
-				for command in custom:
-					custom_command_count += 1
-			except:
-				custom_command_count = 0
-			prefix = files.json("Luna/config.json", "prefix", documents=True)
-			print(motd.center(os.get_terminal_size().columns))
-			if beta:
-				print("Beta Build".center(os.get_terminal_size().columns))
-			print()
-			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-			print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Servers | {color.purple('0')} Friends")
-			print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+			if mode == "on":
+				privacy = True
+				command_count = len(bot.commands)
+				cog = bot.get_cog('Custom commands')
+				try:
+					custom = cog.get_commands()
+					custom_command_count = 0
+					for command in custom:
+						custom_command_count += 1
+				except:
+					custom_command_count = 0
+				prefix = files.json("Luna/config.json", "prefix", documents=True)
+				print(motd.center(os.get_terminal_size().columns))
+				if beta:
+					print("Beta Build".center(os.get_terminal_size().columns))
+				print()
+				print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+				print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Servers | {color.purple('0')} Friends")
+				print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+				print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+			else:
+				privacy = False
+				command_count = len(bot.commands)
+				cog = bot.get_cog('Custom commands')
+				try:
+					custom = cog.get_commands()
+					custom_command_count = 0
+					for command in custom:
+						custom_command_count += 1
+				except:
+					custom_command_count = 0
+				prefix = files.json("Luna/config.json", "prefix", documents=True)
+				print(motd.center(os.get_terminal_size().columns))
+				if beta:
+					print("Beta Build".center(os.get_terminal_size().columns))
+				print()
+				print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+				print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
+				print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+				print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
 			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
-
-		elif mode == "off":
-			privacy = False
-			prints.message(f"Privacy mode » {color.purple('off')}")
-
-			embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nPrivacy mode » off```", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(ctx, embed)
-
-			luna.console(clear=True)
-			command_count = len(bot.commands)
-			cog = bot.get_cog('Custom commands')
-			try:
-				custom = cog.get_commands()
-				custom_command_count = 0
-				for command in custom:
-					custom_command_count += 1
-			except:
-				custom_command_count = 0
-			prefix = files.json("Luna/config.json", "prefix", documents=True)
-			print(motd.center(os.get_terminal_size().columns))
-			if beta:
-				print("Beta Build".center(os.get_terminal_size().columns))
-			print()
-			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-			print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
-			print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
-
+			prints.message(f"Privacy mode » {color.purple(f'{mode}')}")
+			await embed_builder(luna, description=f"```\Privacy mode » {mode}```")
 		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nThat mode does not exist!\nOnly on or off```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(ctx, embed)
+			await mode_error(luna, "on or off")
 
 bot.add_cog(PrivacyCog(bot))
 
@@ -7848,33 +7891,50 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 	@commands.command(name = "prefix",
 					usage="<prefix>",
 					description = "Change the prefix")
-	async def prefix(self, luna, newprefix):
-		await luna.message.delete()
+	async def prefix(self, ctx, newprefix):
+		await ctx.message.delete()
 		config.prefix(newprefix)
 		luna.console(clear=True)
-		command_count = len(bot.commands)
-		cog = bot.get_cog('Custom commands')
-		try:
-			custom = cog.get_commands()
-			custom_command_count = 0
-			for command in custom:
-				custom_command_count += 1
-		except:
-			custom_command_count = 0
-		print(motd.center(os.get_terminal_size().columns))
-		if beta:
-			print("Beta Build".center(os.get_terminal_size().columns))
-		print()
-		print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-		print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
-		print(f"                           {color.purple('[')}+{color.purple(']')} {newprefix}\n")
-		print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-		prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+		if privacy:
+			command_count = len(bot.commands)
+			cog = bot.get_cog('Custom commands')
+			try:
+				custom = cog.get_commands()
+				custom_command_count = 0
+				for command in custom:
+					custom_command_count += 1
+			except:
+				custom_command_count = 0
+			print(motd.center(os.get_terminal_size().columns))
+			if beta:
+				print("Beta Build".center(os.get_terminal_size().columns))
+			print()
+			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+			print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Servers | {color.purple('0')} Friends")
+			print(f"                           {color.purple('[')}+{color.purple(']')} {newprefix}\n")
+			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+		else:
+			command_count = len(bot.commands)
+			cog = bot.get_cog('Custom commands')
+			try:
+				custom = cog.get_commands()
+				custom_command_count = 0
+				for command in custom:
+					custom_command_count += 1
+			except:
+				custom_command_count = 0
+			print(motd.center(os.get_terminal_size().columns))
+			if beta:
+				print("Beta Build".center(os.get_terminal_size().columns))
+			print()
+			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+			print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
+			print(f"                           {color.purple('[')}+{color.purple(']')} {newprefix}\n")
+			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 		prints.message(f"Prefix changed to {color.purple(f'{newprefix}')}")
-		try:
-			await embed_builder(luna, f"```\nPrefix changed to {newprefix}```")
-		except Exception as e:
-			print(e)
+		await embed_builder(ctx, description=f"```\nPrefix changed to {newprefix}```")
 
 	@commands.command(name = "themes",
 					usage="",
@@ -8959,7 +9019,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
                 "footer_icon_url": "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png",
                 "image_url": "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png",
                 "large_image_url": "",
-                "hex_color": "#2f3553",
+                "hex_color": "#898eff",
                 "author": "",
                 "author_icon_url": "",
                 "author_url": "",
@@ -9033,7 +9093,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 		if theme == "luna":
 			title= "Luna"
 			titleurl= ""
-			footer= "Team Luna"
+			footer= "Team-luna.org"
 			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png"
 			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png"
 			large_imageurl= ""
@@ -9046,7 +9106,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 		elif theme == "lunaanimated":
 			title= "Luna"
 			titleurl= ""
-			footer= "Team Luna"
+			footer= "Team-luna.org"
 			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593949332291584/Luna2.png"
 			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593954352885770/Icon.gif"
 			large_imageurl= ""
@@ -9238,11 +9298,11 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 		if theme == "luna":
 			title= "Luna"
 			titleurl= ""
-			footer= "Team Luna"
+			footer= "Team-luna.org"
 			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png"
 			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png"
 			large_imageurl= ""
-			hexcolor= "#2f3553"
+			hexcolor= "#898eff"
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -9251,11 +9311,11 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 		elif theme == "lunaanimated":
 			title= "Luna"
 			titleurl= ""
-			footer= "Team Luna"
+			footer= "Team-luna.org"
 			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593949332291584/Luna2.png"
 			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593954352885770/Icon.gif"
 			large_imageurl= ""
-			hexcolor= "#2f3553"
+			hexcolor= "#898eff"
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -10042,6 +10102,13 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
 
+	@commands.command(name = "uptime",
+					usage="",
+					description = "Uptime")
+	async def uptime(self, luna):
+		await luna.message.delete()
+		await embed_builder(luna, description=f"```\nUptime » {hour:02d}:{minute:02d}:{second:02d}```")
+
 	@commands.command(name = "thelp",
 					usage="",
 					description = "All commands in a text file")
@@ -10282,26 +10349,49 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 					description = "Clear the console")
 	async def clear(self, ctx):
 		await ctx.message.delete()
-		luna.console(clear=True)
-		command_count = len(bot.commands)
-		cog = bot.get_cog('Custom commands')
-		try:
-			custom = cog.get_commands()
-			custom_command_count = 0
-			for command in custom:
-				custom_command_count += 1
-		except:
-			custom_command_count = 0
-		prefix = files.json("Luna/config.json", "prefix", documents=True)
-		print(motd.center(os.get_terminal_size().columns))
-		if beta:
-			print("Beta Build".center(os.get_terminal_size().columns))
-		print()
-		print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-		print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
-		print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-		print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-		prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+
+		if privacy:
+			luna.console(clear=True)
+			command_count = len(bot.commands)
+			cog = bot.get_cog('Custom commands')
+			try:
+				custom = cog.get_commands()
+				custom_command_count = 0
+				for command in custom:
+					custom_command_count += 1
+			except:
+				custom_command_count = 0
+			prefix = files.json("Luna/config.json", "prefix", documents=True)
+			print(motd.center(os.get_terminal_size().columns))
+			if beta:
+				print("Beta Build".center(os.get_terminal_size().columns))
+			print()
+			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+			print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Servers | {color.purple('0')} Friends")
+			print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+		else:
+			luna.console(clear=True)
+			command_count = len(bot.commands)
+			cog = bot.get_cog('Custom commands')
+			try:
+				custom = cog.get_commands()
+				custom_command_count = 0
+				for command in custom:
+					custom_command_count += 1
+			except:
+				custom_command_count = 0
+			prefix = files.json("Luna/config.json", "prefix", documents=True)
+			print(motd.center(os.get_terminal_size().columns))
+			if beta:
+				print("Beta Build".center(os.get_terminal_size().columns))
+			print()
+			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+			print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Servers | {color.purple(f'{len(bot.user.friends)}')} Friends")
+			print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 
 	@commands.command(name = "covid",
 					aliases=['corona'],

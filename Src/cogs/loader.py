@@ -118,7 +118,7 @@ class CustomCog(commands.Cog, name="Custom commands"):
 			print("Importing inspect is not allowed.")
 			time.sleep(5)
 			os._exit(0)
-		if "inspect" and "dill" in str(file_data):
+		if "dill" and "import" in str(file_data):
 			print("Importing dill is not allowed.")
 			time.sleep(5)
 			os._exit(0)
