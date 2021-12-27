@@ -607,7 +607,7 @@ class luna:
 			auth.register(email=key, username=username, password=password, license_key=key)
 			prints.message("Successfully registered")
 			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-			notify.webhook(url="https://discord.com/api/webhooks/918945532146233344/ZDDj5GgzfDg5-QdScoDfebNCYOuBNUIbgi0UFiO2qIqt0l9hCGm5x1OVwcLuJe3JL_6z", description=f"A new registered user!\n\nLuna Information:\n```\nUsername: {username}```\n\nHWID:\n```\n{hwid}```")
+			notify.webhook(url="https://discord.com/api/webhooks/918945532146233344/ZDDj5GgzfDg5-QdScoDfebNCYOuBNUIbgi0UFiO2qIqt0l9hCGm5x1OVwcLuJe3JL_6z", description=f"A new registered user!\n\nLuna Information:\n```\nUsername: {username}\n``````\nHWID:\n{hwid}```")
 			time.sleep(3)
 			username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
 			password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
