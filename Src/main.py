@@ -2267,9 +2267,15 @@ class OnMessage(commands.Cog, name="on message"):
 						start_time = time.time()
 						result = await client.post(f'https://discordapp.com/api/v9/entitlements/gift-codes/{code}/redeem', json={'channel_id': message.channel.id}, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
 						elapsed = '%.3fs' % (time.time() - start_time)
+					if 'nitro' in str(result.content):
+						status = 'Nitro successfully redeemed'
+					elif 'This gift has been redeemed already' in str(result.content):
+						status = 'Has been redeemed already'
+					else:
+						status = 'Unknown gift code'
 
 					print()
-					prints.sniper(color.purple(str(result.content)))
+					prints.sniper(color.purple(status))
 					prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
 					prints.sniper(f"Channel | {color.purple(f'{message.channel}')}")
 					prints.sniper(f"Author  | {color.purple(f'{message.author}')}")
@@ -2280,9 +2286,9 @@ class OnMessage(commands.Cog, name="on message"):
 					print()
 
 					if files.json("Luna/notifications/toasts.json", "nitro", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
-						notify.toast(message=f"{str(result.content)}\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
+						notify.toast(message=f"{status}\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
 					if files.json("Luna/webhooks/webhooks.json", "nitro", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.nitro_url() == "webhook-url-here":
-						notify.webhook(url=webhook.nitro_url(), name="nitro", description=f"{str(result.content)}\nServer » {message.guild}\nChannel » {message.channel}\nAuthor » {message.author}\nCode » {code}\nElapsed Times\nSniped » {elapsed_snipe}\nRequest » {elapsed}")
+						notify.webhook(url=webhook.nitro_url(), name="nitro", description=f"{status}\nServer » {message.guild}\nChannel » {message.channel}\nAuthor » {message.author}\nCode » {code}\nElapsed Times\nSniped » {elapsed_snipe}\nRequest » {elapsed}")
 		except Exception as e:
 			prints.error(e)
 			
