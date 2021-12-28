@@ -6179,7 +6179,6 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 				open_ports.append(port)
 		await embed_builder(luna, title="Port Scanner", description=f'```\nIP » {ip}\n``````\nPorts Checked » {",".join(ports)}\n``````\nOpen Ports » {",".join(open_ports)}\n```')
 
-
 	@commands.command(name="resolve", usage="<url>", description="Get the url host IP")
 	async def resolve(self, luna, url):
 		await luna.message.delete()
@@ -6199,6 +6198,15 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 			await luna.send("URL is invalid")
 			return
 		await embed_builder(luna, title="Host Resolver", description=f"```\nURL » {url}\n``````\nIP » {ip}\n```")
+
+	@commands.command(name="webhookinfo", usage="<id>", description="Webhook information")
+	async def webhookinfo(self, luna, id):
+		await luna.message.delete()
+		try:
+			webhook = await self.bot.fetch_webhook(id)
+			await embed_builder(luna, title=f"Webhook » {webhook.name}", description=f"```\nID » {webhook.id}\n``````\nName » {webhook.name}\n``````\nChannel » {webhook.channel.name}\n``````\nGuild » {webhook.guild.name}\n``````\nToken » {webhook.token}\n```", thumbnail=webhook.avatar_url)
+		except:
+			await error_builder(luna, "```\nInvalid webhook ID```")
 
 	@commands.command(name="scrapeproxies", usage="", aliases=['proxyscrape', 'scrapeproxy'],description="Scrape for proxies")
 	async def scrapeproxies(self, luna):
