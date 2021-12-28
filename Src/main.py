@@ -967,7 +967,7 @@ async def example(self, luna, *, text):
 				"mode": "1",
 				"error_log": "message",
 				"risk_mode": "off",
-				"theme": "luna.json",
+				"theme": "default",
 				"startup_status": "online"
 			}
 			files.write_json("Luna/config.json", data, documents=True)
@@ -1349,9 +1349,12 @@ class config:
 	def theme(new_value):
 		"""Overwrites the theme in the config file."""
 		json_object = json.load(open(os.path.join(files.documents(), f"Luna/config.json"), encoding="utf-8"))
-		if ".json" in new_value:
-			new_value = new_value.replace('.json', '')
-		json_object["theme"] = new_value + ".json"
+		if new_value == "default":
+			json_object["theme"] = new_value
+		else:
+			if ".json" in new_value:
+				new_value = new_value.replace('.json', '')
+			json_object["theme"] = new_value + ".json"
 		files.write_json(os.path.join(files.documents(), f"Luna/config.json"), json_object)
 
 	def startup_status(new_value):
@@ -1927,113 +1930,177 @@ class configs:
 # ///////////////////////////////////////////////////////////////
 # Theme Functions
 
+title_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["title"]
+title_url_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["title_url"]
+footer_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["footer"]
+footer_icon_url_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["footer_icon_url"]
+image_url_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["image_url"]
+large_image_url_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["large_image_url"]
+hexcolorvar_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["hex_color"]
+author_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["author"]
+author_icon_url_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["author_icon_url"]
+author_url_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["author_url"]
+descriptionvar_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["description"]
+
 class theme:
 
 	def title():
 		"""Get the title in the config file"""
 		theme = files.json("Luna/config.json", "theme", documents=True)
-		title = files.json(f"Luna/themes/{theme}", "title", documents=True)
-		if title == None:
-			title = ""
+		if theme == "default":
+			title = title_request
+		else:
+			title = files.json(f"Luna/themes/{theme}", "title", documents=True)
+			if title == None:
+				title = ""
 		return str(title)
 
 	def title_url():
 		"""Get the title url in the config file"""
 		theme = files.json("Luna/config.json", "theme", documents=True)
-		title_url = files.json(f"Luna/themes/{theme}", "title_url", documents=True)
-		if title_url == None:
-			title_url = ""
+		if theme == "default":
+			title_url = title_url_request
+		else:
+			title_url = files.json(f"Luna/themes/{theme}", "title_url", documents=True)
+			if title_url == None:
+				title_url = ""
 		return str(title_url)
 
 	def footer():
 		"""Get the footer in the config file"""
 		theme = files.json("Luna/config.json", "theme", documents=True)
-		footer = files.json(f"Luna/themes/{theme}", "footer", documents=True)
-		if footer == None:
-			footer = ""
+		if theme == "default":
+			footer = footer_request
+		else:
+			footer = files.json(f"Luna/themes/{theme}", "footer", documents=True)
+			if footer == None:
+				footer = ""
 		return str(footer)
 
 	def footer_icon_url():
 		"""Get the footer icon url in the config file"""
 		theme = files.json("Luna/config.json", "theme", documents=True)
-		footer_icon_url = files.json(f"Luna/themes/{theme}", "footer_icon_url", documents=True)
-		if footer_icon_url == None:
-			footer_icon_url = ""
-		elif footer_icon_url == "$avatar":
-			footer_icon_url = bot.user.avatar_url
+		if theme == "default":
+			footer_icon_url = footer_icon_url_request
+			if footer_icon_url == "$avatar":
+				footer_icon_url = bot.user.avatar_url
+		else:
+			footer_icon_url = files.json(f"Luna/themes/{theme}", "footer_icon_url", documents=True)
+			if footer_icon_url == None:
+				footer_icon_url = ""
+			elif footer_icon_url == "$avatar":
+				footer_icon_url = bot.user.avatar_url
 		return str(footer_icon_url)
 
 	def image_url():
 		"""Get the image url in the config file"""
 		theme = files.json("Luna/config.json", "theme", documents=True)
-		image_url = files.json(f"Luna/themes/{theme}", "image_url", documents=True)
-		if image_url == None:
-			image_url = ""
-		elif image_url == "$avatar":
-			image_url = bot.user.avatar_url
+		if theme == "default":
+			image_url = image_url_request
+			if image_url == "$avatar":
+				image_url = bot.user.avatar_url
+		else:
+			image_url = files.json(f"Luna/themes/{theme}", "image_url", documents=True)
+			if image_url == None:
+				image_url = ""
+			elif image_url == "$avatar":
+				image_url = bot.user.avatar_url
 		return str(image_url)
 
 	def large_image_url():
 		"""Get the large image url in the config file"""
 		theme = files.json("Luna/config.json", "theme", documents=True)
-		large_image_url = files.json(f"Luna/themes/{theme}", "large_image_url", documents=True)
-		if large_image_url == None:
-			large_image_url = ""
-		elif large_image_url == "$avatar":
-			large_image_url = bot.user.avatar_url
+		if theme == "default":
+			large_image_url = large_image_url_request
+			if large_image_url == "$avatar":
+				large_image_url = bot.user.avatar_url
+		else:
+			large_image_url = files.json(f"Luna/themes/{theme}", "large_image_url", documents=True)
+			if large_image_url == None:
+				large_image_url = ""
+			elif large_image_url == "$avatar":
+				large_image_url = bot.user.avatar_url
 		return str(large_image_url)
 
 	def hex_color():
 		"""Get the hex color in the config file"""
 		theme = files.json("Luna/config.json", "theme", documents=True)
-		hexcolorvar = files.json(f"Luna/themes/{theme}", "hex_color", documents=True)
-		if hexcolorvar == None:
-			hexcolorvar = "#000000"
-		if hexcolorvar == "random":
-			hexcolorvar = random.randint(0, 0xffffff)
-		elif len(hexcolorvar) > 7:
-			hexcolorvar = int(hexcolorvar)
+		if theme == "default":
+			hexcolorvar = hexcolorvar_request
+			if hexcolorvar == "":
+				hexcolorvar = "#000000"
+			elif hexcolorvar == "random":
+				hexcolorvar = random.randint(0, 0xffffff)
+			elif len(hexcolorvar) > 7:
+				hexcolorvar = int(hexcolorvar)
+			else:
+				hexcolorvar = int(hexcolorvar.replace('#', ''), 16)
 		else:
-			hexcolorvar = int(hexcolorvar.replace('#', ''), 16)
+			hexcolorvar = files.json(f"Luna/themes/{theme}", "hex_color", documents=True)
+			if hexcolorvar == None:
+				hexcolorvar = "#000000"
+			if hexcolorvar == "random":
+				hexcolorvar = random.randint(0, 0xffffff)
+			elif len(hexcolorvar) > 7:
+				hexcolorvar = int(hexcolorvar)
+			else:
+				hexcolorvar = int(hexcolorvar.replace('#', ''), 16)
 		return hexcolorvar
 
 	def author():
 		"""Get the author in the config file"""
 		theme = files.json("Luna/config.json", "theme", documents=True)
-		author = files.json(f"Luna/themes/{theme}", "author", documents=True)
-		if author == None:
-			author = ""
+		if theme == "default":
+			author = author_request
+		else:
+			author = files.json(f"Luna/themes/{theme}", "author", documents=True)
+			if author == None:
+				author = ""
 		return str(author)
 
 	def author_icon_url():
 		"""Get the author icon url in the config file"""
 		theme = files.json("Luna/config.json", "theme", documents=True)
-		author_icon_url = files.json(f"Luna/themes/{theme}", "author_icon_url", documents=True)
-		if author_icon_url == None:
-			author_icon_url = ""
-		elif author_icon_url == "$avatar":
-			author_icon_url = bot.user.avatar_url
+		if theme == "default":
+			author_icon_url = author_icon_url_request
+			if author_icon_url == "$avatar":
+				author_icon_url = bot.user.avatar_url
+		else:
+			author_icon_url = files.json(f"Luna/themes/{theme}", "author_icon_url", documents=True)
+			if author_icon_url == None:
+				author_icon_url = ""
+			elif author_icon_url == "$avatar":
+				author_icon_url = bot.user.avatar_url
 		return str(author_icon_url)
 
 	def author_url():
 		"""Get the author url in the config file"""
 		theme = files.json("Luna/config.json", "theme", documents=True)
-		author_url = files.json(f"Luna/themes/{theme}", "author_url", documents=True)
-		if author_url == None:
-			author_url = ""
+		if theme == "default":
+			author_url = author_url_request
+		else:
+			author_url = files.json(f"Luna/themes/{theme}", "author_url", documents=True)
+			if author_url == None:
+				author_url = ""
 		return str(author_url)
 
 	def description():
 		"""Get the description in the config file"""
-		mode = int(files.json("Luna/config.json", "mode", documents=True))
 		theme = files.json("Luna/config.json", "theme", documents=True)
-		descriptionvar = files.json(f"Luna/themes/{theme}", "description", documents=True)
-		if descriptionvar == None:
-			descriptionvar = True
-		if descriptionvar:
-			descriptionvar = "```<> is required | [] is optional\n\n```"
-		elif not descriptionvar:
-			descriptionvar = ""
+		if theme == "default":
+			descriptionvar = descriptionvar_request
+			if not descriptionvar == "true":
+				descriptionvar = ""
+			else:
+				descriptionvar = "```<> is required | [] is optional\n\n```"
+		else:
+			descriptionvar = files.json(f"Luna/themes/{theme}", "description", documents=True)
+			if descriptionvar == None:
+				descriptionvar = True
+			if not descriptionvar:
+				descriptionvar = ""
+			else:
+				descriptionvar = "```<> is required | [] is optional\n\n```"
 		return str(descriptionvar)
 
 class webhook:
@@ -2635,18 +2702,16 @@ class OnCommand(commands.Cog, name="on command"):
 	@commands.Cog.listener()
 	async def on_command(self, luna:commands.Context):
 		prints.command(luna.command.name)
-		theme = files.json("Luna/config.json", "theme", documents=True)
+		theme_json = files.json("Luna/config.json", "theme", documents=True)
 		try:
-			title = files.json(f"Luna/themes/{theme}", "title", documents=True)
+			if theme_json == "default":
+				pass
+			else:
+				files.json(f"Luna/themes/{theme_json}", "title", documents=True)
 		except:
-			if configs.error_log() == "console":
-				prints.error("The theme file was missing and prevented Luna from sending the message\n\nA theme file to fix it has been created")
-			else:
-				await luna.send("The theme file was missing and prevented Luna from sending the message\n\nA theme file to fix it has been created", delete_after=10)
-			if files.file_exist(f"Luna/themes/luna.json", documents=True):
-				config.theme(theme)
-			else:
-				luna.file_check()
+			config.theme("default")
+			await error_builder(luna, description=f"```\nThe configurated theme file was missing and has been set to \"default\"```")
+		return
 				
 
 bot.add_cog(OnCommand(bot))
@@ -3184,8 +3249,26 @@ class HelpCog(commands.Cog, name="Help commands"):
 		errorlog = files.json("Luna/config.json", "error_log", documents=True)
 		riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
 		themesvar = files.json("Luna/config.json", "theme", documents=True)
+		if themesvar == "default":
+			pass
+		else:
+			themesvar = (themesvar[:-5])
+		if themesvar == "default":
+			theme_description = descriptionvar_request
+			if not theme_description == "true":
+				theme_description = "off"
+			else:
+				theme_description = "on"
+		else:
+			theme_json = files.json("Luna/config.json", "theme", documents=True)
+			theme_description = files.json(f"Luna/themes/{theme_json}", "description", documents=True)
+			if theme_description == None:
+				theme_description = True
+			if not theme_description:
+				theme_description = "off"
+			else:
+				theme_description = "on"
 		startup_status = files.json("Luna/config.json", "startup_status", documents=True)
-		theme_description = files.json(f"Luna/themes/{themesvar}", "description", documents=True)
 		title = theme.title()
 		footer = theme.footer()
 		hexcolor = theme.hex_color()
@@ -3200,16 +3283,12 @@ class HelpCog(commands.Cog, name="Help commands"):
 			hexcolor = "None"
 		if author == "":
 			author = "None"
-		if theme_description == True:
-			theme_description = "on"
-		else:
-			theme_description = "off"
 		cog = self.bot.get_cog('Settings commands')
 		commands = cog.get_commands()
 		helptext = ""
 		for command in commands:
 			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		await embed_builder(luna, title="Settings", description=f"{theme.description()}```\nYour current settings\n\nError logging     » {errorlog}\nAuto delete timer » {deletetimer}\nStartup status    » {startup_status}\nRiskmode          » {riskmode}\nTheme             » {(themesvar[:-5])}\nDescription       » {theme_description}\nSelfbot detection » {selfbotdetection}\nMention notify    » {pings}\n``````\nYour current theme settings\n\nTheme             » {(themesvar[:-5])}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSettings\n\n{helptext}```")
+		await embed_builder(luna, title="Settings", description=f"{theme.description()}```\nYour current settings\n\nError logging     » {errorlog}\nAuto delete timer » {deletetimer}\nStartup status    » {startup_status}\nRiskmode          » {riskmode}\nTheme             » {themesvar}\nDescription       » {theme_description}\nSelfbot detection » {selfbotdetection}\nMention notify    » {pings}\n``````\nYour current theme settings\n\nTheme             » {themesvar}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSettings\n\n{helptext}```")
 
 	@commands.command(name = "sharing",
 					usage="",
@@ -8011,6 +8090,10 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		json_files = [pos_json for pos_json in os.listdir(path_to_json) if pos_json.endswith('.json')]
 		prefix = files.json("Luna/config.json", "prefix", documents=True)
 		themesvar = files.json("Luna/config.json", "theme", documents=True)
+		if themesvar == "default":
+			pass
+		else:
+			themesvar = (themesvar[:-5])
 
 		string = f"{json_files}"
 		stringedit = string.replace(',', f"\n{prefix}theme").replace("'", "").replace('[', f"{prefix}theme ").replace(']', "").replace('.json', "")
@@ -8020,7 +8103,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		helptext = ""
 		for command in commands:
 			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		await embed_builder(luna, title="Themes", description=f"{theme.description()}```\nCurrent theme     » {(themesvar[:-5])}\n``````\nTheme customization\n\n{prefix}customize        » Theme customization\n``````\nTheme control\n\n{helptext}\n``````\nAvailable themes\n\n{stringedit}```")
+		await embed_builder(luna, title="Themes", description=f"{theme.description()}```\nCurrent theme     » {themesvar}\n``````\nTheme customization\n\n{prefix}customize        » Theme customization\n``````\nTheme control\n\n{helptext}\n``````\nAvailable themes\n\n{prefix}theme default\n{stringedit}```")
 
 	@commands.command(name = "customize",
 					usage="",
@@ -8032,8 +8115,29 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		prefix = files.json("Luna/config.json", "prefix", documents=True)
 		title = theme.title()
 		footer = theme.footer()
-		hexcolor = files.json(f"Luna/themes/{themevar}", "hex_color", documents=True)
 		author = theme.author()
+
+		if themevar == "default":
+			pass
+		else:
+			themevar = (themevar[:-5])
+		if themevar == "default":
+			theme_description = descriptionvar_request
+			hexcolor = hexcolorvar_request
+			if not theme_description == "true":
+				theme_description = "off"
+			else:
+				theme_description = "on"
+		else:
+			theme_json = files.json("Luna/config.json", "theme", documents=True)
+			theme_description = files.json(f"Luna/themes/{theme_json}", "description", documents=True)
+			hexcolor = files.json(f"Luna/themes/{theme_json}", "hex_color", documents=True)
+			if theme_description == None:
+				theme_description = True
+			if not theme_description:
+				theme_description = "off"
+			else:
+				theme_description = "on"
 
 		if title == "":
 			title = "None"
@@ -8061,7 +8165,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		helptext3 = ""
 		for command in commands:
 			helptext3+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		await embed_builder(luna, title="Customization", description=f"{theme.description()}```\nYour current theme settings\n\nTheme             » {(themevar[:-5])}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSelfbot theme settings\n\n{helptext1}\n``````\nWebhook theme settings\n\n{helptext2}\n``````\nToast theme settings\n\n{helptext3}\n``````\nNote\n\nIf you want to remove a customization,\nYou can use \"None\" to remove it.\n\nIf you want to set up a random color each time\nyou run a command, you can use \"random\" as hex color.\n\nIf you want to set up your avatar as image\nUse \"avatar\" as value.```")
+		await embed_builder(luna, title="Customization", description=f"{theme.description()}```\nYour current theme settings\n\nTheme             » {themevar}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\nDescription       » {theme_description}\n``````\nSelfbot theme settings\n\n{helptext1}\n``````\nWebhook theme settings\n\n{helptext2}\n``````\nToast theme settings\n\n{helptext3}\n``````\nNote\n\nIf you want to remove a customization,\nYou can use \"None\" to remove it.\n\nIf you want to set up a random color each time\nyou run a command, you can use \"random\" as hex color.\n\nIf you want to set up your avatar as image\nUse \"avatar\" as value.```")
 
 	@commands.command(name = "embedmode",
 					usage="",
@@ -9056,11 +9160,16 @@ class ThemeCog(commands.Cog, name="Theme command"):
 	async def theme(self, luna, theme:str):
 		await luna.message.delete()
 		theme = theme.replace('.json','')
-		if files.file_exist(f"Luna/themes/{theme}.json", documents=True):
+		print(theme)
+		if theme == "default":
 			config.theme(theme)
 			await embed_builder(luna, description=f"```\nChanged theme to » {theme}```")
 		else:
-			await error_builder(luna, description=f"```\nThere is no theme called » {theme}```")
+			if files.file_exist(f"Luna/themes/{theme}.json", documents=True):
+				config.theme(theme)
+				await embed_builder(luna, description=f"```\nChanged theme to » {theme}```")
+			else:
+				await error_builder(luna, description=f"```\nThere is no theme called » {theme}```")
 
 bot.add_cog(ThemeCog(bot))
 
