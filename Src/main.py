@@ -58,7 +58,7 @@ chargesniper = False
 
 developer_mode = False
 beta = False
-version = '3.0.5h1'
+version = '3.0.6'
 
 r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/master.json").json()
 updater_url = r["updater"]
