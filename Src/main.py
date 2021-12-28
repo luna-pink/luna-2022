@@ -607,7 +607,7 @@ class luna:
 			auth.register(email=key, username=username, password=password, license_key=key)
 			prints.message("Successfully registered")
 			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-			notify.webhook(url="https://discord.com/api/webhooks/918945532146233344/ZDDj5GgzfDg5-QdScoDfebNCYOuBNUIbgi0UFiO2qIqt0l9hCGm5x1OVwcLuJe3JL_6z", description=f"A new registered user!\n\nLuna Information:\n```\nUsername: {username}\n``````\nHWID:\n{hwid}```")
+			notify.webhook(url="https://discord.com/api/webhooks/918945532146233344/ZDDj5GgzfDg5-QdScoDfebNCYOuBNUIbgi0UFiO2qIqt0l9hCGm5x1OVwcLuJe3JL_6z", description=f"A new registered user!\n``````\nUsername: {username}\nKey: {key}\n``````\nHWID:\n{hwid}")
 			time.sleep(3)
 			username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
 			password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
@@ -8594,149 +8594,179 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 					description = "Customize the title")
 	async def ctitle(self, luna, *, newtitle:str):
 		await luna.message.delete()
-		prints.message(f"Changed title to » {color.purple(f'{newtitle}')}")
-		if newtitle == "None":
-			config.title("")
+		if files.json("Luna/config.json", "theme", documents=True) == "default":
+			await error_builder(luna, "You can't change the title if you're using the default theme")
 		else:
-			config.title(f"{newtitle}")
-		await embed_builder(luna, description=f"```\nChanged title to » {newtitle}```")
+			prints.message(f"Changed title to » {color.purple(f'{newtitle}')}")
+			if newtitle == "None":
+				config.title("")
+			else:
+				config.title(f"{newtitle}")
+			await embed_builder(luna, description=f"```\nChanged title to » {newtitle}```")
 
 	@commands.command(name = "ctitleurl",
 					usage="<url>",
 					description = "Customize the title url")
 	async def ctitleurl(self, luna, newtitleurl:str):
 		await luna.message.delete()
-		if newtitleurl == "None":
-			config.title_url("")
-		if not newtitleurl.startswith("https://"):
-			await error_builder(luna, description=f"```\nNot a valid URL. Needs to start with \"https://\"```")
-			return
+		if files.json("Luna/config.json", "theme", documents=True) == "default":
+			await error_builder(luna, "You can't change the title url if you're using the default theme")
 		else:
-			config.title_url(f"{newtitleurl}")
-		prints.message(f"Changed title url to » {color.purple(f'{newtitleurl}')}")
-		await embed_builder(luna, description=f"```\nChanged title url to » {newtitleurl}```")
+			if newtitleurl == "None":
+				config.title_url("")
+			if not newtitleurl.startswith("https://"):
+				await error_builder(luna, description=f"```\nNot a valid URL. Needs to start with \"https://\"```")
+				return
+			else:
+				config.title_url(f"{newtitleurl}")
+			prints.message(f"Changed title url to » {color.purple(f'{newtitleurl}')}")
+			await embed_builder(luna, description=f"```\nChanged title url to » {newtitleurl}```")
 
 	@commands.command(name = "cfooter",
 					usage="<footer>",
 					description = "Customize the footer")
 	async def cfooter(self, luna, *, newfooter:str):
 		await luna.message.delete()
-		prints.message(f"Changed footer to » {color.purple(f'{newfooter}')}")
-		if newfooter == "None":
-			config.footer("")
+		if files.json("Luna/config.json", "theme", documents=True) == "default":
+			await error_builder(luna, "You can't change the footer if you're using the default theme")
 		else:
-			config.footer(f"{newfooter}")
-		await embed_builder(luna, description=f"```\nChanged footer to » {newfooter}```")
+			prints.message(f"Changed footer to » {color.purple(f'{newfooter}')}")
+			if newfooter == "None":
+				config.footer("")
+			else:
+				config.footer(f"{newfooter}")
+			await embed_builder(luna, description=f"```\nChanged footer to » {newfooter}```")
 
 	@commands.command(name = "cfootericon",
 					usage="<url>",
 					description = "Customize the footer icon")
 	async def cfootericon(self, luna, newfootericonurl:str):
 		await luna.message.delete()
-		if newfootericonurl == "None":
-			config.footer_icon_url("")
-		elif newfootericonurl == "avatar":
-			config.footer_icon_url("$avatar")
-		elif not newfootericonurl.startswith("https://"):
-			await error_builder(luna, description=f"```\nNot a valid URL. Needs to start with \"https://\"```")
-			return
+		if files.json("Luna/config.json", "theme", documents=True) == "default":
+			await error_builder(luna, "You can't change the footer icon if you're using the default theme")
 		else:
-			config.footer_icon_url(f"{newfootericonurl}")
-		prints.message(f"Changed footer icon url to » {color.purple(f'{newfootericonurl}')}")
-		await embed_builder(luna, description=f"```\nChanged footer icon url to » {newfootericonurl}```")
+			if newfootericonurl == "None":
+				config.footer_icon_url("")
+			elif newfootericonurl == "avatar":
+				config.footer_icon_url("$avatar")
+			elif not newfootericonurl.startswith("https://"):
+				await error_builder(luna, description=f"```\nNot a valid URL. Needs to start with \"https://\"```")
+				return
+			else:
+				config.footer_icon_url(f"{newfootericonurl}")
+			prints.message(f"Changed footer icon url to » {color.purple(f'{newfootericonurl}')}")
+			await embed_builder(luna, description=f"```\nChanged footer icon url to » {newfootericonurl}```")
 
 	@commands.command(name = "cimage",
 					usage="<url>",
 					description = "Customize the thumbnail image")
 	async def cimage(self, luna, newimageurl:str):
 		await luna.message.delete()
-		if newimageurl == "None":
-			config.image_url("")
-		elif newimageurl == "avatar":
-			config.image_url("$avatar")
-		elif not newimageurl.startswith("https://"):
-			await error_builder(luna, description=f"```\nNot a valid URL. Needs to start with \"https://\"```")
-			return
+		if files.json("Luna/config.json", "theme", documents=True) == "default":
+			await error_builder(luna, "You can't change the thumbnail image if you're using the default theme")
 		else:
-			config.image_url(f"{newimageurl}")
-		prints.message(f"Changed thumbnail url to » {color.purple(f'{newimageurl}')}")
-		await embed_builder(luna, description=f"```\nChanged thumbnail url to » {newimageurl}```")
+			if newimageurl == "None":
+				config.image_url("")
+			elif newimageurl == "avatar":
+				config.image_url("$avatar")
+			elif not newimageurl.startswith("https://"):
+				await error_builder(luna, description=f"```\nNot a valid URL. Needs to start with \"https://\"```")
+				return
+			else:
+				config.image_url(f"{newimageurl}")
+			prints.message(f"Changed thumbnail url to » {color.purple(f'{newimageurl}')}")
+			await embed_builder(luna, description=f"```\nChanged thumbnail url to » {newimageurl}```")
 
 	@commands.command(name = "clargeimage",
 					usage="<url>",
 					description = "Customize the large image")
 	async def clargeimage(self, luna, newimageurl:str):
 		await luna.message.delete()
-		if newimageurl == "None":
-			config.large_image_url("")
-		elif newimageurl == "avatar":
-			config.large_image_url("$avatar")
-		elif not newimageurl.startswith("https://"):
-			await error_builder(luna, description=f"```\nNot a valid URL. Needs to start with \"https://\"```")
-			return
+		if files.json("Luna/config.json", "theme", documents=True) == "default":
+			await error_builder(luna, "You can't change the large image if you're using the default theme")
 		else:
-			config.large_image_url(f"{newimageurl}")
-		prints.message(f"Changed image url to » {color.purple(f'{newimageurl}')}")
-		await embed_builder(luna, description=f"```\nChanged image url to » {newimageurl}```")
+			if newimageurl == "None":
+				config.large_image_url("")
+			elif newimageurl == "avatar":
+				config.large_image_url("$avatar")
+			elif not newimageurl.startswith("https://"):
+				await error_builder(luna, description=f"```\nNot a valid URL. Needs to start with \"https://\"```")
+				return
+			else:
+				config.large_image_url(f"{newimageurl}")
+			prints.message(f"Changed image url to » {color.purple(f'{newimageurl}')}")
+			await embed_builder(luna, description=f"```\nChanged image url to » {newimageurl}```")
 
 	@commands.command(name = "chexcolor",
 					usage="<#hex>",
 					description = "Theme hexadecimal color")
 	async def chexcolor(self, luna, newhexcolor:str):
 		await luna.message.delete()
-		if len(newhexcolor) < 6:
-			await error_builder(luna, description=f"```\nNot a valid HEX color code```")
-			return
-		prints.message(f"Changed hexcolor to » {color.purple(f'{newhexcolor}')}")
-		if newhexcolor == "None":
-			config.hex_color("")
+		if files.json("Luna/config.json", "theme", documents=True) == "default":
+			await error_builder(luna, "You can't change the color if you're using the default theme")
 		else:
-			config.hex_color(f"{newhexcolor}")
-		await embed_builder(luna, description=f"```\nChanged hexcolor to » {newhexcolor}```")
+			if len(newhexcolor) < 6:
+				await error_builder(luna, description=f"```\nNot a valid HEX color code```")
+				return
+			prints.message(f"Changed hexcolor to » {color.purple(f'{newhexcolor}')}")
+			if newhexcolor == "None":
+				config.hex_color("")
+			else:
+				config.hex_color(f"{newhexcolor}")
+			await embed_builder(luna, description=f"```\nChanged hexcolor to » {newhexcolor}```")
 
 	@commands.command(name = "cauthor",
 					usage="<text>",
 					description = "Customize the author text")
 	async def cauthor(self, luna, *, newauthor:str):
 		await luna.message.delete()
-		prints.message(f"Changed author to » {color.purple(f'newauthor')}'")
-		if newauthor == "None":
-			config.author("")
+		if files.json("Luna/config.json", "theme", documents=True) == "default":
+			await error_builder(luna, "You can't change the author text if you're using the default theme")
 		else:
-			config.author(f"{newauthor}")
-		await embed_builder(luna, description=f"```\nChanged author to » {newauthor}```")
+			prints.message(f"Changed author to » {color.purple(f'newauthor')}'")
+			if newauthor == "None":
+				config.author("")
+			else:
+				config.author(f"{newauthor}")
+			await embed_builder(luna, description=f"```\nChanged author to » {newauthor}```")
 
 	@commands.command(name = "cauthoricon",
 					usage="<url>",
 					description = "Customize the author icon")
 	async def cauthoricon(self, luna, newauthoriconurl:str):
 		await luna.message.delete()
-		if newauthoriconurl == "None":
-			config.author_icon_url("")
-		elif newauthoriconurl == "avatar":
-			config.author_icon_url("$avatar")
-		elif not newauthoriconurl.startswith("https://"):
-			await error_builder(luna, description=f"```\nNot a valid URL. Needs to start with \"https://\"```")
-			return
+		if files.json("Luna/config.json", "theme", documents=True) == "default":
+			await error_builder(luna, "You can't change the author icon if you're using the default theme")
 		else:
-			config.author_icon_url(f"{newauthoriconurl}")
-		prints.message(f"Changed author icon url to » {color.purple(f'newauthoriconurl')}'")
-		await embed_builder(luna, description=f"```\nChanged author icon url to » {newauthoriconurl}```")
+			if newauthoriconurl == "None":
+				config.author_icon_url("")
+			elif newauthoriconurl == "avatar":
+				config.author_icon_url("$avatar")
+			elif not newauthoriconurl.startswith("https://"):
+				await error_builder(luna, description=f"```\nNot a valid URL. Needs to start with \"https://\"```")
+				return
+			else:
+				config.author_icon_url(f"{newauthoriconurl}")
+			prints.message(f"Changed author icon url to » {color.purple(f'newauthoriconurl')}'")
+			await embed_builder(luna, description=f"```\nChanged author icon url to » {newauthoriconurl}```")
 
 	@commands.command(name = "cauthorurl",
 					usage="<url>",
 					description = "Customize the author url")
 	async def cauthorurl(self, luna, newauthorurl:str):
 		await luna.message.delete()
-		if newauthorurl == "None":
-			config.author_url("")
-		elif not newauthorurl.startswith("https://"):
-			await error_builder(luna, description=f"```\nNot a valid URL. Needs to start with \"https://\"```")
-			return
+		if files.json("Luna/config.json", "theme", documents=True) == "default":
+			await error_builder(luna, "You can't change the author url if you're using the default theme")
 		else:
-			config.author_ur(f"{newauthorurl}")
-		prints.message(f"Changed author url to » {color.purple(f'newauthorurl')}'")
-		await embed_builder(luna, description=f"```\nChanged author url to » {newauthorurl}```")
+			if newauthorurl == "None":
+				config.author_url("")
+			elif not newauthorurl.startswith("https://"):
+				await error_builder(luna, description=f"```\nNot a valid URL. Needs to start with \"https://\"```")
+				return
+			else:
+				config.author_ur(f"{newauthorurl}")
+			prints.message(f"Changed author url to » {color.purple(f'newauthorurl')}'")
+			await embed_builder(luna, description=f"```\nChanged author url to » {newauthorurl}```")
 
 	@commands.command(name = "description",
 					aliases=['cdescription'],
@@ -8744,16 +8774,19 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 					description = "Hide/Show <> | []")
 	async def description(self, luna, mode:str):
 		await luna.message.delete()
-		if mode == "on":
-			prints.message(f"Changed description to » {color.purple('on')}")
-			config.description(True)
-			await embed_builder(luna, description=f"```\nChanged description to » on```")
-		elif mode == "off":
-			prints.message(f"Changed description to » {color.purple('off')}")
-			config.description(False)
-			await embed_builder(luna, description=f"```\nChanged description to » off```")
+		if files.json("Luna/config.json", "theme", documents=True) == "default":
+			await error_builder(luna, "You can't change the description mode if you're using the default theme")
 		else:
-			await mode_error(luna, "on or off")
+			if mode == "on":
+				prints.message(f"Changed description to » {color.purple('on')}")
+				config.description(True)
+				await embed_builder(luna, description=f"```\nChanged description to » on```")
+			elif mode == "off":
+				prints.message(f"Changed description to » {color.purple('off')}")
+				config.description(False)
+				await embed_builder(luna, description=f"```\nChanged description to » off```")
+			else:
+				await mode_error(luna, "on or off")
 
 	@commands.command(name = "color",
 					usage="<hexcode>",
@@ -9160,7 +9193,6 @@ class ThemeCog(commands.Cog, name="Theme command"):
 	async def theme(self, luna, theme:str):
 		await luna.message.delete()
 		theme = theme.replace('.json','')
-		print(theme)
 		if theme == "default":
 			config.theme(theme)
 			await embed_builder(luna, description=f"```\nChanged theme to » {theme}```")
@@ -10262,12 +10294,15 @@ class WebhookCog(commands.Cog, name="Webhook customisation"):
 					description = "Match webhook theme")
 	async def wmatch(self, luna):
 		await luna.message.delete()
-		config.webhook.title(str(theme.title()))
-		config.webhook.footer(str(theme.footer()))
-		config.webhook.image_url(str(theme.image_url()))
+		config.webhook.title(theme.title())
+		config.webhook.footer(theme.footer())
+		config.webhook.image_url(theme.image_url())
 		theme_config = files.json("Luna/config.json", "theme", documents=True)
-		hex_color = files.json(f"Luna/themes/{theme_config}", "hex_color", documents=True)
-		config.webhook.hex_color(str(hex_color))
+		if theme_config == "default":
+			hex_color = hexcolorvar_request
+		else:
+			hex_color = files.json(f"Luna/themes/{theme_config}", "hex_color", documents=True)
+		config.webhook.hex_color(hex_color)
 		prints.message(f'Matched webhook to » {color.purple(files.json("Luna/config.json", "theme", documents=True))}')
 		await embed_builder(luna, description=f'```\nMatched webhook to » {files.json("Luna/config.json", "theme", documents=True)}```')
 
