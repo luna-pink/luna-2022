@@ -6658,7 +6658,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 				afkstatus = 1
 			else:
 				afkstatus = 0
-			await embed_builder(luna, description=f"```\nError logging » {mode}```")
+			await embed_builder(luna, description=f"```\nAFK Mode » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
 
@@ -7860,36 +7860,22 @@ bot.add_cog(PrivacyCog(bot))
 class ProtectionCog(commands.Cog, name="Protection commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
-        
+		
 	@commands.command(name = "antiraid",
 					usage="",
 					description = "Protects against raids")
-	async def antiraid(self, luna):
+	async def antiraid(self, luna, mode:str):
 		await luna.message.delete()
-
 		global antiraid
-
-		if antiraid == False:
-			antiraid = True
-			prints.message(f"Antiraid: {color.purple('on')}")
-
-			embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nAntiraid » on```", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
-
-		elif antiraid == True:
-			antiraid = False
-			prints.message(f"Antiraid: {color.purple('off')}")
-
-			embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nAntiraid » off```", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+		if mode == "on" or mode == "off":
+			prints.message(f"Antiraid » {color.purple(f'{mode}')}")
+			if mode == "on":
+				antiraid = True
+			else:
+				antiraid = False
+			await embed_builder(luna, description=f"```\nAntiraid » {mode}```")
+		else:
+			await mode_error(luna, "on or off")
 
 bot.add_cog(ProtectionCog(bot))
 class BackupsCog(commands.Cog, name="Backup commands"):
