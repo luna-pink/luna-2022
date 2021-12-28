@@ -12,6 +12,7 @@ import socket
 import urllib
 import ctypes
 import random
+import discum
 import psutil
 import typing
 import aiohttp
@@ -6817,15 +6818,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 			except Exception as e:
 				prints.error(f"{e}")
 		else:
-			if configs.error_log() == "console":
-				prints.error("Riskmode is disabled")
-			else:
-				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-				embed.set_thumbnail(url=theme.image_url())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				embed.set_image(url=theme.large_image_url())
-				await send(luna, embed)
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "massgp",
 					usage="<delay> <amount>",
@@ -6858,19 +6851,45 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 			except Exception as e:
 				await error_builder(luna, description=e)
 		else:
-			if configs.error_log() == "console":
-				prints.error("Riskmode is disabled")
-			else:
-				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-				embed.set_thumbnail(url=theme.image_url())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				embed.set_image(url=theme.large_image_url())
-				await send(luna, embed)
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "massnick",
+					usage="<name>",
+					description = "Mass change nicknames")
+	async def massnick(self, luna, name:str):
+		if configs.risk_mode() == "on":
+			bot = discum.Client(token=user_token, log=False, user_agent="Mozilla/5.0")
+
+			def done_fetching(resp, guild_id):
+				if bot.gateway.finishedMemberFetching(guild_id):
+					members = bot.gateway.session.guild(guild_id).members
+					bot.gateway.removeCommand({'function': done_fetching, 'params': {'guild_id': guild_id}})
+					bot.gateway.close()
+					return members
+
+			def get_members(guild_id, channel_id):
+				bot.gateway.fetchMembers(guild_id, channel_id, keep="all", wait=1)
+				bot.gateway.command({'function': done_fetching, 'params': {'guild_id': guild_id}})
+				bot.gateway.run()
+				bot.gateway.resetSession()
+				return bot.gateway.session.guild(guild_id).members
+			amount = 0
+			members = get_members(str(luna.guild.id), str(luna.channel.id))
+			for member in members:
+				try:
+					member = await luna.guild.fetch_member(member.id)
+					await member.edit(nick=name)
+					amount += 1
+					await asyncio.sleep(1)
+				except:
+					pass
+			await embed_builder(luna, title="Success", description=f"```\nChanged nicknames of {amount} members```")
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "spam",
 					usage="<delay> <amount> <message>",
-					description = "Spam a message")
+					description = "Spammer")
 	async def spam(self, luna, delay:int, amount:int, *, message:str):
 		await luna.message.delete()
 		if configs.risk_mode() == "on":
@@ -6878,6 +6897,40 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 				for each in range(0, amount):
 					await asyncio.sleep(delay)
 					await luna.send(f"{message}")
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "spamdm",
+					usage="<delay> <amount> <@user> <message>",
+					description = "DMs'")
+	async def spamdm(self, luna, delay:int, amount:int, user: discord.User, *, message:str):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				for each in range(0, amount):
+					await asyncio.sleep(delay)
+					await user.send(f"{message}")
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "spamch",
+					usage="<delay> <amount> <message>",
+					description = "Channels")
+	async def spamch(self, luna, delay:int, amount:int, *, message:str):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				for each in range(0, amount):
+					for channel in luna.guild.text_channels:
+						try:
+							await asyncio.sleep(delay)
+							await channel.send(f"{message}")
+						except Exception as e:
+							await error_builder(luna, description=e)
 			except Exception as e:
 				await error_builder(luna, description=e)
 		else:
@@ -6905,7 +6958,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 	@commands.command(name = "spamrep",
 					usage="<message_id> <amount>",
 					aliases=['spamreport'],
-					description = "Spam reports")
+					description = "Reports")
 	async def spamrep(self, luna, message_id:str, amount:int):
 		await luna.message.delete()
 
@@ -6929,7 +6982,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 
 	@commands.command(name = "spamhentai",
 					usage="<delay> <amount>",
-					description = "Spam hentai")
+					description = "Hentai")
 	async def spamhentai(self, luna, delay:int, amount:int):
 		await luna.message.delete()
 		if configs.risk_mode() == "on":
@@ -6945,7 +6998,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 
 	@commands.command(name = "spamwebhook",
 					usage="<delay> <amount> <url>",
-					description = "Webhook spammer")
+					description = "Webhooks")
 	async def spamwebhook(self, luna, delay:int, amount:int, url:str):
 		await luna.message.delete()
 		if configs.risk_mode() == "on":
@@ -7037,12 +7090,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 			except Exception:
 				prints.error(f"Failed to send {message} to {member}")
 				pass
-			embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nSent {message} to {sent} users```", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+			await embed_builder(luna, description=f"```\nSent {message} to {sent} users```")
 		else:
 			await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -7064,12 +7112,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 						pass
 			except Exception:
 				pass
-			embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nSent {message} to {sent} friends```", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+			await embed_builder(luna, description=f"```\nSent {message} to {sent} friends```")
 		else:
 			await error_builder(luna, description="```\nRiskmode is disabled```")
 
