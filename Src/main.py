@@ -6300,7 +6300,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 							prints.error(e)
 							pass
 		else:
-			await error_builder(luna, description="Riskmode is disabled")
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "proxyserverjoiner",
 					usage="",
@@ -6336,7 +6336,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 							prints.error(e)
 							pass
 		else:
-			await error_builder(luna, description="Riskmode is disabled")
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "countdown",
 					usage="<number>",
@@ -6881,15 +6881,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 			except Exception as e:
 				await error_builder(luna, description=e)
 		else:
-			if configs.error_log() == "console":
-				prints.error("Riskmode is disabled")
-			else:
-				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-				embed.set_thumbnail(url=theme.image_url())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				embed.set_image(url=theme.large_image_url())
-				await send(luna, embed)
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "spamgp",
 					usage="<delay> <amount> <@member>",
@@ -6908,7 +6900,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 			except Exception as e:
 				await luna.send(f"Error: {e}")
 		else:
-			await error_builder(luna, description="Riskmode is disabled")
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "spamrep",
 					usage="<message_id> <amount>",
@@ -6933,10 +6925,10 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 			except Exception as e:
 				await error_builder(luna, description=e)
 		else:
-			await error_builder(luna, description="Riskmode is disabled")
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "spamhentai",
-					usage="",
+					usage="<delay> <amount>",
 					description = "Spam hentai")
 	async def spamhentai(self, luna, delay:int, amount:int):
 		await luna.message.delete()
@@ -6949,15 +6941,39 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 			except Exception as e:
 				await error_builder(luna, description=e)
 		else:
-			if configs.error_log() == "console":
-				prints.error("Riskmode is disabled")
-			else:
-				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-				embed.set_thumbnail(url=theme.image_url())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				embed.set_image(url=theme.large_image_url())
-				await send(luna, embed)
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "spamwebhook",
+					usage="<delay> <amount> <url>",
+					description = "Webhook spammer")
+	async def spamwebhook(self, luna, delay:int, amount:int, url:str):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			if not "https://discord.com/api/webhooks/" in url:
+				await error_builder(luna, description="```\nInvalid URL```")
+				return
+			try:
+				for each in range(0, amount):
+					await asyncio.sleep(delay)
+					await embed_builder(luna, description=f"```\nSending webhooks...\n``````\nAmount » {amount}\nDelay » {delay}\n``````\nURL » {url}```")
+					hook = dhooks.Webhook(url=url, avatar_url=webhook.image_url())
+					color = 0x000000
+					if error == True:
+						color = 0xE10959
+					elif color == None:
+						pass
+					else:
+						color = webhook.hex_color()
+					embed = dhooks.Embed(title=webhook.title(), description=f"```Get spammed!```", color=color)
+					embed.set_thumbnail(url=webhook.image_url())
+					embed.set_footer(text=webhook.footer())
+					hook.send(embed=embed)
+			except Exception as e:
+				await error_builder(luna, description=e)
+				return
+			await embed_builder(luna, description=f"```\nWebhooks sent```")
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "purgehack",
 					usage="",
@@ -6973,7 +6989,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
 			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
 		else:
-			await error_builder(luna, description="Riskmode is disabled")
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "mpreact",
 					usage="<emoji>",
@@ -6985,7 +7001,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 			for message in messages:
 				await message.add_reaction(emoji)
 		else:
-			await error_builder(luna, description="Riskmode is disabled")
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "junknick",
 					usage="",
@@ -6999,7 +7015,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 			except Exception as e:
 				await error_builder(luna, description=e)
 		else:
-			await error_builder(luna, description="Riskmode is disabled")
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "dmall",
 					usage="<message>",
@@ -7028,7 +7044,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 			embed.set_image(url=theme.large_image_url())
 			await send(luna, embed)
 		else:
-			await error_builder(luna, description="Riskmode is disabled")
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "dmallfriends",
 					usage="<message>",
@@ -7055,7 +7071,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 			embed.set_image(url=theme.large_image_url())
 			await send(luna, embed)
 		else:
-			await error_builder(luna, description="Riskmode is disabled")
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "sendall",
 					usage="<message>",
@@ -7070,7 +7086,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 			except:
 				pass
 		else:
-			await error_builder(luna, description="Riskmode is disabled")
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 bot.add_cog(AbuseCog(bot))
 
@@ -7876,6 +7892,14 @@ class ProtectionCog(commands.Cog, name="Protection commands"):
 			await embed_builder(luna, description=f"```\nAntiraid » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
+
+	@commands.command(name = "sbcheck",
+					usage="",
+					description = "Check for bad selfbots")
+	async def sbcheck(self, luna):
+		await luna.message.delete()
+		await embed_builder(luna, title="GIVEAWAY")
+		await embed_builder(luna, description="```\nThose that reacted, could be running selfbots```")
 
 bot.add_cog(ProtectionCog(bot))
 class BackupsCog(commands.Cog, name="Backup commands"):
