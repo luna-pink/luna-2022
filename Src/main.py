@@ -8595,7 +8595,7 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 	async def ctitle(self, luna, *, newtitle:str):
 		await luna.message.delete()
 		if files.json("Luna/config.json", "theme", documents=True) == "default":
-			await error_builder(luna, "You can't change the title if you're using the default theme")
+			await error_builder(luna, f"```\nYou can't change the title if you're using the default theme\n``````\nPlease change the theme first with {get_prefix()}theme\n\n({get_prefix()}themes to show all available themes)```")
 		else:
 			prints.message(f"Changed title to » {color.purple(f'{newtitle}')}")
 			if newtitle == "None":
@@ -8610,7 +8610,7 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 	async def ctitleurl(self, luna, newtitleurl:str):
 		await luna.message.delete()
 		if files.json("Luna/config.json", "theme", documents=True) == "default":
-			await error_builder(luna, "You can't change the title url if you're using the default theme")
+			await error_builder(luna, f"```\nYou can't change the title url if you're using the default theme\n``````\nPlease change the theme first with {get_prefix()}theme\n\n({get_prefix()}themes to show all available themes)```")
 		else:
 			if newtitleurl == "None":
 				config.title_url("")
@@ -8628,7 +8628,7 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 	async def cfooter(self, luna, *, newfooter:str):
 		await luna.message.delete()
 		if files.json("Luna/config.json", "theme", documents=True) == "default":
-			await error_builder(luna, "You can't change the footer if you're using the default theme")
+			await error_builder(luna, f"```\nYou can't change the footer if you're using the default theme\n``````\nPlease change the theme first with {get_prefix()}theme\n\n({get_prefix()}themes to show all available themes)```")
 		else:
 			prints.message(f"Changed footer to » {color.purple(f'{newfooter}')}")
 			if newfooter == "None":
@@ -8643,7 +8643,7 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 	async def cfootericon(self, luna, newfootericonurl:str):
 		await luna.message.delete()
 		if files.json("Luna/config.json", "theme", documents=True) == "default":
-			await error_builder(luna, "You can't change the footer icon if you're using the default theme")
+			await error_builder(luna, f"```\nYou can't change the footer icon if you're using the default theme\n``````\nPlease change the theme first with {get_prefix()}theme\n\n({get_prefix()}themes to show all available themes)```")
 		else:
 			if newfootericonurl == "None":
 				config.footer_icon_url("")
@@ -8663,7 +8663,7 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 	async def cimage(self, luna, newimageurl:str):
 		await luna.message.delete()
 		if files.json("Luna/config.json", "theme", documents=True) == "default":
-			await error_builder(luna, "You can't change the thumbnail image if you're using the default theme")
+			await error_builder(luna, f"```\nYou can't change the thumbnail image if you're using the default theme\n``````\nPlease change the theme first with {get_prefix()}theme\n\n({get_prefix()}themes to show all available themes)```")
 		else:
 			if newimageurl == "None":
 				config.image_url("")
@@ -8683,7 +8683,7 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 	async def clargeimage(self, luna, newimageurl:str):
 		await luna.message.delete()
 		if files.json("Luna/config.json", "theme", documents=True) == "default":
-			await error_builder(luna, "You can't change the large image if you're using the default theme")
+			await error_builder(luna, f"```\nYou can't change the large image if you're using the default theme\n``````\nPlease change the theme first with {get_prefix()}theme\n\n({get_prefix()}themes to show all available themes)```")
 		else:
 			if newimageurl == "None":
 				config.large_image_url("")
@@ -8703,7 +8703,7 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 	async def chexcolor(self, luna, newhexcolor:str):
 		await luna.message.delete()
 		if files.json("Luna/config.json", "theme", documents=True) == "default":
-			await error_builder(luna, "You can't change the color if you're using the default theme")
+			await error_builder(luna, f"```\nYou can't change the color if you're using the default theme\n``````\nPlease change the theme first with {get_prefix()}theme\n\n({get_prefix()}themes to show all available themes)```")
 		else:
 			if len(newhexcolor) < 6:
 				await error_builder(luna, description=f"```\nNot a valid HEX color code```")
@@ -8721,7 +8721,7 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 	async def cauthor(self, luna, *, newauthor:str):
 		await luna.message.delete()
 		if files.json("Luna/config.json", "theme", documents=True) == "default":
-			await error_builder(luna, "You can't change the author text if you're using the default theme")
+			await error_builder(luna, f"```\nYou can't change the author text if you're using the default theme\n``````\nPlease change the theme first with {get_prefix()}theme\n\n({get_prefix()}themes to show all available themes)```")
 		else:
 			prints.message(f"Changed author to » {color.purple(f'newauthor')}'")
 			if newauthor == "None":
@@ -8736,7 +8736,7 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 	async def cauthoricon(self, luna, newauthoriconurl:str):
 		await luna.message.delete()
 		if files.json("Luna/config.json", "theme", documents=True) == "default":
-			await error_builder(luna, "You can't change the author icon if you're using the default theme")
+			await error_builder(luna, f"```\nYou can't change the author icon if you're using the default theme\n``````\nPlease change the theme first with {get_prefix()}theme\n\n({get_prefix()}themes to show all available themes)```")
 		else:
 			if newauthoriconurl == "None":
 				config.author_icon_url("")
@@ -8756,7 +8756,7 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 	async def cauthorurl(self, luna, newauthorurl:str):
 		await luna.message.delete()
 		if files.json("Luna/config.json", "theme", documents=True) == "default":
-			await error_builder(luna, "You can't change the author url if you're using the default theme")
+			await error_builder(luna, f"```\nYou can't change the author url if you're using the default theme\n``````\nPlease change the theme first with {get_prefix()}theme\n\n({get_prefix()}themes to show all available themes)```")
 		else:
 			if newauthorurl == "None":
 				config.author_url("")
@@ -8775,7 +8775,7 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 	async def description(self, luna, mode:str):
 		await luna.message.delete()
 		if files.json("Luna/config.json", "theme", documents=True) == "default":
-			await error_builder(luna, "You can't change the description mode if you're using the default theme")
+			await error_builder(luna, f"```\nYou can't change the description mode if you're using the default theme\n``````\nPlease change the theme first with {get_prefix()}theme\n\n({get_prefix()}themes to show all available themes)```")
 		else:
 			if mode == "on":
 				prints.message(f"Changed description to » {color.purple('on')}")
