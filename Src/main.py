@@ -3992,6 +3992,21 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
 			await asyncio.sleep(2)
 			await luna.message.edit(content=i)
 
+	@commands.command(name = "unflip",
+						usage="",
+						description = "Unflip animation")
+	async def tableflip(self, luna):
+		list = (
+			"`(\°-°)\  ┻━┻`",
+			"`(\°□°)\  ┻━┻`",
+			"`(-°□°)-  ┻━┻`",
+			"`(-°□°)-  ]`",
+			"`(\°-°)\  ┬─┬`",
+		)
+		for i in list:
+			await asyncio.sleep(2)
+			await luna.message.edit(content=i)
+
 	@commands.command(name = "warning",
 						usage="",
 						description = "System overload animation")
