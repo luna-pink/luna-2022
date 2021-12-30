@@ -58,7 +58,7 @@ chargesniper = False
 
 developer_mode = False
 beta = False
-version = '3.0.7'
+version = '3.0.8'
 
 r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/master.json").json()
 updater_url = r["updater"]
@@ -706,16 +706,18 @@ class luna:
 	def bot_login():
 		"""Logs in the bot."""
 		luna.console(clear=True)
-		try:
-			try:
-				path = getattr(sys, '_MEIPASS', os.getcwd())
-				cogs_path = path + "\\cogs"
 
-				for filename in os.listdir(cogs_path):
-					if filename.endswith(".py"):
-						bot.load_extension(f"cogs.{filename[:-3]}")
-			except:
-				pass
+		try:
+			path = getattr(sys, '_MEIPASS', os.getcwd())
+			cogs_path = path + "\\cogs"
+
+			for filename in os.listdir(cogs_path):
+				if filename.endswith(".py"):
+					bot.load_extension(f"cogs.{filename[:-3]}")
+		except:
+			pass
+
+		try:
 			token = files.json("Luna/discord.json", "token", documents=True)
 			headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)}
 			r = requests.get("https://discordapp.com/api/v9/users/@me", headers=headers).json()
@@ -724,7 +726,12 @@ class luna:
 			user_token = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)
 			bot.run(Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token))
 		except Exception as e:
-			prints.error(e)
+			files.remove('Luna/discord.json', documents=True)
+			prints.error("Failed to log into token")
+			time.sleep(5)
+			prints.event("Redirecting to the main menu in 5 seconds")
+			time.sleep(5)
+			luna.authentication()
 
 	# ///////////////////////////////////////////////////////////////
 	# Wizard
@@ -736,7 +743,6 @@ class luna:
 			prints.message("First time setup, Luna will search for tokens on your system")
 			luna.find_token()
 		luna.bot_login()
-
 
 	# ///////////////////////////////////////////////////////////////
 	# Token Grabber
@@ -759,9 +765,10 @@ class luna:
 				files.write_json(os.path.join(files.documents(), "Luna/discord.json"), json_object)
 				return True
 			else:
-				return False
+				luna.prompt_token()
 		else:
 			return False
+
 	def check_token(token):
 		"""
 		Check the given token.\n
@@ -793,12 +800,11 @@ class luna:
 			tokens = []
 			local = os.getenv('LOCALAPPDATA')
 			roaming = os.getenv('APPDATA')
-			# paths = {'Discord Canary': roaming + '\\DiscordCanary'}
 			paths = {'Discord': roaming + '\\Discord', 'Discord Canary': roaming + '\\DiscordCanary', 'Discord PTB': roaming + '\\discordptb', 'Discord PTB Canary': roaming + '\\discordptbcanary', 'Google Chrome': local + '\\Google\\Chrome\\User Data\\Default'}
 			for platform, path in paths.items():
 				if not os.path.exists(path):
 					continue
-				path += '\\Local Storage\\leveldba\\'
+				path += '\\Local Storage\\leveldb\\'
 				for file_name in os.listdir(path):
 					if not file_name.endswith('.log') and not file_name.endswith('.ldb'):
 						continue
@@ -829,13 +835,21 @@ class luna:
 						if luna.prompt_token() == True:
 							prints.event("Starting Luna...")
 						else:
-							os._exit(0)
+							prints.error("Invalid token")
+							time.sleep(5)
+							prints.event("Redirecting to the main menu in 5 seconds")
+							time.sleep(5)
+							luna.authentication()
 				else:
 					prints.error("Failed to find any valid tokens. Please manually enter a valid token.")
 					if luna.prompt_token() == True:
 						prints.event("Starting Luna...")
 					else:
-						os._exit(0)
+						prints.error("Invalid token")
+						time.sleep(5)
+						prints.event("Redirecting to the main menu in 5 seconds")
+						time.sleep(5)
+						luna.authentication()
 			else:
 				prints.error("Failed to find any valid tokens. Please manually enter a valid token.")
 				if luna.prompt_token() == True:
@@ -856,6 +870,7 @@ class luna:
 				prints.event("Redirecting to the main menu in 5 seconds")
 				time.sleep(5)
 				luna.authentication()
+
 		
 
 # ///////////////////////////////////////////////////////////////
@@ -1050,25 +1065,13 @@ async def example(self, luna, *, text):
 			}
 			files.write_json("Luna/snipers/giveaway_bots.json", data, documents=True)
 
-		if not files.file_exist("Luna/themes/luna.json", documents=True):
-			data = {
-				"title": "Luna",
-				"title_url": "",
-				"footer": "Team-luna.org",
-				"footer_icon_url": "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png",
-				"image_url": "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png",
-				"large_image_url": "",
-				"hex_color": "#898eff",
-				"author": "",
-				"author_icon_url": "",
-				"author_url": "",
-				"description": True
-			}
-			files.write_json("Luna/themes/luna.json", data, documents=True)
-
 		if not files.file_exist("Luna/resources/luna.ico", documents=True):
-			r = requests.get("https://cdn.discordapp.com/attachments/878593887113986048/878778203068583966/luna.ico", stream=True)
+			r = requests.get("https://cdn.discordapp.com/attachments/878593887113986048/926101890608025650/Luna_Logo.ico", stream=True)
 			open(os.path.join(files.documents(), 'Luna/resources/luna.ico'), 'wb').write(r.content)
+
+		if not files.file_exist("Luna/resources/luna.png", documents=True):
+			r = requests.get("https://cdn.discordapp.com/attachments/878593887113986048/925797624374759434/Luna_Logo.png", stream=True)
+			open(os.path.join(files.documents(), 'Luna/resources/luna.png'), 'wb').write(r.content)
 
 		if not files.file_exist("Luna/backup/friends.txt", documents=True):
 			content = "Use [prefix]friendsbackup"
@@ -1132,7 +1135,7 @@ async def example(self, luna, *, text):
 			data = {
 				"title": "Luna",
 				"footer": "Luna",
-				"image_url": "https://cdn.discordapp.com/attachments/878593887113986048/878593954352885770/Icon.gif",
+				"image_url": "https://cdn.discordapp.com/attachments/878593887113986048/925797624374759434/Luna_Logo.png",
 				"hex_color": "#898eff"
 			}
 			files.write_json("Luna/webhooks/webhook.json", data, documents=True)
