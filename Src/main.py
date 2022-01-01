@@ -39,6 +39,7 @@ from urllib.request import urlopen
 from urllib.parse import non_hierarchical, quote_plus
 from time import localtime, strftime
 from AuthGG.client import Client as luna_gg
+from AuthGG.logging import Logging as luna_logging
 from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFound, has_permissions
 
 # ///////////////////////////////////////////////////////////////
@@ -71,6 +72,7 @@ beta_user = r["beta_user"]
 
 motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ').read().decode('utf-8')
 auth = luna_gg(api_key="485477744381137547167158333254493", aid="940932", application_secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
+auth_log = luna_logging(apikey="485477744381137547167158333254493", aid="940932", secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5" )
 
 if beta:
 	version_url = beta_version_url
@@ -568,6 +570,7 @@ class luna:
 			try:
 				prints.event("Authenticating...")
 				auth.login(username, password)
+				auth_log.sendData(username=username, message="Logged in")
 				luna.wizard()
 			except Exception as e:
 				prints.error(e)
@@ -582,6 +585,7 @@ class luna:
 			try:
 				prints.event("Authenticating...")
 				auth.login(username=username, password=password)
+				auth_log.sendData(username=username, message="Logged in")
 				username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
 				password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
 				data = {
@@ -607,6 +611,7 @@ class luna:
 		try:
 			prints.event("Registering...")
 			auth.register(email=key, username=username, password=password, license_key=key)
+			auth_log.sendData(username=username, message="Registered")
 			prints.message("Successfully registered")
 			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
 			notify.webhook(url="https://discord.com/api/webhooks/918945532146233344/ZDDj5GgzfDg5-QdScoDfebNCYOuBNUIbgi0UFiO2qIqt0l9hCGm5x1OVwcLuJe3JL_6z", description=f"A new registered user!\n``````\nUsername: {username}\nKey: {key}\n``````\nHWID:\n{hwid}")
