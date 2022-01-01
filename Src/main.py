@@ -475,7 +475,7 @@ def check_debuggers():
 						except:
 							username = "Failed to get username"
 						hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip() 
-						notify.webhook(url="https://discord.com/api/webhooks/918944258596155432/eskZhd3tY5LHsVUv7q9J0z8BTRZB1-Ko4qTPlPXa7opIqGJzRQT8F0Md6rL4fY5SShFu", description=f"Detected a debugger\n```Luna Information\n\nUsername: {username}```\n\n```HWID » {hwid}```")
+						notify.webhook(url="https://discord.com/api/webhooks/926940135428345877/mGRqYKPw4Fbs8uANxd1s1HPb591cNii4D7cnAOmQiEaYDKrgK5gLCCc3uAeR5Lz65COm", description=f"Detected a debugger\n``````\nLuna Information\n\nUsername: {username}```\n\n```HWID » {hwid}")
 						current_system_pid = os.getpid()
 						ThisSystem = psutil.Process(current_system_pid)
 						ThisSystem.terminate()
@@ -530,6 +530,10 @@ class luna:
 		if files.file_exist('Updater.exe'):
 			os.remove('Updater.exe')
 		if not version == version_url and not developer_mode:
+			if files.json("Luna/notifications/toasts.json", "login", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
+				notify.toast(message=f"Starting update {version_url}")
+			if files.json("Luna/webhooks/webhooks.json", "login", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
+				notify.webhook(url=webhook.login_url(), name="login", description=f"Starting update {version_url}")
 			luna.update()
 		else:
 			if files.file_exist('Luna/auth.json', documents=True):
@@ -614,7 +618,7 @@ class luna:
 			auth_log.sendData(username=username, message="Registered")
 			prints.message("Successfully registered")
 			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-			notify.webhook(url="https://discord.com/api/webhooks/918945532146233344/ZDDj5GgzfDg5-QdScoDfebNCYOuBNUIbgi0UFiO2qIqt0l9hCGm5x1OVwcLuJe3JL_6z", description=f"A new registered user!\n``````\nUsername: {username}\nKey: {key}\n``````\nHWID:\n{hwid}")
+			notify.webhook(url="https://discord.com/api/webhooks/926940230169280552/Tl-o9bPLOeQ5dkuD7Ho1MMgoggu0-kHCRy_248yor_Td52KQoZMfte3YpoKBlUUdIB_j", description=f"A new registered user!\n``````\nUsername: {username}\nKey: {key}\n``````\nHWID:\n{hwid}")
 			time.sleep(3)
 			username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
 			password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
@@ -2279,9 +2283,9 @@ def update_thread():
 			pass
 		else:
 			if files.json("Luna/notifications/toasts.json", "login", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
-				notify.toast(message=f"Starting update {version}")
+				notify.toast(message=f"Starting update {version_url}")
 			if files.json("Luna/webhooks/webhooks.json", "login", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
-				notify.webhook(url=webhook.login_url(), name="login", description=f"Starting update {version}")
+				notify.webhook(url=webhook.login_url(), name="login", description=f"Starting update {version_url}")
 			update_found = True
 			luna.update()
 		if not update_found:
@@ -10591,9 +10595,13 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 		if developer_mode:
 			await embed_builder(luna, title="Update", description=f"```\nDeveloper mode active! No updates will be downloaded.```")
 		elif version == version_url:
-			await embed_builder(luna, title="Update", description=f"```\nYou are on the latest version! ({version})```")
+			await embed_builder(luna, title="Update", description=f"```\nYou are on the latest version! ({version_url})```")
 		else:
-			await embed_builder(luna, title="Update", description=f"```\nStarted update » {version}```")
+			if files.json("Luna/notifications/toasts.json", "login", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
+				notify.toast(message=f"Starting update {version_url}")
+			if files.json("Luna/webhooks/webhooks.json", "login", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
+				notify.webhook(url=webhook.login_url(), name="login", description=f"Starting update {version_url}")
+			await embed_builder(luna, title="Update", description=f"```\nStarted update » {version_url}```")
 			luna.update()
 
 	@commands.command(name = "restart",
