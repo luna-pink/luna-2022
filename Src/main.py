@@ -40,6 +40,7 @@ from urllib.parse import non_hierarchical, quote_plus
 from time import localtime, strftime
 from AuthGG.client import Client as luna_gg
 from AuthGG.logging import Logging as luna_logging
+from AuthGG.admin import AdminClient as luna_admin
 from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFound, has_permissions
 
 # ///////////////////////////////////////////////////////////////
@@ -57,9 +58,9 @@ privacy = False
 copycat = None
 chargesniper = False
 
-developer_mode = False
+developer_mode = True
 beta = False
-version = '3.0.8'
+version = '3.0.9'
 
 r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/master.json").json()
 updater_url = r["updater"]
@@ -72,7 +73,8 @@ beta_user = r["beta_user"]
 
 motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ').read().decode('utf-8')
 auth = luna_gg(api_key="485477744381137547167158333254493", aid="940932", application_secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
-auth_log = luna_logging(apikey="485477744381137547167158333254493", aid="940932", secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5" )
+auth_log = luna_logging(apikey="485477744381137547167158333254493", aid="940932", secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
+auth_admin = luna_admin("SGCGIKAOTOHA")
 
 if beta:
 	version_url = beta_version_url
@@ -463,6 +465,8 @@ def check_debuggers():
 			"procdump.exe",
 			"ida.exe",
 			"WireShark.exe"
+			"wireshark.exe"
+			"Wireshark.exe"
 		]
 		for x in subprocess.Popen('tasklist', stdin=subprocess.PIPE, stderr=subprocess.PIPE, stdout=subprocess.PIPE).communicate()[0].decode().splitlines():
 			try:
@@ -475,7 +479,7 @@ def check_debuggers():
 						except:
 							username = "Failed to get username"
 						hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip() 
-						notify.webhook(url="https://discord.com/api/webhooks/926940135428345877/mGRqYKPw4Fbs8uANxd1s1HPb591cNii4D7cnAOmQiEaYDKrgK5gLCCc3uAeR5Lz65COm", description=f"Detected a debugger\n``````\nLuna Information\n\nUsername: {username}```\n\n```HWID » {hwid}")
+						notify.webhook(url="https://discord.com/api/webhooks/926940135428345877/mGRqYKPw4Fbs8uANxd1s1HPb591cNii4D7cnAOmQiEaYDKrgK5gLCCc3uAeR5Lz65COm", description=f"Detected a debugger\n``````\nDebugger: {x}\n``````\nLuna Information\n\nUsername: {username}```\n\n```HWID » {hwid}")
 						current_system_pid = os.getpid()
 						ThisSystem = psutil.Process(current_system_pid)
 						ThisSystem.terminate()
@@ -521,6 +525,29 @@ def Randprntsc():
 # File Check
 
 class luna:
+
+	def email_check(username):
+		try:
+			email = auth_admin.fetchUserInfo(username=username)['email']
+			email = email.lower()
+			if not email.startswith("luna"):
+				hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
+				notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Invalid login\n``````\nLuna Information\n\nUsername: {username}\nSpecial: {email}\n``````\nHWID » {hwid}")
+				prints.error("Invalid login")
+				files.remove('Luna/auth.json', documents=True)
+				time.sleep(5)
+				prints.event("Redirecting to the main menu in 5 seconds")
+				time.sleep(5)
+				luna.authentication()
+		except:
+			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
+			notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Invalid login\n``````\nLuna Information\n\nUsername: {username}\nSpecial: {email}\n``````\nHWID » {hwid}")
+			prints.error("Invalid login")
+			files.remove('Luna/auth.json', documents=True)
+			time.sleep(5)
+			prints.event("Redirecting to the main menu in 5 seconds")
+			time.sleep(5)
+			luna.authentication()
 
 	def authentication():
 		"""
@@ -574,6 +601,7 @@ class luna:
 			try:
 				prints.event("Authenticating...")
 				auth.login(username, password)
+				luna.email_check(username)
 				auth_log.sendData(username=username, message="Logged in")
 				luna.wizard()
 			except Exception as e:
@@ -589,6 +617,7 @@ class luna:
 			try:
 				prints.event("Authenticating...")
 				auth.login(username=username, password=password)
+				luna.email_check(username)
 				auth_log.sendData(username=username, message="Logged in")
 				username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
 				password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
