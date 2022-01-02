@@ -59,11 +59,11 @@ privacy = False
 copycat = None
 chargesniper = False
 
-developer_mode = True
+developer_mode = False
 beta = False
 version = '3.0.9'
 
-r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/master.json").json()
+r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 updater_url = r["updater"]
 version_url = r["version"]
 
@@ -804,7 +804,7 @@ class luna:
 		"""
 		luna.console(clear=True)
 
-		r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/master.json").json()
+		r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 		updater_url = r["updater"]
 		version_url = r["version"]
 
@@ -2438,7 +2438,7 @@ def uptime_thread():
 	minute = 0
 	second = 0
 	while True:
-		luna.title(f"Luna | {hour:02d}:{minute:02d}:{second:02d}")
+		luna.title(f"Luna {version_url} | {hour:02d}:{minute:02d}:{second:02d}")
 		time.sleep(1)
 		second += 1
 		if second == 60:
@@ -2455,7 +2455,7 @@ def uptime_thread():
 def update_thread():
 	update_found = False
 	while True:
-		r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/master.json").json()
+		r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 		version_url = r["version"]
 
 		r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/beta.json").json()
@@ -9554,9 +9554,9 @@ class ThemesCog(commands.Cog, name="Theme commands"):
             data = {
                 "title": "Luna",
                 "title_url": "",
-                "footer": "Team Luna",
-                "footer_icon_url": "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png",
-                "image_url": "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png",
+                "footer": "Team-luna.org",
+                "footer_icon_url": "https://cdn.discordapp.com/attachments/927033067468623882/927033385216520232/Luna_Logo.png",
+                "image_url": "https://cdn.discordapp.com/attachments/927033067468623882/927033385216520232/Luna_Logo.png",
                 "large_image_url": "",
                 "hex_color": "#898eff",
                 "author": "",
@@ -9633,10 +9633,10 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Luna"
 			titleurl= ""
 			footer= "Team-luna.org"
-			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png"
-			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png"
+			footer_iconurl= "https://cdn.discordapp.com/attachments/927033067468623882/927033182157668352/Luna_Logo1.png"
+			imageurl= "https://cdn.discordapp.com/attachments/927033067468623882/927033182157668352/Luna_Logo1.png"
 			large_imageurl= ""
-			hexcolor= 0x2f3553
+			hexcolor= 0x898eff
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -9649,7 +9649,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593949332291584/Luna2.png"
 			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593954352885770/Icon.gif"
 			large_imageurl= ""
-			hexcolor= 0x2f3553
+			hexcolor= 0x898eff
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -9820,7 +9820,13 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			description = "```<> is required | [] is optional\n\n```"
 		elif description == False:
 			description = ""
-		embed = discord.Embed(title=title, url=titleurl, description=f"{description}```\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}animated         » Animated commands\n{prefix}text             » Text commands\n{prefix}image            » Image commands\n{prefix}troll            » Troll commands\n{prefix}fun              » Funny commands\n{prefix}tools            » General tools\n{prefix}nettools         » Networking tools\n{prefix}utils            » Utilities\n{prefix}abuse            » Abusive commands\n{prefix}raid             » Raiding servers\n{prefix}nuking           » Account nuking\n{prefix}protection       » Protections\n{prefix}misc             » Miscellaneous commands\n{prefix}settings         » Settings\n{prefix}sharing          » Share commands\n{prefix}community        » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}search <command> » Search for a command\n{prefix}covid            » Corona statistics\n``````\nThis is a preview of the theme {theme}\nThis theme was made by {madeby}```", color=hexcolor)
+		command_count = len(bot.commands)
+		cog = bot.get_cog('Custom commands')
+		custom = cog.get_commands()
+		custom_command_count = 0
+		for command in custom:
+			custom_command_count += 1
+		embed = discord.Embed(title=title, url=titleurl, description=f"{description}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}game             » Game commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Current guild profile\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}about            » Luna information\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}\n``````\nThis is a preview of the theme {theme}\nThis theme was made by {madeby}\n```", color=hexcolor)
 		embed.set_thumbnail(url=imageurl)
 		embed.set_footer(text=footer, icon_url=footer_iconurl)
 		embed.set_author(name=author, url=authorurl, icon_url=author_iconurl)
@@ -9838,8 +9844,8 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Luna"
 			titleurl= ""
 			footer= "Team-luna.org"
-			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png"
-			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/879063329459544074/Luna3.png"
+			footer_iconurl= "https://cdn.discordapp.com/attachments/927033067468623882/927033182157668352/Luna_Logo1.png"
+			imageurl= "https://cdn.discordapp.com/attachments/927033067468623882/927033182157668352/Luna_Logo1.png"
 			large_imageurl= ""
 			hexcolor= "#898eff"
 			author= ""
