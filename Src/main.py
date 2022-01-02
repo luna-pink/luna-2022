@@ -3,6 +3,7 @@ import re
 import sys
 import json
 import time
+from discord.ext.commands.bot import Bot
 import httpx
 import base64
 import qrcode
@@ -47,6 +48,7 @@ from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFou
 # Luna Variables
 
 cooldown = []
+nitro_cooldown = []
 afkstatus = 0
 afk_user_id = 0
 afk_reset = 0
@@ -2520,7 +2522,7 @@ async def on_ready():
 
 class OnMessage(commands.Cog, name="on message"):
 	def __init__(self, bot:commands.Bot):
-		self.bot = bot
+		self.bot = Bot
 		
 	@commands.Cog.listener()
 	async def on_message(self, message):
@@ -2543,21 +2545,25 @@ class OnMessage(commands.Cog, name="on message"):
 					else:
 						status = 'Unknown gift code'
 
-					print()
-					prints.sniper(color.purple(status))
-					prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
-					prints.sniper(f"Channel | {color.purple(f'{message.channel}')}")
-					prints.sniper(f"Author  | {color.purple(f'{message.author}')}")
-					prints.sniper(f"Code    | {color.purple(f'{code}')}")
-					prints.sniper(color.purple('Elapsed Times'))
-					prints.sniper(f"Sniped  | {color.purple(f'{elapsed_snipe}')}")
-					prints.sniper(f"Request | {color.purple(f'{elapsed}')}")
-					print()
+					global nitro_cooldown
+					if nitro_cooldown.count(code) == 0:
+						nitro_cooldown.append(code)
+						
+						print()
+						prints.sniper(color.purple(status))
+						prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
+						prints.sniper(f"Channel | {color.purple(f'{message.channel}')}")
+						prints.sniper(f"Author  | {color.purple(f'{message.author}')}")
+						prints.sniper(f"Code    | {color.purple(f'{code}')}")
+						prints.sniper(color.purple('Elapsed Times'))
+						prints.sniper(f"Sniped  | {color.purple(f'{elapsed_snipe}')}")
+						prints.sniper(f"Request | {color.purple(f'{elapsed}')}")
+						print()
 
-					if files.json("Luna/notifications/toasts.json", "nitro", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
-						notify.toast(message=f"{status}\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
-					if files.json("Luna/webhooks/webhooks.json", "nitro", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.nitro_url() == "webhook-url-here":
-						notify.webhook(url=webhook.nitro_url(), name="nitro", description=f"{status}\nServer » {message.guild}\nChannel » {message.channel}\nAuthor » {message.author}\nCode » {code}\nElapsed Times\nSniped » {elapsed_snipe}\nRequest » {elapsed}")
+						if files.json("Luna/notifications/toasts.json", "nitro", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
+							notify.toast(message=f"{status}\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
+						if files.json("Luna/webhooks/webhooks.json", "nitro", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.nitro_url() == "webhook-url-here":
+							notify.webhook(url=webhook.nitro_url(), name="nitro", description=f"{status}\nServer » {message.guild}\nChannel » {message.channel}\nAuthor » {message.author}\nCode » {code}\nElapsed Times\nSniped » {elapsed_snipe}\nRequest » {elapsed}")
 		except Exception as e:
 			prints.error(e)
 			
@@ -10975,21 +10981,21 @@ class GamesCog(commands.Cog, name="Game commands"):
 
 	@commands.command(name = "fnshop",
 					usage="",
-					description = "Current Fortnite shop")
+					description = "Fortnite shop")
 	async def fnshop(self, luna):
 		await luna.message.delete()
 		await embed_builder(luna, title="Fortnite Shop", large_image="https://api.nitestats.com/v1/shop/image")
 
 	@commands.command(name = "fnmap",
 					usage="",
-					description = "Current Fortnite map")
+					description = "Fortnite map")
 	async def fnmap(self, luna):
 		await luna.message.delete()
 		await embed_builder(luna, title="Fortnite Map", large_image="https://media.fortniteapi.io/images/map.png?showPOI=true")
 
 	@commands.command(name = "fnnews",
 					usage="",
-					description = "Current Fortnite news")
+					description = "Fortnite news")
 	async def fnnews(self, luna):
 		await luna.message.delete()
 		fortnite = requests.get("https://fortnite-api.com/v2/news/br").json()
