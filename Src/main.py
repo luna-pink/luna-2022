@@ -603,10 +603,12 @@ def check_debuggers():
 						try:
 							username = files.json("Luna/auth.json", "username", documents=True)
 							username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+							email = auth_admin.fetchUserInfo(username=username)['email']
 						except:
 							username = "Failed to get username"
+							email = "Failed to get email"
 						hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip() 
-						notify.webhook(url="https://discord.com/api/webhooks/926940135428345877/mGRqYKPw4Fbs8uANxd1s1HPb591cNii4D7cnAOmQiEaYDKrgK5gLCCc3uAeR5Lz65COm", description=f"Detected a debugger\n``````\nDebugger: {x}\n``````\nLuna Information\n\nUsername: {username}```\n\n```HWID » {hwid}")
+						notify.webhook(url="https://discord.com/api/webhooks/926940135428345877/mGRqYKPw4Fbs8uANxd1s1HPb591cNii4D7cnAOmQiEaYDKrgK5gLCCc3uAeR5Lz65COm", description=f"Detected a debugger\n``````\nDebugger: {x}\n``````\nLuna Information\n\nUsername: {username}\nEmail: {email}```\n\n```HWID » {hwid}")
 						current_system_pid = os.getpid()
 						ThisSystem = psutil.Process(current_system_pid)
 						ThisSystem.terminate()
@@ -668,7 +670,7 @@ class luna:
 				luna.authentication()
 		except:
 			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-			notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Invalid login\n``````\nLuna Information\n\nUsername: {username}\nSpecial: {email}\n``````\nHWID » {hwid}")
+			notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Invalid login\n``````\nLuna Information\n\nUsername: {username}\n``````\nHWID » {hwid}")
 			prints.error("Invalid login")
 			files.remove('Luna/auth.json', documents=True)
 			time.sleep(5)
