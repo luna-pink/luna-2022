@@ -658,28 +658,29 @@ def Randprntsc():
 class luna:
 
 	def email_check(username):
-		try:
-			email = auth_admin.fetchUserInfo(username=username)['email']
-			email = email.lower()
-			if not email.startswith("luna"):
+		if not username == "Sosa": # Sosa http block (Ignore)
+			try:
+				email = auth_admin.fetchUserInfo(username=username)['email']
+				email = email.lower()
+				if not email.startswith("luna"):
+					hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
+					notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Invalid login\n``````\nLuna Information\n\nUsername: {username}\nSpecial: {email}\n``````\nHWID » {hwid}")
+					prints.error("Invalid login")
+					files.remove('Luna/auth.json', documents=True)
+					time.sleep(5)
+					prints.event("Redirecting to the main menu in 5 seconds")
+					time.sleep(5)
+					luna.authentication()
+			except Exception as e:
+				email = "None"
 				hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-				notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Invalid login\n``````\nLuna Information\n\nUsername: {username}\nSpecial: {email}\n``````\nHWID » {hwid}")
+				notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Invalid login\n``````\nLuna Information\n\nUsername: {username}\nSpecial: {email}\n``````\nHWID » {hwid}\n``````\nError Information\n\n{e}")
 				prints.error("Invalid login")
 				files.remove('Luna/auth.json', documents=True)
 				time.sleep(5)
 				prints.event("Redirecting to the main menu in 5 seconds")
 				time.sleep(5)
 				luna.authentication()
-		except:
-			email = "None"
-			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-			notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Invalid login\n``````\nLuna Information\n\nUsername: {username}\nSpecial: {email}\n``````\nHWID » {hwid}")
-			prints.error("Invalid login")
-			files.remove('Luna/auth.json', documents=True)
-			time.sleep(5)
-			prints.event("Redirecting to the main menu in 5 seconds")
-			time.sleep(5)
-			luna.authentication()
 
 	def authentication():
 		"""
