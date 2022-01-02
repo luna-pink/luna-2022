@@ -3,7 +3,6 @@ import re
 import sys
 import json
 import time
-from discord.ext.commands.bot import Bot
 import httpx
 import base64
 import qrcode
@@ -2522,7 +2521,7 @@ async def on_ready():
 
 class OnMessage(commands.Cog, name="on message"):
 	def __init__(self, bot:commands.Bot):
-		self.bot = Bot
+		self.bot = bot
 		
 	@commands.Cog.listener()
 	async def on_message(self, message):
