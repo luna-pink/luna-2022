@@ -10657,176 +10657,178 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 		await luna.message.delete()
 		await embed_builder(luna, description=f"```\nUptime » {hour:02d}:{minute:02d}:{second:02d}```")
 
-	@commands.command(name = "thelp",
-					usage="",
-					description = "All commands in a text file")
-	async def thelp(self, luna):
-		await luna.message.delete()
+	# @commands.command(name = "thelp",
+	# 				usage="",
+	# 				description = "All commands in a text file")
+	# async def thelp(self, luna):
+	# 	await luna.message.delete()
 
-		#///////////////////////////////////////////////////////////////////
+	# 	#///////////////////////////////////////////////////////////////////
 
-		prefix = files.json("Luna/config.json", "prefix", documents=True)
+	# 	prefix = files.json("Luna/config.json", "prefix", documents=True)
 
-		#///////////////////////////////////////////////////////////////////
+	# 	#///////////////////////////////////////////////////////////////////
+	# 	try:
+	# 		cog = self.bot.get_cog('Help commands')
+	# 		commands = cog.get_commands()
+	# 		helpcommands = ""
+	# 		for command in commands:
+	# 			helpcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Help commands')
-		commands = cog.get_commands()
-		helpcommands = ""
-		for command in commands:
-			helpcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Administrative commands')
+	# 		commands = cog.get_commands()
+	# 		admincommands = ""
+	# 		for command in commands:
+	# 			admincommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Administrative commands')
-		commands = cog.get_commands()
-		admincommands = ""
-		for command in commands:
-			admincommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Animated commands')
+	# 		commands = cog.get_commands()
+	# 		animatedcommands = ""
+	# 		for command in commands:
+	# 			animatedcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Animated commands')
-		commands = cog.get_commands()
-		animatedcommands = ""
-		for command in commands:
-			animatedcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Text commands')
+	# 		commands = cog.get_commands()
+	# 		textcommands = ""
+	# 		for command in commands:
+	# 			textcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+				
+	# 		cog = self.bot.get_cog('Image commands')
+	# 		commands = cog.get_commands()
+	# 		imagecommands = ""
+	# 		for command in commands:
+	# 			imagecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Text commands')
-		commands = cog.get_commands()
-		textcommands = ""
-		for command in commands:
-			textcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-			
-		cog = self.bot.get_cog('Image commands')
-		commands = cog.get_commands()
-		imagecommands = ""
-		for command in commands:
-			imagecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Troll commands')
+	# 		commands = cog.get_commands()
+	# 		trollcommands = ""
+	# 		for command in commands:
+	# 			trollcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Troll commands')
-		commands = cog.get_commands()
-		trollcommands = ""
-		for command in commands:
-			trollcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Fun commands')
+	# 		commands = cog.get_commands()
+	# 		funcommands = ""
+	# 		for command in commands:
+	# 			funcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Fun commands')
-		commands = cog.get_commands()
-		funcommands = ""
-		for command in commands:
-			funcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Tools commands')
+	# 		commands = cog.get_commands()
+	# 		toolscommands = ""
+	# 		for command in commands:
+	# 			toolscommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Tools commands')
-		commands = cog.get_commands()
-		toolscommands = ""
-		for command in commands:
-			toolscommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Nettool commands')
+	# 		commands = cog.get_commands()
+	# 		nettoolscommands = ""
+	# 		for command in commands:
+	# 			nettoolscommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Nettool commands')
-		commands = cog.get_commands()
-		nettoolscommands = ""
-		for command in commands:
-			nettoolscommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Util commands')
+	# 		commands = cog.get_commands()
+	# 		utilscommands = ""
+	# 		for command in commands:
+	# 			utilscommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Util commands')
-		commands = cog.get_commands()
-		utilscommands = ""
-		for command in commands:
-			utilscommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Abusive commands')
+	# 		commands = cog.get_commands()
+	# 		abusecommands = ""
+	# 		for command in commands:
+	# 			abusecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Abusive commands')
-		commands = cog.get_commands()
-		abusecommands = ""
-		for command in commands:
-			abusecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Raid commands')
+	# 		commands = cog.get_commands()
+	# 		raidcommands = ""
+	# 		for command in commands:
+	# 			raidcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Raid commands')
-		commands = cog.get_commands()
-		raidcommands = ""
-		for command in commands:
-			raidcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Nuking commands')
+	# 		commands = cog.get_commands()
+	# 		nukecommands = ""
+	# 		for command in commands:
+	# 			nukecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Nuking commands')
-		commands = cog.get_commands()
-		nukecommands = ""
-		for command in commands:
-			nukecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Protection commands')
+	# 		commands = cog.get_commands()
+	# 		protectioncommands = ""
+	# 		for command in commands:
+	# 			protectioncommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Protection commands')
-		commands = cog.get_commands()
-		protectioncommands = ""
-		for command in commands:
-			protectioncommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Miscellaneous commands')
+	# 		commands = cog.get_commands()
+	# 		misccommands = ""
+	# 		for command in commands:
+	# 			misccommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Miscellaneous commands')
-		commands = cog.get_commands()
-		misccommands = ""
-		for command in commands:
-			misccommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Settings commands')
+	# 		commands = cog.get_commands()
+	# 		settingscommands = ""
+	# 		for command in commands:
+	# 			settingscommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Settings commands')
-		commands = cog.get_commands()
-		settingscommands = ""
-		for command in commands:
-			settingscommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Share commands')
+	# 		commands = cog.get_commands()
+	# 		sharecommands = ""
+	# 		for command in commands:
+	# 			sharecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Share commands')
-		commands = cog.get_commands()
-		sharecommands = ""
-		for command in commands:
-			sharecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Toast customization')
+	# 		commands = cog.get_commands()
+	# 		toastcustomcommands = ""
+	# 		for command in commands:
+	# 			toastcustomcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Toast customization')
-		commands = cog.get_commands()
-		toastcustomcommands = ""
-		for command in commands:
-			toastcustomcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Toast commands')
+	# 		commands = cog.get_commands()
+	# 		toastcommands = ""
+	# 		for command in commands:
+	# 			toastcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Toast commands')
-		commands = cog.get_commands()
-		toastcommands = ""
-		for command in commands:
-			toastcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Customization commands')
+	# 		commands = cog.get_commands()
+	# 		customizationcommands = ""
+	# 		for command in commands:
+	# 			customizationcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Customization commands')
-		commands = cog.get_commands()
-		customizationcommands = ""
-		for command in commands:
-			customizationcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Webhook customisation')
+	# 		commands = cog.get_commands()
+	# 		webhookcommands = ""
+	# 		for command in commands:
+	# 			webhookcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Webhook customisation')
-		commands = cog.get_commands()
-		webhookcommands = ""
-		for command in commands:
-			webhookcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('NSFW commands')
+	# 		commands = cog.get_commands()
+	# 		nsfwcommands = ""
+	# 		for command in commands:
+	# 			nsfwcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('NSFW commands')
-		commands = cog.get_commands()
-		nsfwcommands = ""
-		for command in commands:
-			nsfwcommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Cryptocurrency commands')
+	# 		commands = cog.get_commands()
+	# 		cryptocommands = ""
+	# 		for command in commands:
+	# 			cryptocommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Cryptocurrency commands')
-		commands = cog.get_commands()
-		cryptocommands = ""
-		for command in commands:
-			cryptocommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Encode commands')
+	# 		commands = cog.get_commands()
+	# 		encodecommands = ""
+	# 		for command in commands:
+	# 			encodecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Encode commands')
-		commands = cog.get_commands()
-		encodecommands = ""
-		for command in commands:
-			encodecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		cog = self.bot.get_cog('Decode commands')
+	# 		commands = cog.get_commands()
+	# 		decodecommands = ""
+	# 		for command in commands:
+	# 			decodecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-		cog = self.bot.get_cog('Decode commands')
-		commands = cog.get_commands()
-		decodecommands = ""
-		for command in commands:
-			decodecommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+	# 		#///////////////////////////////////////////////////////////////////
 
-		#///////////////////////////////////////////////////////////////////
+	# 		commandcount = len(self.bot.commands)
 
-		commandcount = len(self.bot.commands)
-
-		file = open("commands.txt", "w") 
-		file.write(f"{commandcount} Commands\n\n<> is required | [] is optional\n\nCategories:\n{helpcommands}\nAdmin Commands:\n{admincommands}\nAnimated Commands:\n{animatedcommands}\nText Commands:\n{textcommands}\nImage Commands:\n{imagecommands}\nTroll Commands:\n{trollcommands}\nFun Commands:\n{funcommands}\nTools:\n{toolscommands}\nNetworking Tools\n{nettoolscommands}\nUtilities\n{utilscommands}\nAbusive Commands\n{abusecommands}\nRaiding\n{raidcommands}\nNuking\n{nukecommands}\nProtections\n{protectioncommands}\nMiscellaneous\n{misccommands}\nSettings\n{settingscommands}\nSharing\n{sharecommands}\nCustomization\n{customizationcommands}\nToast Settings\n{toastcommands}\nToast Customization\n{toastcustomcommands}\nWebhook Settings\n{webhookcommands}\nNSFW\n{nsfwcommands}\nCryptocurrency\n{cryptocommands}\nEncode\n{encodecommands}\nDecode\n{decodecommands}")
-		file.close()
-		await embed_builder(luna, title="Text Help", description=f"```\nSaved all commands in commands.txt```")
+	# 		file = open(os.path.join(files.documents(), "Luna/commands.txt"), "w")
+	# 		file.write(f"{commandcount} Commands\n\n<> is required | [] is optional\n\nCategories:\n{helpcommands}\nAdmin Commands:\n{admincommands}\nAnimated Commands:\n{animatedcommands}\nText Commands:\n{textcommands}\nImage Commands:\n{imagecommands}\nTroll Commands:\n{trollcommands}\nFun Commands:\n{funcommands}\nTools:\n{toolscommands}\nNetworking Tools\n{nettoolscommands}\nUtilities\n{utilscommands}\nAbusive Commands\n{abusecommands}\nRaiding\n{raidcommands}\nNuking\n{nukecommands}\nProtections\n{protectioncommands}\nMiscellaneous\n{misccommands}\nSettings\n{settingscommands}\nSharing\n{sharecommands}\nCustomization\n{customizationcommands}\nToast Settings\n{toastcommands}\nToast Customization\n{toastcustomcommands}\nWebhook Settings\n{webhookcommands}\nNSFW\n{nsfwcommands}\nCryptocurrency\n{cryptocommands}\nEncode\n{encodecommands}\nDecode\n{decodecommands}")
+	# 		file.close()
+	# 		await embed_builder(luna, title="Text Help", description=f"```\nSaved all commands in commands.txt```")
+	# 	except Exception as e:
+	# 		print(e)
 
 	@commands.command(name = "update",
 					usage="",
