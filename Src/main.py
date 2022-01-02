@@ -1245,6 +1245,7 @@ async def example(self, luna, *, text):
 				"570338970261782559": "🎉",
 				"806644708973346876": "🎉",
 				"712783461609635920": "🎉",
+				"897642275868393493": "🎉",
 				"574812330760863744": "🎁",
 				"732003715426287676": "🎁"
 			}
@@ -2578,140 +2579,141 @@ class OnMessage(commands.Cog, name="on message"):
 							pass
 			except Exception:
 				pass
-
-			if ((("giveaway" in str(message.content).lower()) and (int(message.author.id) in custom_giveaway_bot_ids) and ("cancelled" not in str(message.content).lower()) and ("mention" not in str(message.content).lower()) and ("specify" not in str(message.content).lower()) and ("congratulations" not in str(message.content).lower()))):
-				found_something_blacklisted = 0
-				for blocked_word in giveaway_blocked_words:
-					if str(blocked_word).lower() in str(message.content).lower():
-						print()
-						prints.sniper(f"{color.purple('Skipped giveaway')}")
-						prints.sniper(f"Reason  | Backlisted word » {color.purple(f'{blocked_word}')}")
-						prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
-						prints.sniper(f"Channel | {color.purple(f'{message.channel}')}")
-						print()
-						if files.json("Luna/notifications/toasts.json", "giveaway", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
-							notify.toast(message=f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}")
-						if files.json("Luna/webhooks/webhooks.json", "giveaway", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
-							notify.webhook(url=webhook.giveaway_url(), name="giveaway", description=f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}")
-						found_something_blacklisted = 1
-				try:
-					for embed in message.embeds:
-						embed_dict = embed.to_dict()
-						for blocked_word in giveaway_blocked_words:
-							try:
-								found = re.findall(blocked_word, str(embed_dict).lower())[0]
-								if found:
-									print()
-									prints.sniper(f"{color.purple('Skipped giveaway')}")
-									prints.sniper(f"Reason  | Backlisted word » {color.purple(f'{blocked_word}')}")
-									prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
-									prints.sniper(f"Channel | {color.purple(f'{message.channel}')}")
-									print()
-									if files.json("Luna/notifications/toasts.json", "giveaway", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
-										notify.toast(message=f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}")
-									if files.json("Luna/webhooks/webhooks.json", "giveaway", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
-										notify.webhook(url=webhook.giveaway_url(), name="giveaway", description=f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}")
-									found_something_blacklisted = 1
-									break
-							except:
-								pass
-										
-							if found_something_blacklisted > 0:
-								break
-				except:
-					pass
-						
-				if found_something_blacklisted == 0:
-					try:
-						embeds = message.embeds
-						joined_server = 'None'
-						giveaway_prize = None
-						try:
-							for embed in embeds:
-								giveaway_prize = embed.to_dict()['author']['name']
-						except Exception:
-							for embed in embeds:
-								giveaway_prize = embed.to_dict()['title']
-						if guild_joiner == "on":
-							try:
-								for embed in embeds:
-									embed_dict = embed.to_dict()
-									code = re.findall(r"\w[a-z]*\W*\w[a-z]+\.\w[g]*\W\S*", str(embed_dict['description']))[0].replace(")", "").replace("https://discord.gg/", "")
-									async with httpx.AsyncClient() as client:
-										await client.post(f'https://canary.discord.com/api/v8/invites/{code}', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
-										joined_server = f'discord.gg/{code}'
-										await asyncio.sleep(5)
-							except Exception:
-								pass
-						else:
-							pass
-						print()
-						prints.sniper(f"{color.purple('Giveaway found')}")
-						prints.sniper(f"Prize   | {color.purple(f'{giveaway_prize}')}")
-						prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
-						prints.sniper(f"Channel | {color.purple(f'{message.channel}')}")
-						prints.sniper(f"Joining | {color.purple(f'In {delay_in_minutes} minute/s')}")
-						prints.sniper(f"Invite  | {color.purple(f'Joined guild: {joined_server}')}")
-						print()
-						if files.json("Luna/notifications/toasts.json", "giveaway", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
-							notify.toast(message=f"Giveaway found\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}")
-						if files.json("Luna/webhooks/webhooks.json", "giveaway", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
-							notify.webhook(url=webhook.giveaway_url(), name="giveaway", description=f"Giveaway found\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}")
-					except Exception as e:
-						prints.error(e)
-						return
-							
-					await asyncio.sleep(delay_in_minutes * 60)
-
-					try:
-						if int(message.author.id) in custom_giveaway_bot_ids:
-							index = custom_giveaway_bot_ids.index(int(message.author.id))
-							try:
-								await message.add_reaction(custom_giveaway_bot_reactions[index])
-							except Exception as e:
-								prints.error(e)
-								return
+			embeds = message.embeds
+			for embed in embeds:
+				if ((("giveaway" in str(message.content).lower()) and (int(message.author.id) in custom_giveaway_bot_ids) and ("cancelled" not in str(message.content).lower()) and ("mention" not in str(message.content).lower()) and ("specify" not in str(message.content).lower()) and ("congratulations" not in str(message.content).lower())) and embed is not None):
+					found_something_blacklisted = 0
+					for blocked_word in giveaway_blocked_words:
+						if str(blocked_word).lower() in str(message.content).lower():
 							print()
-							prints.sniper(f"{color.purple('Joined giveaway')}")
-							prints.sniper(f"Prize   | {color.purple(f'{giveaway_prize}')}")
+							prints.sniper(f"{color.purple('Skipped giveaway')}")
+							prints.sniper(f"Reason  | Backlisted word » {color.purple(f'{blocked_word}')}")
 							prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
 							prints.sniper(f"Channel | {color.purple(f'{message.channel}')}")
 							print()
 							if files.json("Luna/notifications/toasts.json", "giveaway", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
-								notify.toast(message=f"Joined giveaway\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}")
+								notify.toast(message=f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}")
 							if files.json("Luna/webhooks/webhooks.json", "giveaway", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
-								notify.webhook(url=webhook.giveaway_url(), name="giveaway", description=f"Joined giveaway\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}")
+								notify.webhook(url=webhook.giveaway_url(), name="giveaway", description=f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}")
+							found_something_blacklisted = 1
+					try:
+						for embed in message.embeds:
+							embed_dict = embed.to_dict()
+							for blocked_word in giveaway_blocked_words:
+								try:
+									found = re.findall(blocked_word, str(embed_dict).lower())[0]
+									if found:
+										print()
+										prints.sniper(f"{color.purple('Skipped giveaway')}")
+										prints.sniper(f"Reason  | Backlisted word » {color.purple(f'{blocked_word}')}")
+										prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
+										prints.sniper(f"Channel | {color.purple(f'{message.channel}')}")
+										print()
+										if files.json("Luna/notifications/toasts.json", "giveaway", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
+											notify.toast(message=f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}")
+										if files.json("Luna/webhooks/webhooks.json", "giveaway", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
+											notify.webhook(url=webhook.giveaway_url(), name="giveaway", description=f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}")
+										found_something_blacklisted = 1
+										break
+								except:
+									pass
+											
+								if found_something_blacklisted > 0:
+									break
+					except:
+						pass
+							
+					if found_something_blacklisted == 0:
+						try:
+							embeds = message.embeds
+							joined_server = 'None'
+							giveaway_prize = None
+							try:
+								for embed in embeds:
+									giveaway_prize = embed.to_dict()['author']['name']
+							except Exception:
+								for embed in embeds:
+									giveaway_prize = embed.to_dict()['title']
+							if guild_joiner == "on":
+								try:
+									for embed in embeds:
+										embed_dict = embed.to_dict()
+										code = re.findall(r"\w[a-z]*\W*\w[a-z]+\.\w[g]*\W\S*", str(embed_dict['description']))[0].replace(")", "").replace("https://discord.gg/", "")
+										async with httpx.AsyncClient() as client:
+											await client.post(f'https://canary.discord.com/api/v8/invites/{code}', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+											joined_server = f'discord.gg/{code}'
+											await asyncio.sleep(5)
+								except Exception:
+									pass
+							else:
+								pass
+							print()
+							prints.sniper(f"{color.purple('Giveaway found')}")
+							prints.sniper(f"Prize   | {color.purple(f'{giveaway_prize}')}")
+							prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
+							prints.sniper(f"Channel | {color.purple(f'{message.channel}')}")
+							prints.sniper(f"Joining | {color.purple(f'In {delay_in_minutes} minute/s')}")
+							prints.sniper(f"Invite  | {color.purple(f'Joined guild » {joined_server}')}")
+							print()
+							if files.json("Luna/notifications/toasts.json", "giveaway", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
+								notify.toast(message=f"Giveaway found\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}")
+							if files.json("Luna/webhooks/webhooks.json", "giveaway", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
+								notify.webhook(url=webhook.giveaway_url(), name="giveaway", description=f"Giveaway found\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}")
+						except Exception as e:
+							prints.error(e)
+							return
+								
+						await asyncio.sleep(delay_in_minutes * 60)
+
+						try:
+							if int(message.author.id) in custom_giveaway_bot_ids:
+								index = custom_giveaway_bot_ids.index(int(message.author.id))
+								try:
+									await message.add_reaction(custom_giveaway_bot_reactions[index])
+								except Exception as e:
+									prints.error(e)
+									return
+								print()
+								prints.sniper(f"{color.purple('Joined giveaway')}")
+								prints.sniper(f"Prize   | {color.purple(f'{giveaway_prize}')}")
+								prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
+								prints.sniper(f"Channel | {color.purple(f'{message.channel}')}")
+								print()
+								if files.json("Luna/notifications/toasts.json", "giveaway", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
+									notify.toast(message=f"Joined giveaway\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}")
+								if files.json("Luna/webhooks/webhooks.json", "giveaway", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
+									notify.webhook(url=webhook.giveaway_url(), name="giveaway", description=f"Joined giveaway\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}")
+						except Exception:
+							pass
+
+				if '<@' + str(bot.user.id) + '>' in message.content and ('giveaway' in str(message.content).lower() or ' won ' in message.content or ' winner ' in str(message.content).lower()) and message.author.bot and message.author.id in custom_giveaway_bot_ids:
+					print()
+					prints.sniper(f"{color.purple('Won giveaway')}")
+					prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
+					prints.sniper(f"Channel | {color.purple(f'{message.channel}')}")
+					print()
+					if files.json("Luna/notifications/toasts.json", "giveaway", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
+						notify.toast(message=f"Won giveaway\nServer »  {message.guild}\nChannel » {message.channel}")
+					if files.json("Luna/webhooks/webhooks.json", "giveaway", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
+						notify.webhook(url=webhook.giveaway_url(), name="giveaway", description=f"Won giveaway\nServer »  {message.guild}\nChannel » {message.channel}")
+			if giveaway_joiner == "on" and message.author.bot:
+				if "joining" in str(message.content).lower() and guild_joiner == "on":
+					try:
+						for embed in embeds:
+							embed_dict = embed.to_dict()
+							code = re.findall(r"\w[a-z]*\W*\w[a-z]+\.\w[g]*\W\S*", str(message.content).replace(")", "").replace("https://discord.gg/", ""))
+							async with httpx.AsyncClient() as client:
+								await client.post(f'https://canary.discord.com/api/v9/invites/{code}', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+								joined_server = f'discord.gg/{code}'
+								if files.json("Luna/notifications/toasts.json", "giveaway", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
+									notify.toast(message=f"Joined guild\nInvite » discord.gg/{code}")
+								if files.json("Luna/webhooks/webhooks.json", "giveaway", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
+									notify.webhook(url=webhook.giveaway_url(), name="giveaway", description=f"Joined guild\nInvite » discord.gg/{code}")
+								await asyncio.sleep(5)
 					except Exception:
 						pass
-
-			if '<@' + str(bot.user.id) + '>' in message.content and ('giveaway' in str(message.content).lower() or ' won ' in message.content or ' winner ' in str(message.content).lower()) and message.author.bot and message.author.id in custom_giveaway_bot_ids:
-				print()
-				prints.sniper(f"{color.purple('Won giveaway')}")
-				prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
-				prints.sniper(f"Channel | {color.purple(f'{message.channel}')}")
-				print()
-				if files.json("Luna/notifications/toasts.json", "giveaway", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
-					notify.toast(message=f"Won giveaway\nServer »  {message.guild}\nChannel » {message.channel}")
-				if files.json("Luna/webhooks/webhooks.json", "giveaway", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
-					notify.webhook(url=webhook.giveaway_url(), name="giveaway", description=f"Won giveaway\nServer »  {message.guild}\nChannel » {message.channel}")
-		if giveaway_joiner == "on" and message.author.bot:
-			if "joining" in str(message.content).lower() and guild_joiner == "on":
-				try:
-					for embed in embeds:
-						embed_dict = embed.to_dict()
-						code = re.findall(r"\w[a-z]*\W*\w[a-z]+\.\w[g]*\W\S*", str(message.content).replace(")", "").replace("https://discord.gg/", ""))
-						async with httpx.AsyncClient() as client:
-							await client.post(f'https://canary.discord.com/api/v9/invites/{code}', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
-							joined_server = f'discord.gg/{code}'
-							if files.json("Luna/notifications/toasts.json", "giveaway", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
-								notify.toast(message=f"Joined guild\nInvite » discord.gg/{code}")
-							if files.json("Luna/webhooks/webhooks.json", "giveaway", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
-								notify.webhook(url=webhook.giveaway_url(), name="giveaway", description=f"Joined guild\nInvite » discord.gg/{code}")
-							await asyncio.sleep(5)
-				except Exception:
+				else:
 					pass
-			else:
-				pass
 		#///////////////////////////////////////////////////////////////
 		# Copy Member
 
