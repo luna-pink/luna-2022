@@ -22,9 +22,9 @@ import hashlib
 import pwinput
 import requests
 import threading
-import pyPrivnote
 import subprocess
 import pypresence
+import pyPrivnote as pn
 import ctypes.wintypes as wintypes
 from CEA256 import *
 from gtts import gTTS
@@ -1103,6 +1103,9 @@ class luna:
 
 		if not files.file_exist("Luna/emojis", documents=True):
 			files.create_folder("Luna/emojis", documents=True)
+
+		if not files.file_exist("Luna/privnote", documents=True):
+			files.create_folder("Luna/privnote", documents=True)
 
 		if not files.file_exist("Luna/dumping", documents=True):
 			files.create_folder("Luna/dumping", documents=True)
@@ -2845,6 +2848,48 @@ class OnMessage(commands.Cog, name="on message"):
 							pass
 					else:
 						pass
+
+		if 'privnote.com' in message.content:
+			elapsed_snipe = '%.3fs' % (time.time() - sniped_start_time)
+			privnote_sniper = files.json(f"Luna/snipers/privnote.json", "sniper", documents=True)
+			if privnote_sniper == "on":
+				code = re.search('privnote.com/(.*)', message.content).group(1)
+				link = 'https://privnote.com/' + code
+				try:
+					start_time = time.time()
+					note_text = pn.read_note(link)
+					elapsed = '%.3fs' % (time.time() - start_time)
+					with open(os.path.join(files.documents(), f"Luna/privnote/{code}.txt"), 'a+') as f:
+						print()
+						prints.sniper(color.purple('Privnote sniped'))
+						prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
+						prints.sniper(f"Channel | {color.purple(f'{message.channel}')}")
+						prints.sniper(f"Author  | {color.purple(f'{message.author}')}")
+						prints.sniper(f"Link    | {color.purple(f'{link}')}")
+						prints.sniper(f"Code    | {color.purple(f'{code}')}")
+						prints.sniper(color.purple('Elapsed Times'))
+						prints.sniper(f"Sniped  | {color.purple(f'{elapsed_snipe}')}")
+						prints.sniper(f"Read    | {color.purple(f'{elapsed}')}")
+						print()
+						file = open(os.path.join(files.documents(), f"Luna/privnote/{code}.txt"), "w")
+						file.write(str(note_text))
+						file.close()
+				except Exception:
+					print()
+					prints.sniper(color.purple('Privnote already sniped'))
+					prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
+					prints.sniper(f"Channel | {color.purple(f'{message.channel}')}")
+					prints.sniper(f"Author  | {color.purple(f'{message.author}')}")
+					prints.sniper(f"Link    | {color.purple(f'{link}')}")
+					prints.sniper(f"Code    | {color.purple(f'{code}')}")
+					prints.sniper(color.purple('Elapsed Times'))
+					prints.sniper(f"Sniped  | {color.purple(f'{elapsed_snipe}')}")
+					print()
+			else:
+				return
+		
+		else:
+			return
 
 bot.add_cog(OnMessage(bot))
 
@@ -8475,16 +8520,14 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 	async def sniper(self, luna):
 		await luna.message.delete()
 		prefix = files.json("Luna/config.json", "prefix", documents=True)
-		with open('data/nitro.json') as f:
-			data = json.load(f)
-		nitro_sniper = data.get('nitrosniper')
-		api = data.get('api')
+		nitro_sniper = files.json("Luna/snipers/nitro.json", "sniper", documents=True)
+		privnote_sniper = files.json("Luna/snipers/privnote.json", "sniper", documents=True)
 		cog = self.bot.get_cog('Sniper settings')
 		commands = cog.get_commands()
 		helptext = ""
 		for command in commands:
 			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		await embed_builder(luna, title="Sniper settings", description=f"{theme.description()}```\nYour current settings\n\nNitro Sniper      » {nitro_sniper}\nNitro API         » {api}\n``````\nSettings\n\n{helptext}```")
+		await embed_builder(luna, title="Sniper settings", description=f"{theme.description()}```\nYour current settings\n\nNitro Sniper      » {nitro_sniper}\nPrivnote Sniper   » {privnote_sniper}\n``````\nSettings\n\n{helptext}```")
 
 	@commands.command(name = "giveaway",
 					usage="",
@@ -8492,25 +8535,16 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 	async def giveaway(self, luna):
 		await luna.message.delete()
 		prefix = files.json("Luna/config.json", "prefix", documents=True)
-
-		with open('data/giveaway_joiner.json') as f:
-			data = json.load(f)
-		giveaway_joiner = data.get('giveaway_joiner')
-		delay_in_minutes = int(data.get('delay_in_minutes'))
-		guild_joiner = data.get('guild_joiner')
+		giveaway_joiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
+		delay_in_minutes = files.json("Luna/snipers/giveaway.json", "delay_in_minutes", documents=True)
+		guild_joiner = files.json("Luna/snipers/giveaway.json", "guild_joiner", documents=True)
 
 		cog = self.bot.get_cog('Giveaway settings')
 		commands = cog.get_commands()
 		helptext = ""
 		for command in commands:
 			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-
-		embed = discord.Embed(title="Giveaway settings", description=f"{theme.description()}```\nYour current settings\n\nGiveaway Joiner   » {giveaway_joiner}\nDelay             » {delay_in_minutes} minute/s\nServer Joiner     » {guild_joiner}\n``````\n{helptext}```", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await embed_builder(luna, title="Giveaway settings", description=f"{theme.description()}```\nYour current settings\n\nGiveaway Joiner   » {giveaway_joiner}\nDelay             » {delay_in_minutes} minute/s\nServer Joiner     » {guild_joiner}\n``````\nSettings\n\n{helptext}```")
 
 	@commands.command(name = "errorlog",
 					usage="<console/message>",
@@ -9436,7 +9470,19 @@ class SniperCog(commands.Cog, name="Sniper settings"):
 		if mode == "on" or mode == "off":
 			prints.message(f"Nitro sniper » {color.purple(f'{mode}')}")
 			config.nitro.sniper(mode)
-			await embed_builder(luna, description=f"```\nNitro sniper api » {mode}```")
+			await embed_builder(luna, description=f"```\nNitro sniper » {mode}```")
+		else:
+			await mode_error(luna, "on or off")
+
+	@commands.command(name = "privsniper",
+					usage="<on/off>",
+					description = "Privnote sniper")
+	async def privsniper(self, luna, mode:str):
+		await luna.message.delete()
+		if mode == "on" or mode == "off":
+			prints.message(f"Privnote sniper » {color.purple(f'{mode}')}")
+			config.privnote.sniper(mode)
+			await embed_builder(luna, description=f"```\nPrivnote sniper » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
 
