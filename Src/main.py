@@ -867,28 +867,34 @@ class luna:
 	# ///////////////////////////////////////////////////////////////
 	# Bot Login
 
+	def loader_check():
+		"""Check if the loader has been tampered with."""
+		path = getattr(sys, '_MEIPASS', os.getcwd())
+		cogs_path = path + "\\cogs"
+		loader_path = cogs_path + "\\loader.py"
+
+		file = open(loader_path, "r")
+		file_data = file.read()
+		
+		if not file_data == loader_src:
+			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
+			try:
+				username = files.json("Luna/auth.json", "username", documents=True)
+				username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+			except:
+				username = "Failed to get username"
+			notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Tampered loader\n``````\nLuna Information\n\nUsername: {username}\n``````\nHWID » {hwid}")
+			os._exit(0)
+
 	def bot_login():
 		"""Logs in the bot."""
 		luna.console(clear=True)
 
 		try:
 			path = getattr(sys, '_MEIPASS', os.getcwd())
-			print(path)
 			cogs_path = path + "\\cogs"
-			loader_path = cogs_path + "\\loader.py"
 
-			file = open(loader_path, "r")
-			file_data = file.read()
-			
-			if not file_data == loader_src:
-				hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-				try:
-					username = files.json("Luna/auth.json", "username", documents=True)
-					username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-				except:
-					username = "Failed to get username"
-				notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Tampered loader\n``````\nLuna Information\n\nUsername: {username}\n``````\nHWID » {hwid}")
-				os._exit(0)
+			luna.loader_check()
 
 			for filename in os.listdir(cogs_path):
 				if filename.endswith(".py"):
@@ -2560,8 +2566,8 @@ class OnMessage(commands.Cog, name="on message"):
 			custom_giveaway_bot_ids = []
 			custom_giveaway_bot_reactions = []
 			try:
-				if os.path.exists('data/giveawaybots.json'):
-					with open("data/giveawaybots.json", "r", encoding="utf-8") as jsonFile:
+				if os.path.exists(os.path.join(files.documents(), f"Luna/snipers/giveaway_bots.json")):
+					with open(os.path.join(files.documents(), f"Luna/snipers/giveaway_bots.json"), "r", encoding="utf-8") as jsonFile:
 						data = json.load(jsonFile)
 							
 					for key, value in data.items():
@@ -8594,15 +8600,16 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 	@commands.command(name = "reload",
 					usage="",
 					description = "Reload custom commands")
-	async def reload(self, luna):
-		await luna.message.delete()
+	async def reload(self, ctx):
+		await ctx.message.delete()
 		path = getattr(sys, '_MEIPASS', os.getcwd())
 		cogs_path = path + "\\cogs"
+		luna.loader_check()
 		for filename in os.listdir(cogs_path):
 			if filename.endswith(".py"):
 				bot.reload_extension(f"cogs.{filename[:-3]}")
 		prints.message(f"Reloaded custom commands")
-		await embed_builder(luna, description=f"```\nReloaded custom commands```")
+		await embed_builder(ctx, description=f"```\nReloaded custom commands```")
 
 bot.add_cog(SettingsCog(bot))
 
