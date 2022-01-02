@@ -37,7 +37,6 @@ from discord.ext import commands
 from urllib.request import urlopen
 from urllib.parse import quote_plus
 from time import localtime, strftime
-from AuthGG.client import Client as luna_gg
 from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFound, has_permissions
 class files:
 	def documents():
