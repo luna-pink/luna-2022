@@ -58,7 +58,7 @@ chargesniper = False
 
 developer_mode = False
 beta = False
-version = '3.0.9'
+version = '3.1.0'
 
 r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 updater_url = r["updater"]
