@@ -10486,7 +10486,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 		}
 		files.write_json(f"Luna/themes/{theme}.json", data, documents=True)
 		config.theme(f"{theme}")
-		await embed_builder(luna, description=f"```\nInstalled theme {theme} and applied it\nThis theme was made by {madeby}```")
+		await embed_builder(luna, description=f"```\nInstalled theme \"{theme}\" and applied it\nThis theme was made by {madeby}```")
 
 bot.add_cog(CommunitythemesCog(bot))
 

@@ -1,7 +1,7 @@
 # Luna-SelfBot
 Team Luna's flagship selfbot!
 
-![Luna Logo](https://github.com/Team-Luna-Development/Luna-SelfBot/blob/master/Images/Luna3.png)
+![Luna Logo](https://github.com/Team-Luna-Development/Luna-SelfBot/blob/master/Images/Luna_Logo.png)
 
 ---------------------------
 
