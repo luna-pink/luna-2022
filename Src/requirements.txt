@@ -12,3 +12,4 @@ pypresence
 pwinput
 psutil
 notify-py
+clint

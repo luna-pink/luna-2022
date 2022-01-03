@@ -58,7 +58,7 @@ chargesniper = False
 
 developer_mode = False
 beta = False
-version = '3.1.0'
+version = '3.1.1'
 
 r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 updater_url = r["updater"]
@@ -1176,7 +1176,7 @@ class luna:
 			try:
 				prints.event("Authenticating...")
 				auth.login(username=username, password=password)
-				luna.email_check(username)
+				# luna.email_check(username)
 				auth_log.sendData(username=username, message="Logged in")
 				luna.wizard()
 			except Exception as e:
@@ -1192,7 +1192,7 @@ class luna:
 			try:
 				prints.event("Authenticating...")
 				auth.login(username=username, password=password)
-				luna.email_check(username)
+				# luna.email_check(username)
 				auth_log.sendData(username=username, message="Logged in")
 				username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
 				password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
