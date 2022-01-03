@@ -1175,7 +1175,7 @@ class luna:
 				auth.authentication()
 			try:
 				prints.event("Authenticating...")
-				auth.login(username, password)
+				auth.login(username=username, password=password)
 				luna.email_check(username)
 				auth_log.sendData(username=username, message="Logged in")
 				luna.wizard()
@@ -10046,6 +10046,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
                     usage="",
                     description = "Send the current theme file")
     async def sendtheme(self, luna):
+		await luna.message.delete()
         themesvar = files.json("Luna/config.json", "theme", documents=True)
         await luna.send(file=discord.File(os.path.join(files.documents(), f"Luna/themes/{themesvar}")))
 
