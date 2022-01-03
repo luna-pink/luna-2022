@@ -9981,83 +9981,83 @@ class ThemeCog(commands.Cog, name="Theme command"):
 bot.add_cog(ThemeCog(bot))
 
 class ThemesCog(commands.Cog, name="Theme commands"):
-    def __init__(self, bot:commands.bot):
-        self.bot = bot
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
 
-    @commands.command(name = "newtheme",
-                    usage="<name>",
-                    description = "Create a theme")
-    async def newtheme(self, luna, themename:str):
-        await luna.message.delete()
-        themename = themename.replace('.json','')
-        if files.file_exist(f"Luna/themes/{themename}.json", documents=True):
-            await error_builder(luna, description=f"```\nA theme already exists with the name » {themename}```")
-        else:
-            prints.message(f"Created theme » {color.purple(f'{themename}')}")
-            data = {
-                "title": "Luna",
-                "title_url": "",
-                "footer": "Team-luna.org",
-                "footer_icon_url": "https://cdn.discordapp.com/attachments/927033067468623882/927033385216520232/Luna_Logo.png",
-                "image_url": "https://cdn.discordapp.com/attachments/927033067468623882/927033385216520232/Luna_Logo.png",
-                "large_image_url": "",
-                "hex_color": "#898eff",
-                "author": "",
-                "author_icon_url": "",
-                "author_url": "",
-                "description": True
-            }
-            files.write_json(f"Luna/themes/{themename}.json", data, documents=True)
-            config.theme(f"{themename}")
-            await embed_builder(luna, description=f"```\nCreated theme » {themename}```")
-
-    @commands.command(name = "edittheme",
-                    usage="<name>",
-                    description = "Edit current theme name")
-    async def edittheme(self, luna, themename:str):
-        await luna.message.delete()
-        themesvar = files.json("Luna/config.json", "theme", documents=True)
-        if files.file_exist(f"Luna/themes/{themename}.json", documents=True):
-            await error_builder(luna, description=f"```\nA theme already exists with the name » {themename}```")
-        else:
-            prints.message(f"Edited theme name to » {color.purple(f'{themename}')}")
-            os.rename(os.path.join(files.documents(), f"Luna/themes/{themesvar}"),os.path.join(files.documents(), f"Luna/themes/{themename}.json"))
-            config.theme(f"{themename}")
-            await embed_builder(luna, description=f"```\nEdited theme name to » {themename}```")
-        
-    @commands.command(name = "deltheme",
-                    usage="<name>",
-                    description = "Delete a theme")
-    async def deltheme(self, luna, themename:str):
-        await luna.message.delete()
-        themename = themename.replace('.json','')
-        themesvar = files.json("Luna/config.json", "theme", documents=True)
-        if themesvar == f"{themename}.json":
-            await error_builder(luna, description="```\nYou cant delete the theme you are currently using```")
-            return
-        if files.file_exist(f"Luna/themes/{themename}.json", documents=True):
-            files.remove(f"Luna/themes/{themename}.json", documents=True)
-            prints.message(f"Deleted theme » {color.purple(f'{themename}')}")
-            await embed_builder(luna, description=f"```\nDeleted theme » {themename}```")
-        else:
-            await error_builder(luna, description=f"```\nThere is no theme called » {themename}```")
-
-    @commands.command(name = "sendtheme",
-                    usage="",
-                    description = "Send the current theme file")
-    async def sendtheme(self, luna):
+	@commands.command(name = "newtheme",
+					usage="<name>",
+					description = "Create a theme")
+	async def newtheme(self, luna, themename:str):
 		await luna.message.delete()
-        themesvar = files.json("Luna/config.json", "theme", documents=True)
-        await luna.send(file=discord.File(os.path.join(files.documents(), f"Luna/themes/{themesvar}")))
+		themename = themename.replace('.json','')
+		if files.file_exist(f"Luna/themes/{themename}.json", documents=True):
+			await error_builder(luna, description=f"```\nA theme already exists with the name » {themename}```")
+		else:
+			prints.message(f"Created theme » {color.purple(f'{themename}')}")
+			data = {
+				"title": "Luna",
+				"title_url": "",
+				"footer": "Team-luna.org",
+				"footer_icon_url": "https://cdn.discordapp.com/attachments/927033067468623882/927033385216520232/Luna_Logo.png",
+				"image_url": "https://cdn.discordapp.com/attachments/927033067468623882/927033385216520232/Luna_Logo.png",
+				"large_image_url": "",
+				"hex_color": "#898eff",
+				"author": "",
+				"author_icon_url": "",
+				"author_url": "",
+				"description": True
+			}
+			files.write_json(f"Luna/themes/{themename}.json", data, documents=True)
+			config.theme(f"{themename}")
+			await embed_builder(luna, description=f"```\nCreated theme » {themename}```")
 
-    @commands.command(name = "communitythemes",
-                    aliases=['cthemes'],
-                    usage="",
-                    description = "Community made themes")
-    async def communitythemes(self, luna):
-        await luna.message.delete()
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
-        await embed_builder(luna, title="Community Themes", description=f"{theme.description()}```\n{prefix}preview <theme>  » Preview a theme\n``````\n{prefix}install luna     » Luna theme\n{prefix}install lunaanimated » Luna theme\n{prefix}install chill    » Chill theme\n{prefix}install midnight » Midnight theme\n{prefix}install vaporwave » Vaporwave theme\n{prefix}install sweetrevenge » Sweetrevenge theme\n{prefix}install error    » Error theme\n{prefix}install lunapearl » Pearl theme\n{prefix}install gamesense » Gamesense theme\n{prefix}install aimware  » Aimware theme\n{prefix}install guilded  » Guilded theme\n{prefix}install lucifer  » Lucifer selfbot theme\n{prefix}install nighty   » Nighty selfbot theme\n{prefix}install aries    » Aries selfbot theme```")
+	@commands.command(name = "edittheme",
+					usage="<name>",
+					description = "Edit current theme name")
+	async def edittheme(self, luna, themename:str):
+		await luna.message.delete()
+		themesvar = files.json("Luna/config.json", "theme", documents=True)
+		if files.file_exist(f"Luna/themes/{themename}.json", documents=True):
+			await error_builder(luna, description=f"```\nA theme already exists with the name » {themename}```")
+		else:
+			prints.message(f"Edited theme name to » {color.purple(f'{themename}')}")
+			os.rename(os.path.join(files.documents(), f"Luna/themes/{themesvar}"),os.path.join(files.documents(), f"Luna/themes/{themename}.json"))
+			config.theme(f"{themename}")
+			await embed_builder(luna, description=f"```\nEdited theme name to » {themename}```")
+		
+	@commands.command(name = "deltheme",
+					usage="<name>",
+					description = "Delete a theme")
+	async def deltheme(self, luna, themename:str):
+		await luna.message.delete()
+		themename = themename.replace('.json','')
+		themesvar = files.json("Luna/config.json", "theme", documents=True)
+		if themesvar == f"{themename}.json":
+			await error_builder(luna, description="```\nYou cant delete the theme you are currently using```")
+			return
+		if files.file_exist(f"Luna/themes/{themename}.json", documents=True):
+			files.remove(f"Luna/themes/{themename}.json", documents=True)
+			prints.message(f"Deleted theme » {color.purple(f'{themename}')}")
+			await embed_builder(luna, description=f"```\nDeleted theme » {themename}```")
+		else:
+			await error_builder(luna, description=f"```\nThere is no theme called » {themename}```")
+
+	@commands.command(name = "sendtheme",
+					usage="",
+					description = "Send the current theme file")
+	async def sendtheme(self, luna):
+		await luna.message.delete()
+		themesvar = files.json("Luna/config.json", "theme", documents=True)
+		await luna.send(file=discord.File(os.path.join(files.documents(), f"Luna/themes/{themesvar}")))
+
+	@commands.command(name = "communitythemes",
+					aliases=['cthemes'],
+					usage="",
+					description = "Community made themes")
+	async def communitythemes(self, luna):
+		await luna.message.delete()
+		prefix = files.json("Luna/config.json", "prefix", documents=True)
+		await embed_builder(luna, title="Community Themes", description=f"{theme.description()}```\n{prefix}preview <theme>  » Preview a theme\n``````\n{prefix}install luna     » Luna theme\n{prefix}install lunaanimated » Luna theme\n{prefix}install chill    » Chill theme\n{prefix}install midnight » Midnight theme\n{prefix}install vaporwave » Vaporwave theme\n{prefix}install sweetrevenge » Sweetrevenge theme\n{prefix}install error    » Error theme\n{prefix}install lunapearl » Pearl theme\n{prefix}install gamesense » Gamesense theme\n{prefix}install aimware  » Aimware theme\n{prefix}install guilded  » Guilded theme\n{prefix}install lucifer  » Lucifer selfbot theme\n{prefix}install nighty   » Nighty selfbot theme\n{prefix}install aries    » Aries selfbot theme```")
 
 bot.add_cog(ThemesCog(bot))
 
