@@ -56,7 +56,7 @@ privacy = False
 copycat = None
 chargesniper = False
 
-developer_mode = False
+developer_mode = True
 beta = False
 version = '3.1.1'
 
@@ -1284,7 +1284,7 @@ class luna:
 			prints.message("Beta Build")
 			version = beta_version_url
 			url = beta_updater_url
-		prints.event(f"Downloading Luna {version}...")
+		prints.event(f"Downloading Updater...")
 		from clint.textui import progress
 		r = requests.get(url, stream=True)
 		with open('Updater.exe', 'wb') as f:

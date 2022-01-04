@@ -12,6 +12,7 @@ r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 updater_url = r["updater"]
 version_url = r["version"]
 
+print()
 print(f"Current version: {version_url}")
 version = input("What should the new version be?: ")
 
