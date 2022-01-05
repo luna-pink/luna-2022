@@ -3701,10 +3701,15 @@ class HelpCog(commands.Cog, name="Help commands"):
 		invitetext = ""
 		for command in commands:
 			invitetext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Ignore commands')
+		commands = cog.get_commands()
+		ignoretext = ""
+		for command in commands:
+			ignoretext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 		if page == "1":
 			await embed_builder(luna, title="Administrative", footer_extra=f"Page 1", description=f"{theme.description()}```\nMember Control\n\n{membertext}``````\nChannel Control\n\n{channeltext}``````\nNickname Control\n\n{nicktext}``````\nRole Control\n\n{roletext}``````\nNoet\n\n{prefix}admin 2 » Page 2```")
 		elif page == "2":
-			await embed_builder(luna, title="Administrative", footer_extra=f"Page 2", description=f"{theme.description()}```\nGuild Control\n\n{helptext}``````\nInvite Control\n\n{invitetext}```")
+			await embed_builder(luna, title="Administrative", footer_extra=f"Page 2", description=f"{theme.description()}```\nGuild Control\n\n{helptext}``````\nInvite Control\n\n{invitetext}``````\nIgnore Control\n\n{ignoretext}```")
 
 	@commands.command(name = "profile",
 					usage="",
@@ -5030,6 +5035,60 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 				
 bot.add_cog(AdminCog(bot))
 
+ignore_list = []
+
+class IgnoreCog(commands.Cog, name="Ignore commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+
+	@commands.command(name = "ignore",
+					usage="<@user>",
+					description = "Ignore user DMs")
+	async def ignore(self, luna, *, user:discord.Member):
+		await luna.message.delete()
+		global ignore_list
+		if user.id in ignore_list:
+			await embed_builder(luna, title="Ignore", description=f"```\n{user} is already ignored```")
+			return
+		ignore_list.append(user.id)
+		await embed_builder(luna, title="Ignore", description=f"```\n{user} is now ignored```")
+
+	@commands.command(name = "unignore",
+					usage="<@user>",
+					description = "Unignore user DMs")
+	async def unignore(self, luna, *, user:discord.Member):
+		await luna.message.delete()
+		global ignore_list
+		if user.id not in ignore_list:
+			await embed_builder(luna, title="Unignore", description=f"```\n{user} is not ignored```")
+			return
+		ignore_list.remove(user.id)
+		await embed_builder(luna, title="Unignore", description=f"```\n{user} is now unignored```")
+
+	@commands.command(name = "ignorelist",
+					usage="",
+					description = "List ignored users")
+	async def ignorelist(self, luna):
+		await luna.message.delete()
+		global ignore_list
+		if len(ignore_list) == 0:
+			await embed_builder(luna, title="Ignorelist", description=f"```\nNo users are ignored```")
+			return
+		await embed_builder(luna, title="Ignorelist", description=f"```\n{ignore_list}```")
+
+	@commands.command(name = "ignorelistclear",
+					usage="",
+					description = "Clear ignore list")
+	async def ignorelistclear(self, luna):
+		await luna.message.delete()
+		global ignore_list
+		if len(ignore_list) == 0:
+			await embed_builder(luna, title="Ignorelist", description=f"```\nNo users are ignored```")
+			return
+		ignore_list.clear()
+		await embed_builder(luna, title="Ignorelist", description=f"```\nIgnore list is now cleared```")
+
+bot.add_cog(IgnoreCog(bot))
 class AnimatedCog(commands.Cog, name="Animated commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
@@ -8360,6 +8419,84 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 		else:
 			await error_builder(luna, description="```\nRiskmode is disabled```")
 
+	@commands.command(name = "banall",
+					usage="[reason]",
+					description = "Ban all")
+	async def banall(self, luna, *, reason:str = None):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				for each in luna.guild.members:
+					if each is not luna.author or each is not luna.guild.owner:
+						await each.ban(reason=reason)
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+		
+	@commands.command(name = "banbots",
+					usage="[reason]",
+					description = "Ban all bots")
+	async def banbots(self, luna, *, reason:str = None):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				for each in luna.guild.members:
+					if each.bot == True:
+						await each.ban(reason=reason)
+					else:
+						pass
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "unbanall",
+					usage="[reason]",
+					description = "Unban all")
+	async def unbanall(self, luna, *, reason:str = None):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				for each in luna.guild.bans:
+					await luna.guild.unban(each[0], reason=reason)
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "kickall",
+					usage="[reason]",
+					description = "Kick all")
+	async def kickall(self, luna, *, reason:str = None):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				for each in luna.guild.members:
+					if each is not luna.author or each is not luna.guild.owner:
+						await each.kick(reason=reason)
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "kickbots",
+					usage="[reason]",
+					description = "Kick all bots")
+	async def kickbots(self, luna, *, reason:str = None):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				for each in luna.guild.members:
+					if each.bot == True:
+						await each.kick(reason=reason)
+					else:
+						pass
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
 	@commands.command(name = "massping",
 					usage="<delay> <amount>",
 					description = "Mass ping members")
@@ -8458,6 +8595,89 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 			await embed_builder(luna, title="Success", description=f"```\nChanged nicknames of {amount} members```")
 		else:
 			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "masschannels",
+					usage="<amount>",
+					description = "Mass create channels")
+	async def masschannels(self, luna, amount:int):
+		if configs.risk_mode() == "on":
+			try:
+				for i in range(amount):
+					await luna.guild.create_text_channel("Created by Luna")
+					await asyncio.sleep(1)
+				await embed_builder(luna, title="Success", description=f"```\nCreated {amount} channels```")
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "massroles",
+					usage="<amount>",
+					description = "Mass create roles")
+	async def massroles(self, luna, amount:int):
+		if configs.risk_mode() == "on":
+			try:
+				for i in range(amount):
+					await luna.guild.create_role(name="Created by Luna")
+					await asyncio.sleep(1)
+				await embed_builder(luna, title="Success", description=f"```\nCreated {amount} roles```")
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "renamechannels",
+					usage="<name>",
+					description = "Rename all channels")
+	async def renamechannels(self, luna, name:str):
+		if configs.risk_mode() == "on":
+			try:
+				for channel in luna.guild.channels:
+					await channel.edit(name=name)
+					await asyncio.sleep(1)
+				await embed_builder(luna, title="Success", description=f"```\nRenamed all channels to {name}```")
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "delchannels",
+					usage="",
+					description = "Delete all channels")
+	async def delchannels(self, luna):
+		if configs.risk_mode() == "on":
+			try:
+				for channel in luna.guild.channels:
+					if channel.name != "general":
+						await channel.delete()
+				await embed_builder(luna, title="Success", description="```\nDeleted all channels```")
+			except Exception as e:
+				await error_builder(luna, description=e)
+
+	@commands.command(name = "delroles",
+					usage="",
+					description = "Delete all roles")
+	async def delroles(self, luna):
+		if configs.risk_mode() == "on":
+			try:
+				for role in luna.guild.roles:
+					if role.name != "@everyone":
+						await role.delete()
+				await embed_builder(luna, title="Success", description="```\nDeleted all roles```")
+			except Exception as e:
+				await error_builder(luna, description=e)
+
+	@commands.command(name = "delemojis",
+					usage="",
+					description = "Delete all emojis")
+	async def delemojis(self, luna):
+		if configs.risk_mode() == "on":
+			try:
+				for emoji in luna.guild.emojis:
+					await emoji.delete()
+				await embed_builder(luna, title="Success", description="```\nDeleted all emojis```")
+			except Exception as e:
+				await error_builder(luna, description=e)
 
 	@commands.command(name = "purgehack",
 					usage="",
@@ -8558,6 +8778,84 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 				for channel in channels:
 					await channel.send(message)
 			except:
+				pass
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "blockall",
+					usage="",
+					description = "Block everyone")
+	async def blockall(self, luna):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				members = luna.guild.members
+				for member in members:
+					if member is not luna.author:
+						try:
+							await member.ban()
+							prints.message(f"Banned {member}")
+						except Exception:
+							pass
+			except Exception:
+				pass
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "prune",
+					usage="<@role> [reason]",
+					description = "Prune a role")
+	async def prune(self, luna, role, *, reason: str = None):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				if reason is None:
+					reason = "No reason provided"
+				else:
+					reason = reason
+				role = luna.guild.get_role(role)
+				if role is None:
+					await error_builder(luna, description="```\nRole not found```")
+					return
+				members = luna.guild.members
+				for member in members:
+					if role in member.roles:
+						try:
+							await member.send(f"You have been pruned from {luna.guild.name} for {reason}")
+							await member.kick(reason=reason)
+						except Exception:
+							pass
+				await embed_builder(luna, description=f"```\nPruned {len(members)} members```")
+			except Exception:
+				pass
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "pruneban",
+					usage="<@role> [reason]",
+					description = "Prune & ban a role")
+	async def pruneban(self, luna, role, *, reason: str = None):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				if reason is None:
+					reason = "No reason provided"
+				else:
+					reason = reason
+				role = luna.guild.get_role(role)
+				if role is None:
+					await error_builder(luna, description="```\nRole not found```")
+					return
+				members = luna.guild.members
+				for member in members:
+					if role in member.roles:
+						try:
+							await member.send(f"You have been pruned and banned from {luna.guild.name} for {reason}")
+							await member.ban(reason=reason)
+						except Exception:
+							pass
+				await embed_builder(luna, description=f"```\nPruned and banned {len(members)} members```")
+			except Exception:
 				pass
 		else:
 			await error_builder(luna, description="```\nRiskmode is disabled```")
@@ -9113,113 +9411,6 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 			embed.set_image(url=theme.large_image_url())
 			await send(luna, embed)
 
-	@commands.command(name = "masschannels",
-					usage="<guild_id> <amount> <name>",
-					description = "Mass create channels")
-	@has_permissions(manage_channels=True)
-	async def masschannels(self, luna, guild_id:int, amount:int, *, name:str):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			guildhit = self.bot.get_guild(guild_id)
-			elapsed = datetime.now() - start
-			elapsed = f'{elapsed.microseconds}'
-			elapsed = elapsed[:-3]
-			for i in range(0, amount):
-				try:
-					await guildhit.create_text_channel(name=f"{name}")
-					prints.message(f"Created channel » {color.purple(name)}")
-				except Exception:
-					prints.error(f"Failed to create channel » {color.purple(name)}")
-			prints.message(f"Finished creating channels in » {color.purple(elapsed)}ms")
-		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
-
-	@commands.command(name = "massroles",
-					usage="<guild_id> <amount> <name>",
-					description = "Mass create roles")
-	@has_permissions(manage_roles=True)
-	async def massroles(self, luna, guild_id:int, amount:int, *, name:str):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			guildhit = self.bot.get_guild(guild_id)
-			elapsed = datetime.now() - start
-			elapsed = f'{elapsed.microseconds}'
-			elapsed = elapsed[:-3]
-			for i in range(0, amount):
-				try:
-					await guildhit.create_roles(name=f"{name}")
-					prints.message(f"Created role » {color.purple(name)}")
-				except Exception:
-					prints.error(f"Failed to create role » {color.purple(name)}")
-			prints.message(f"Finished creating roles in » {color.purple(elapsed)}ms")
-		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
-
-	@commands.command(name = "massdelchannels",
-					usage="<guild_id>",
-					description = "Mass delete channels")
-	@has_permissions(manage_channels=True)
-	async def massdelchannels(self, luna, guild_id:int):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			guildhit = self.bot.get_guild(guild_id)
-			channels = guildhit.channels
-			elapsed = datetime.now() - start
-			elapsed = f'{elapsed.microseconds}'
-			elapsed = elapsed[:-3]
-			for channel in channels:
-				try:
-					await channel.delete()
-					prints.message(f"Deleted channel » {color.purple(channel)}")
-				except Exception:
-					prints.error(f"Failed to delete channel » {color.purple(channel)}")
-			prints.message(f"Finished deleting channels in » {color.purple(elapsed)}ms")
-		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
-
-	@commands.command(name = "massdelroles",
-					usage="<guild_id>",
-					description = "Mass delete roles")
-	@has_permissions(manage_roles=True)
-	async def massdelroles(self, luna, guild_id:int):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			guildhit = self.bot.get_guild(guild_id)
-			roles = guildhit.roles
-			roles.pop(0)
-			elapsed = datetime.now() - start
-			elapsed = f'{elapsed.microseconds}'
-			elapsed = elapsed[:-3]
-			for role in roles:
-				try:
-					await role.delete()
-					prints.message(f"Deleted role » {color.purple(role)}")
-				except Exception:
-					prints.error(f"Failed to delete role » {color.purple(role)}")
-			prints.message(f"Finished deleting roles in » {color.purple(elapsed)}ms")
-		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
-
 	@commands.command(name = "annihilate",
 					aliases=['destroy', 'wipe', 'nukeserver'],
 					usage="<guild_id> <channel_name> <role_name>",
@@ -9228,60 +9419,38 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 	async def annihilate(self, luna, guild_id:int, channel_name:str, role_name:str):
 		await luna.message.delete()
 		if configs.risk_mode() == "on":
+			guild_id = int(guild_id)
 			guildhit = self.bot.get_guild(guild_id)
-			roles = guildhit.roles
-			roles.pop(0)
-			amount = 50
 			members = guildhit.members
-			channels = guildhit.channels
 			elapsed = datetime.now() - start
 			elapsed = f'{elapsed.microseconds}'
 			elapsed = elapsed[:-3]
-			for channel in channels:
-				try:
-					await channel.delete()
-					prints.message(f"Deleted channel » {color.purple(channel)}")
-				except Exception:
-					prints.error(f"Failed to delete channel » {color.purple(channel)}")
-			prints.message(f"Finished deleting channels in » {color.purple(elapsed)}ms")
-			for role in roles:
-				try:
-					await role.delete()
-					prints.message(f"Deleted role » {color.purple(role)}")
-				except Exception:
-					prints.error(f"Failed to delete role » {color.purple(role)}")
-			prints.message(f"Finished deleting roles in » {color.purple(elapsed)}ms")
-			for i in range(0, amount):
-				try:
-					await guildhit.create_text_channel(name=f"{channel_name}")
-					prints.message(f"Created channel » {color.purple(channel_name)}")
-				except Exception:
-					prints.error(f"Failed to create channel » {color.purple(channel_name)}")
-			prints.message(f"Finished creating channels in » {color.purple(elapsed)}ms")
-			for i in range(0, amount):
-				try:
-					await guildhit.create_roles(name=f"{role_name}")
-					prints.message(f"Created role » {color.purple(role_name)}")
-				except Exception:
-					prints.error(f"Failed to create role » {color.purple(role_name)}")
-			prints.message(f"Finished creating roles in » {color.purple(elapsed)}ms")
 			for member in members:
 				if member is not luna.author:
 					try:
 						count = count + 1
 						await member.ban()
-						prints.message(f"Banned {color.purple(member)}")
+						prints.message(f"Banned » {color.purple(member)}")
 					except Exception:
 						prints.error(f"Failed to ban » {color.purple(member)}")
 			prints.message(f"Finished banning in » {color.purple(elapsed)}ms")
-			prints.message(f"Finished annihilating in » {color.purple(elapsed)}ms")
+			for channel in guildhit.channels:
+				if channel.name == channel_name:
+					try:
+						await channel.delete()
+						prints.message(f"Deleted channel » {color.purple(channel)}")
+					except Exception:
+						prints.error(f"Failed to delete channel » {color.purple(channel)}")
+			for role in guildhit.roles:
+				if role.name == role_name:
+					try:
+						await role.delete()
+						prints.message(f"Deleted role » {color.purple(role)}")
+					except Exception:
+						prints.error(f"Failed to delete role » {color.purple(role)}")
+			prints.message(f"Finished deleting in » {color.purple(elapsed)}ms")
 		else:
 			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
 
 bot.add_cog(NukingCog(bot))
 class PrivacyCog(commands.Cog, name="Privacy commands"):
