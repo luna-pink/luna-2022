@@ -1566,6 +1566,9 @@ class luna:
 		if not files.file_exist("Luna/backup", documents=True):
 			files.create_folder("Luna/backup", documents=True)
 
+		if not files.file_exist("Luna/backup/guilds", documents=True):
+			files.create_folder("Luna/backup/guilds", documents=True)
+
 		if not files.file_exist("Luna/resources", documents=True):
 			files.create_folder("Luna/resources", documents=True)
 
@@ -3663,9 +3666,9 @@ class HelpCog(commands.Cog, name="Help commands"):
 			await embed_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}game             » Game commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Current guild profile\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}about            » Luna information\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
 
 	@commands.command(name = "admin",
-						usage="",
+						usage="[2]",
 						description = "Administrative commands")
-	async def admin(self, luna):
+	async def admin(self, luna, page:str = "1"):
 		await luna.message.delete()
 		prefix = files.json("Luna/config.json", "prefix", documents=True)
 		cog = self.bot.get_cog('Administrative commands')
@@ -3673,7 +3676,35 @@ class HelpCog(commands.Cog, name="Help commands"):
 		helptext = ""
 		for command in commands:
 			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		await embed_builder(luna, title="Administrative", description=f"{theme.description()}```\n{helptext}```")
+		cog = self.bot.get_cog('Channel commands')
+		commands = cog.get_commands()
+		channeltext = ""
+		for command in commands:
+			channeltext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Member commands')
+		commands = cog.get_commands()
+		membertext = ""
+		for command in commands:
+			membertext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Nickname commands')
+		commands = cog.get_commands()
+		nicktext = ""
+		for command in commands:
+			nicktext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Role commands')
+		commands = cog.get_commands()
+		roletext = ""
+		for command in commands:
+			roletext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Invite commands')
+		commands = cog.get_commands()
+		invitetext = ""
+		for command in commands:
+			invitetext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		if page == "1":
+			await embed_builder(luna, title="Administrative", footer_extra=f"Page 1 | {prefix}admin 2 » Page 2", description=f"{theme.description()}```\nMember Control\n\n{membertext}``````\nChannel Control\n\n{channeltext}``````\nNickname Control\n\n{nicktext}``````\nRole Control\n\n{roletext}``````\nGuild Control\n\n{helptext}```")
+		elif page == "2":
+			await embed_builder(luna, title="Administrative", footer_extra=f"Page 2", description=f"{theme.description()}```\nInvite Control\n\n{invitetext}```")
 
 	@commands.command(name = "profile",
 					usage="",
@@ -4209,13 +4240,14 @@ class StatusCog(commands.Cog, name="Animated statuses"):
 		await embed_builder(luna, description=f"```\nRemoved custom status```")
 
 bot.add_cog(StatusCog(bot))
-class AdminCog(commands.Cog, name="Administrative commands"):
+class ChannelCog(commands.Cog, name="Channel commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
 
 	@commands.command(name = "textchannel",
 					usage="<name>",
 					description = "Create a text channel")
+	@commands.guild_only()
 	@has_permissions(manage_channels=True)
 	async def textchannel(self, luna, name:str):
 		await luna.message.delete()
@@ -4225,6 +4257,7 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 	@commands.command(name = "voicechannel",
 					usage="<name>",
 					description = "Create a voice channel")
+	@commands.guild_only()
 	@has_permissions(manage_channels=True)
 	async def voicechannel(self, luna, name:str):
 		await luna.message.delete()
@@ -4234,6 +4267,7 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 	@commands.command(name = "stagechannel",
 					usage="<name>",
 					description = "Create a stage channel")
+	@commands.guild_only()
 	@has_permissions(manage_channels=True)
 	async def stagechannel(self, luna, name:str):
 		await luna.message.delete()
@@ -4247,6 +4281,7 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 	@commands.command(name = "newschannel",
 					usage="<name>",
 					description = "Create a news channel")
+	@commands.guild_only()
 	@has_permissions(manage_channels=True)
 	async def newschannel(self, luna, name:str):
 		await luna.message.delete()
@@ -4257,14 +4292,94 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 		requests.post(f'https://discordapp.com/api/v9/guilds/{luna.guild.id}/channels', json=payload, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
 		await embed_builder(luna, description=f"```\nCreated news channel » {name}```")
 
+	@commands.command(name = "renamechannel",
+					usage="<#channel> <name>",
+					description = "Rename channel")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def renamechannel(self, luna, channel:discord.TextChannel, name:str):
+		await luna.message.delete()
+		await channel.edit(name=name)
+		await embed_builder(luna, description=f"```\nRenamed {luna.channel.name} to » {channel.mention}```")
+
+	@commands.command(name = "deletechannel",
+					usage="<#channel>",
+					description = "Delete a channel")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def deletechannel(self, luna, channel:discord.TextChannel):
+		await luna.message.delete()
+		await channel.delete()
+		await embed_builder(luna, description=f"```\nDeleted channel » {channel.mention}```")
+
+	@commands.command(name = "slowmode",
+					usage="<seconds>",
+					description = "Set slowmode")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def slowmode(self, luna, seconds:int):
+		await luna.message.delete()
+		if seconds < 0:
+			await embed_builder(luna, title="Slowmode", description=f"```\nThe slowmode can't be negative```")
+			return
+		if seconds == 0:
+			await luna.channel.edit(slowmode_delay=0)
+			await embed_builder(luna, title="Slowmode", description=f"```\nDisabled slowmode```")
+			return
+		await luna.channel.edit(slowmode_delay=seconds)
+		await embed_builder(luna, title="Slowmode", description=f"```\nSet slowmode to » {seconds} seconds```")
+
+	@commands.command(name = "removeslowmode",
+					usage="",
+					description = "Remove slowmode")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def removeslowmode(self, luna):
+		await luna.message.delete()
+		await luna.channel.edit(slowmode_delay=0)
+		await embed_builder(luna, title="Slowmode", description=f"```\nRemoved slowmode```")
+
+	@commands.command(name = "lock",
+					usage="<#channel>",
+					description = "Lock a channel")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def lock(self, luna, channel:discord.TextChannel):
+		await luna.message.delete()
+		await channel.set_permissions(luna.guild.default_role, send_messages=False)
+		await channel.edit(name="🔒-locked")
+		await embed_builder(luna, description=f"```\nLocked channel » {channel.mention}```")
+
+	@commands.command(name = "unlock",
+					usage="<#channel>",
+					description = "Unlock a channel")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def unlock(self, luna, channel:discord.TextChannel):
+		await luna.message.delete()
+		await channel.set_permissions(luna.guild.default_role, send_messages=True)
+		await channel.edit(name="🔒-unlocked")
+		await embed_builder(luna, description=f"```\nUnlocked channel » {channel.mention}```")
+
 	@commands.command(name = "category",
 					usage="<name>",
 					description = "Create a category")
+	@commands.guild_only()
 	@has_permissions(manage_channels=True)
 	async def category(self, luna, name:str):
 		await luna.message.delete()
 		category = await luna.guild.create_category_channel(name)
 		await embed_builder(luna, description=f"```\nCreated category » {category.mention}```")
+
+	@commands.command(name = "deletecategory",
+					usage="<category_id>",
+					description = "Delete a category")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def deletecategory(self, luna, category:discord.CategoryChannel):
+		await luna.message.delete()
+		await category.delete()
+		await embed_builder(luna, description=f"```\nDeleted category » {category.mention}```")
 
 	@commands.command(name = "purge",
 					usage="<amount>",
@@ -4276,23 +4391,11 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 				await message.delete()
 			except:
 				pass
-
-	@commands.command(name = "timeout",
-					usage="<user> <time>",
-					description = "Time out a user")
-	@has_permissions(ban_members=True)
-	async def timeout(self, luna, user:discord.Member, time:int):
-		await luna.message.delete()
-		payload = {
-			'user_id': user.id,
-			'duration': time
-			}
-		requests.post(f'https://discordapp.com/api/v9/guilds/{luna.guild.id}/bans', json=payload, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
-		await embed_builder(luna, description=f"```\nTime out » {user.mention} for {time} seconds```")
  
 	@commands.command(name = "nuke",
 					usage="[#channel]",
 					description = "Nuke the channel")
+	@commands.guild_only()
 	@has_permissions(manage_channels=True)
 	async def nuke(self, luna, channel:discord.TextChannel=None):
 		await luna.message.delete()
@@ -4303,9 +4406,15 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 		await channel.delete()
 		await embed_builder(new_channel, description=f"```\nThis channel has been nuked```")
 
+bot.add_cog(ChannelCog(bot))
+class MemberCog(commands.Cog, name="Member commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+
 	@commands.command(name = "whois",
 					usage="<@member>",
-					description = "Show information the user")
+					description = "Guild member information")
+	@commands.guild_only()
 	async def whois(self, luna, user: discord.Member = None):
 		await luna.message.delete()
 		if user is None:
@@ -4333,178 +4442,516 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 					description = "Report a user")
 	async def report(self, luna, message_id:str, *, reason:str):
 		await luna.message.delete()
-		try:
-			payload = {
-				'message_id': message_id,
-				'reason': reason
+		payload = {
+			'message_id': message_id,
+			'reason': reason
+		}
+		requests.post('https://discordapp.com/api/v9/report', json=payload, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+		await embed_builder(luna, title="Report", description=f"```\nMessage {message_id} has been reported\n\nReason » {reason}```")
+
+	@commands.command(name = "mute",
+					usage="<@member> [reason]",
+					description = "Mute a user")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def mute(self, luna, user: discord.Member, *, reason:str=None):
+		await luna.message.delete()
+		role = discord.utils.get(luna.guild.roles, name="Muted")
+		if not role:
+			role = await luna.guild.create_role(name="Muted", reason="Mute role")
+			for channel in luna.guild.channels:
+				await channel.set_permissions(role, send_messages=False)
+		await user.add_roles(role, reason="Mute")
+		await embed_builder(luna, title="Mute", description=f"```\n{user.mention} has been muted\n\nReason » {reason}```")
+
+	@commands.command(name = "unmute",
+					usage="<@member> [reason]",
+					description = "Unmute a user")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def unmute(self, luna, user: discord.Member, *, reason:str=None):
+		await luna.message.delete()
+		role = discord.utils.get(luna.guild.roles, name="Muted")
+		if not role:
+			await embed_builder(luna, title="Unmute", description="No mute role found")
+			return
+		await user.remove_roles(role, reason="Unmute")
+		await embed_builder(luna, title="Unmute", description=f"```\n{user.mention} has been unmuted\n\nReason » {reason}```")
+
+	@commands.command(name = "timeout",
+					usage="<user> <time>",
+					description = "Time out a user")
+	@commands.guild_only()
+	@has_permissions(ban_members=True)
+	async def timeout(self, luna, user:discord.Member, time:int):
+		await luna.message.delete()
+		payload = {
+			'user_id': user.id,
+			'duration': time
 			}
-			requests.post('https://discordapp.com/api/v9/report', json=payload, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
-			await embed_builder(luna, title="Report", url=theme.title_url(), description=f"Message {message_id} has been reported\n\nReason » {reason}")
-		except Exception as e:
-			await error_builder(luna, description=e)
+		requests.post(f'https://discordapp.com/api/v9/guilds/{luna.guild.id}/bans', json=payload, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+		await embed_builder(luna, description=f"```\nTime out » {user.mention} for {time} seconds```")
+
+	@commands.command(name = "kick",
+					usage="<@member> [reason]",
+					description = "Kick a user")
+	@commands.guild_only()
+	@has_permissions(kick_members=True)
+	async def kick(self, luna, user: discord.Member, *, reason:str=None):
+		await luna.message.delete()
+		await user.kick(reason=reason)
+		await embed_builder(luna, title="Kick", description=f"```\n{user.mention} has been kicked\n\nReason » {reason}```")
+
+	@commands.command(name = "softban",
+					usage="<@member> [reason]",
+					description = "Softban a user")
+	@commands.guild_only()
+	@has_permissions(ban_members=True)
+	async def softban(self, luna, user: discord.Member, *, reason:str=None):
+		await luna.message.delete()
+		await user.ban(reason=reason)
+		await user.unban(reason=reason)
+		await embed_builder(luna, title="Softban", description=f"```\n{user.mention} has been softbanned\n\nReason » {reason}```")
 
 	@commands.command(name = "ban",
-					usage="<@member>",
-					description = "Bans a user")
+					usage="<@member> [reason]",
+					description = "Ban a user")
+	@commands.guild_only()
 	@has_permissions(ban_members=True)
-	async def ban(self, luna, user: discord.Member = None, *, reason: str = None):
+	async def ban(self, luna, user: discord.Member, *, reason:str=None):
 		await luna.message.delete()
-		if user == None:
-			await error_builder(luna, title="Ban Error", description=f"Who do you want banned? Please mention an user")
-			return
-		elif user == luna.author:
-			await error_builder(luna, title="Ban Error", description=f"You can't ban yourself, Please mention someone else")
-			return
-		else:
-			pass
-		try:
-			await user.ban(reason=reason)
-			await embed_builder(luna, title="Ban", url=theme.title_url(), description=f"User {user.mention}({user.id}) has been banned\n\nReason » {reason}")
-		except Exception as e:
-			await error_builder(luna, description=e)
+		await user.ban(reason=reason)
+		await embed_builder(luna, title="Ban", description=f"```\n{user.mention} has been banned\n\nReason » {reason}```")
 
 	@commands.command(name = "unban",
 					usage="<user_id>",
 					description = "Unban a user")
+	@commands.guild_only()
 	@has_permissions(ban_members=True)
-	async def unban(self, luna, user: discord.Member = None):
+	async def unban(self, luna, user_id:int):
 		await luna.message.delete()
-		if user == None:
-			await error_builder(luna, title="Ban Error", description=f"Who do you want unbanned? Please specify the user id")
-			return
-		elif user == luna.author:
-			await error_builder(luna, title="Ban Error", description=f"You can't unban yourself, Please specify someone elses user id")
-			return
-		else:
-			pass
-		try:
-			user1 = await self.bot.fetch_user(user)
-			await luna.guild.unban(user1)
-			await embed_builder(luna, title="Ban", url=theme.title_url(), description=f"User {user.mention} ({user.id}) has been unbanned")
-		except Exception as e:
-			await error_builder(luna, description=e)
+		banned_users = await luna.guild.bans()
+		for ban_entry in banned_users:
+			user = ban_entry.user
+			if user.id == user_id:
+				await luna.guild.unban(user)
+				await embed_builder(luna, title="Unban", description=f"```\n{user.mention} has been unbanned```")
+				return
+		await embed_builder(luna, title="Unban", description=f"```\nNo banned user with the id {user_id} was found```")
 
-	@commands.command(name = "kick",
+	@commands.command(name = "bans",
+					usage="[guild_id]",
+					description = "List all bans")
+	@commands.guild_only()
+	@has_permissions(ban_members=True)
+	async def bans(self, luna, guild_id:int=None):
+		await luna.message.delete()
+		if guild_id is not None:
+			guild = discord.utils.get(self.bot.guilds, id=guild_id)
+			bans = await guild.bans()
+		else:
+			guild = luna.guild
+			bans = await guild.bans()
+		if len(bans) == 0:
+			await embed_builder(luna, title=f"Bans in {guild.name}", description=f"```\nNo users are banned in {guild.name}```")
+			return
+		bans = [f"{b.user.name}#{b.user.discriminator} | {b.user.id}" for b in bans]
+		bans = "\n".join(bans)
+		await embed_builder(luna, title=f"Bans in {guild.name}", description=f"```{bans}```")
+
+	@commands.command(name = "savebans",
+					usage="[guild_id]",
+					description = "Save bans")
+	@commands.guild_only()
+	@has_permissions(ban_members=True)
+	async def savebans(self, luna, guild_id:int=None):
+		await luna.message.delete()
+		if guild_id is not None:
+			guild = discord.utils.get(self.bot.guilds, id=guild_id)
+			bans = await guild.bans()
+		else:
+			guild = luna.guild
+			bans = await guild.bans()
+		if len(bans) == 0:
+			await embed_builder(luna, title=f"Bans in {guild.name}", description=f"```\nNo users are banned in {guild.name}```")
+			return
+		bans = [f"{b.user.name}#{b.user.discriminator} | {b.user.id}" for b in bans]
+		bans = "\n".join(bans)
+		files.create_folder(f"Luna/backup/guilds/{guild.name}", documents=True)
+		files.write_file(f"Luna/backup/guilds/{guild.name}/bans.txt", bans, documents=True)
+		await embed_builder(luna, title=f"Saved Bans", description=f"```\nSaved all bans in Luna/backup/guilds/{guild.name}/bans.txt\n``````{bans}```")
+
+	@commands.command(name = "loadbans",
+					usage="[guild_id]",
+					description = "Load bans")
+	@commands.guild_only()
+	@has_permissions(ban_members=True)
+	async def loadbans(self, luna, guild_id:int=None):
+		await luna.message.delete()
+		if guild_id is not None:
+			guild = discord.utils.get(self.bot.guilds, id=guild_id)
+		else:
+			guild = luna.guild
+		if not files.file_exist(f"Luna/backup/guilds/{guild.name}", documents=True):
+			await embed_builder(luna, title=f"Load bans", description=f"```\nNo bans were found in Luna/backup/{guild.name}/bans.txt```")
+			return
+		bans = files.read_file(f"Luna/backup/guilds/{guild.name}/bans.txt", documents=True)
+		bans = bans.split("\n")
+		for ban in bans:
+			if ban == "":
+				continue
+			user_id = int(ban.split(" | ")[1])
+			user = discord.utils.get(guild.members, id=user_id)
+			await guild.ban(user)
+		await embed_builder(luna, title=f"Load bans", description=f"```\nLoaded all bans from Luna/backup/guilds/{guild.name}/bans.txt```")
+
+bot.add_cog(MemberCog(bot))
+class RoleCog(commands.Cog, name="Role commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+
+	@commands.command(name = "giverole",
+					usage="<@member> <role_id>",
+					description = "Give a role")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def giverole(self, luna, member:discord.Member, role_id:int):
+		await luna.message.delete()
+		role = discord.utils.get(luna.guild.roles, id=role_id)
+		if role is None:
+			await embed_builder(luna, title="Give role", description=f"```\nNo role with the id {role_id} was found```")
+			return
+		await member.add_roles(role)
+		await embed_builder(luna, title="Give role", description=f"```\nGave {member.name}#{member.discriminator} role » {role.name}```")
+
+	@commands.command(name = "giveallroles",
 					usage="<@member>",
-					description = "Kicks a user")
-	@has_permissions(kick_members=True)
-	async def kick(self, luna, user: discord.Member = None, *, reason: str = None):
+					description = "Give all roles")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def giveallroles(self, luna, member:discord.Member):
 		await luna.message.delete()
-		if user == None:
-			if configs.error_log() == "console":
-				prints.error("Who do you want kicked? Please mention an user")
-			else:
-				embed = discord.Embed(title="Kick Error", url=theme.title_url(), description=f"Who do you want Kicked? Please mention an user.", color=theme.hex_color())
-				embed.set_thumbnail(url=theme.image_url())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				embed.set_image(url=theme.large_image_url())
-				await send(luna, embed)
-				return
-		elif user == luna.author:
-			if configs.error_log() == "console":
-				prints.error("You can't kick yourself, Please mention someone else")
-			else:
-				embed = discord.Embed(title="Kick Error", url=theme.title_url(), description=f"You can't kick yourself, Please mention someone else.", color=theme.hex_color())
-				embed.set_thumbnail(url=theme.image_url())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				embed.set_image(url=theme.large_image_url())
-				await send(luna, embed)
-				return
-		else:
-			pass
-		try:
-			await user.kick(reason=reason)
-			embed = discord.Embed(title="Kick", url=theme.title_url(), description=f"User {user.mention} ({user.id}) has been kicked.\n\nReason: {reason}", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
-		except Exception as e:
-			prints.error(e)
+		for role in luna.guild.roles:
+			if role.name == "@everyone":
+				continue
+			await member.add_roles(role)
+		await embed_builder(luna, title="Give all roles", description=f"```\nGave all roles to » {member.name}#{member.discriminator}```")
 
-	@commands.command(name = "kickgc",
+	@commands.command(name = "allroles",
 					usage="",
-					description = "Kick all in the group channel")
-	async def kickgc(self, luna):
+					description = "Give all roles")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def allroles(self, luna):
 		await luna.message.delete()
-		if isinstance(luna.message.channel, discord.GroupChannel):
-			for recipient in luna.message.channel.recipients:
-				await luna.message.channel.remove_recipients(recipient)
+		for member in luna.guild.members:
+			for role in luna.guild.roles:
+				if role.name == "@everyone":
+					continue
+				await member.add_roles(role)
+		await embed_builder(luna, title="Give all roles", description=f"```\nGave all members all roles```")
 
-	@commands.command(name = "leavegc",
-					usage="",
-					description = "Leave the group channel")
-	async def leavegc(self, luna):
+	@commands.command(name = "removeallroles",
+					usage="<@member>",
+					description = "Remove all roles")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)	
+	async def removeallroles(self, luna, member:discord.Member):
 		await luna.message.delete()
-		if isinstance(luna.message.channel, discord.GroupChannel):
-			await luna.message.channel.leave()
+		for role in luna.guild.roles:
+			if role.name == "@everyone":
+				continue
+			await member.remove_roles(role)
+		await embed_builder(luna, title="Remove all roles", description=f"```\nRemoved all roles from » {member.name}#{member.discriminator}```")
+
+	@commands.command(name = "removerole",
+					usage="<@member> <role_id>",
+					description = "Remove a role")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def removerole(self, luna, member:discord.Member, role_id:int):
+		await luna.message.delete()
+		role = discord.utils.get(luna.guild.roles, id=role_id)
+		if role is None:
+			await embed_builder(luna, title="Remove role", description=f"```\nNo role with the id {role_id} was found```")
+			return	
+		await member.remove_roles(role)
+		await embed_builder(luna, title="Remove role", description=f"```\nRemoved role {role.name} from » {member.name}#{member.discriminator}```")
+
+	@commands.command(name = "createrole",
+					usage="<role_name>",
+					description = "Create a role")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def createrole(self, luna, *, role_name:str):
+		await luna.message.delete()
+		role = await luna.guild.create_role(name=role_name)
+		await embed_builder(luna, title="Create role", description=f"```\nCreated role » {role.name}```")
+
+	@commands.command(name = "renamerole",
+					usage="<role_id> <name>",
+					description = "Rename a role")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def renamerole(self, luna, role_id:int, *, name:str):
+		await luna.message.delete()
+		role = discord.utils.get(luna.guild.roles, id=role_id)
+		if role is None:
+			await embed_builder(luna, title="Rename role", description=f"```\nNo role with the id {role_id} was found```")
+			return
+		await role.edit(name=name)
+		await embed_builder(luna, title="Rename role", description=f"```\nRenamed role {role.name} to » {name}```")
+
+	@commands.command(name = "renameroles",
+					usage="<name>",
+					description = "Rename all roles")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def renameroles(self, luna, *, name:str):
+		await luna.message.delete()
+		for role in luna.guild.roles:
+			if role.name == "@everyone":
+				continue
+			await role.edit(name=name)
+		await embed_builder(luna, title="Rename all roles", description=f"```\nRenamed all roles to » {name}```")
+
+	@commands.command(name = "deleterole",
+					usage="<role_id>",
+					description = "Delete a role")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def deleterole(self, luna, role_id:int):
+		await luna.message.delete()
+		role = discord.utils.get(luna.guild.roles, id=role_id)
+		if role is None:
+			await embed_builder(luna, title="Delete role", description=f"```\nNo role with the id {role_id} was found```")
+			return
+		await role.delete()
+		await embed_builder(luna, title="Delete role", description=f"```\nDeleted role » {role.name}```")
+
+bot.add_cog(RoleCog(bot))
+class NickCog(commands.Cog, name="Nickname commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
 
 	@commands.command(name = "nick",
-					aliases=['nickname'],
-					usage="",
-					description = "Change your nickname")
-	async def nick(self, luna, *, name):
+					usage="<name> [@member]",
+					description = "Change nickname")
+	@commands.guild_only()
+	@has_permissions(manage_nicknames=True)
+	async def nick(self, luna, *, name:str, member:discord.Member=None):
 		await luna.message.delete()
-		try:
-			await luna.message.author.edit(nick=name)
-			embed = discord.Embed(title="Nickname", url=theme.title_url(), description=f"```\nSuccessfully changed your nickname to: {name}```", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
-		except Exception as e:
-			if configs.error_log() == "console":
-				prints.error(e)
-			else:
-				embed = discord.Embed(title="Error", url=theme.title_url(), description=e, color=0xff0000)
-				embed.set_thumbnail(url=theme.image_url())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				embed.set_image(url=theme.large_image_url())
-				await send(luna, embed)
+		if member is None:
+			member = luna.author
+		await member.edit(nick=name)
+		await embed_builder(luna, title="Nickname", description=f"```\nChanged nickname of {member.name}#{member.discriminator} to » {name}```")
+
+	@commands.command(name = "nickall",
+					usage="<name>",
+					description = "Change nickname of everyone")
+	@commands.guild_only()
+	@has_permissions(manage_nicknames=True)
+	async def nickall(self, luna, *, name:str):
+		await luna.message.delete()
+		for member in luna.guild.members:
+			await member.edit(nick=name)
+		await embed_builder(luna, title="Nickall", description=f"```\nChanged nickname of everyone to » {name}```")
+
+	@commands.command(name = "clearnick",
+					usage="[@member]",
+					description = "Clear nickname")
+	@commands.guild_only()
+	@has_permissions(manage_nicknames=True)
+	async def clearnick(self, luna, member:discord.Member=None):
+		await luna.message.delete()
+		if member is None:
+			member = luna.author
+		await member.edit(nick=None)
+		await embed_builder(luna, title="Clearnick", description=f"```\nCleared nickname of » {member.name}#{member.discriminator}```")
+
+	@commands.command(name = "clearallnick",
+					usage="",
+					description = "Clear all nicknames")
+	@commands.guild_only()
+	@has_permissions(manage_nicknames=True)
+	async def clearallnick(self, luna):
+		await luna.message.delete()
+		for member in luna.guild.members:
+			await member.edit(nick=None)
+		await embed_builder(luna, title="Clearnick", description=f"```\nCleared nickname of everyone```")
+
+bot.add_cog(NickCog(bot))
+class InviteCog(commands.Cog, name="Invite commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+
+	@commands.command(name = "inviteinfo",
+					usage="<invite>",
+					description = "Invite information")
+	@commands.guild_only()
+	async def inviteinfo(self, luna, invite:str):
+		await luna.message.delete()
+		invite = await self.bot.get_invite(invite)
+		if invite is None:
+			await embed_builder(luna, title="Invite info", description=f"```\nNo invite with the id {invite} was found```")
+			return
+		await embed_builder(luna, title="Invite info", description=f"```\nInvite » {invite.code}\nCreated at » {invite.created_at}\nChannel » {invite.channel.mention}\nGuild » {invite.guild.name}\nCreated by » {invite.inviter.name}#{invite.inviter.discriminator}\nMax uses » {invite.max_uses}\nUses » {invite.uses}```")
+
+	@commands.command(name = "invite",
+					usage="[channel_id] [age] [uses]",
+					description = "Invite")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def invite(self, luna, channel_id:int=None, max_age:int=0, max_uses:int=0):
+		await luna.message.delete()
+		if channel_id is None:
+			channel = luna.channel
+		else:
+			channel = discord.utils.get(luna.guild.channels, id=channel_id)
+		if channel is None:
+			await embed_builder(luna, title="Invite", description=f"```\nNo channel with the id » {channel_id} was found```")
+			return
+		invite = await channel.create_invite(max_age=max_age, max_uses=max_uses)
+		await embed_builder(luna, title="Invite", description=f"```\nCreated invite » {invite.url}```")
+
+	@commands.command(name = "delinvite",
+					usage="<invite_id>",
+					description = "Delete invite")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def delinvite(self, luna, invite_id:int):
+		await luna.message.delete()
+		invite = discord.utils.get(luna.guild.invites, id=invite_id)
+		if invite is None:
+			await embed_builder(luna, title="Delete invite", description=f"```\nNo invite with the id » {invite_id} was found```")
+			return
+		await invite.delete()
+		await embed_builder(luna, title="Delete invite", description=f"```\nDeleted invite » {invite.url}```")	
+
+	@commands.command(name = "delallinvite",
+					usage="",
+					description = "Delete all invites")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def delallinvite(self, luna):
+		await luna.message.delete()
+		for invite in luna.guild.invites:
+			await invite.delete()
+		await embed_builder(luna, title="Delete invite", description=f"```\nDeleted all invites```")
+
+	@commands.command(name = "invitelist",
+					usage="",
+					description = "List all invites")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def invitelist(self, luna):	
+		await luna.message.delete()
+		invites = luna.guild.invites
+		if len(invites) == 0:
+			await embed_builder(luna, title="Invite list", description=f"```\nNo invites were found```")
+			return
+		invite_list = ""
+		for invite in invites:
+			invite_list += f"{invite.url}\n"
+		await embed_builder(luna, title="Invite list", description=f"```\n{invite_list}```")
+
+	@commands.command(name = "invitechannel",
+					usage="<channel_id>",
+					description = "Channel invites")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def invitelistchannel(self, luna, channel_id:int):
+		await luna.message.delete()
+		channel = discord.utils.get(luna.guild.channels, id=channel_id)
+		if channel is None:
+			await embed_builder(luna, title="Invite list", description=f"```\nNo channel with the id » {channel_id} was found```")
+			return	
+		invites = channel.invites
+		if len(invites) == 0:
+			await embed_builder(luna, title="Invite list", description=f"```\nNo invites were found```")
+			return
+		invite_list = ""
+		for invite in invites:
+			invite_list += f"{invite.url}\n"
+		await embed_builder(luna, title="Invite list", description=f"```\n{invite_list}```")
+
+	@commands.command(name = "inviteguild",
+					usage="",
+					description = "Invites of a guild")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def invitelistguild(self, luna):
+		await luna.message.delete()
+		invites = luna.guild.invites
+		if len(invites) == 0:
+			await embed_builder(luna, title="Invite list", description=f"```\nNo invites were found```")
+			return
+		invite_list = ""
+		for invite in invites:
+			invite_list += f"{invite.url}\n"
+		await embed_builder(luna, title="Invite list", description=f"```\n{invite_list}```")
+
+	@commands.command(name = "inviteuser",
+					usage="<user_id>",
+					description = "Invites of a user")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def invitelistuser(self, luna, user_id:int):
+		await luna.message.delete()
+		user = discord.utils.get(luna.guild.members, id=user_id)
+		if user is None:
+			await embed_builder(luna, title="Invite list", description=f"```\nNo user with the id » {user_id} was found```")
+			return
+		invites = user.invites
+		if len(invites) == 0:
+			await embed_builder(luna, title="Invite list", description=f"```\nNo invites were found```")
+			return
+		invite_list = ""
+		for invite in invites:
+			invite_list += f"{invite.url}\n"
+		await embed_builder(luna, title="Invite list", description=f"```\n{invite_list}```")
+
+bot.add_cog(InviteCog(bot))
+class AdminCog(commands.Cog, name="Administrative commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
 
 	@commands.command(name = "guildname",
 					usage="<name>",
 					description = "Change the guild name")
+	@commands.guild_only()
+	@has_permissions(manage_guild=True)
 	async def guildname(self, luna, *, name:str):
 		await luna.message.delete()
 		await luna.guild.edit(name=name)
-		embed = discord.Embed(title="Servername", url=theme.title_url(), description=f"```\nSuccessfully changed the servername to: {name}```", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await embed_builder(luna, title="Guildname", description=f"```\nChanged the name of the guild to » {name}```")
 
-	@commands.command(name = "nickall",
-					usage="<name>",
-					description = "Change everyone's nickname")
-	async def nickall(self, luna, *, name:str):
+	@commands.command(name = "guildimage",
+					usage="<image_url>",
+					description = "Change the guild image")
+	@commands.guild_only()
+	@has_permissions(manage_guild=True)
+	async def guildimage(self, luna, *, image_url:str):
 		await luna.message.delete()
-		for user in list(luna.guild.members):
-			try:
-				await user.edit(nick=name)
-			except:
-				pass
-		embed = discord.Embed(title="Nickall", url=theme.title_url(), description=f"```\nSuccessfully changed the nickname of every member to: {name}```", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await luna.guild.edit(icon=image_url)
+		await embed_builder(luna, title="Guildimage", description=f"```\nChanged the image of the guild to » {image_url}```")
 
-	@commands.command(name = "rchannels",
-					usage="<name>",
-					description = "Change every channel")
-	async def rchannels(self, luna, *, name):
+	@commands.command(name = "guildinfo",
+					usage="[guild_id]",
+					description = "Guild information")
+	@commands.guild_only()
+	@has_permissions(manage_guild=True)
+	async def guildinfo(self, luna, guild_id:int=None):
 		await luna.message.delete()
-		for channel in luna.guild.channels:
-			await channel.edit(name=name)
-
+		if guild_id is None:
+			guild = luna.guild
+		else:
+			guild = discord.utils.get(bot.guilds, id=guild_id)
+			if guild is None:
+				await embed_builder(luna, title="Guildinfo", description=f"```\nNo guild with the id {guild_id} was found```")
+				return
+		await embed_builder(luna, title="Guildinfo", description=f"```\nGeneral Information\n\nGuild » {guild.name}\nID » {guild.id}\nOwner » {guild.owner}\nCreated at » {guild.created_at}\nBoost » {guild.premium_subscription_count}\nBoost status » {guild.premium_subscription_count is not None}\nRegion » {guild.region}\nVerification level » {guild.verification_level}\n``````\nMember Information\n\nMember count » {guild.member_count}\n``````\nChannel Information\n\nText channel count » {len(guild.text_channels)}\nVoice channel count » {len(guild.voice_channels)}\n``````\nRole Information\n\nRole count » {len(guild.roles)}```")
+				
 bot.add_cog(AdminCog(bot))
 
 class AnimatedCog(commands.Cog, name="Animated commands"):
@@ -11612,7 +12059,7 @@ async def mode_error(luna, modes:str):
         embed.set_image(url=theme.large_image_url())
         await send(luna, embed)
 
-async def embed_builder(luna, title=None, description="", color=None, large_image=None, thumbnail=None, delete_after=None):
+async def embed_builder(luna, title=None, description="", color=None, large_image=None, thumbnail=None, delete_after=None, footer_extra=None):
 	"""
 	Luna's main function for creating embeds with the theme applied.\n
 	Parse `luna = ctx` as first argument. (Important)\n
@@ -11633,9 +12080,13 @@ async def embed_builder(luna, title=None, description="", color=None, large_imag
 		thumbnail = ""
 	if title == None:
 		title = theme.title()
+	if footer_extra == None:
+		footer_extra = theme.footer()
+	else:
+		footer_extra = f"{footer_extra} | {theme.footer()}"
 	embed = discord.Embed(title=title, url=theme.title_url(), description=description, color=color)
 	embed.set_thumbnail(url=thumbnail)
-	embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+	embed.set_footer(text=footer_extra, icon_url=theme.footer_icon_url())
 	embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
 	embed.set_image(url=large_image)
 	await send(luna, embed, delete_after)
