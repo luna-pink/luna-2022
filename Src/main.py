@@ -8345,6 +8345,21 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 		else:
 			await error_builder(luna, description="```\nRiskmode is disabled```")
 
+	@commands.command(name = "spamtts",
+					usage="<delay> <amount> <message>",
+					description = "TTS")
+	async def spamtts(self, luna, delay:int, amount:int, *, message:str):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				for each in range(0, amount):
+					await asyncio.sleep(delay)
+					await luna.send(message, tts=True)
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
 	@commands.command(name = "massping",
 					usage="<delay> <amount>",
 					description = "Mass ping members")
