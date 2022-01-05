@@ -493,10 +493,10 @@ class files:
 	def write_json(path, content, documents=False):
 		"""Writes a json file"""
 		if documents:
-			with open(os.path.join(files.documents(), path), "w", encoding="utf-8") as f:
+			with open(os.path.join(files.documents(), path), "w") as f:
 				f.write(json.dumps(content, indent=4))
 		else:
-			with open(path, "w", encoding="utf-8") as f:
+			with open(path, "w") as f:
 				f.write(json.dumps(content, indent=4))
 	def read_file(path, documents=False):
 		"""Reads a file"""
@@ -656,6 +656,10 @@ def clear():
     os.system("cls")
 
 def restart_program():
+	if files.json("Luna/notifications/toasts.json", "login", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
+		notify.toast(message=f"Restarting Luna...")
+	if files.json("Luna/webhooks/webhooks.json", "login", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
+		notify.webhook(url=webhook.login_url(), name="login", description=f"Restarting Luna...")
 	python = sys.executable
 	os.execl(python, python, *sys.argv)
 
@@ -1180,55 +1184,57 @@ class luna:
 		"""
 		The authentication login function
 		"""
-		if exists:
-			luna.console(clear=True)
-			try:
-				username = files.json("Luna/auth.json", "username", documents=True)
-				password = files.json("Luna/auth.json", "password", documents=True)
-				username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-				password = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
-			except:
-				files.remove('Luna/auth.json', documents=True)
-				prints.error("There has been an issue with your login")
-				time.sleep(5)
-				prints.event("Redirecting to the main menu in 5 seconds")
-				time.sleep(5)
-				auth.authentication()
-			try:
-				prints.event("Authenticating...")
-				auth.login(username=username, password=password)
-				# luna.email_check(username)
-				auth_log.sendData(username=username, message="Logged in")
-				luna.wizard()
-			except Exception as e:
-				prints.error(e)
-				files.remove('Luna/auth.json', documents=True)
-				time.sleep(5)
-				prints.event("Redirecting to the main menu in 5 seconds")
-				time.sleep(5)
-				luna.authentication()
-		else:
-			username = prints.input("Username")
-			password = prints.password("Password")
-			try:
-				prints.event("Authenticating...")
-				auth.login(username=username, password=password)
-				# luna.email_check(username)
-				auth_log.sendData(username=username, message="Logged in")
-				username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-				password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
-				data = {
-					"username": f"{username}",
-					"password": f"{password}"
-				}
-				files.write_json("Luna/auth.json", data, documents=True)
-			except Exception as e:
-				prints.error(e)
-				files.remove('Luna/auth.json', documents=True)
-				time.sleep(5)
-				prints.event("Redirecting to the main menu in 5 seconds")
-				time.sleep(5)
-				luna.authentication()
+		if not developer_mode:
+			if exists:
+				luna.console(clear=True)
+				try:
+					username = files.json("Luna/auth.json", "username", documents=True)
+					password = files.json("Luna/auth.json", "password", documents=True)
+					username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+					password = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+				except:
+					files.remove('Luna/auth.json', documents=True)
+					prints.error("There has been an issue with your login")
+					time.sleep(5)
+					prints.event("Redirecting to the main menu in 5 seconds")
+					time.sleep(5)
+					auth.authentication()
+				try:
+					prints.event("Authenticating...")
+					auth.login(username=username, password=password)
+					# luna.email_check(username)
+					auth_log.sendData(username=username, message="Logged in")
+					luna.wizard()
+				except Exception as e:
+					prints.error(e)
+					files.remove('Luna/auth.json', documents=True)
+					time.sleep(5)
+					prints.event("Redirecting to the main menu in 5 seconds")
+					time.sleep(5)
+					luna.authentication()
+			else:
+				username = prints.input("Username")
+				password = prints.password("Password")
+				try:
+					prints.event("Authenticating...")
+					auth.login(username=username, password=password)
+					# luna.email_check(username)
+					auth_log.sendData(username=username, message="Logged in")
+					username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+					password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+					data = {
+						"username": f"{username}",
+						"password": f"{password}"
+					}
+					files.write_json("Luna/auth.json", data, documents=True)
+				except Exception as e:
+					prints.error(e)
+					files.remove('Luna/auth.json', documents=True)
+					time.sleep(5)
+					prints.event("Redirecting to the main menu in 5 seconds")
+					time.sleep(5)
+					luna.authentication()
+		luna.wizard()
 
 	def register():
 		"""
@@ -1238,20 +1244,21 @@ class luna:
 		password = prints.password("Password")
 		key = prints.input("Key")
 		try:
-			prints.event("Registering...")
-			auth.register(email=key, username=username, password=password, license_key=key)
-			auth_log.sendData(username=username, message="Registered")
-			prints.message("Successfully registered")
-			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-			notify.webhook(url="https://discord.com/api/webhooks/926940230169280552/Tl-o9bPLOeQ5dkuD7Ho1MMgoggu0-kHCRy_248yor_Td52KQoZMfte3YpoKBlUUdIB_j", description=f"A new registered user!\n``````\nUsername: {username}\nKey: {key}\n``````\nHWID:\n{hwid}")
-			time.sleep(3)
-			username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-			password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
-			data = {
-				"username": f"{username}",
-				"password": f"{password}"
-			}
-			files.write_json("Luna/auth.json", data, documents=True)
+			if not developer_mode:
+				prints.event("Registering...")
+				auth.register(email=key, username=username, password=password, license_key=key)
+				auth_log.sendData(username=username, message="Registered")
+				prints.message("Successfully registered")
+				hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
+				notify.webhook(url="https://discord.com/api/webhooks/926940230169280552/Tl-o9bPLOeQ5dkuD7Ho1MMgoggu0-kHCRy_248yor_Td52KQoZMfte3YpoKBlUUdIB_j", description=f"A new registered user!\n``````\nUsername: {username}\nKey: {key}\n``````\nHWID:\n{hwid}")
+				time.sleep(3)
+				username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+				password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+				data = {
+					"username": f"{username}",
+					"password": f"{password}"
+				}
+				files.write_json("Luna/auth.json", data, documents=True)
 			luna.login(exists=True)
 		except Exception as e:
 			prints.error(e)
@@ -3529,7 +3536,11 @@ class OnCommandErrorCog(commands.Cog, name="on command error"):
 				pass
 			await error_builder(luna, f"```\n{error}```")
 		else:
-			pass
+			try:
+				await luna.message.delete()
+			except Exception:
+				pass
+			await error_builder(luna, f"```\n{error}```")
 
 bot.add_cog(OnCommandErrorCog(bot))
 
@@ -4202,6 +4213,59 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
 
+	@commands.command(name = "textchannel",
+					usage="<name>",
+					description = "Create a text channel")
+	@has_permissions(manage_channels=True)
+	async def textchannel(self, luna, name:str):
+		await luna.message.delete()
+		channel = await luna.guild.create_text_channel(name)
+		await embed_builder(luna, description=f"```\nCreated text channel » {channel.mention}```")
+
+	@commands.command(name = "voicechannel",
+					usage="<name>",
+					description = "Create a voice channel")
+	@has_permissions(manage_channels=True)
+	async def voicechannel(self, luna, name:str):
+		await luna.message.delete()
+		channel = await luna.guild.create_voice_channel(name)
+		await embed_builder(luna, description=f"```\nCreated voice channel » {channel.mention}```")
+
+	@commands.command(name = "stagechannel",
+					usage="<name>",
+					description = "Create a stage channel")
+	@has_permissions(manage_channels=True)
+	async def stagechannel(self, luna, name:str):
+		await luna.message.delete()
+		payload = {
+			'name': f"{name}",
+			'type': 13
+			}
+		this = requests.post(f'https://discordapp.com/api/v9/guilds/{luna.guild.id}/channels', json=payload, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+		await embed_builder(luna, description=f"```\nCreated stage channel » {name}```")
+
+	@commands.command(name = "newschannel",
+					usage="<name>",
+					description = "Create a news channel")
+	@has_permissions(manage_channels=True)
+	async def newschannel(self, luna, name:str):
+		await luna.message.delete()
+		payload = {
+			'name': f"{name}",
+			'type': 5
+			}
+		requests.post(f'https://discordapp.com/api/v9/guilds/{luna.guild.id}/channels', json=payload, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+		await embed_builder(luna, description=f"```\nCreated news channel » {name}```")
+
+	@commands.command(name = "category",
+					usage="<name>",
+					description = "Create a category")
+	@has_permissions(manage_channels=True)
+	async def category(self, luna, name:str):
+		await luna.message.delete()
+		category = await luna.guild.create_category_channel(name)
+		await embed_builder(luna, description=f"```\nCreated category » {category.mention}```")
+
 	@commands.command(name = "purge",
 					usage="<amount>",
 					description = "Purge the channel")
@@ -4213,36 +4277,31 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 			except:
 				pass
 
-	@has_permissions(manage_channels=True) 
+	@commands.command(name = "timeout",
+					usage="<user> <time>",
+					description = "Time out a user")
+	@has_permissions(ban_members=True)
+	async def timeout(self, luna, user:discord.Member, time:int):
+		await luna.message.delete()
+		payload = {
+			'user_id': user.id,
+			'duration': time
+			}
+		requests.post(f'https://discordapp.com/api/v9/guilds/{luna.guild.id}/bans', json=payload, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+		await embed_builder(luna, description=f"```\nTime out » {user.mention} for {time} seconds```")
+ 
 	@commands.command(name = "nuke",
 					usage="[#channel]",
-					description = "Nuke a channel")
-	async def nuke(self, luna, channel: discord.TextChannel = None):
-		nuke_channel = discord.utils.get(luna.guild.channels, name=luna.channel.name, position=luna.channel.position)
-		if channel == None:
-			new_channel = await nuke_channel.clone(reason="Has been Nuked")
-			await nuke_channel.delete()
-			embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nThis channel has been nuked```", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await new_channel.send(embed=embed)
-			return
-		nuke_channel = discord.utils.get(luna.guild.channels, name=channel.name, position=luna.channel.position)
-		if nuke_channel is not None:
-			new_channel = await nuke_channel.clone(reason="Has been Nuked")
-			await nuke_channel.delete()
-			embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nThis channel has been nuked```", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await new_channel.send(embed=embed)
-			return
-		else:
-			await error_builder(luna, description=f"```\nNo channel named {channel.name} was found!```")
-			return
+					description = "Nuke the channel")
+	@has_permissions(manage_channels=True)
+	async def nuke(self, luna, channel:discord.TextChannel=None):
+		await luna.message.delete()
+		if channel is None:
+			channel = luna.channel
+		new_channel = await channel.clone()
+		await new_channel.edit(position=channel.position)
+		await channel.delete()
+		await embed_builder(new_channel, description=f"```\nThis channel has been nuked```")
 
 	@commands.command(name = "whois",
 					usage="<@member>",
