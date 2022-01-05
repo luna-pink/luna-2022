@@ -3662,8 +3662,8 @@ class HelpCog(commands.Cog, name="Help commands"):
 			custom = cog.get_commands()
 			custom_command_count = 0
 			for command in custom:
-				custom_command_count += 1
-			await embed_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}game             » Game commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Current guild profile\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}about            » Luna information\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
+				custom_command_count += 1 #{command_count-custom_command_count}
+			await embed_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » 563\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}game             » Game commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Current guild profile\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}about            » Luna information\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
 
 	@commands.command(name = "admin",
 						usage="[2]",
@@ -3702,9 +3702,9 @@ class HelpCog(commands.Cog, name="Help commands"):
 		for command in commands:
 			invitetext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 		if page == "1":
-			await embed_builder(luna, title="Administrative", footer_extra=f"Page 1 | {prefix}admin 2 » Page 2", description=f"{theme.description()}```\nMember Control\n\n{membertext}``````\nChannel Control\n\n{channeltext}``````\nNickname Control\n\n{nicktext}``````\nRole Control\n\n{roletext}``````\nGuild Control\n\n{helptext}```")
+			await embed_builder(luna, title="Administrative", footer_extra=f"Page 1", description=f"{theme.description()}```\nMember Control\n\n{membertext}``````\nChannel Control\n\n{channeltext}``````\nNickname Control\n\n{nicktext}``````\nRole Control\n\n{roletext}``````\nNoet\n\n{prefix}admin 2 » Page 2```")
 		elif page == "2":
-			await embed_builder(luna, title="Administrative", footer_extra=f"Page 2", description=f"{theme.description()}```\nInvite Control\n\n{invitetext}```")
+			await embed_builder(luna, title="Administrative", footer_extra=f"Page 2", description=f"{theme.description()}```\nGuild Control\n\n{helptext}``````\nInvite Control\n\n{invitetext}```")
 
 	@commands.command(name = "profile",
 					usage="",
@@ -4411,6 +4411,22 @@ class MemberCog(commands.Cog, name="Member commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
 
+	@commands.command(name = "userinfo",
+					usage="[user_id]",
+					description = "User information")
+	async def userinfo(self, luna, user:discord.Member=None):
+		await luna.message.delete()
+		if user is None:
+			user = luna.author
+		r = requests.get(f'https://discordapp.com/api/v9/users/{user.id}', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'}).json()
+		req = await bot.http.request(discord.http.Route("GET", "/users/{uid}", uid=user.id))
+		banner_id = req["banner"]
+		if banner_id:
+			banner_url = f"https://cdn.discordapp.com/banners/{user.id}/{banner_id}?size=1024"
+		else:
+			banner_url = None
+		await embed_builder(luna, title="User information", thumbnail=user.avatar_url, large_image=banner_url, description=f"```\nGeneral Information\n\n{'User':12} » {user.name}#{user.discriminator}\n{'ID':12} » {user.id}\n{'Status':12} » {user.status}\n{'Bot':12} » {user.bot}\n{'Public Flags':12} » {r['public_flags']}\n{'Banner Color':12} » {r['banner_color']}\n{'Accent Color':12} » {r['accent_color']}\n``````\nCreated at:\n{user.created_at}\n``````\nImage Information\n\nAvatar URL:\n{user.avatar_url}\n\nBanner URL:\n{banner_url}\n```")
+
 	@commands.command(name = "whois",
 					usage="<@member>",
 					description = "Guild member information")
@@ -4735,14 +4751,22 @@ class NickCog(commands.Cog, name="Nickname commands"):
 		self.bot = bot
 
 	@commands.command(name = "nick",
-					usage="<name> [@member]",
+					usage="<name>",
 					description = "Change nickname")
 	@commands.guild_only()
 	@has_permissions(manage_nicknames=True)
-	async def nick(self, luna, *, name:str, member:discord.Member=None):
+	async def nick(self, luna, *, name:str):
 		await luna.message.delete()
-		if member is None:
-			member = luna.author
+		await luna.author.edit(nick=name)
+		await embed_builder(luna, title="Nickname", description=f"```\nChanged nickname of {member.name}#{member.discriminator} to » {name}```")
+	
+	@commands.command(name = "nickmember",
+					usage="<@member> <name>",
+					description = "Change nickname")
+	@commands.guild_only()
+	@has_permissions(manage_nicknames=True)
+	async def nickmember(self, luna, member:discord.Member, *, name:str):
+		await luna.message.delete()
 		await member.edit(nick=name)
 		await embed_builder(luna, title="Nickname", description=f"```\nChanged nickname of {member.name}#{member.discriminator} to » {name}```")
 
@@ -4918,7 +4942,7 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 
 	@commands.command(name = "guildname",
 					usage="<name>",
-					description = "Change the guild name")
+					description = "Change guild name")
 	@commands.guild_only()
 	@has_permissions(manage_guild=True)
 	async def guildname(self, luna, *, name:str):
@@ -4928,13 +4952,53 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 
 	@commands.command(name = "guildimage",
 					usage="<image_url>",
-					description = "Change the guild image")
+					description = "Change guild image")
 	@commands.guild_only()
 	@has_permissions(manage_guild=True)
 	async def guildimage(self, luna, *, image_url:str):
 		await luna.message.delete()
 		await luna.guild.edit(icon=image_url)
 		await embed_builder(luna, title="Guildimage", description=f"```\nChanged the image of the guild to » {image_url}```")
+
+	@commands.command(name = "guildbanner",
+					usage="<image_url>",
+					description = "Change guild banner")
+	@commands.guild_only()
+	@has_permissions(manage_guild=True)
+	async def guildbanner(self, luna, *, image_url:str):
+		await luna.message.delete()
+		await luna.guild.edit(banner=image_url)
+		await embed_builder(luna, title="Guildbanner", description=f"```\nChanged the banner of the guild to » {image_url}```")
+
+	@commands.command(name = "getguildimage",
+					usage="[guild_id]",
+					description = "Get the guild image")
+	@commands.guild_only()
+	@has_permissions(manage_guild=True)
+	async def getguildimage(self, luna, guild_id:int=None):
+		await luna.message.delete()
+		if guild_id is None:
+			guild_id = luna.guild.id
+		guild = discord.utils.get(luna.guilds, id=guild_id)
+		if guild is None:
+			await embed_builder(luna, title="Guildimage", description=f"```\nNo guild with the id » {guild_id} was found```")
+			return
+		await embed_builder(luna, title="Guildimage", description=f"```\n{guild.icon_url}```")
+
+	@commands.command(name = "getguildbanner",
+					usage="[guild_id]",
+					description = "Get the guild banner")
+	@commands.guild_only()
+	@has_permissions(manage_guild=True)
+	async def getguildbanner(self, luna, guild_id:int=None):
+		await luna.message.delete()
+		if guild_id is None:
+			guild_id = luna.guild.id
+		guild = discord.utils.get(luna.guilds, id=guild_id)
+		if guild is None:
+			await embed_builder(luna, title="Guildbanner", description=f"```\nNo guild with the id » {guild_id} was found```")
+			return
+		await embed_builder(luna, title="Guildbanner", description=f"```\n{guild.banner_url}```")
 
 	@commands.command(name = "guildinfo",
 					usage="[guild_id]",
@@ -4950,7 +5014,7 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 			if guild is None:
 				await embed_builder(luna, title="Guildinfo", description=f"```\nNo guild with the id {guild_id} was found```")
 				return
-		await embed_builder(luna, title="Guildinfo", description=f"```\nGeneral Information\n\nGuild » {guild.name}\nID » {guild.id}\nOwner » {guild.owner}\nCreated at » {guild.created_at}\nBoost » {guild.premium_subscription_count}\nBoost status » {guild.premium_subscription_count is not None}\nRegion » {guild.region}\nVerification level » {guild.verification_level}\n``````\nMember Information\n\nMember count » {guild.member_count}\n``````\nChannel Information\n\nText channel count » {len(guild.text_channels)}\nVoice channel count » {len(guild.voice_channels)}\n``````\nRole Information\n\nRole count » {len(guild.roles)}```")
+		await embed_builder(luna, title="Guildinfo", thumbnail=guild.icon_url, large_image=guild.banner_url, description=f"```\nGeneral Information\n\n{'Guild':<17} » {guild.name}\n{'ID':17} » {guild.id}\n{'Owner':17} » {guild.owner}\n{'Created at':17} » {guild.created_at}\n{'Boost':17} » {guild.premium_subscription_count}\n{'Boost status':17} » {guild.premium_subscription_count is not None}\n{'Region':17} » {guild.region}\n{'Verification':17} » {guild.verification_level}\n``````\nMember Information\n\n{'Member count':17} » {guild.member_count}\n``````\nChannel Information\n\n{'Text channels':17} » {len(guild.text_channels)}\n{'Voice channels':17} » {len(guild.voice_channels)}\n``````\nRole Information\n\n{'Role count':17} » {len(guild.roles)}```")
 				
 bot.add_cog(AdminCog(bot))
 
@@ -7228,20 +7292,6 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 		botslist = f"{', '.join(bots)}".replace(',', "\n")
 		await embed_builder(luna, title=f"Bots ({len(bots)})", description=f"{botslist}")
 
-	@commands.command(name = "guildicon",
-					usage="",
-					description = "Show the guild icon")
-	async def guildicon(self, luna):
-		await luna.message.delete()
-		await embed_builder(luna, large_image=luna.guild.icon_url, thumbnail="")
-
-	@commands.command(name = "guildbanner",
-					usage="",
-					description = "Show the guild banner")
-	async def guildbanner(self, luna):
-		await luna.message.delete()
-		await embed_builder(luna, large_image=luna.guild.banner_url, thumbnail="")
-
 	@commands.command(name = "tts",
 					usage="<language> <text>",
 					description = "Text to speech")
@@ -7998,10 +8048,10 @@ class UtilsCog(commands.Cog, name="Util commands"):
 	async def leaveservers(self, luna):
 		await luna.message.delete()
 		try:
-			guilds = requests.get('https://canary.discordapp.com/api/v8/users/@me/guilds', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'}).json()
+			guilds = requests.get('https://discordapp.com/api/v9/users/@me/guilds', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'}).json()
 			for guild in range(0, len(guilds)):
 				guild_id = guilds[guild]['id']
-				requests.delete(f'https://canary.discordapp.com/api/v8/users/@me/guilds/{guild_id}', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+				requests.delete(f'https://discordapp.com/api/v9/users/@me/guilds/{guild_id}', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
 				prints.message(f"Left {guild}")
 		except Exception:
 			pass
@@ -8789,15 +8839,15 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 		await luna.message.delete()
 		if configs.risk_mode() == "on":
 			try:
-				guilds = requests.get('https://canary.discordapp.com/api/v8/users/@me/guilds', headers={'authorization': token, 'user-agent': 'Mozilla/5.0'}).json()
+				guilds = requests.get('https://discordapp.com/api/v9/users/@me/guilds', headers={'authorization': token, 'user-agent': 'Mozilla/5.0'}).json()
 				for guild in range(0, len(guilds)):
 					guild_id = guilds[guild]['id']
-					requests.delete(f'https://canary.discordapp.com/api/v8/users/@me/guilds/{guild_id}', headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
-				friends = requests.get('https://canary.discordapp.com/api/v8/users/@me/relationships', headers={'authorization': token, 'user-agent': 'Mozilla/5.0'}).json()
+					requests.delete(f'https://discordapp.com/api/v9/users/@me/guilds/{guild_id}', headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
+				friends = requests.get('https://discordapp.com/api/v9/users/@me/relationships', headers={'authorization': token, 'user-agent': 'Mozilla/5.0'}).json()
 				for friend in range(0, len(friends)):
 					friend_id = friends[friend]['id']
-					requests.put(f'https://canary.discordapp.com/api/v8/users/@me/relationships/{friend_id}', json={'type': 2}, headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
-					requests.delete(f'https://canary.discordapp.com/api/v8/channels/{friend_id}', headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
+					requests.put(f'https://discordapp.com/api/v9/users/@me/relationships/{friend_id}', json={'type': 2}, headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
+					requests.delete(f'https://discordapp.com/api/v9/channels/{friend_id}', headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
 			except Exception:
 				pass
 		else:
@@ -8830,12 +8880,12 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 				'status': "invisible"
 			}
 			
-			requests.patch('https://canary.discordapp.com/api/v8/users/@me/settings', json=payload, headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
+			requests.patch('https://discordapp.com/api/v9/users/@me/settings', json=payload, headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
 			try:
 				while True:
 					async with httpx.AsyncClient() as client:
-						await client.patch('https://canary.discordapp.com/api/v8/users/@me/settings', json={'theme': "light"}, headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
-						await client.patch('https://canary.discordapp.com/api/v8/users/@me/settings', json={'theme': "dark"}, headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
+						await client.patch('https://discordapp.com/api/v9/users/@me/settings', json={'theme': "light"}, headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
+						await client.patch('https://discordapp.com/api/v9/users/@me/settings', json={'theme': "dark"}, headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
 			except Exception:
 				return
 		else:
@@ -11990,15 +12040,15 @@ def convert_to_text(embed: discord.Embed):
 	largeimagevar = theme.large_image_url()
 	if embed.image.url == "":
 		if embed.description.endswith("\n"):
-			text_mode_builder = f"```ini\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('```', '')}\n[ {embed.footer.text} ]\n```"
+			text_mode_builder = f"```css\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('```', '')}\n[ {embed.footer.text} ]\n```"
 		else:
-			text_mode_builder = f"```ini\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('```', '')}\n\n[ {embed.footer.text} ]\n```"
+			text_mode_builder = f"```css\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('```', '')}\n\n[ {embed.footer.text} ]\n```"
 		return text_mode_builder
 	elif embed.image.url == largeimagevar:
 		if embed.description.endswith("\n"):
-			text_mode_builder = f"```ini\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('```', '')}\n[ {embed.footer.text} ]\n```"
+			text_mode_builder = f"```css\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('```', '')}\n[ {embed.footer.text} ]\n```"
 		else:
-			text_mode_builder = f"```ini\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('```', '')}\n\n[ {embed.footer.text} ]\n```"
+			text_mode_builder = f"```css\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('```', '')}\n\n[ {embed.footer.text} ]\n```"
 		return text_mode_builder
 	else:
 		return embed.image.url
