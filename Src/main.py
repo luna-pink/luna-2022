@@ -3662,8 +3662,8 @@ class HelpCog(commands.Cog, name="Help commands"):
 			custom = cog.get_commands()
 			custom_command_count = 0
 			for command in custom:
-				custom_command_count += 1 #{command_count-custom_command_count}
-			await embed_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » 563\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}game             » Game commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Current guild profile\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}about            » Luna information\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
+				custom_command_count += 1
+			await embed_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}game             » Game commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Current guild profile\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}about            » Luna information\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
 
 	@commands.command(name = "admin",
 						usage="[2]",
@@ -4215,6 +4215,18 @@ class ProfileCog(commands.Cog, name="Profile commands"):
 		payload = {'status': "invisible"}
 		requests.patch('https://discordapp.com/api/v9/users/@me/settings', json=payload, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
 		await embed_builder(luna, description="```\nSet status to offline/invisible```")
+
+	@commands.command(name = "startup",
+					usage="<online/idle/dnd/offline>",
+					description = "Startup")
+	async def startup(self, luna, mode:str):
+		await luna.message.delete()
+		if mode == "online" or mode == "idle" or mode == "dnd" or mode == "offline":
+			prints.message(f"Startup status » {color.purple(f'{mode}')}")
+			config.startup_status(mode)
+			await embed_builder(luna, description=f"```\nStartup status » {mode}```")
+		else:
+			await mode_error(luna, "online, idle, dnd or offline")
 
 bot.add_cog(ProfileCog(bot))
 class StatusCog(commands.Cog, name="Animated statuses"):
@@ -7402,7 +7414,6 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 	async def ping(self, luna, *, url:str):
 		await luna.message.delete()
 		await embed_builder(luna, title=f"Ping", description=f"```\nPinging {url}...```")
-		# output = subprocess.Popen(["ping", url], stdout=subprocess.PIPE).communicate()[0]
 		output = subprocess.run(f"ping {url}",text=True,stdout=subprocess.PIPE).stdout.splitlines()
 		values = "".join(output[-1:])[4:].split(", ")
 		minimum = values[0][len("Minimum = "):]
@@ -7485,7 +7496,7 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 		try:
 			ip = socket.gethostbyname(new_url)
 		except:
-			await luna.send("URL is invalid")
+			await embed_builder(luna, title="Resolve", description=f"```\nURL is invalid```")
 			return
 		await embed_builder(luna, title="Host Resolver", description=f"```\nURL » {url}\n``````\nIP » {ip}\n```")
 
@@ -7498,6 +7509,137 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 		except:
 			await error_builder(luna, "```\nInvalid webhook ID```")
 
+	@commands.command(name="maclookup", usage="<mac>", description="MAC address Information")
+	async def maclookup(self, luna, mac:str):
+		await luna.message.delete()
+		if mac is None:
+			await luna.send("Please specify a MAC address")
+			return
+		if len(mac) != 17:
+			await luna.send("Invalid MAC address")
+			return
+		try:
+			resp = requests.get(f'https://api.macvendors.com/{mac}')
+			if "Not Found" in resp.text:
+				await embed_builder(luna, description="```\nInvalid MAC address```")
+			else:
+				j = resp.json()	
+				await embed_builder(luna, title=f"MAC » {mac}", description=f"```\nVendor » {j}\n```")
+		except:
+			await error_builder(luna, "```\nError » Invalid MAC address```")
+
+	@commands.command(name="reverseip", usage="<ip>", description="Reverse DNS")
+	async def reverseip(self, luna, ip):
+		await luna.message.delete()
+		if ip is None:
+			await embed_builder(luna, description="```\nPlease specify an IP address```")
+			return
+		try:
+			resp = requests.get(f'https://api.hackertarget.com/reverseiplookup/?q={ip}')
+			if "error" in resp.text:
+				await embed_builder(luna, description="```\nInvalid IP address```")
+			else:
+				j = resp.json()
+				await embed_builder(luna, title=f"Reverse DNS » {ip}", description=f"```\n{j}\n```")
+		except:
+			await error_builder(luna, "```\nError » Invalid IP address```")
+
+	@commands.command(name="mtr", usage="<ip>", description="MTR Traceroute")
+	async def mtr(self, luna, ip):
+		await luna.message.delete()
+		if ip is None:
+			await embed_builder(luna, description="```\nPlease specify an IP address```")
+			return
+		try:
+			resp = requests.get(f'https://api.hackertarget.com/mtr/?q={ip}')
+			if "error" in resp.text:
+				await embed_builder(luna, description="```\nInvalid IP address```")
+			else:
+				j = resp.json()
+				await embed_builder(luna, title=f"MTR Traceroute » {ip}", description=f"```\n{j}\n```")
+		except:
+			await error_builder(luna, "```\nError » Invalid IP address```")
+
+	@commands.command(name="asn", usage="<ip>", description="ASN Information")
+	async def asn(self, luna, ip):
+		await luna.message.delete()
+		if ip is None:
+			await embed_builder(luna, description="```\nPlease specify an IP address```")
+			return
+		try:
+			resp = requests.get(f'https://api.hackertarget.com/asnlookup/?q={ip}')	
+			if "error" in resp.text:
+				await embed_builder(luna, description="```\nInvalid IP address```")
+			else:
+				j = resp.json()
+				await embed_builder(luna, title=f"ASN » {ip}", description=f"```\n{j}\n```")
+		except:
+			await error_builder(luna, "```\nError » Invalid IP address```")
+
+	@commands.command(name="zonetransfer", usage="<domain>", description="Zone Transfer")
+	async def zonetransfer(self, luna, domain):
+		await luna.message.delete()
+		if domain is None:
+			await embed_builder(luna, description="```\nPlease specify a domain```")
+			return
+		try:
+			resp = requests.get(f'https://api.hackertarget.com/zonetransfer/?q={domain}')
+			if "error" in resp.text:
+				await embed_builder(luna, description="```\nInvalid domain```")
+			else:
+				j = resp.json()
+				await embed_builder(luna, title=f"Zone Transfer » {domain}", description=f"```\n{j}\n```")
+		except:
+			await error_builder(luna, "```\nError » Invalid domain```")
+
+	@commands.command(name="httpheaders", usage="<url>", description="HTTP Headers")
+	async def httpheaders(self, luna, url):
+		await luna.message.delete()
+		if url is None:
+			await embed_builder(luna, description="```\nPlease specify a URL```")
+			return
+		try:
+			resp = requests.get(f'https://api.hackertarget.com/httpheaders/?q={url}')
+			if "error" in resp.text:
+				await embed_builder(luna, description="```\nInvalid URL```")
+			else:
+				j = resp.json()
+				await embed_builder(luna, title=f"HTTP Headers » {url}", description=f"```\n{j}\n```")
+		except:
+			await error_builder(luna, "```\nError » Invalid URL```")
+
+	@commands.command(name="subnetcalc", usage="<ip>", description="Subnet Calculator")
+	async def subnetcalc(self, luna, ip):
+		await luna.message.delete()
+		if ip is None:
+			await embed_builder(luna, description="```\nPlease specify an IP address```")
+			return
+		try:
+			resp = requests.get(f'https://api.hackertarget.com/subnetcalc/?q={ip}')
+			if "error" in resp.text:
+				await embed_builder(luna, description="```\nInvalid IP address```")
+			else:
+				j = resp.json()
+				await embed_builder(luna, title=f"Subnet Calculator » {ip}", description=f"```\n{j}\n```")
+		except:
+			await error_builder(luna, "```\nError » Invalid IP address```")
+
+	@commands.command(name="crawl", usage="<url>", description="Crawl a website")
+	async def crawl(self, luna, url):
+		await luna.message.delete()
+		if url is None:
+			await embed_builder(luna, description="```\nPlease specify a URL```")
+			return
+		try:
+			resp = requests.get(f'https://api.hackertarget.com/pagelinks/?q={url}')
+			if "error" in resp.text:
+				await embed_builder(luna, description="```\nInvalid URL```")
+			else:
+				j = resp.json()
+				await embed_builder(luna, title=f"Crawl » {url}", description=f"```\n{j}\n```")
+		except:
+			await error_builder(luna, "```\nError » Invalid URL```")
+	
 	@commands.command(name="scrapeproxies", usage="", aliases=['proxyscrape', 'scrapeproxy'],description="Scrape for proxies")
 	async def scrapeproxies(self, luna):
 		await luna.message.delete()
@@ -8062,105 +8204,6 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
 
-	@commands.command(name = "massping",
-					usage="<delay> <amount>",
-					description = "Mass ping members")
-	async def massping(self, luna, delay:int, amount:int):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			try:
-				for i in range(amount):
-					members = [m.mention for m in luna.guild.members]
-					if len(members) < 30:
-						mentionamount = len(members)
-					else:
-						mentionamount = 30
-					sendamount = len(members) - mentionamount + 1
-					for i in range(sendamount):
-						if mentionamount == 0:
-							break
-						pingtext = ""
-						for i in range(mentionamount):
-							pingtext += members.pop()
-						await luna.send(pingtext)
-						await asyncio.sleep(delay)
-						if len(members) < 30:
-							mentionamount = len(members)
-						else:
-							mentionamount = 30
-						sendamount = len(members) - mentionamount + 1
-			except Exception as e:
-				prints.error(f"{e}")
-		else:
-			await error_builder(luna, description="```\nRiskmode is disabled```")
-
-	@commands.command(name = "massgp",
-					usage="<delay> <amount>",
-					description = "Mass ghostping members")
-	async def massgp(self, luna, delay:int, amount:int):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			try:
-				for i in range(amount):
-					members = [m.mention for m in luna.guild.members]
-					if len(members) < 30:
-						mentionamount = len(members)
-					else:
-						mentionamount = 30
-					sendamount = len(members) - mentionamount + 1
-					for i in range(sendamount):
-						if mentionamount == 0:
-							break
-						pingtext = ""
-						for i in range(mentionamount):
-							pingtext += members.pop()
-						msg = await luna.send(pingtext)
-						await msg.delete()
-						await asyncio.sleep(delay)
-						if len(members) < 40:
-							mentionamount = len(members)
-						else:
-							mentionamount = 40
-						sendamount = len(members) - mentionamount + 1
-			except Exception as e:
-				await error_builder(luna, description=e)
-		else:
-			await error_builder(luna, description="```\nRiskmode is disabled```")
-
-	@commands.command(name = "massnick",
-					usage="<name>",
-					description = "Mass change nicknames")
-	async def massnick(self, luna, name:str):
-		if configs.risk_mode() == "on":
-			bot = discum.Client(token=user_token, log=False, user_agent="Mozilla/5.0")
-
-			def done_fetching(resp, guild_id):
-				if bot.gateway.finishedMemberFetching(guild_id):
-					members = bot.gateway.session.guild(guild_id).members
-					bot.gateway.removeCommand({'function': done_fetching, 'params': {'guild_id': guild_id}})
-					bot.gateway.close()
-					return members
-
-			def get_members(guild_id, channel_id):
-				bot.gateway.fetchMembers(guild_id, channel_id, keep="all", wait=1)
-				bot.gateway.command({'function': done_fetching, 'params': {'guild_id': guild_id}})
-				bot.gateway.run()
-				bot.gateway.resetSession()
-				return bot.gateway.session.guild(guild_id).members
-			amount = 0
-			members = get_members(str(luna.guild.id), str(luna.channel.id))
-			for member in members:
-				try:
-					member = await luna.guild.fetch_member(member.id)
-					await member.edit(nick=name)
-					amount += 1
-					await asyncio.sleep(1)
-				except:
-					pass
-			await embed_builder(luna, title="Success", description=f"```\nChanged nicknames of {amount} members```")
-		else:
-			await error_builder(luna, description="```\nRiskmode is disabled```")
-
 	@commands.command(name = "spam",
 					usage="<delay> <amount> <message>",
 					description = "Spammer")
@@ -8299,6 +8342,105 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 				await error_builder(luna, description=e)
 				return
 			await embed_builder(luna, description=f"```\nWebhooks sent```")
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "massping",
+					usage="<delay> <amount>",
+					description = "Mass ping members")
+	async def massping(self, luna, delay:int, amount:int):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				for i in range(amount):
+					members = [m.mention for m in luna.guild.members]
+					if len(members) < 30:
+						mentionamount = len(members)
+					else:
+						mentionamount = 30
+					sendamount = len(members) - mentionamount + 1
+					for i in range(sendamount):
+						if mentionamount == 0:
+							break
+						pingtext = ""
+						for i in range(mentionamount):
+							pingtext += members.pop()
+						await luna.send(pingtext)
+						await asyncio.sleep(delay)
+						if len(members) < 30:
+							mentionamount = len(members)
+						else:
+							mentionamount = 30
+						sendamount = len(members) - mentionamount + 1
+			except Exception as e:
+				prints.error(f"{e}")
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "massgp",
+					usage="<delay> <amount>",
+					description = "Mass ghostping members")
+	async def massgp(self, luna, delay:int, amount:int):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				for i in range(amount):
+					members = [m.mention for m in luna.guild.members]
+					if len(members) < 30:
+						mentionamount = len(members)
+					else:
+						mentionamount = 30
+					sendamount = len(members) - mentionamount + 1
+					for i in range(sendamount):
+						if mentionamount == 0:
+							break
+						pingtext = ""
+						for i in range(mentionamount):
+							pingtext += members.pop()
+						msg = await luna.send(pingtext)
+						await msg.delete()
+						await asyncio.sleep(delay)
+						if len(members) < 40:
+							mentionamount = len(members)
+						else:
+							mentionamount = 40
+						sendamount = len(members) - mentionamount + 1
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "massnick",
+					usage="<name>",
+					description = "Mass change nicknames")
+	async def massnick(self, luna, name:str):
+		if configs.risk_mode() == "on":
+			bot = discum.Client(token=user_token, log=False, user_agent="Mozilla/5.0")
+
+			def done_fetching(resp, guild_id):
+				if bot.gateway.finishedMemberFetching(guild_id):
+					members = bot.gateway.session.guild(guild_id).members
+					bot.gateway.removeCommand({'function': done_fetching, 'params': {'guild_id': guild_id}})
+					bot.gateway.close()
+					return members
+
+			def get_members(guild_id, channel_id):
+				bot.gateway.fetchMembers(guild_id, channel_id, keep="all", wait=1)
+				bot.gateway.command({'function': done_fetching, 'params': {'guild_id': guild_id}})
+				bot.gateway.run()
+				bot.gateway.resetSession()
+				return bot.gateway.session.guild(guild_id).members
+			amount = 0
+			members = get_members(str(luna.guild.id), str(luna.channel.id))
+			for member in members:
+				try:
+					member = await luna.guild.fetch_member(member.id)
+					await member.edit(nick=name)
+					amount += 1
+					await asyncio.sleep(1)
+				except:
+					pass
+			await embed_builder(luna, title="Success", description=f"```\nChanged nicknames of {amount} members```")
 		else:
 			await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -9651,18 +9793,6 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		prints.message(f"Changed password to » {color.purple(f'{password}')}")
 		config.password(f"{password}")
 
-	@commands.command(name = "startup",
-					usage="<online/idle/dnd/offline>",
-					description = "Startup")
-	async def startup(self, luna, mode:str):
-		await luna.message.delete()
-		if mode == "online" or mode == "idle" or mode == "dnd" or mode == "offline":
-			prints.message(f"Startup status » {color.purple(f'{mode}')}")
-			config.startup_status(mode)
-			await embed_builder(luna, description=f"```\nStartup status » {mode}```")
-		else:
-			await mode_error(luna, "online, idle, dnd or offline")
-
 	@commands.command(name = "reload",
 					usage="",
 					description = "Reload custom commands")
@@ -10626,6 +10756,33 @@ class ThemesCog(commands.Cog, name="Theme commands"):
 		await luna.message.delete()
 		themesvar = files.json("Luna/config.json", "theme", documents=True)
 		await luna.send(file=discord.File(os.path.join(files.documents(), f"Luna/themes/{themesvar}")))
+
+	@commands.command(name="stealtheme", 
+					usage="<message_id>", 
+					description="Steal a theme")
+	async def stealtheme(self, luna, message_id:int):
+		await luna.message.delete()
+		prefix = files.json("Luna/config.json", "prefix", documents=True)
+		message = await luna.fetch_message(message_id)
+		embed = message.embeds[0]
+		path = os.path.expanduser('~\Documents\Luna')
+		file = open(path + "\\themes\\" + embed.title.lower().replace(" ", "") + ".json", "w+", encoding="utf-8")
+		data = """{
+	"title": "%s",
+	"title_url": "%s",
+	"footer": "%s",
+	"footer_icon_url": "%s",
+	"image_url": "%s",
+	"large_image_url": "%s",
+	"hex_color": "%s",
+	"author": "%s",
+	"author_icon_url": "%s",
+	"author_url": "%s",
+	"description": true	
+}"""%(embed.title, embed.url, embed.footer.text, embed.footer.icon_url, embed.thumbnail.url, embed.image.url, embed.color, embed.author.name, embed.author.icon_url, embed.author.url)
+		file.write(data.replace("Embed.Empty", ""))
+		file.close()
+		await embed_builder(luna, description=f"""```\nSaved the embed theme as » {embed.title.lower().replace(" ", "")}\n``````\nNote\n\nUse \"{prefix}theme {embed.title.lower().replace(" ", "")}\" to use the theme.```""")
 
 	@commands.command(name = "communitythemes",
 					aliases=['cthemes'],
@@ -11676,7 +11833,24 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 					description = "Uptime")
 	async def uptime(self, luna):
 		await luna.message.delete()
-		await embed_builder(luna, description=f"```\nUptime » {hour:02d}:{minute:02d}:{second:02d}```")
+		await embed_builder(luna, description=f"```\nUptime » {hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds.```")
+
+
+	@commands.command(name = "logout",
+					usage="",
+					description = "Logout of the bot")
+	async def logout(self, luna):
+		await luna.message.delete()
+		prints.message(f"Logging out of the bot")
+		await embed_builder(luna, description=f"```\nLogging out of the bot```")
+		await bot.logout()
+
+	@commands.command(name = "shutdown",
+					usage="",
+					description = "Shutdown the bot")
+	async def shutdown(self, luna):
+		await luna.message.delete()
+		os._exit(0)
 
 	# @commands.command(name = "thelp",
 	# 				usage="",
@@ -12052,7 +12226,6 @@ def convert_to_text(embed: discord.Embed):
 		return text_mode_builder
 	else:
 		return embed.image.url
-
 
 def convert_to_indent(embed: discord.Embed):
 	largeimagevar = theme.large_image_url()
