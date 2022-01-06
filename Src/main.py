@@ -12365,6 +12365,14 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 		else:
 			await mode_error(luna, "on or off")
 
+	@commands.command(name = "hwid",
+					usage="",
+					description = "Prints your hwid")
+	async def hwid(self, luna):
+		await luna.message.delete()
+		hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\r\n')[1].strip('\r').strip()
+		prints.message(f"Your HWID » {hwid}")
+
 bot.add_cog(MiscCog(bot))
 class GamesCog(commands.Cog, name="Game commands"):
 	def __init__(self, bot:commands.bot):
