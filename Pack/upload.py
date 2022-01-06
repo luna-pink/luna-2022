@@ -1,10 +1,11 @@
-import discord
-import requests
-from discord import *
-from CEA256 import *
-from discord.ext import commands
 import json
 import os
+
+import discord
+import requests
+from CEA256 import *
+from discord import *
+from discord.ext import commands
 
 # ///////////////////////////////////////////////////////////////
 

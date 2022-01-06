@@ -17,7 +17,6 @@ import psutil
 import typing
 import aiohttp
 import asyncio
-import discord
 import hashlib
 import pwinput
 import requests
@@ -26,9 +25,9 @@ import subprocess
 import pypresence
 import pyPrivnote as pn
 import ctypes.wintypes as wintypes
+
 from CEA256 import *
 from gtts import gTTS
-from discord import *
 from ctypes import windll
 from notifypy import Notify
 from os import error, name, system
@@ -38,6 +37,9 @@ from discord.ext import commands
 from urllib.request import urlopen
 from urllib.parse import non_hierarchical, quote_plus
 from time import localtime, strftime
+
+import discord
+from discord import *
 from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFound, has_permissions
 
 # ///////////////////////////////////////////////////////////////
@@ -3424,12 +3426,17 @@ bot.add_cog(OnTyping(bot))
 # ///////////////////////////////////////////////////////////////
 # On Command Event
 
+last_used = ""
+
 class OnCommand(commands.Cog, name="on command"):
 	def __init__(self, bot:commands.Bot):
 		self.bot = bot
 		
 	@commands.Cog.listener()
 	async def on_command(self, luna:commands.Context):
+		global last_used
+		if not luna.command.name == "repeat":
+			last_used = luna.command.name
 		prints.command(luna.command.name)
 		theme_json = files.json("Luna/config.json", "theme", documents=True)
 		try:
@@ -3457,7 +3464,10 @@ class OnCommandErrorCog(commands.Cog, name="on command error"):
 		error_str = str(error)
 		error = getattr(error, 'original', error)
 		if isinstance(error, commands.CommandOnCooldown):
-			await luna.message.delete()
+			try:
+				await luna.message.delete()
+			except:
+				pass
 			day = round(error.retry_after/86400)
 			hour = round(error.retry_after/3600)
 			minute = round(error.retry_after/60)
@@ -3485,7 +3495,7 @@ class OnCommandErrorCog(commands.Cog, name="on command error"):
 		if isinstance(error, CommandNotFound):
 			try:
 				await luna.message.delete()
-			except Exception:
+			except:
 				pass
 			prefix = files.json("Luna/config.json", "prefix", documents=True)
 			helptext = ""
@@ -3517,31 +3527,55 @@ class OnCommandErrorCog(commands.Cog, name="on command error"):
 		elif isinstance(error, CheckFailure):
 			try:
 				await luna.message.delete()
-			except Exception:
+			except:
 				pass
 			await error_builder(luna, f"```\n{error}```")
 		elif isinstance(error, commands.MissingRequiredArgument):
 			try:
 				await luna.message.delete()
-			except Exception:
+			except:
 				pass
 			await error_builder(luna, f"```\nMissing arguments\n\n{error}```")
 		elif isinstance(error, MissingPermissions):
 			try:
 				await luna.message.delete()
-			except Exception:
+			except:
 				pass
 			await error_builder(luna, f"```\nMissing permissions\n\n{error}```")
+		elif isinstance(error, commands.CommandInvokeError):
+			try:
+				await luna.message.delete()
+			except:
+				pass
+			await error_builder(luna, f"```\n{error}```")
 		elif "Cannot send an empty message" in error_str:
 			try:
 				await luna.message.delete()
-			except Exception:
+			except:
 				pass
 			await error_builder(luna, f"```\n{error}```")
+		elif "Cannot send messages to this user" in error_str:
+			try:
+				await luna.message.delete()
+			except:
+				pass
+			await error_builder(luna, f"```\nCannot send a message to this user\n\n{error}```")
+		elif "Cannot send messages in this channel" in error_str:
+			try:
+				await luna.message.delete()
+			except:
+				pass
+			await error_builder(luna, f"```\nCannot send a message in this channel\n\n{error}```")
+		elif "Cannot send files bigger than" in error_str:
+			try:
+				await luna.message.delete()
+			except:
+				pass
+			await error_builder(luna, f"```\nCannot send files bigger than 8MB\n\n{error}```")
 		else:
 			try:
 				await luna.message.delete()
-			except Exception:
+			except:
 				pass
 			await error_builder(luna, f"```\n{error}```")
 
@@ -3663,7 +3697,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 			custom_command_count = 0
 			for command in custom:
 				custom_command_count += 1
-			await embed_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}game             » Game commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Current guild profile\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}about            » Luna information\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
+			await embed_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}game             » Game commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Current guild profile\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}about            » Luna information\n{prefix}repeat           » Repeat last used command\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
 
 	@commands.command(name = "admin",
 						usage="[2]",
@@ -4159,6 +4193,14 @@ class HelpCog(commands.Cog, name="Help commands"):
 		else:
 			beta_info = ""
 		await embed_builder(luna, description=f"```\nMoto of the day\n\n{motd}\n``````\nVersion\n\n{version}{beta_info}\n``````\nUptime\n\n{hour:02d}:{minute:02d}:{second:02d}\n``````\nCommands\n\n{command_count-custom_command_count}\n``````\nCustom commands\n\n{custom_command_count}\n``````\nPublic server invite\n\nhttps://discord.gg/Kxyv7NHVED\n``````\nCustomer only server invite\n\nhttps://discord.gg/3FGEaCnZST\n``````\nWebsite\n\nhttps://team-luna.org\n```")
+
+	@commands.command(name = "repeat",
+						usage="",
+						description = "Repeat last used command")
+	async def repeat(self, luna):
+		await luna.message.delete()
+		prefix = files.json("Luna/config.json", "prefix", documents=True)
+		await luna.send(f"{prefix}{last_used}")
 
 	@commands.command(name = "search",
 						usage="<command>",
@@ -9557,7 +9599,7 @@ class BackupsCog(commands.Cog, name="Backup commands"):
 		serverName = luna.guild.name
 
 		newGuild = await self.bot.create_guild(serverName)
-		prints.info(f"Created new guild.")
+		prints.info(f"Created new guild")
 		newGuildDefaultChannels = await newGuild.fetch_channels()
 		for channel in newGuildDefaultChannels:
 			await channel.delete()
@@ -9612,7 +9654,7 @@ class BackupsCog(commands.Cog, name="Backup commands"):
 				except:
 					pass
 
-		await embed_builder(luna, f"```\nCloned {luna.guild.name}```")
+		await embed_builder(luna, description=f"```\nCloned {luna.guild.name}```")
 
 	@commands.command(name = "friendsbackup",
 					usage="",
@@ -9626,17 +9668,19 @@ class BackupsCog(commands.Cog, name="Backup commands"):
 		blockedlist = ""
 		for friend in self.bot.user.friends:
 			friendslist += f"{friend.name}#{friend.discriminator}\n"
-			friendsamount += 1
-		file = open("data/backup/friends.txt", "w", encoding='utf-8') 
+			friendsamount += 1 
+		file = open(os.path.join(files.documents(), "Luna/backup/friends.txt"), "w", encoding='utf-8')
 		file.write(friendslist)
 		file.close()
 		for block in self.bot.user.blocked:
 			blockedlist += f"{block.name}#{block.discriminator}\n"
 			blockedamount += 1
-		file = open("data/backup/blocked.txt", "w", encoding='utf-8') 
+		file = open(os.path.join(files.documents(), "Luna/backup/blocked.txt"), "w", encoding='utf-8')
 		file.write(blockedlist)
 		file.close()
-		await embed_builder(luna, f"```\nBacked up {friendsamount} friends in data/backup/friends.txt\nBacked up {blockedamount} blocked users in data/backup/blocked.txt```")
+		prints.message(f"Friendslist backed up. Friends » {friendsamount} Blocked » {blockedamount}")
+		print("1")
+		await embed_builder(luna, description=f"```\nBacked up {friendsamount} friends in Documents/Luna/backup/friends.txt\nBacked up {blockedamount} blocked users in Documents/Luna/backup/blocked.txt```")
 
 bot.add_cog(BackupsCog(bot))
 class WhitelistCog(commands.Cog, name="Whitelist commands"):
@@ -9654,10 +9698,10 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
 			if luna.guild.id not in whitelisted_users.keys():
 				whitelisted_users[luna.guild.id] = {}
 			if user.id in whitelisted_users[luna.guild.id]:
-				await embed_builder(luna, f"```\n{user.name}#{user.discriminator} is already whitelisted```")
+				await embed_builder(luna, description=f"```\n{user.name}#{user.discriminator} is already whitelisted```")
 			else:
 				whitelisted_users[luna.guild.id][user.id] = 0
-				await embed_builder(luna, f"```\nWhitelisted " + user.name.replace("*", "\*").replace("`", "\`").replace("_", "\_") + "#" + user.discriminator + "```")
+				await embed_builder(luna, description=f"```\nWhitelisted " + user.name.replace("*", "\*").replace("`", "\`").replace("_", "\_") + "#" + user.discriminator + "```")
 
 	@commands.command(name = "unwhitelist",
 					usage="",
@@ -9673,7 +9717,7 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
 			if user.id in whitelisted_users[luna.guild.id]:
 				whitelisted_users[luna.guild.id].pop(user.id, 0)
 				user2 = self.bot.get_user(user.id)
-				await embed_builder(luna, f"```\nUnwhitelisted " + user.name.replace("*", "\*").replace("`", "\`").replace("_", "\_") + "#" + user.discriminator + "```")
+				await embed_builder(luna, description=f"```\nUnwhitelisted " + user.name.replace("*", "\*").replace("`", "\`").replace("_", "\_") + "#" + user.discriminator + "```")
 
 	@commands.command(name = "whitelisted",
 					usage="",
@@ -9686,7 +9730,7 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
 				for key2 in whitelisted_users[key]:
 					user = self.bot.get_user(key2)
 					whitelist += '+ ' + user.name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + "#" + user.discriminator + " - " + self.bot.get_guild(key).name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + "" + "\n"
-			await embed_builder(luna, f"```\n{whitelist}```")
+			await embed_builder(luna, description=f"```\n{whitelist}```")
 		else:
 			whitelist = "`" + luna.guild.name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + '\'s Whitelisted Users:`\n'
 			for key in self.bot.whitelisted_users:
@@ -9694,7 +9738,7 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
 					for key2 in self.bot.whitelisted_users[luna.guild.id]:
 						user = self.bot.get_user(key2)
 						whitelist += '+ ' + user.name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + "#" + user.discriminator + " (" + str(user.id) + ")" + "\n"
-			await embed_builder(luna, f"```\n{whitelist}```")
+			await embed_builder(luna, description=f"```\n{whitelist}```")
 
 	@commands.command(name = "clearwhitelist",
 					usage="",
@@ -9702,7 +9746,7 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
 	async def clearwhitelist(self, luna):
 		await luna.message.delete()
 		whitelisted_users.clear()
-		await embed_builder(luna, f"```\nCleared the whitelist```")
+		await embed_builder(luna, description=f"```\nCleared the whitelist```")
 
 bot.add_cog(WhitelistCog(bot))
 class SettingsCog(commands.Cog, name="Settings commands"):
