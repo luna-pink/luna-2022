@@ -20,6 +20,7 @@ import asyncio
 import hashlib
 import pwinput
 import requests
+import platform
 import threading
 import subprocess
 import pypresence
@@ -40,7 +41,7 @@ from time import localtime, strftime
 
 import discord
 from discord import *
-from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFound, has_permissions
+from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFound, core, has_permissions
 
 # ///////////////////////////////////////////////////////////////
 # Luna Variables
@@ -2959,7 +2960,7 @@ bot = commands.Bot(bot_prefix, self_bot=True, case_insensitive=True, guild_subsc
 async def on_ready():
 	"""Prints a ready log."""
 	if files.json("Luna/notifications/toasts.json", "login", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
-		notify.toast(message=f"Logged into {bot.user}")
+		notify.toast(message=f"Logged into {bot.user}\nLuna Version » {version}")
 	if files.json("Luna/webhooks/webhooks.json", "login", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
 		notify.webhook(url=webhook.login_url(), name="login", description=f"Logged into {bot.user}")
 	luna.console(clear=True)
@@ -3010,8 +3011,9 @@ class OnMessage(commands.Cog, name="on message"):
 		if message.author == self.bot.user:
 			return
 		try:
+			global nitro_cooldown
 			if files.json("Luna/snipers/nitro.json", "sniper", documents=True) == "on" and 'discord.gift/' in message.content:
-				elapsed_snipe = '%.3fs' % (time.time() - sniped_start_time)
+				elapsed_snipe = '%.4fs' % (time.time() - sniped_start_time)
 				code = re.search("discord.gift/(.*)", message.content).group(1)
 				if len(code) >= 16:
 					async with httpx.AsyncClient() as client:
@@ -3025,7 +3027,40 @@ class OnMessage(commands.Cog, name="on message"):
 					else:
 						status = 'Unknown gift code'
 
-					global nitro_cooldown
+					if nitro_cooldown.count(code) == 0:
+						nitro_cooldown.append(code)
+						
+						print()
+						prints.sniper(color.purple(status))
+						prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
+						prints.sniper(f"Channel | {color.purple(f'{message.channel}')}")
+						prints.sniper(f"Author  | {color.purple(f'{message.author}')}")
+						prints.sniper(f"Code    | {color.purple(f'{code}')}")
+						prints.sniper(color.purple('Elapsed Times'))
+						prints.sniper(f"Sniped  | {color.purple(f'{elapsed_snipe}')}")
+						prints.sniper(f"Request | {color.purple(f'{elapsed}')}")
+						print()
+
+						if files.json("Luna/notifications/toasts.json", "nitro", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
+							notify.toast(message=f"{status}\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
+						if files.json("Luna/webhooks/webhooks.json", "nitro", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.nitro_url() == "webhook-url-here":
+							notify.webhook(url=webhook.nitro_url(), name="nitro", description=f"{status}\nServer » {message.guild}\nChannel » {message.channel}\nAuthor » {message.author}\nCode » {code}\nElapsed Times\nSniped » {elapsed_snipe}\nRequest » {elapsed}")
+			
+			elif files.json("Luna/snipers/nitro.json", "sniper", documents=True) == "on" and 'discord.com/gifts' in message.content:
+				elapsed_snipe = '%.4fs' % (time.time() - sniped_start_time)
+				code = re.search("discord.com/gifts/(.*)", message.content).group(1)
+				if len(code) >= 16:
+					async with httpx.AsyncClient() as client:
+						start_time = time.time()
+						result = await client.post(f'https://discordapp.com/api/v9/entitlements/gift-codes/{code}/redeem', json={'channel_id': message.channel.id}, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+						elapsed = '%.3fs' % (time.time() - start_time)
+					if 'nitro' in str(result.content):
+						status = 'Nitro successfully redeemed'
+					elif 'This gift has been redeemed already' in str(result.content):
+						status = 'Has been redeemed already'
+					else:
+						status = 'Unknown gift code'
+
 					if nitro_cooldown.count(code) == 0:
 						nitro_cooldown.append(code)
 						
@@ -3934,7 +3969,27 @@ class HelpCog(commands.Cog, name="Help commands"):
 			helptext = ""
 			for command in commands:
 				helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-			await embed_builder(luna, title="Abusive commands", description=f"{theme.description()}```\n{helptext}```")
+			cog = self.bot.get_cog('Guild commands')
+			commands = cog.get_commands()
+			guildtext = ""
+			for command in commands:
+				guildtext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+			cog = self.bot.get_cog('Mass commands')
+			commands = cog.get_commands()
+			masstext = ""
+			for command in commands:
+				masstext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+			cog = self.bot.get_cog('All commands')
+			commands = cog.get_commands()
+			alltext = ""
+			for command in commands:
+				alltext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+			cog = self.bot.get_cog('Spam commands')
+			commands = cog.get_commands()
+			spamtext = ""
+			for command in commands:
+				spamtext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+			await embed_builder(luna, title="Abusive commands", description=f"{theme.description()}```\nSpam\n\n{spamtext}\n``````\nGuild\n\n{guildtext}\n``````\nMass\n\n{masstext}\n``````\nAll\n\n{alltext}\n``````\nGeneral\n\n{helptext}\n```")
 		else:
 			await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -4302,6 +4357,13 @@ bot.add_cog(StatusCog(bot))
 class ChannelCog(commands.Cog, name="Channel commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
+
+	@commands.command(name = "channelinfo",
+					usage="<#channel>",
+					description = "Information")
+	async def channelinfo(self, luna, channel:discord.TextChannel):
+		await luna.message.delete()
+		await embed_builder(luna, title="Channel Information", description=f"```\n{'Name':17} » {channel.name}\n{'ID':17} » {channel.id}\n{'Created at':17} » {channel.created_at}\n{'Category':17} » {channel.category}\n{'Position':17} » {channel.position}\n{'Topic':17} » {channel.topic}\n{'Is NSFW?':17} » {channel.is_nsfw()}\n```")
 
 	@commands.command(name = "textchannel",
 					usage="<name>",
@@ -4684,6 +4746,13 @@ bot.add_cog(MemberCog(bot))
 class RoleCog(commands.Cog, name="Role commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
+	
+	@commands.command(name = "roleinfo",
+					usage="<@role>",
+					description = "Information")
+	async def roleinfo(self, luna, role:discord.Role):
+		await luna.message.delete()
+		await embed_builder(luna, title="Role Information", description=f"```\n{'Name':17} » {role.name}\n{'ID':17} » {role.id}\n{'Color':17} » {role.color}\n{'Created at':17} » {role.created_at}\n{'Position':17} » {role.position}\n{'Permissions':17} » {role.permissions}\n```")
 
 	@commands.command(name = "giverole",
 					usage="<@member> <role_id>",
@@ -7780,13 +7849,59 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 				proxies.append(proxy)
 		for p in proxies:
 			file.write((p)+"\n")
-		await embed_builder(luna, title="Proxy Scraper", description=f"```\nSaved all scraped proxies in Luna/raiding/proxies```")
+		await embed_builder(luna, title="Proxy Scraper", description=f"```\nSaved all scraped proxies in Luna/raiding/proxies```")#
+
+	@commands.command(name="ip", usage="", description="Show your ip")
+	async def ip(self, luna):
+		await luna.message.delete()
+		ip = requests.get('https://api.ipify.org').text
+		await embed_builder(luna, title="Your IP", description=f"```\nIP » {ip}\n```")
 
 bot.add_cog(NettoolCog(bot))
+
+def get_size(bytes, suffix="B"):
+    """
+    Scale bytes to its proper format
+    e.g:
+        1253656 => '1.20MB'
+        1253656678 => '1.17GB'
+    """
+    factor = 1024
+    for unit in ["", "K", "M", "G", "T", "P"]:
+        if bytes < factor:
+            return f"{bytes:.2f}{unit}{suffix}"
+        bytes /= factor
 
 class UtilsCog(commands.Cog, name="Util commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
+
+	@commands.command(name = "pcspecs", 
+					usage="",
+					aliases=['pc', 'specs'],
+					description="Show your pc specs")
+	async def pcspecs(self, luna):
+		await luna.message.delete()
+		uname = platform.uname()
+		boot_time_timestamp = psutil.boot_time()
+		bt = datetime.fromtimestamp(boot_time_timestamp)
+		cpufreq = psutil.cpu_freq()
+		cores = ""
+		for i, percentage in enumerate(psutil.cpu_percent(percpu=True, interval=1)):
+			cores += f"\n{'Core' + str(i):17} » {percentage}%"
+		svmem = psutil.virtual_memory()
+		partitions = psutil.disk_partitions()
+		disk_io = psutil.disk_io_counters()
+		partition_info = ""
+		for partition in partitions:
+			try:
+				partition_usage = psutil.disk_usage(partition.mountpoint)
+			except PermissionError:
+				continue
+			partition_info += f"{'Device':17} » {partition.device}\n{'Mountpoint':17} » {partition.mountpoint}\n{'System Type':17} » {partition.fstype}\n{'Total Size':17} » {get_size(partition_usage.total)}\n{'Used':17} » {get_size(partition_usage.used)}\n{'Free':17} » {get_size(partition_usage.free)}\n{'Percentage':17} » {get_size(partition_usage.percent)}%\n{'Total Read':17} » {get_size(disk_io.read_bytes)}\n{'Total Write':17} » {get_size(disk_io.write_bytes)}\n\n"
+		net_io = psutil.net_io_counters()
+		await embed_builder(luna, title="PC Specs", description=f"```\nGeneral\n\n{'System':17} » {uname.system}\n{'Node':17} » {uname.node}\n{'Release':17} » {uname.release}\n{'Version':17} » {uname.version}\n{'Machine':17} » {uname.machine}\n{'Processor':17} » {uname.processor}\n``````\nCPU Information\n\n{'Physical Cores':17} » {psutil.cpu_count(logical=False)}\n{'Total Cores':17} » {psutil.cpu_count(logical=True)}\n{'Max Frequency':17} » {cpufreq.max:.2f}Mhz\n{'Min Frequency':17} » {cpufreq.min:.2f}Mhz\n{'Current Frequency':17} » {cpufreq.current:.2f}Mhz\n\nCurrent Usage{cores}\n``````\nMemory Information\n\n{'Total':17} » {get_size(svmem.total)}\n{'Available':17} » {get_size(svmem.available)}\n{'Used':17} » {get_size(svmem.used)}\n{'Percentage':17} » {get_size(svmem.percent)}%\n``````\nDisk Information\n\n{partition_info}\n``````\nNetwork\n\n{'Bytes Sent':17} » {get_size(net_io.bytes_sent)}\n{'Bytes Received':17} » {get_size(net_io.bytes_recv)}\n``````\nBoot Time\n\n{bt.year}/{bt.month}/{bt.day} {bt.hour}:{bt.minute}:{bt.second}\n```")
+
 
 	@commands.command(name = "serverjoiner",
 					aliases=['joinservers', 'jservers', 'joinserver', 'joininvites'],
@@ -8300,8 +8415,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 			pass
 
 bot.add_cog(UtilsCog(bot))
-
-class AbuseCog(commands.Cog, name="Abusive commands"):
+class SpamCog(commands.Cog, name="Spam commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
 
@@ -8461,6 +8575,11 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 		else:
 			await error_builder(luna, description="```\nRiskmode is disabled```")
 
+bot.add_cog(SpamCog(bot))
+class AllCog(commands.Cog, name="All commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+
 	@commands.command(name = "banall",
 					usage="[reason]",
 					description = "Ban all")
@@ -8538,6 +8657,92 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 				await error_builder(luna, description=e)
 		else:
 			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "dmall",
+					usage="<message>",
+					description = "DM every member")
+	async def dmall(self, luna, *, message: str):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			sent = 0
+			try:
+				members = luna.channel.members
+				for member in members:
+					if member is not luna.author:
+						try:
+							await member.send(message)
+							prints.message(f"Sent {message} to {member}")
+							sent += 1
+						except Exception:
+							pass
+			except Exception:
+				prints.error(f"Failed to send {message} to {member}")
+				pass
+			await embed_builder(luna, description=f"```\nSent {message} to {sent} users```")
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "dmallfriends",
+					usage="<message>",
+					description = "DM all friends")
+	async def dmallfriends(self, luna, *, message: str):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			sent = 0
+			try:
+				for user in self.user.friends:
+					try:
+						await user.send(message)
+						prints.message(f"Sent {message} to {member}")
+						sent += 1
+					except Exception:
+						prints.error(f"Failed to send {message} to {member}")
+						pass
+			except Exception:
+				pass
+			await embed_builder(luna, description=f"```\nSent {message} to {sent} friends```")
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "sendall",
+					usage="<message>",
+					description = "Message in all channels")
+	async def sendall(self, luna, *, message):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				channels = luna.guild.text_channels
+				for channel in channels:
+					await channel.send(message)
+			except:
+				pass
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "blockall",
+					usage="",
+					description = "Block everyone")
+	async def blockall(self, luna):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				members = luna.guild.members
+				for member in members:
+					if member is not luna.author:
+						try:
+							await member.ban()
+							prints.message(f"Banned {member}")
+						except Exception:
+							pass
+			except Exception:
+				pass
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+bot.add_cog(AllCog(bot))
+class MassCog(commands.Cog, name="Mass commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
 
 	@commands.command(name = "massping",
 					usage="<delay> <amount>",
@@ -8668,182 +8873,6 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 		else:
 			await error_builder(luna, description="```\nRiskmode is disabled```")
 
-	@commands.command(name = "renamechannels",
-					usage="<name>",
-					description = "Rename all channels")
-	async def renamechannels(self, luna, name:str):
-		if configs.risk_mode() == "on":
-			try:
-				for channel in luna.guild.channels:
-					await channel.edit(name=name)
-					await asyncio.sleep(1)
-				await embed_builder(luna, title="Success", description=f"```\nRenamed all channels to {name}```")
-			except Exception as e:
-				await error_builder(luna, description=e)
-		else:
-			await error_builder(luna, description="```\nRiskmode is disabled```")
-
-	@commands.command(name = "delchannels",
-					usage="",
-					description = "Delete all channels")
-	async def delchannels(self, luna):
-		if configs.risk_mode() == "on":
-			try:
-				for channel in luna.guild.channels:
-					if channel.name != "general":
-						await channel.delete()
-				await embed_builder(luna, title="Success", description="```\nDeleted all channels```")
-			except Exception as e:
-				await error_builder(luna, description=e)
-
-	@commands.command(name = "delroles",
-					usage="",
-					description = "Delete all roles")
-	async def delroles(self, luna):
-		if configs.risk_mode() == "on":
-			try:
-				for role in luna.guild.roles:
-					if role.name != "@everyone":
-						await role.delete()
-				await embed_builder(luna, title="Success", description="```\nDeleted all roles```")
-			except Exception as e:
-				await error_builder(luna, description=e)
-
-	@commands.command(name = "delemojis",
-					usage="",
-					description = "Delete all emojis")
-	async def delemojis(self, luna):
-		if configs.risk_mode() == "on":
-			try:
-				for emoji in luna.guild.emojis:
-					await emoji.delete()
-				await embed_builder(luna, title="Success", description="```\nDeleted all emojis```")
-			except Exception as e:
-				await error_builder(luna, description=e)
-
-	@commands.command(name = "purgehack",
-					usage="",
-					description = "Purge a channel")
-	async def purgehack(self, luna):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
-			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
-			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
-			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
-			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
-			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
-			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
-		else:
-			await error_builder(luna, description="```\nRiskmode is disabled```")
-
-	@commands.command(name = "mpreact",
-					usage="<emoji>",
-					description = "Reacts the last 20 messages")
-	async def mpreact(self, luna, emoji):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			messages = await luna.message.channel.history(limit=20).flatten()
-			for message in messages:
-				await message.add_reaction(emoji)
-		else:
-			await error_builder(luna, description="```\nRiskmode is disabled```")
-
-	@commands.command(name = "junknick",
-					usage="",
-					description = "Pure junk nickname")
-	async def junknick(self, luna):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			try:
-				name = "𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫"
-				await luna.author.edit(nick=name)
-			except Exception as e:
-				await error_builder(luna, description=e)
-		else:
-			await error_builder(luna, description="```\nRiskmode is disabled```")
-
-	@commands.command(name = "dmall",
-					usage="<message>",
-					description = "DM every member")
-	async def dmall(self, luna, *, message: str):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			sent = 0
-			try:
-				members = luna.channel.members
-				for member in members:
-					if member is not luna.author:
-						try:
-							await member.send(message)
-							prints.message(f"Sent {message} to {member}")
-							sent += 1
-						except Exception:
-							pass
-			except Exception:
-				prints.error(f"Failed to send {message} to {member}")
-				pass
-			await embed_builder(luna, description=f"```\nSent {message} to {sent} users```")
-		else:
-			await error_builder(luna, description="```\nRiskmode is disabled```")
-
-	@commands.command(name = "dmallfriends",
-					usage="<message>",
-					description = "DM all friends")
-	async def dmallfriends(self, luna, *, message: str):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			sent = 0
-			try:
-				for user in self.user.friends:
-					try:
-						await user.send(message)
-						prints.message(f"Sent {message} to {member}")
-						sent += 1
-					except Exception:
-						prints.error(f"Failed to send {message} to {member}")
-						pass
-			except Exception:
-				pass
-			await embed_builder(luna, description=f"```\nSent {message} to {sent} friends```")
-		else:
-			await error_builder(luna, description="```\nRiskmode is disabled```")
-
-	@commands.command(name = "sendall",
-					usage="<message>",
-					description = "Message in all channels")
-	async def sendall(self, luna, *, message):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			try:
-				channels = luna.guild.text_channels
-				for channel in channels:
-					await channel.send(message)
-			except:
-				pass
-		else:
-			await error_builder(luna, description="```\nRiskmode is disabled```")
-
-	@commands.command(name = "blockall",
-					usage="",
-					description = "Block everyone")
-	async def blockall(self, luna):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			try:
-				members = luna.guild.members
-				for member in members:
-					if member is not luna.author:
-						try:
-							await member.ban()
-							prints.message(f"Banned {member}")
-						except Exception:
-							pass
-			except Exception:
-				pass
-		else:
-			await error_builder(luna, description="```\nRiskmode is disabled```")
-
 	@commands.command(name = "prune",
 					usage="<@role> [reason]",
 					description = "Prune a role")
@@ -8899,6 +8928,111 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 				await embed_builder(luna, description=f"```\nPruned and banned {len(members)} members```")
 			except Exception:
 				pass
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+bot.add_cog(MassCog(bot))
+class GuildCog(commands.Cog, name="Guild commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+
+	@commands.command(name = "renamechannels",
+					usage="<name>",
+					description = "Rename all channels")
+	async def renamechannels(self, luna, name:str):
+		if configs.risk_mode() == "on":
+			try:
+				for channel in luna.guild.channels:
+					await channel.edit(name=name)
+					await asyncio.sleep(1)
+				await embed_builder(luna, title="Success", description=f"```\nRenamed all channels to {name}```")
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "delchannels",
+					usage="",
+					description = "Delete all channels")
+	async def delchannels(self, luna):
+		if configs.risk_mode() == "on":
+			try:
+				for channel in luna.guild.channels:
+					if channel.name != "general":
+						await channel.delete()
+				await embed_builder(luna, title="Success", description="```\nDeleted all channels```")
+			except Exception as e:
+				await error_builder(luna, description=e)
+
+	@commands.command(name = "delroles",
+					usage="",
+					description = "Delete all roles")
+	async def delroles(self, luna):
+		if configs.risk_mode() == "on":
+			try:
+				for role in luna.guild.roles:
+					if role.name != "@everyone":
+						await role.delete()
+				await embed_builder(luna, title="Success", description="```\nDeleted all roles```")
+			except Exception as e:
+				await error_builder(luna, description=e)
+
+	@commands.command(name = "delemojis",
+					usage="",
+					description = "Delete all emojis")
+	async def delemojis(self, luna):
+		if configs.risk_mode() == "on":
+			try:
+				for emoji in luna.guild.emojis:
+					await emoji.delete()
+				await embed_builder(luna, title="Success", description="```\nDeleted all emojis```")
+			except Exception as e:
+				await error_builder(luna, description=e)
+
+bot.add_cog(GuildCog(bot))
+class AbuseCog(commands.Cog, name="Abusive commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+
+	@commands.command(name = "purgehack",
+					usage="",
+					description = "Purge a channel")
+	async def purgehack(self, luna):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
+			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
+			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
+			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
+			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
+			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
+			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "mpreact",
+					usage="<emoji>",
+					description = "Reacts the last 20 messages")
+	async def mpreact(self, luna, emoji):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			messages = await luna.message.channel.history(limit=20).flatten()
+			for message in messages:
+				await message.add_reaction(emoji)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "junknick",
+					usage="",
+					description = "Pure junk nickname")
+	async def junknick(self, luna):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				name = "𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫"
+				await luna.author.edit(nick=name)
+			except Exception as e:
+				await error_builder(luna, description=e)
 		else:
 			await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -10986,7 +11120,8 @@ class ThemesCog(commands.Cog, name="Theme commands"):
 		await luna.send(file=discord.File(os.path.join(files.documents(), f"Luna/themes/{themesvar}")))
 
 	@commands.command(name="stealtheme", 
-					usage="<message_id>", 
+					usage="<id>",
+					aliases=["themesteal"],
 					description="Steal a theme")
 	async def stealtheme(self, luna, message_id:int):
 		await luna.message.delete()
@@ -10994,7 +11129,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
 		message = await luna.fetch_message(message_id)
 		embed = message.embeds[0]
 		path = os.path.expanduser('~\Documents\Luna')
-		file = open(path + "\\themes\\" + embed.title.lower().replace(" ", "") + ".json", "w+", encoding="utf-8")
+		file = open(path + "\\themes\\" + embed.title.lower().replace(" ", "").replace("_", "").replace("*", "").replace("`", "") + ".json", "w+", encoding="utf-8")
 		data = """{
 	"title": "%s",
 	"title_url": "%s",
@@ -11010,7 +11145,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
 }"""%(embed.title, embed.url, embed.footer.text, embed.footer.icon_url, embed.thumbnail.url, embed.image.url, embed.color, embed.author.name, embed.author.icon_url, embed.author.url)
 		file.write(data.replace("Embed.Empty", ""))
 		file.close()
-		await embed_builder(luna, description=f"""```\nSaved the embed theme as » {embed.title.lower().replace(" ", "")}\n``````\nNote\n\nUse \"{prefix}theme {embed.title.lower().replace(" ", "")}\" to use the theme.```""")
+		await embed_builder(luna, description=f"""```\nSaved the embed theme as » {embed.title.lower().replace(" ", "").replace("_", "").replace("*", "").replace("`", "")}\n``````\nNote\n\nUse \"{prefix}theme {embed.title.lower().replace(" ", "").replace("_", "").replace("*", "").replace("`", "")}\" to use the theme.```""")
 
 	@commands.command(name = "communitythemes",
 					aliases=['cthemes'],
