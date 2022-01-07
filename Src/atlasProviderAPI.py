@@ -76,7 +76,7 @@ class Atlas:
                 raise CustomError("An unknown issue occured while attempting to authenticate")
         except Exception as e:
             self._disconnect()
-            raise CustomError("Error: {}".format(e))
+            raise CustomError("{}".format(e))
 
     def Register(self, username: str, password: str):
         socket = self.socket
@@ -96,7 +96,7 @@ class Atlas:
                 raise CustomError("An unknown issue occured while registering the specified user")
         except Exception as e:
             self._disconnect()
-            raise CustomError("Error: {}".format(e))
+            raise CustomError("{}".format(e))
 
 
     def InitAppUser(self, hwid: str): # Must be authenticated (See docs)
@@ -117,7 +117,7 @@ class Atlas:
                 raise CustomError("An unknown issue occured while enrolling application user")
         except Exception as e:
             self._disconnect()
-            raise CustomError("Error: {}".format(e))
+            raise CustomError("{}".format(e))
 
     
     def DropAppUser(self): # Must be authenticated (See docs)
@@ -136,7 +136,7 @@ class Atlas:
                 raise CustomError("An unknown issue occured while removing the application user")
         except Exception as e:
             self._disconnect()
-            raise CustomError("Error: {}".format(e))
+            raise CustomError("{}".format(e))
 
     def RedeemEntitlement(self, LicenseKey: str, applicationSKU: str): # Must be authenticated (See docs)
         socket = self.socket
@@ -154,7 +154,7 @@ class Atlas:
                 raise CustomError("An unknown issue occured while redeeming the specified entitlement")
         except Exception as e:
             self._disconnect()
-            raise CustomError("Error: {}".format(e))
+            raise CustomError("{}".format(e))
 
     def ValidateEntitlement(self, applicationSKU: str): # Must be authenticated (See docs)
         socket = self.socket
@@ -176,7 +176,7 @@ class Atlas:
                 raise CustomError("An unknown issue occured while validating the application")
         except Exception as e:
             self._disconnect()
-            raise CustomError("Error: {}".format(e))
+            raise CustomError("{}".format(e))
 
     def SetUserHWID(self, hwid: str): # Must be authenticated (See docs)
         socket = self.socket
@@ -194,7 +194,7 @@ class Atlas:
                 raise CustomError("An unknown issue occured while attempting to update the specified user's HWID")
         except Exception as e:
             self._disconnect()
-            raise CustomError("Error: {}".format(e))
+            raise CustomError("{}".format(e))
     
     def ValidateUserHWID(self, hwid: str): # Must be authenticated (See docs)
         socket = self.socket
@@ -214,7 +214,7 @@ class Atlas:
                 raise CustomError("An unknown issue occured while attempting to validate the specified user's HWID")
         except Exception as e:
             self._disconnect()
-            raise CustomError("Error: {}".format(e))
+            raise CustomError("{}".format(e))
 
     def GetAppUserRole(self): # Must be authenticated (See docs)
         socket = self.socket
@@ -228,6 +228,6 @@ class Atlas:
                 raise CustomError("An unknown issue occured while attempting to obtain the specified user's AppUserRole")
         except Exception as e:
             self._disconnect()
-            raise CustomError("Error: {}".format(e))
+            raise CustomError("{}".format(e))
 
 
