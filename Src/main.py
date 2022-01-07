@@ -921,15 +921,12 @@ class luna:
 		try:
 			path = getattr(sys, '_MEIPASS', os.getcwd())
 			cogs_path = path + "\\cogs"
-
 			luna.loader_check()
-
 			for filename in os.listdir(cogs_path):
 				if filename.endswith(".py"):
 					bot.load_extension(f"cogs.{filename[:-3]}")
 		except:
 			pass
-
 		try:
 			token = files.json("Luna/discord.json", "token", documents=True)
 			headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)}
@@ -1196,7 +1193,8 @@ async def example(self, luna, *, text):
 
 		if not files.file_exist("Luna/protections/invite.json", documents=True):
 			data = {
-				"" # show me where to add the auth function and register function
+				"delete": True,
+				"action": "warn"
 			}
 			files.write_json("Luna/protections/invite.json", data, documents=True)
 
@@ -6410,145 +6408,66 @@ class FunCog(commands.Cog, name="Fun commands"):
 	@commands.command(name = "shoot",
 					usage="<@member>",
 					description = "Shoot up someone")
-	async def shoot(self, luna, user: discord.Member = None):
+	async def shoot(self, luna, user: discord.Member):
 		await luna.message.delete()
-		if user == None:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"Who do you want to shoot up? Please mention someone.", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await luna.send(embed=embed)
-			return
-		else:
-			embed = discord.Embed(description=f"{user.mention} got shot up!", color=theme.hex_color())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url="https://media1.tenor.com/images/cfb7817a23645120d4baba2dcb9205e0/tenor.gif")
-			await luna.send(embed=embed)
+		await embed_builder(luna, description=f"{user.mention},  got shot up!", large_image="https://media1.tenor.com/images/cfb7817a23645120d4baba2dcb9205e0/tenor.gif")
 
 	@commands.command(name = "feed",
 					usage="<@member>",
 					description = "Feed someone")
-	async def feed(self, luna, user: discord.Member = None):
+	async def feed(self, luna, user: discord.Member):
 		await luna.message.delete()
-		if user == None:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"Who do you want to feed? Please mention someone.", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await luna.send(embed=embed)
-			return
-		else:
-			r = requests.get("https://nekos.life/api/v2/img/feed").json()
-			embed = discord.Embed(description=f"{luna.author.mention} feeds {user.mention}", color=theme.hex_color())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=str(r['url']))
-			await luna.send(embed=embed)
+		r = requests.get("https://nekos.life/api/v2/img/feed").json()
+		await embed_builder(luna, description=f"{luna.author.mention} feeds {user.mention}", large_image=str(r['url']))
+
+	@commands.command(name = "bite",
+					usage="<@member>",
+					description = "Bite someone")
+	async def feed(self, luna, user: discord.Member):
+		await luna.message.delete()
+		gif_list = ["https://tenor.com/view/bite-cute-chew-chewing-hungry-gif-12388163", "https://tenor.com/view/arms-bite-anime-gif-17761094", "https://tenor.com/view/anime-love-neko-bite-biting-gif-12151511", "https://tenor.com/view/mao-amatsuka-gj-bu-anime-manga-japanese-anime-gif-4704665"]
+		await embed_builder(luna, description=f"{user.mention} got bitten by {luna.author.mention}!", large_image=random.choice(gif_list))
 
 	@commands.command(name = "kiss",
 					usage="<@member>",
 					description = "Kiss someone")
-	async def kiss(self, luna, user: discord.Member = None):
+	async def kiss(self, luna, user: discord.Member):
 		await luna.message.delete()
-		if user == None:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"Who do you want to kiss? Please mention someone.", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await luna.send(embed=embed)
-			return
-		else:
-			r = requests.get("https://nekos.life/api/v2/img/kiss").json()
-			embed = discord.Embed(description=f"{luna.author.mention} kisses {user.mention}", color=theme.hex_color())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=str(r['url']))
-			await luna.send(embed=embed)
+		r = requests.get("https://nekos.life/api/v2/img/kiss").json()
+		await embed_builder(luna, description=f"{user.mention} got kissed by {luna.author.mention}!", large_image=str(r['url']))
 
 	@commands.command(name = "hug",
 					usage="<@member>",
 					description = "Hug someone")
-	async def hug(self, luna, user: discord.Member = None):
+	async def hug(self, luna, user: discord.Member):
 		await luna.message.delete()
-		if user == None:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"Who do you want to hug? Please mention someone.", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await luna.send(embed=embed)
-			return
-		else:
-			r = requests.get("https://nekos.life/api/v2/img/hug").json()
-			embed = discord.Embed(description=f"{luna.author.mention} hugs {user.mention}", color=theme.hex_color())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=str(r['url']))
-			await luna.send(embed=embed)
+		r = requests.get("https://nekos.life/api/v2/img/hug").json()
+		await embed_builder(luna, description=f"{user.mention} got hugged by {luna.author.mention}!", large_image=str(r['url']))
+
 
 	@commands.command(name = "pat",
 					usage="<@member>",
 					description = "Pat someone")
-	async def pat(self, luna, user: discord.Member = None):
+	async def pat(self, luna, user: discord.Member):
 		await luna.message.delete()
-		if user == None:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"Who do you want to pat? Please mention someone.", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await luna.send(embed=embed)
-			return
-		else:
-			r = requests.get("https://nekos.life/api/v2/img/pat").json()
-			embed = discord.Embed(description=f"{luna.author.mention} pats {user.mention}", color=theme.hex_color())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=str(r['url']))
+		r = requests.get("https://nekos.life/api/v2/img/pat").json()
+		await embed_builder(luna, description=f"{luna.author.mention} pats {user.mention}", large_image=str(r['url']))
 
 	@commands.command(name = "slap",
 					usage="<@member>",
 					description = "Slap someone")
-	async def slap(self, luna, user: discord.Member = None):
+	async def slap(self, luna, user: discord.Member):
 		await luna.message.delete()
-		if user == None:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"Who do you want to slap? Please mention someone.", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await luna.send(embed=embed)
-			return
-		else:
-			r = requests.get("https://nekos.life/api/v2/img/slap").json()
-			embed = discord.Embed(description=f"{luna.author.mention} slaps {user.mention}", color=theme.hex_color())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=str(r['url']))
+		r = requests.get("https://nekos.life/api/v2/img/slap").json()
+		await embed_builder(luna, description=f"{luna.author.mention} slapped {user.mention}", large_image=str(r['url']))
 
 	@commands.command(name = "tickle",
 					usage="<@member>",
 					description = "Tickle someone")
-	async def tickle(self, luna, user: discord.Member = None):
+	async def tickle(self, luna, user: discord.Member):
 		await luna.message.delete()
-		if user == None:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"Who do you want to tickle? Please mention someone.", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await luna.send(embed=embed)
-			return
-		else:
-			r = requests.get("https://nekos.life/api/v2/img/tickle").json()
-			embed = discord.Embed(description=f"{luna.author.mention} tickles {user.mention}", color=theme.hex_color())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=str(r['url']))
+		r = requests.get("https://nekos.life/api/v2/img/tickle").json()
+		await embed_builder(luna, description=f"{luna.author.mention} tickles {user.mention}", large_image=str(r['url']))
 
 	@commands.command(name = "fml",
 					usage="",
@@ -6558,11 +6477,7 @@ class FunCog(commands.Cog, name="Fun commands"):
 		request = requests.get(f'https://react.flawcra.cc/api/generation.php?type=fml')
 		data = request.json()
 		text = data['text']
-		embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f'{text}', color=theme.hex_color())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await embed_builder(luna, description=text)
         
 	@commands.command(name = "gay",
 					usage="[@member]",
@@ -6572,12 +6487,7 @@ class FunCog(commands.Cog, name="Fun commands"):
 		if user is None:
 			user = luna.author
 		number = random.randint(1, 100)
-		embed = discord.Embed(title=f"{user}'s Gay Rate", description=f"{number}% Gay 🏳️‍🌈", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await embed_builder(luna, title=f"{user}'s Gay Rate", description=f"{number}% Gay 🏳️‍🌈")
 
 	@commands.command(name = "iq",
 					usage="[@member]",
@@ -6587,12 +6497,7 @@ class FunCog(commands.Cog, name="Fun commands"):
 		if user is None:
 			user = luna.author
 		number = random.randint(1, 120)
-		embed = discord.Embed(title=f"{user}'s IQ", description=f"{number}", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await embed_builder(luna, title=f"{user}'s IQ", description=f"{number}")
 
 	@commands.command(name = "love",
 					usage="<@member> [@member]",
