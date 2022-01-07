@@ -26,9 +26,10 @@ import subprocess
 import pypresence
 import pyPrivnote as pn
 import ctypes.wintypes as wintypes
+import atlasProviderAPI as Atlas
 
-from CEA256 import *
 from gtts import gTTS
+from encryption import *
 from ctypes import windll
 from notifypy import Notify
 from os import error, name, system
@@ -46,6 +47,17 @@ from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFou
 # ///////////////////////////////////////////////////////////////
 # Luna Variables
 
+antiraid = False
+antiinvite = False
+
+active_protections = 0
+active_list = []
+
+auth_luna = Atlas.Atlas("auth.project-atlas.xyz", 6969, "02621487807712432558", "Pde67VDTmJXGCpKZLPHijiPFhZUTHcMF")
+
+# ///////////////////////////////////////////////////////////////
+# Luna Protections
+
 cooldown = []
 nitro_cooldown = []
 afkstatus = 0
@@ -54,7 +66,6 @@ afk_reset = 0
 user_token = ""
 whitelisted_users = {}
 crosshairmode = 0
-antiraid = False
 privacy = False
 copycat = None
 chargesniper = False
@@ -621,7 +632,7 @@ def check_debuggers():
 						except:
 							username = "Failed to get username"
 						try:
-							email = auth_admin.fetchUserInfo(username=username)['email']
+							email = "Failed to get email"
 						except:
 							email = "Failed to get email"
 						hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip() 
@@ -674,483 +685,482 @@ def Randprntsc():
 # ///////////////////////////////////////////////////////////////
 # Class AUTH
 
-class luna_admin:
-    def __init__(self, auth_key: str):
-        """ 
-        #### Requires a authorization key which can be found in the application settings
-        """
-        self.authorization = auth_key
+# class luna_admin:
+#     def __init__(self, auth_key: str):
+#         """ 
+#         #### Requires a authorization key which can be found in the application settings
+#         """
+#         self.authorization = auth_key
 
-    def fetchUserInfo(self, username: str):
-        """ 
-        ## Fetches information about the given user
-        ```
-        from AuthGG.admin import AdminClient
+#     def fetchUserInfo(self, username: str):
+#         """ 
+#         ## Fetches information about the given user
+#         ```
+#         from AuthGG.admin import AdminClient
         
-        client = AdminClient("authorization_key")
+#         client = AdminClient("authorization_key")
         
-        username = input("Username: ")
+#         username = input("Username: ")
 
-        try:
-            status = client.fetchUserInfo(username)
-            print(status['email']) # prints out the email
-        except Exception as e:
-            print(e)            
-        ```
-        You can replace 'email' with the following options
-        ### Available Options
-        - username
-        - email
-        - rank
-        - hwid
-        - variable 
-        - lastlogin
-        - lastip
-        - expiry
-        """
+#         try:
+#             status = client.fetchUserInfo(username)
+#             print(status['email']) # prints out the email
+#         except Exception as e:
+#             print(e)            
+#         ```
+#         You can replace 'email' with the following options
+#         ### Available Options
+#         - username
+#         - email
+#         - rank
+#         - hwid
+#         - variable 
+#         - lastlogin
+#         - lastip
+#         - expiry
+#         """
 
-        r = requests.get(f"https://developers.auth.gg/USERS/?type=fetch&authorization={self.authorization}&user={username}")             
-        if r.json()['status'] == "success":
-            information = {
-                "username": r.json()['username'],
-                "email": r.json()['email'],
-                "rank": r.json()['rank'],
-                "hwid": r.json()['hwid'],
-                "variable": r.json()['variable'],
-                "lastlogin": r.json()['lastlogin'],
-                "lastip": r.json()['lastip'],
-                "expiry": r.json()['expiry']
-            }
-            return information
-        else:
-            raise error_handler.FailedTask(message="Failed Fetching User Information!")
+#         r = requests.get(f"https://developers.auth.gg/USERS/?type=fetch&authorization={self.authorization}&user={username}")             
+#         if r.json()['status'] == "success":
+#             information = {
+#                 "username": r.json()['username'],
+#                 "email": r.json()['email'],
+#                 "rank": r.json()['rank'],
+#                 "hwid": r.json()['hwid'],
+#                 "variable": r.json()['variable'],
+#                 "lastlogin": r.json()['lastlogin'],
+#                 "lastip": r.json()['lastip'],
+#                 "expiry": r.json()['expiry']
+#             }
+#             return information
+#         else:
+#             raise error_handler.FailedTask(message="Failed Fetching User Information!")
 
-    def changeUserPassword(self, username: str, password: str):
-        """
-        ## Changes the provided users password 
-        ```
-        from AuthGG.admin import AdminClient
+#     def changeUserPassword(self, username: str, password: str):
+#         """
+#         ## Changes the provided users password 
+#         ```
+#         from AuthGG.admin import AdminClient
 
-        client = AdminClient("authorization_key")
+#         client = AdminClient("authorization_key")
 
-        try:
-            client.changeUserPassword(username='razu', password='razu')        
+#         try:
+#             client.changeUserPassword(username='razu', password='razu')        
 
-            # continue
-        except Exception as e:
-            print(e)   
-        ```
-        """
+#             # continue
+#         except Exception as e:
+#             print(e)   
+#         ```
+#         """
 
-        r = requests.get(f"https://developers.auth.gg/USERS/?type=changepw&authorization={self.authorization}&user={username}&password={password}")             
-        if r.json()['status'] == "success":
-            return True
-        else:
-            raise error_handler.FailedTask(message="Failed Changing Users Password!")
+#         r = requests.get(f"https://developers.auth.gg/USERS/?type=changepw&authorization={self.authorization}&user={username}&password={password}")             
+#         if r.json()['status'] == "success":
+#             return True
+#         else:
+#             raise error_handler.FailedTask(message="Failed Changing Users Password!")
 
-    def getHWID(self, username: str):
-        """
-        Grabs the users HWID
-        ```
-        from AuthGG.admin import AdminClient
+#     def getHWID(self, username: str):
+#         """
+#         Grabs the users HWID
+#         ```
+#         from AuthGG.admin import AdminClient
 
-        client = AdminClient("authorization_key")
+#         client = AdminClient("authorization_key")
 
-        try:
-            client.getHWID(username='razu')
+#         try:
+#             client.getHWID(username='razu')
 
-            # continue
-        except Exception as e:
-            print(e)
-        ```
-        """
+#             # continue
+#         except Exception as e:
+#             print(e)
+#         ```
+#         """
 
-        r = requests.get(f"https://developers.auth.gg/HWID/?type=fetch&authorization={self.authorization}&user={username}")             
-        if r.json()['status'] == "success":
-            return r.json()['value']
-        else:
-            raise error_handler.FailedTask(message="Failed Grabbing Users HWID!")        
+#         r = requests.get(f"https://developers.auth.gg/HWID/?type=fetch&authorization={self.authorization}&user={username}")             
+#         if r.json()['status'] == "success":
+#             return r.json()['value']
+#         else:
+#             raise error_handler.FailedTask(message="Failed Grabbing Users HWID!")        
 
-    def resetHWID(self, username: str):
-        """
-        ## Reset the provided users HWID
-        ```
-        from AuthGG.admin import AdminClient
+#     def resetHWID(self, username: str):
+#         """
+#         ## Reset the provided users HWID
+#         ```
+#         from AuthGG.admin import AdminClient
 
-        client = AdminClient("authorization_key")
+#         client = AdminClient("authorization_key")
 
-        try:
-            client.resetHWID(username='razu')        
+#         try:
+#             client.resetHWID(username='razu')        
 
-            # continue
-        except Exception as e:
-            print(e)            
-        ```
-        """
-        r = requests.get(f"https://developers.auth.gg/HWID/?type=reset&authorization={self.authorization}&user={username}")             
-        if r.json()['status'] == "success":
-            return True
-        else:
-            raise error_handler.FailedTask(message="Failed Resetting Users HWID!")        
+#             # continue
+#         except Exception as e:
+#             print(e)            
+#         ```
+#         """
+#         r = requests.get(f"https://developers.auth.gg/HWID/?type=reset&authorization={self.authorization}&user={username}")             
+#         if r.json()['status'] == "success":
+#             return True
+#         else:
+#             raise error_handler.FailedTask(message="Failed Resetting Users HWID!")        
 
-    def deleteUser(self, username: str):
-        """
-        Deletes a user from your Auth.GG application
-        ```
-        from AuthGG.admin import AdminClient
+#     def deleteUser(self, username: str):
+#         """
+#         Deletes a user from your Auth.GG application
+#         ```
+#         from AuthGG.admin import AdminClient
         
-        client = AdminClient("authorization_key")
+#         client = AdminClient("authorization_key")
         
-        username = input("Username: ")
+#         username = input("Username: ")
 
-        try:
-            status = client.deleteUser(username)
+#         try:
+#             status = client.deleteUser(username)
             
-            # continue
-        except Exception as e:
-            print(e)        
-        ```
-        """
+#             # continue
+#         except Exception as e:
+#             print(e)        
+#         ```
+#         """
 
-        r = requests.get(f"https://developers.auth.gg/USERS/?type=delete&authorization={self.authorization}&user={username}")             
-        if r.json()['status'] == "success":
-            return True
-        else:
-            raise error_handler.FailedTask(message="Failed Deleting User!")
+#         r = requests.get(f"https://developers.auth.gg/USERS/?type=delete&authorization={self.authorization}&user={username}")             
+#         if r.json()['status'] == "success":
+#             return True
+#         else:
+#             raise error_handler.FailedTask(message="Failed Deleting User!")
 
-    def getUserCount(self):
-        """
-        Get the user count of your application
-        ```
-        from AuthGG.admin import AdminClient
+#     def getUserCount(self):
+#         """
+#         Get the user count of your application
+#         ```
+#         from AuthGG.admin import AdminClient
 
-        client = AdminClient("authorization_key")
+#         client = AdminClient("authorization_key")
 
-        try:
-            status = client.getUserCount()
-            print(status)
-        except Exception as e:
-            print(e)        
-        ```
-        """
-        r = requests.get(f"https://developers.auth.gg/USERS/?type=count&authorization={self.authorization}")
-        if r.json()['status'] == "success":
-            jsonResponse = r.json()["value"]
-            return jsonResponse
-        else:
-            raise error_handler.ErrorConnecting()
+#         try:
+#             status = client.getUserCount()
+#             print(status)
+#         except Exception as e:
+#             print(e)        
+#         ```
+#         """
+#         r = requests.get(f"https://developers.auth.gg/USERS/?type=count&authorization={self.authorization}")
+#         if r.json()['status'] == "success":
+#             jsonResponse = r.json()["value"]
+#             return jsonResponse
+#         else:
+#             raise error_handler.ErrorConnecting()
 
-class luna_logging:
-    def __init__(self, aid: str, apikey: str, secret: str):
-        self.aid = aid
-        self.apikey = apikey
-        self.secret = secret
+# class luna_logging:
+#     def __init__(self, aid: str, apikey: str, secret: str):
+#         self.aid = aid
+#         self.apikey = apikey
+#         self.secret = secret
 
 
-    def sendData(self, username: str, message: str):
-        """ 
-        Enable Custom Logs.
-        ```
-        from AuthGG.logging import Logging
-        client = Loggging(aid='', apikey='', secret='')
-        try:
-            client.sendData(username='AuthGG', message='Deleted User')
-        except:
-            pass   
-        ```
-        """
+#     def sendData(self, username: str, message: str):
+#         """ 
+#         Enable Custom Logs.
+#         ```
+#         from AuthGG.logging import Logging
+#         client = Loggging(aid='', apikey='', secret='')
+#         try:
+#             client.sendData(username='AuthGG', message='Deleted User')
+#         except:
+#             pass   
+#         ```
+#         """
 
-        data = {
-            "type": "log",
-            "action": message,
-            "pcuser": socket.gethostname(),
-            "username": username,
-            "aid": self.aid,
-            "secret": self.secret,
-            "apikey": self.apikey
-        }
-        r = requests.post(f"https://api.auth.gg/v1/", data=data)        
-        response = r.json()
-        if response['result'] == "success":
-            return True
-        else:
-            raise error_handler.ErrorConnecting()
+#         data = {
+#             "type": "log",
+#             "action": message,
+#             "pcuser": socket.gethostname(),
+#             "username": username,
+#             "aid": self.aid,
+#             "secret": self.secret,
+#             "apikey": self.apikey
+#         }
+#         r = requests.post(f"https://api.auth.gg/v1/", data=data)        
+#         response = r.json()
+#         if response['result'] == "success":
+#             return True
+#         else:
+#             raise error_handler.ErrorConnecting()
 
-class luna_client:
-    def __init__(self, api_key, aid, application_secret):
-        """
-        API key can be found in the user settings
-        AID can also be found in the user settings
-        Application Secret can be easily found on the home page of https://auth.gg/
-        """
+# class luna_client:
+#     def __init__(self, api_key, aid, application_secret):
+#         """
+#         API key can be found in the user settings
+#         AID can also be found in the user settings
+#         Application Secret can be easily found on the home page of https://auth.gg/
+#         """
 
-        self.api_key = api_key
-        self.aid = aid
-        self.application_secret = application_secret
+#         self.api_key = api_key
+#         self.aid = aid
+#         self.application_secret = application_secret
 
-    def login(self, username: str, password: str):
-        """
-        Allow the user to login
-        ```
-        client = Client(api_key="api_key", aid="aid", application_secret="secret")
+#     def login(self, username: str, password: str):
+#         """
+#         Allow the user to login
+#         ```
+#         client = Client(api_key="api_key", aid="aid", application_secret="secret")
 
-        username = input("Username: ")
-        password = input("Password: ")
+#         username = input("Username: ")
+#         password = input("Password: ")
 
-        try:
-            client.login(username, password)
+#         try:
+#             client.login(username, password)
             
-            # clear console and redirect
-        except Exception as e:
-            print(e)
-        ```
-        """
+#             # clear console and redirect
+#         except Exception as e:
+#             print(e)
+#         ```
+#         """
 
-        hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-        data = {
-            "type": "login",
-            "secret": self.application_secret,
-            "apikey": self.api_key,
-            "aid": self.aid,
-            "username": username,
-            "password": password,
-            "hwid": hwid
-        }
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded"
-        }
-        r = requests.post("https://api.auth.gg/v1/", data=data, headers=headers)
-        response = r.json()
-        if response["result"] == "success":
-            return True
-        elif response["result"] == "invalid_details":
-            raise error_handler.InvalidPassword()
-        elif response["result"] == "invalid_hwid":
-            raise error_handler.InvalidHWID()
-        elif response["result"] == "time_expired":
-            raise error_handler.SubscriptionExpired()
-        elif response["result"] == "hwid_updated":
-            return True
-        else:
-            raise error_handler.ErrorConnecting()
+#         hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
+#         data = {
+#             "type": "login",
+#             "secret": self.application_secret,
+#             "apikey": self.api_key,
+#             "aid": self.aid,
+#             "username": username,
+#             "password": password,
+#             "hwid": hwid
+#         }
+#         headers = {
+#             "Content-Type": "application/x-www-form-urlencoded"
+#         }
+#         r = requests.post("https://api.auth.gg/v1/", data=data, headers=headers)
+#         response = r.json()
+#         if response["result"] == "success":
+#             return True
+#         elif response["result"] == "invalid_details":
+#             raise error_handler.InvalidPassword()
+#         elif response["result"] == "invalid_hwid":
+#             raise error_handler.InvalidHWID()
+#         elif response["result"] == "time_expired":
+#             raise error_handler.SubscriptionExpired()
+#         elif response["result"] == "hwid_updated":
+#             return True
+#         else:
+#             raise error_handler.ErrorConnecting()
 
-    def register(self, license_key: str, email:str, username: str, password: str):
-        """
-        Easily register users
-        ```
-        from AuthGG.client import Client
+#     def register(self, license_key: str, email:str, username: str, password: str):
+#         """
+#         Easily register users
+#         ```
+#         from AuthGG.client import Client
 
-        client = Client(api_key="api_key", aid="aid", application_secret="secret")
+#         client = Client(api_key="api_key", aid="aid", application_secret="secret")
 
-        email = input("Email: ")
-        license_key = input("License: ")
-        username = input("Username: ")
-        password = input("Password: ")
+#         email = input("Email: ")
+#         license_key = input("License: ")
+#         username = input("Username: ")
+#         password = input("Password: ")
 
-        try:
-            client.register(email=email, username=username, password=password, license_key=license_key)
+#         try:
+#             client.register(email=email, username=username, password=password, license_key=license_key)
 
-            # successfully registerd
-        except Exception as e:
-            print(e)
-        ```
-        """
+#             # successfully registerd
+#         except Exception as e:
+#             print(e)
+#         ```
+#         """
 
-        hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-        data = {
-            "type": "register",
-            "secret": self.application_secret,
-            "apikey": self.api_key,
-            "aid": self.aid,
-            "username": username,
-            "password": password,
-            "hwid": hwid,
-            "email": email,
-            "license": license_key
-        }       
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded"
-        }
-        r = requests.post("https://api.auth.gg/v1/", data=data, headers=headers)        
-        response = r.json()["result"]
-        if response == "success":
-            return True
-        elif response == "invalid_license":
-            raise error_handler.InvalidLicense()
-        elif response == "email_used":
-            raise error_handler.UserError(message="email_used")
-        elif response == "invalid_username":
-            raise error_handler.UserError(message="invalid_username")               
-        else:
-            raise error_handler.ErrorConnecting()         
+#         hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
+#         data = {
+#             "type": "register",
+#             "secret": self.application_secret,
+#             "apikey": self.api_key,
+#             "aid": self.aid,
+#             "username": username,
+#             "password": password,
+#             "hwid": hwid,
+#             "email": email,
+#             "license": license_key
+#         }       
+#         headers = {
+#             "Content-Type": "application/x-www-form-urlencoded"
+#         }
+#         r = requests.post("https://api.auth.gg/v1/", data=data, headers=headers)        
+#         response = r.json()["result"]
+#         if response == "success":
+#             return True
+#         elif response == "invalid_license":
+#             raise error_handler.InvalidLicense()
+#         elif response == "email_used":
+#             raise error_handler.UserError(message="email_used")
+#         elif response == "invalid_username":
+#             raise error_handler.UserError(message="invalid_username")               
+#         else:
+#             raise error_handler.ErrorConnecting()         
 
-    def forgotPassword(self, username: str):
-        """
-        Sends a reset password email to the given user
-        ```
-        from AuthGG.client import Client
+#     def forgotPassword(self, username: str):
+#         """
+#         Sends a reset password email to the given user
+#         ```
+#         from AuthGG.client import Client
 
-        client = Client(api_key="api_key", aid="aid", application_secret="secret")
+#         client = Client(api_key="api_key", aid="aid", application_secret="secret")
 
-        username = input("Username: ")
+#         username = input("Username: ")
 
-        try:
-            client.forgotPassword(username)
+#         try:
+#             client.forgotPassword(username)
 
-            # successfully sent
-        except Exception as e:
-            print(e)        
-        ```
-        """
+#             # successfully sent
+#         except Exception as e:
+#             print(e)        
+#         ```
+#         """
 
-        data = {
-            "type": "forgotpw",
-            "secret": self.application_secret,
-            "apikey": self.api_key,
-            "aid": self.aid,
-            "username": username
-        }           
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded"
-        }
-        r = requests.post("https://api.auth.gg/v1/", data=data, headers=headers)        
-        response = r.json()["result"]  
-        info = r.json()["info"]      
-        if response == "success":
-            return True
-        elif response == "failed":
-            return f"{info}"
-        else:
-            raise error_handler.ErrorConnecting()
+#         data = {
+#             "type": "forgotpw",
+#             "secret": self.application_secret,
+#             "apikey": self.api_key,
+#             "aid": self.aid,
+#             "username": username
+#         }           
+#         headers = {
+#             "Content-Type": "application/x-www-form-urlencoded"
+#         }
+#         r = requests.post("https://api.auth.gg/v1/", data=data, headers=headers)        
+#         response = r.json()["result"]  
+#         info = r.json()["info"]      
+#         if response == "success":
+#             return True
+#         elif response == "failed":
+#             return f"{info}"
+#         else:
+#             raise error_handler.ErrorConnecting()
 
-    def changePassword(self, username: str, password: str, newPassword: str):
-        """
-        Changes the password for that user.
-        ```
-        from AuthGG.client import Client
+#     def changePassword(self, username: str, password: str, newPassword: str):
+#         """
+#         Changes the password for that user.
+#         ```
+#         from AuthGG.client import Client
 
-        client = Client(api_key="api_key", aid="aid", application_secret="secret")
+#         client = Client(api_key="api_key", aid="aid", application_secret="secret")
 
-        username = input("Username: ")
-        password = input("Password: ")
-        newPassword = input("New Password: ")
+#         username = input("Username: ")
+#         password = input("Password: ")
+#         newPassword = input("New Password: ")
 
-        try:
-            client.changePassword(username=username, password=password, newPassword=newPassword)
+#         try:
+#             client.changePassword(username=username, password=password, newPassword=newPassword)
 
-            # successfully changed password
-        except Exception as e:
-            print(e)        
-        ```
-        """
+#             # successfully changed password
+#         except Exception as e:
+#             print(e)        
+#         ```
+#         """
 
-        data = {
-            "type": "changepw",
-            "secret": self.application_secret,
-            "apikey": self.api_key,
-            "aid": self.aid,
-            "username": username,
-            "password": password,
-            "newpassword": newPassword
-        }           
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded"
-        }
-        r = requests.post("https://api.auth.gg/v1/", data=data, headers=headers)       
-        response = r.json()["response"]
-        if response == "success":
-            return True
-        elif response == "invalid_details":
-            raise error_handler.UserError(message="invalid_details")
-        else:
-            raise error_handler.ErrorConnecting()
+#         data = {
+#             "type": "changepw",
+#             "secret": self.application_secret,
+#             "apikey": self.api_key,
+#             "aid": self.aid,
+#             "username": username,
+#             "password": password,
+#             "newpassword": newPassword
+#         }           
+#         headers = {
+#             "Content-Type": "application/x-www-form-urlencoded"
+#         }
+#         r = requests.post("https://api.auth.gg/v1/", data=data, headers=headers)       
+#         response = r.json()["response"]
+#         if response == "success":
+#             return True
+#         elif response == "invalid_details":
+#             raise error_handler.UserError(message="invalid_details")
+#         else:
+#             raise error_handler.ErrorConnecting()
 
-class error_handler:
-	class InvalidPassword(Exception):
-		"""Raised when the users password is incorrect"""
-		def __init__(self):
-			self.message = "The given password is incorrect!"
-			super().__init__(self.message)
+# class error_handler:
+# 	class InvalidPassword(Exception):
+# 		"""Raised when the users password is incorrect"""
+# 		def __init__(self):
+# 			self.message = "The given password is incorrect!"
+# 			super().__init__(self.message)
 
-	class InvalidLicense(Exception):
-		"""Raised when the provided key is invalid!"""
-		def __init__(self):
-			self.message = "The given key is invalid!"
-			super().__init__(self.message)
+# 	class InvalidLicense(Exception):
+# 		"""Raised when the provided key is invalid!"""
+# 		def __init__(self):
+# 			self.message = "The given key is invalid!"
+# 			super().__init__(self.message)
 
-	class ErrorConnecting(Exception):
-		"""Raised when the connection to Luna auth is unstable or offline"""
-		def __init__(self):
-			self.message = "We had problems connecting to Luna."
-			super().__init__(self.message)        
+# 	class ErrorConnecting(Exception):
+# 		"""Raised when the connection to Luna auth is unstable or offline"""
+# 		def __init__(self):
+# 			self.message = "We had problems connecting to Luna."
+# 			super().__init__(self.message)        
 
-	class SubscriptionExpired(Exception):
-		"""Raised when a users subscription is expired"""
-		def __init__(self):
-			self.message = "Your subscription is expired."
-			super().__init__(self.message)
+# 	class SubscriptionExpired(Exception):
+# 		"""Raised when a users subscription is expired"""
+# 		def __init__(self):
+# 			self.message = "Your subscription is expired."
+# 			super().__init__(self.message)
 
-	class InvalidHWID(Exception):
-		"""Raised when a users HWID is invalid"""
-		def __init__(self):
-			self.message = "Your hwid is invalid or the account is logged to another HWID."
-			super().__init__(self.message)
+# 	class InvalidHWID(Exception):
+# 		"""Raised when a users HWID is invalid"""
+# 		def __init__(self):
+# 			self.message = "Your hwid is invalid or the account is logged to another HWID."
+# 			super().__init__(self.message)
 
-	class UserError(Exception):
-		"""Raised when a user has an error registering"""
-		def __init__(self, message):
-			if message == "email_used":
-				self.message = "That key has been already used!"
-			elif message == "invalid_username":
-				self.message = "That username is already taken!"
-			elif message == "invalid_details":
-				self.message = "Your details are incorrect!"
-			elif message == "failed":
-				self.message = "Failed to complete that task!"
-			else:
-				pass
+# 	class UserError(Exception):
+# 		"""Raised when a user has an error registering"""
+# 		def __init__(self, message):
+# 			if message == "email_used":
+# 				self.message = "That key has been already used!"
+# 			elif message == "invalid_username":
+# 				self.message = "That username is already taken!"
+# 			elif message == "invalid_details":
+# 				self.message = "Your details are incorrect!"
+# 			elif message == "failed":
+# 				self.message = "Failed to complete that task!"
+# 			else:
+# 				pass
 
-			super().__init__(self.message)     
+# 			super().__init__(self.message)     
 
-	class FailedTask(Exception):
-		def __init__(self, message):
-			self.message = message
-			super().__init__(self.message)
+# 	class FailedTask(Exception):
+# 		def __init__(self, message):
+# 			self.message = message
+# 			super().__init__(self.message)
 
 motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ').read().decode('utf-8')
-auth = luna_client(api_key="485477744381137547167158333254493", aid="940932", application_secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
-auth_log = luna_logging(apikey="485477744381137547167158333254493", aid="940932", secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
-auth_admin = luna_admin("SGCGIKAOTOHA")
+
 
 # ///////////////////////////////////////////////////////////////
 # Class Luna
 
 class luna:
 
-	def email_check(username):
-		if not username == "Sosa": # Sosa http block (Ignore)
-			try:
-				email = auth_admin.fetchUserInfo(username=username)['email']
-				email = email.lower()
-				if not email.startswith("luna"):
-					hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-					notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Invalid login\n``````\nLuna Information\n\nUsername: {username}\nSpecial: {email}\n``````\nHWID » {hwid}")
-					prints.error("Invalid login")
-					files.remove('Luna/auth.json', documents=True)
-					time.sleep(5)
-					prints.event("Redirecting to the main menu in 5 seconds")
-					time.sleep(5)
-					luna.authentication()
-			except Exception as e:
-				email = "None"
-				hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-				notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Invalid login\n``````\nLuna Information\n\nUsername: {username}\nSpecial: {email}\n``````\nHWID » {hwid}\n``````\nError Information\n\n{e}")
-				prints.error("Invalid login")
-				files.remove('Luna/auth.json', documents=True)
-				time.sleep(5)
-				prints.event("Redirecting to the main menu in 5 seconds")
-				time.sleep(5)
-				luna.authentication()
+	# dont need this call back rn
+	#def email_check(username):
+	#	if not username == "Sosa": # Sosa http block (Ignore)
+	#		try:
+	#			email = auth_admin.fetchUserInfo(username=username)['email'] 
+	#			email = email.lower()
+	#			if not email.startswith("luna"):
+	#				hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
+	#				notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Invalid login\n``````\nLuna Information\n\nUsername: {username}\nSpecial: {email}\n``````\nHWID » {hwid}")
+	#				prints.error("Invalid login")
+	#				files.remove('Luna/auth.json', documents=True)
+	#				time.sleep(5)
+	#				prints.event("Redirecting to the main menu in 5 seconds")
+	#				time.sleep(5)
+	#				luna.authentication()
+	#		except Exception as e:
+	#			email = "None"
+	#			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
+	#			notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Invalid login\n``````\nLuna Information\n\nUsername: {username}\nSpecial: {email}\n``````\nHWID » {hwid}\n``````\nError Information\n\n{e}")
+	#			prints.error("Invalid login")
+	#			files.remove('Luna/auth.json', documents=True)
+	#			time.sleep(5)
+	#			prints.event("Redirecting to the main menu in 5 seconds")
+	#			time.sleep(5)
+	#			luna.authentication()
 
 	def authentication():
 		"""
@@ -1184,6 +1194,7 @@ class luna:
 					restart_program()
 
 	def login(exists=False):
+		hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
 		"""
 		The authentication login function
 		"""
@@ -1201,12 +1212,14 @@ class luna:
 					time.sleep(5)
 					prints.event("Redirecting to the main menu in 5 seconds")
 					time.sleep(5)
-					auth.authentication()
+					luna.authentication()
 				try:
 					prints.event("Authenticating...")
-					auth.login(username=username, password=password)
-					# luna.email_check(username)
-					auth_log.sendData(username=username, message="Logged in")
+					auth_luna._connect()
+					auth_luna.Login(username, password)
+					auth_luna.ValidateUserHWID(hwid)
+					auth_luna.ValidateEntitlement("LunaSB")
+					auth_luna._disconnect()
 					luna.wizard()
 				except Exception as e:
 					prints.error(e)
@@ -1220,9 +1233,11 @@ class luna:
 				password = prints.password("Password")
 				try:
 					prints.event("Authenticating...")
-					auth.login(username=username, password=password)
-					# luna.email_check(username)
-					auth_log.sendData(username=username, message="Logged in")
+					auth_luna._connect()
+					auth_luna.Login(username, password)
+					auth_luna.ValidateUserHWID(hwid)
+					auth_luna.ValidateEntitlement("LunaSB")
+					auth_luna._disconnect()
 					username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
 					password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
 					data = {
@@ -1240,6 +1255,7 @@ class luna:
 		luna.wizard()
 
 	def register():
+		hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
 		"""
 		The authentication register function
 		"""
@@ -1249,10 +1265,13 @@ class luna:
 		try:
 			if not developer_mode:
 				prints.event("Registering...")
-				auth.register(email=key, username=username, password=password, license_key=key)
-				auth_log.sendData(username=username, message="Registered")
+				auth_luna._connect()
+				auth_luna.Register(username, password)
+				auth_luna.Login(username, password)
+				auth_luna.InitAppUser(hwid)
+				auth_luna.RedeemEntitlement(key, "LunaSB")
+				auth_luna.__disconnect()
 				prints.message("Successfully registered")
-				hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
 				notify.webhook(url="https://discord.com/api/webhooks/926940230169280552/Tl-o9bPLOeQ5dkuD7Ho1MMgoggu0-kHCRy_248yor_Td52KQoZMfte3YpoKBlUUdIB_j", description=f"A new registered user!\n``````\nUsername: {username}\nKey: {key}\n``````\nHWID:\n{hwid}")
 				time.sleep(3)
 				username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
@@ -1589,6 +1608,9 @@ class luna:
 
 		if not files.file_exist("Luna/privnote", documents=True):
 			files.create_folder("Luna/privnote", documents=True)
+		
+		if not files.file_exist("Luna/protections", documents=True):
+			files.create_folder("Luna/protections", documents=True)
 
 		if not files.file_exist("Luna/dumping", documents=True):
 			files.create_folder("Luna/dumping", documents=True)
@@ -1634,6 +1656,22 @@ async def example(self, luna, *, text):
 			files.write_file("Luna/custom/custom.py", content, documents=True)
 
 		# ///////////////////////////////////////////////////////////////
+		# Protection Files
+
+		if not files.file_exist("Luna/protections/config.json", documents=True):
+			data = {
+				"footer": True,
+				"guilds": []
+			}
+			files.write_json("Luna/protections/config.json", data, documents=True)
+
+		if not files.file_exist("Luna/protections/invite.json", documents=True):
+			data = {
+				"" # show me where to add the auth function and register function
+			}
+			files.write_json("Luna/protections/invite.json", data, documents=True)
+
+		# ///////////////////////////////////////////////////////////////
 		# Json Files
 
 		if not files.file_exist("Luna/rpc.json", documents=True):
@@ -1652,13 +1690,6 @@ async def example(self, luna, *, text):
 				"button_2_url": "",
 			}
 			files.write_json("Luna/rpc.json", data, documents=True)
-
-		if not files.file_exist("Luna/discord.json", documents=True):
-			data = {
-				"token": "token-here",
-				"password": "password-here",
-			}
-			files.write_json("Luna/discord.json", data, documents=True)
 
 		if not files.file_exist("Luna/config.json", documents=True):
 			data = {
@@ -1986,6 +2017,15 @@ class notify:
 # Config Functions
 
 class config:
+	# ///////////////////////////////////////////////////////////////
+	# File overwrite (Global)
+
+	def _global(path:str, value_holder:str, new_value):
+		"""Overwrites a value in a config file. (Global configs)"""
+		json_object = json.load(open(os.path.join(files.documents(), path), encoding="utf-8"))
+		json_object[value_holder] = new_value
+		files.write_json(os.path.join(files.documents(), path), json_object)
+
 	# ///////////////////////////////////////////////////////////////
 	# File overwrite (Config)
 
@@ -3012,7 +3052,7 @@ class OnMessage(commands.Cog, name="on message"):
 			return
 		try:
 			global nitro_cooldown
-			if files.json("Luna/snipers/nitro.json", "sniper", documents=True) == "on" and 'discord.gift/' in message.content:
+			if files.json("Luna/snipers/nitro.json", "sniper", documents=True) == "on" and 'discord.gift/' in message.content.lower():
 				elapsed_snipe = '%.4fs' % (time.time() - sniped_start_time)
 				code = re.search("discord.gift/(.*)", message.content).group(1)
 				if len(code) >= 16:
@@ -3046,7 +3086,7 @@ class OnMessage(commands.Cog, name="on message"):
 						if files.json("Luna/webhooks/webhooks.json", "nitro", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.nitro_url() == "webhook-url-here":
 							notify.webhook(url=webhook.nitro_url(), name="nitro", description=f"{status}\nServer » {message.guild}\nChannel » {message.channel}\nAuthor » {message.author}\nCode » {code}\nElapsed Times\nSniped » {elapsed_snipe}\nRequest » {elapsed}")
 			
-			elif files.json("Luna/snipers/nitro.json", "sniper", documents=True) == "on" and 'discord.com/gifts' in message.content:
+			elif files.json("Luna/snipers/nitro.json", "sniper", documents=True) == "on" and 'discord.com/gifts' in message.content.lower():
 				elapsed_snipe = '%.4fs' % (time.time() - sniped_start_time)
 				code = re.search("discord.com/gifts/(.*)", message.content).group(1)
 				if len(code) >= 16:
@@ -3252,7 +3292,7 @@ class OnMessage(commands.Cog, name="on message"):
 
 		if share == "on":
 			if message.author.id == user_id:
-				if f"{prefix}help" in message.content:
+				if f"{prefix}help" in message.content.lower():
 					prints.shared("help")
 					if configs.mode() == 2:
 						sent = await message.channel.send(f"```ini\n[ {theme.title()} ]\n\n{theme.description()}Coming soon\n\n[ {theme.footer()} ]```")
@@ -3295,7 +3335,7 @@ class OnMessage(commands.Cog, name="on message"):
 				if configs.mode() == 2:
 					sent = await message.channel.send(f"```ini\n[ AFK ]\n\n{afkmessage}\n\n[ {theme.footer()} ]```")
 				else:
-					embed = discord.Embed(title="AFK", url=theme.title_url(), description=f"{afkmessage}", color=theme.hex_color())
+					embed = discord.Embed(title="AFK", url=theme.title_url(), description=f"```\n{afkmessage}```", color=theme.hex_color())
 					embed.set_thumbnail(url=theme.image_url())
 					embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 					embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
@@ -3310,7 +3350,7 @@ class OnMessage(commands.Cog, name="on message"):
 		# ///////////////////////////////////////////////////////////////
 		# Mention
 
-		if f'<@{self.bot.user.id}>' in message.content or f'<@!{self.bot.user.id}>' in message.content:
+		if f'<@{self.bot.user.id}>' in message.content or f'<@!{self.bot.user.id}>' in message.content.lower():
 			if files.json("Luna/notifications/toasts.json", "pings", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
 				notify.toast(message=f"You have been mentioned\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
 			if files.json("Luna/webhooks/webhooks.json", "pings", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.pings_url() == "webhook-url-here":
@@ -3323,8 +3363,8 @@ class OnMessage(commands.Cog, name="on message"):
 				prints.sniper(f"Author  | {color.purple(f'{message.author}')}")
 				print()
 			
-			#///////////////////////////////////////////////////////////////
-			# Selfbot Detection - Embed
+		#///////////////////////////////////////////////////////////////
+		# Selfbot Detection - Embed
 
 		if message.author.bot == False:
 			if message.author == self.bot.user:
@@ -3333,7 +3373,7 @@ class OnMessage(commands.Cog, name="on message"):
 				embeds = message.embeds
 				for embed in embeds:
 					global cooldown
-					if embed is not None and cooldown.count(message.author.id) == 0 and not ("https://" or "http://" or "cdn.discordapp.com" or ".png" or ".gif" or "www.") in message.content:
+					if embed is not None and cooldown.count(message.author.id) == 0 and not ("https://" or "http://" or "cdn.discordapp.com" or ".png" or ".gif" or "www.") in message.content.lower():
 						cooldown.append(message.author.id)
 						if files.json("Luna/snipers/selfbot.json", "sniper", documents=True) == "on":
 							if files.json("Luna/notifications/toasts.json", "selfbot", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
@@ -3370,7 +3410,10 @@ class OnMessage(commands.Cog, name="on message"):
 					else:
 						pass
 
-		if 'privnote.com' in message.content:
+		#///////////////////////////////////////////////////////////////
+		# Privnote Sniper
+
+		if 'privnote.com' in message.content.lower():
 			elapsed_snipe = '%.3fs' % (time.time() - sniped_start_time)
 			privnote_sniper = files.json(f"Luna/snipers/privnote.json", "sniper", documents=True)
 			if privnote_sniper == "on":
@@ -3408,9 +3451,48 @@ class OnMessage(commands.Cog, name="on message"):
 					print()
 			else:
 				return
-		
-		else:
-			return
+
+		#///////////////////////////////////////////////////////////////
+		# Anti-Invite
+		if 'discord.gg/' in message.content.lower() and antiinvite == True:
+			try:
+				await message.delete()
+			except:
+				pass
+			try:
+				if configs.mode() == 2 or configs.mode() == 3:
+					sent = await message.channel.send(f"```ini\n[ Anti Invite ]\n\n\"Anti Invite\" is enabled, sending Discord invites is not allowed.\n\n[ {theme.footer()} ]```")
+				else:
+					embed = discord.Embed(title="Anti Invite", url=theme.title_url(), description="```\n\"Anti Invite\" is enabled, sending Discord invites is not allowed.```", color=theme.hex_color())
+					embed.set_thumbnail(url=theme.image_url())
+					embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+					embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+					embed.set_image(url=theme.large_image_url())
+					sent = await message.channel.send(embed=embed)
+				await asyncio.sleep(30)
+				await sent.delete()
+			except:
+				pass
+
+		#///////////////////////////////////////////////////////////////
+		# Anti-Upper
+		if 'discord.gg/' in message.content.lower() and antiinvite == True:
+			try:
+				await message.delete()
+			except:
+				pass
+			try:
+				if configs.mode() == 2 or configs.mode() == 3:
+					sent = await message.channel.send(f"```ini\n[ Anti Invite ]\n\n\"Anti Invite\" is enabled, sending Discord invites is not allowed.\n\n[ {theme.footer()} ]```")
+				else:
+					embed = discord.Embed(title="Anti Invite", url=theme.title_url(), description="```\n\"Anti Invite\" is enabled, sending Discord invites is not allowed.```", color=theme.hex_color())
+					embed.set_thumbnail(url=theme.image_url())
+					embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+					embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+					embed.set_image(url=theme.large_image_url())
+					sent = await message.channel.send(embed=embed)
+			except:
+				pass
 
 bot.add_cog(OnMessage(bot))
 
@@ -4053,7 +4135,10 @@ class HelpCog(commands.Cog, name="Help commands"):
 		whitelisttext = ""
 		for command in commands:
 			whitelisttext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		await embed_builder(luna, title="Protections", description=f"{theme.description()}```\nPrivacy | Streamer Mode\n\n{privacytext}\n``````\nBackups\n\n{backuptext}\n``````\nWhitelist\n\n{whitelisttext}\n``````\nProtections\n\n{helptext}```")
+		activetext = ""
+		for active in active_list:
+			activetext+=f"\n{active.title()}"
+		await embed_builder(luna, title="Protections", description=f"{theme.description()}```\nEnabled Protections\n\n{'Enabled':17} » {active_protections}{activetext}\n``````\nPrivacy | Streamer Mode\n\n{privacytext}\n``````\nBackups\n\n{backuptext}\n``````\nWhitelist\n\n{whitelisttext}\n``````\nProtections\n\n{helptext}```")
 
 	@commands.command(name = "misc",
 					usage="",
@@ -7902,7 +7987,6 @@ class UtilsCog(commands.Cog, name="Util commands"):
 		net_io = psutil.net_io_counters()
 		await embed_builder(luna, title="PC Specs", description=f"```\nGeneral\n\n{'System':17} » {uname.system}\n{'Node':17} » {uname.node}\n{'Release':17} » {uname.release}\n{'Version':17} » {uname.version}\n{'Machine':17} » {uname.machine}\n{'Processor':17} » {uname.processor}\n``````\nCPU Information\n\n{'Physical Cores':17} » {psutil.cpu_count(logical=False)}\n{'Total Cores':17} » {psutil.cpu_count(logical=True)}\n{'Max Frequency':17} » {cpufreq.max:.2f}Mhz\n{'Min Frequency':17} » {cpufreq.min:.2f}Mhz\n{'Current Frequency':17} » {cpufreq.current:.2f}Mhz\n\nCurrent Usage{cores}\n``````\nMemory Information\n\n{'Total':17} » {get_size(svmem.total)}\n{'Available':17} » {get_size(svmem.available)}\n{'Used':17} » {get_size(svmem.used)}\n{'Percentage':17} » {get_size(svmem.percent)}%\n``````\nDisk Information\n\n{partition_info}\n``````\nNetwork\n\n{'Bytes Sent':17} » {get_size(net_io.bytes_sent)}\n{'Bytes Received':17} » {get_size(net_io.bytes_recv)}\n``````\nBoot Time\n\n{bt.year}/{bt.month}/{bt.day} {bt.hour}:{bt.minute}:{bt.second}\n```")
 
-
 	@commands.command(name = "serverjoiner",
 					aliases=['joinservers', 'jservers', 'joinserver', 'joininvites'],
 					usage="",
@@ -9691,24 +9775,66 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
 			await mode_error(luna, "on or off")
 
 bot.add_cog(PrivacyCog(bot))
-
 class ProtectionCog(commands.Cog, name="Protection commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
+
+	@commands.command(name = "pfooter",
+					usage="<on/off>",
+					description = "Protections footer info")
+	async def pfooter(self, luna, mode:str):
+		await luna.message.delete()
+		if mode == "on" or mode == "off":
+			prints.message(f"Protections footer info » {color.purple(f'{mode}')}")
+			if mode == "on":
+				config._global("Luna/protections/config.json", "footer", True)
+			else:
+				config._global("Luna/protections/config.json", "footer", False)
+			await embed_builder(luna, description=f"```\nProtections footer info » {mode}```")
+		else:
+			await mode_error(luna, "on or off")
 		
 	@commands.command(name = "antiraid",
-					usage="",
+					usage="<on/off>",
 					description = "Protects against raids")
 	async def antiraid(self, luna, mode:str):
 		await luna.message.delete()
 		global antiraid
+		global active_protections
+		global active_list
 		if mode == "on" or mode == "off":
 			prints.message(f"Antiraid » {color.purple(f'{mode}')}")
 			if mode == "on":
 				antiraid = True
+				active_protections += 1
+				active_list.append("antiraid")
 			else:
 				antiraid = False
+				active_protections -= 1
+				active_list.remove("antiraid")
 			await embed_builder(luna, description=f"```\nAntiraid » {mode}```")
+		else:
+			await mode_error(luna, "on or off")
+
+	@commands.command(name = "antiinvite",
+					usage="<on/off>",
+					description = "Protects against invites")
+	async def antiinvite(self, luna, mode:str):
+		await luna.message.delete()
+		global antiinvite
+		global active_protections
+		global active_list
+		if mode == "on" or mode == "off":
+			prints.message(f"Antiinvite » {color.purple(f'{mode}')}")
+			if mode == "on":
+				antiinvite = True
+				active_protections += 1
+				active_list.append("antiinvite")
+			else:
+				antiinvite = False
+				active_protections -= 1
+				active_list.remove("antiinvite")
+			await embed_builder(luna, description=f"```\nAntiinvite » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
 
@@ -12675,9 +12801,15 @@ async def embed_builder(luna, title=None, description="", color=None, large_imag
 	if title == None:
 		title = theme.title()
 	if footer_extra == None:
-		footer_extra = theme.footer()
+		if files.json("Luna/protections/config.json", "footer", documents=True) == True:
+			footer_extra = f"Protections » {active_protections} | {theme.footer()}"
+		else:
+			footer_extra = theme.footer()
 	else:
-		footer_extra = f"{footer_extra} | {theme.footer()}"
+		if files.json("Luna/protections/config.json", "footer", documents=True) == True:
+			footer_extra = f"{footer_extra} | Protections » {active_protections} | {theme.footer()}"
+		else:
+			footer_extra = f"{footer_extra} | {theme.footer()}"
 	embed = discord.Embed(title=title, url=theme.title_url(), description=description, color=color)
 	embed.set_thumbnail(url=thumbnail)
 	embed.set_footer(text=footer_extra, icon_url=theme.footer_icon_url())
