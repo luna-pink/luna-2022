@@ -73,12 +73,12 @@ class Misc:
         return "".join(plain_text)
         
 
-class Encryption:
+class Encryption_Changed:
     def __init__(self, key = Misc.GenerateKey(), encoding = 1):
         self.key = key
         self.encoding = encoding
 
-    def CEA256(self, plain_text):
+    def CEA256_Changed(self, plain_text):
 
         ################# VARIABLES >>
 
@@ -124,12 +124,12 @@ class Encryption:
         return base64.b64encode(f"{temp_data}".encode()).decode()
 
 
-class Decryption:
+class Decryption_Changed:
     def __init__(self, key, encoding = 1):
         self.key = key
         self.encoding = encoding
 
-    def CEA256(self, encoded_text):
+    def CEA256_Changed(self, encoded_text):
 
         ################# VARIABLES >>
 

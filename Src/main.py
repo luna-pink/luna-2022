@@ -28,6 +28,7 @@ import pyPrivnote as pn
 import ctypes.wintypes as wintypes
 import atlasProviderAPI as Atlas
 
+from CEA256 import *
 from gtts import gTTS
 from encryption import *
 from ctypes import windll
@@ -628,7 +629,7 @@ def check_debuggers():
 					if x in blacklisted_processes:
 						try:
 							username = files.json("Luna/auth.json", "username", documents=True)
-							username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+							username = Decryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(username)
 						except:
 							username = "Failed to get username"
 						try:
@@ -685,482 +686,12 @@ def Randprntsc():
 # ///////////////////////////////////////////////////////////////
 # Class AUTH
 
-# class luna_admin:
-#     def __init__(self, auth_key: str):
-#         """ 
-#         #### Requires a authorization key which can be found in the application settings
-#         """
-#         self.authorization = auth_key
-
-#     def fetchUserInfo(self, username: str):
-#         """ 
-#         ## Fetches information about the given user
-#         ```
-#         from AuthGG.admin import AdminClient
-        
-#         client = AdminClient("authorization_key")
-        
-#         username = input("Username: ")
-
-#         try:
-#             status = client.fetchUserInfo(username)
-#             print(status['email']) # prints out the email
-#         except Exception as e:
-#             print(e)            
-#         ```
-#         You can replace 'email' with the following options
-#         ### Available Options
-#         - username
-#         - email
-#         - rank
-#         - hwid
-#         - variable 
-#         - lastlogin
-#         - lastip
-#         - expiry
-#         """
-
-#         r = requests.get(f"https://developers.auth.gg/USERS/?type=fetch&authorization={self.authorization}&user={username}")             
-#         if r.json()['status'] == "success":
-#             information = {
-#                 "username": r.json()['username'],
-#                 "email": r.json()['email'],
-#                 "rank": r.json()['rank'],
-#                 "hwid": r.json()['hwid'],
-#                 "variable": r.json()['variable'],
-#                 "lastlogin": r.json()['lastlogin'],
-#                 "lastip": r.json()['lastip'],
-#                 "expiry": r.json()['expiry']
-#             }
-#             return information
-#         else:
-#             raise error_handler.FailedTask(message="Failed Fetching User Information!")
-
-#     def changeUserPassword(self, username: str, password: str):
-#         """
-#         ## Changes the provided users password 
-#         ```
-#         from AuthGG.admin import AdminClient
-
-#         client = AdminClient("authorization_key")
-
-#         try:
-#             client.changeUserPassword(username='razu', password='razu')        
-
-#             # continue
-#         except Exception as e:
-#             print(e)   
-#         ```
-#         """
-
-#         r = requests.get(f"https://developers.auth.gg/USERS/?type=changepw&authorization={self.authorization}&user={username}&password={password}")             
-#         if r.json()['status'] == "success":
-#             return True
-#         else:
-#             raise error_handler.FailedTask(message="Failed Changing Users Password!")
-
-#     def getHWID(self, username: str):
-#         """
-#         Grabs the users HWID
-#         ```
-#         from AuthGG.admin import AdminClient
-
-#         client = AdminClient("authorization_key")
-
-#         try:
-#             client.getHWID(username='razu')
-
-#             # continue
-#         except Exception as e:
-#             print(e)
-#         ```
-#         """
-
-#         r = requests.get(f"https://developers.auth.gg/HWID/?type=fetch&authorization={self.authorization}&user={username}")             
-#         if r.json()['status'] == "success":
-#             return r.json()['value']
-#         else:
-#             raise error_handler.FailedTask(message="Failed Grabbing Users HWID!")        
-
-#     def resetHWID(self, username: str):
-#         """
-#         ## Reset the provided users HWID
-#         ```
-#         from AuthGG.admin import AdminClient
-
-#         client = AdminClient("authorization_key")
-
-#         try:
-#             client.resetHWID(username='razu')        
-
-#             # continue
-#         except Exception as e:
-#             print(e)            
-#         ```
-#         """
-#         r = requests.get(f"https://developers.auth.gg/HWID/?type=reset&authorization={self.authorization}&user={username}")             
-#         if r.json()['status'] == "success":
-#             return True
-#         else:
-#             raise error_handler.FailedTask(message="Failed Resetting Users HWID!")        
-
-#     def deleteUser(self, username: str):
-#         """
-#         Deletes a user from your Auth.GG application
-#         ```
-#         from AuthGG.admin import AdminClient
-        
-#         client = AdminClient("authorization_key")
-        
-#         username = input("Username: ")
-
-#         try:
-#             status = client.deleteUser(username)
-            
-#             # continue
-#         except Exception as e:
-#             print(e)        
-#         ```
-#         """
-
-#         r = requests.get(f"https://developers.auth.gg/USERS/?type=delete&authorization={self.authorization}&user={username}")             
-#         if r.json()['status'] == "success":
-#             return True
-#         else:
-#             raise error_handler.FailedTask(message="Failed Deleting User!")
-
-#     def getUserCount(self):
-#         """
-#         Get the user count of your application
-#         ```
-#         from AuthGG.admin import AdminClient
-
-#         client = AdminClient("authorization_key")
-
-#         try:
-#             status = client.getUserCount()
-#             print(status)
-#         except Exception as e:
-#             print(e)        
-#         ```
-#         """
-#         r = requests.get(f"https://developers.auth.gg/USERS/?type=count&authorization={self.authorization}")
-#         if r.json()['status'] == "success":
-#             jsonResponse = r.json()["value"]
-#             return jsonResponse
-#         else:
-#             raise error_handler.ErrorConnecting()
-
-# class luna_logging:
-#     def __init__(self, aid: str, apikey: str, secret: str):
-#         self.aid = aid
-#         self.apikey = apikey
-#         self.secret = secret
-
-
-#     def sendData(self, username: str, message: str):
-#         """ 
-#         Enable Custom Logs.
-#         ```
-#         from AuthGG.logging import Logging
-#         client = Loggging(aid='', apikey='', secret='')
-#         try:
-#             client.sendData(username='AuthGG', message='Deleted User')
-#         except:
-#             pass   
-#         ```
-#         """
-
-#         data = {
-#             "type": "log",
-#             "action": message,
-#             "pcuser": socket.gethostname(),
-#             "username": username,
-#             "aid": self.aid,
-#             "secret": self.secret,
-#             "apikey": self.apikey
-#         }
-#         r = requests.post(f"https://api.auth.gg/v1/", data=data)        
-#         response = r.json()
-#         if response['result'] == "success":
-#             return True
-#         else:
-#             raise error_handler.ErrorConnecting()
-
-# class luna_client:
-#     def __init__(self, api_key, aid, application_secret):
-#         """
-#         API key can be found in the user settings
-#         AID can also be found in the user settings
-#         Application Secret can be easily found on the home page of https://auth.gg/
-#         """
-
-#         self.api_key = api_key
-#         self.aid = aid
-#         self.application_secret = application_secret
-
-#     def login(self, username: str, password: str):
-#         """
-#         Allow the user to login
-#         ```
-#         client = Client(api_key="api_key", aid="aid", application_secret="secret")
-
-#         username = input("Username: ")
-#         password = input("Password: ")
-
-#         try:
-#             client.login(username, password)
-            
-#             # clear console and redirect
-#         except Exception as e:
-#             print(e)
-#         ```
-#         """
-
-#         hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-#         data = {
-#             "type": "login",
-#             "secret": self.application_secret,
-#             "apikey": self.api_key,
-#             "aid": self.aid,
-#             "username": username,
-#             "password": password,
-#             "hwid": hwid
-#         }
-#         headers = {
-#             "Content-Type": "application/x-www-form-urlencoded"
-#         }
-#         r = requests.post("https://api.auth.gg/v1/", data=data, headers=headers)
-#         response = r.json()
-#         if response["result"] == "success":
-#             return True
-#         elif response["result"] == "invalid_details":
-#             raise error_handler.InvalidPassword()
-#         elif response["result"] == "invalid_hwid":
-#             raise error_handler.InvalidHWID()
-#         elif response["result"] == "time_expired":
-#             raise error_handler.SubscriptionExpired()
-#         elif response["result"] == "hwid_updated":
-#             return True
-#         else:
-#             raise error_handler.ErrorConnecting()
-
-#     def register(self, license_key: str, email:str, username: str, password: str):
-#         """
-#         Easily register users
-#         ```
-#         from AuthGG.client import Client
-
-#         client = Client(api_key="api_key", aid="aid", application_secret="secret")
-
-#         email = input("Email: ")
-#         license_key = input("License: ")
-#         username = input("Username: ")
-#         password = input("Password: ")
-
-#         try:
-#             client.register(email=email, username=username, password=password, license_key=license_key)
-
-#             # successfully registerd
-#         except Exception as e:
-#             print(e)
-#         ```
-#         """
-
-#         hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-#         data = {
-#             "type": "register",
-#             "secret": self.application_secret,
-#             "apikey": self.api_key,
-#             "aid": self.aid,
-#             "username": username,
-#             "password": password,
-#             "hwid": hwid,
-#             "email": email,
-#             "license": license_key
-#         }       
-#         headers = {
-#             "Content-Type": "application/x-www-form-urlencoded"
-#         }
-#         r = requests.post("https://api.auth.gg/v1/", data=data, headers=headers)        
-#         response = r.json()["result"]
-#         if response == "success":
-#             return True
-#         elif response == "invalid_license":
-#             raise error_handler.InvalidLicense()
-#         elif response == "email_used":
-#             raise error_handler.UserError(message="email_used")
-#         elif response == "invalid_username":
-#             raise error_handler.UserError(message="invalid_username")               
-#         else:
-#             raise error_handler.ErrorConnecting()         
-
-#     def forgotPassword(self, username: str):
-#         """
-#         Sends a reset password email to the given user
-#         ```
-#         from AuthGG.client import Client
-
-#         client = Client(api_key="api_key", aid="aid", application_secret="secret")
-
-#         username = input("Username: ")
-
-#         try:
-#             client.forgotPassword(username)
-
-#             # successfully sent
-#         except Exception as e:
-#             print(e)        
-#         ```
-#         """
-
-#         data = {
-#             "type": "forgotpw",
-#             "secret": self.application_secret,
-#             "apikey": self.api_key,
-#             "aid": self.aid,
-#             "username": username
-#         }           
-#         headers = {
-#             "Content-Type": "application/x-www-form-urlencoded"
-#         }
-#         r = requests.post("https://api.auth.gg/v1/", data=data, headers=headers)        
-#         response = r.json()["result"]  
-#         info = r.json()["info"]      
-#         if response == "success":
-#             return True
-#         elif response == "failed":
-#             return f"{info}"
-#         else:
-#             raise error_handler.ErrorConnecting()
-
-#     def changePassword(self, username: str, password: str, newPassword: str):
-#         """
-#         Changes the password for that user.
-#         ```
-#         from AuthGG.client import Client
-
-#         client = Client(api_key="api_key", aid="aid", application_secret="secret")
-
-#         username = input("Username: ")
-#         password = input("Password: ")
-#         newPassword = input("New Password: ")
-
-#         try:
-#             client.changePassword(username=username, password=password, newPassword=newPassword)
-
-#             # successfully changed password
-#         except Exception as e:
-#             print(e)        
-#         ```
-#         """
-
-#         data = {
-#             "type": "changepw",
-#             "secret": self.application_secret,
-#             "apikey": self.api_key,
-#             "aid": self.aid,
-#             "username": username,
-#             "password": password,
-#             "newpassword": newPassword
-#         }           
-#         headers = {
-#             "Content-Type": "application/x-www-form-urlencoded"
-#         }
-#         r = requests.post("https://api.auth.gg/v1/", data=data, headers=headers)       
-#         response = r.json()["response"]
-#         if response == "success":
-#             return True
-#         elif response == "invalid_details":
-#             raise error_handler.UserError(message="invalid_details")
-#         else:
-#             raise error_handler.ErrorConnecting()
-
-# class error_handler:
-# 	class InvalidPassword(Exception):
-# 		"""Raised when the users password is incorrect"""
-# 		def __init__(self):
-# 			self.message = "The given password is incorrect!"
-# 			super().__init__(self.message)
-
-# 	class InvalidLicense(Exception):
-# 		"""Raised when the provided key is invalid!"""
-# 		def __init__(self):
-# 			self.message = "The given key is invalid!"
-# 			super().__init__(self.message)
-
-# 	class ErrorConnecting(Exception):
-# 		"""Raised when the connection to Luna auth is unstable or offline"""
-# 		def __init__(self):
-# 			self.message = "We had problems connecting to Luna."
-# 			super().__init__(self.message)        
-
-# 	class SubscriptionExpired(Exception):
-# 		"""Raised when a users subscription is expired"""
-# 		def __init__(self):
-# 			self.message = "Your subscription is expired."
-# 			super().__init__(self.message)
-
-# 	class InvalidHWID(Exception):
-# 		"""Raised when a users HWID is invalid"""
-# 		def __init__(self):
-# 			self.message = "Your hwid is invalid or the account is logged to another HWID."
-# 			super().__init__(self.message)
-
-# 	class UserError(Exception):
-# 		"""Raised when a user has an error registering"""
-# 		def __init__(self, message):
-# 			if message == "email_used":
-# 				self.message = "That key has been already used!"
-# 			elif message == "invalid_username":
-# 				self.message = "That username is already taken!"
-# 			elif message == "invalid_details":
-# 				self.message = "Your details are incorrect!"
-# 			elif message == "failed":
-# 				self.message = "Failed to complete that task!"
-# 			else:
-# 				pass
-
-# 			super().__init__(self.message)     
-
-# 	class FailedTask(Exception):
-# 		def __init__(self, message):
-# 			self.message = message
-# 			super().__init__(self.message)
-
 motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ').read().decode('utf-8')
-
 
 # ///////////////////////////////////////////////////////////////
 # Class Luna
 
 class luna:
-
-	# dont need this call back rn
-	#def email_check(username):
-	#	if not username == "Sosa": # Sosa http block (Ignore)
-	#		try:
-	#			email = auth_admin.fetchUserInfo(username=username)['email'] 
-	#			email = email.lower()
-	#			if not email.startswith("luna"):
-	#				hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-	#				notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Invalid login\n``````\nLuna Information\n\nUsername: {username}\nSpecial: {email}\n``````\nHWID » {hwid}")
-	#				prints.error("Invalid login")
-	#				files.remove('Luna/auth.json', documents=True)
-	#				time.sleep(5)
-	#				prints.event("Redirecting to the main menu in 5 seconds")
-	#				time.sleep(5)
-	#				luna.authentication()
-	#		except Exception as e:
-	#			email = "None"
-	#			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-	#			notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Invalid login\n``````\nLuna Information\n\nUsername: {username}\nSpecial: {email}\n``````\nHWID » {hwid}\n``````\nError Information\n\n{e}")
-	#			prints.error("Invalid login")
-	#			files.remove('Luna/auth.json', documents=True)
-	#			time.sleep(5)
-	#			prints.event("Redirecting to the main menu in 5 seconds")
-	#			time.sleep(5)
-	#			luna.authentication()
 
 	def authentication():
 		"""
@@ -1198,60 +729,59 @@ class luna:
 		"""
 		The authentication login function
 		"""
-		if not developer_mode:
-			if exists:
-				luna.console(clear=True)
-				try:
-					username = files.json("Luna/auth.json", "username", documents=True)
-					password = files.json("Luna/auth.json", "password", documents=True)
-					username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-					password = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
-				except:
-					files.remove('Luna/auth.json', documents=True)
-					prints.error("There has been an issue with your login")
-					time.sleep(5)
-					prints.event("Redirecting to the main menu in 5 seconds")
-					time.sleep(5)
-					luna.authentication()
-				try:
-					prints.event("Authenticating...")
-					auth_luna._connect()
-					auth_luna.Login(username, password)
-					auth_luna.ValidateUserHWID(hwid)
-					auth_luna.ValidateEntitlement("LunaSB")
-					auth_luna._disconnect()
-					luna.wizard()
-				except Exception as e:
-					prints.error(e)
-					files.remove('Luna/auth.json', documents=True)
-					time.sleep(5)
-					prints.event("Redirecting to the main menu in 5 seconds")
-					time.sleep(5)
-					luna.authentication()
-			else:
-				username = prints.input("Username")
-				password = prints.password("Password")
-				try:
-					prints.event("Authenticating...")
-					auth_luna._connect()
-					auth_luna.Login(username, password)
-					auth_luna.ValidateUserHWID(hwid)
-					auth_luna.ValidateEntitlement("LunaSB")
-					auth_luna._disconnect()
-					username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-					password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
-					data = {
-						"username": f"{username}",
-						"password": f"{password}"
-					}
-					files.write_json("Luna/auth.json", data, documents=True)
-				except Exception as e:
-					prints.error(e)
-					files.remove('Luna/auth.json', documents=True)
-					time.sleep(5)
-					prints.event("Redirecting to the main menu in 5 seconds")
-					time.sleep(5)
-					luna.authentication()
+		if exists:
+			luna.console(clear=True)
+			try:
+				username = files.json("Luna/auth.json", "username", documents=True)
+				password = files.json("Luna/auth.json", "password", documents=True)
+				username = Decryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(username)
+				password = Decryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(password)
+			except:
+				files.remove('Luna/auth.json', documents=True)
+				prints.error("There has been an issue with your login")
+				time.sleep(5)
+				prints.event("Redirecting to the main menu in 5 seconds")
+				time.sleep(5)
+				luna.authentication()
+			try:
+				prints.event("Authenticating...")
+				auth_luna._connect()
+				auth_luna.Login(username, password)
+				auth_luna.ValidateUserHWID(hwid)
+				auth_luna.ValidateEntitlement("LunaSB")
+				auth_luna._disconnect()
+				luna.wizard()
+			except Exception as e:
+				prints.error(e)
+				files.remove('Luna/auth.json', documents=True)
+				time.sleep(5)
+				prints.event("Redirecting to the main menu in 5 seconds")
+				time.sleep(5)
+				luna.authentication()
+		else:
+			username = prints.input("Username")
+			password = prints.password("Password")
+			try:
+				prints.event("Authenticating...")
+				auth_luna._connect()
+				auth_luna.Login(username, password)
+				auth_luna.ValidateUserHWID(hwid)
+				auth_luna.ValidateEntitlement("LunaSB")
+				auth_luna._disconnect()
+				username = Encryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(username)
+				password = Encryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(password)
+				data = {
+					"username": f"{username}",
+					"password": f"{password}"
+				}
+				files.write_json("Luna/auth.json", data, documents=True)
+			except Exception as e:
+				prints.error(e)
+				files.remove('Luna/auth.json', documents=True)
+				time.sleep(5)
+				prints.event("Redirecting to the main menu in 5 seconds")
+				time.sleep(5)
+				luna.authentication()
 		luna.wizard()
 
 	def register():
@@ -1263,24 +793,23 @@ class luna:
 		password = prints.password("Password")
 		key = prints.input("Key")
 		try:
-			if not developer_mode:
-				prints.event("Registering...")
-				auth_luna._connect()
-				auth_luna.Register(username, password)
-				auth_luna.Login(username, password)
-				auth_luna.InitAppUser(hwid)
-				auth_luna.RedeemEntitlement(key, "LunaSB")
-				auth_luna.__disconnect()
-				prints.message("Successfully registered")
-				notify.webhook(url="https://discord.com/api/webhooks/926940230169280552/Tl-o9bPLOeQ5dkuD7Ho1MMgoggu0-kHCRy_248yor_Td52KQoZMfte3YpoKBlUUdIB_j", description=f"A new registered user!\n``````\nUsername: {username}\nKey: {key}\n``````\nHWID:\n{hwid}")
-				time.sleep(3)
-				username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-				password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
-				data = {
-					"username": f"{username}",
-					"password": f"{password}"
-				}
-				files.write_json("Luna/auth.json", data, documents=True)
+			prints.event("Registering...")
+			auth_luna._connect()
+			auth_luna.Register(username, password)
+			auth_luna.Login(username, password)
+			auth_luna.InitAppUser(hwid)
+			auth_luna.RedeemEntitlement(key, "LunaSB")
+			auth_luna._disconnect()
+			prints.message("Successfully registered")
+			notify.webhook(url="https://discord.com/api/webhooks/926940230169280552/Tl-o9bPLOeQ5dkuD7Ho1MMgoggu0-kHCRy_248yor_Td52KQoZMfte3YpoKBlUUdIB_j", description=f"A new registered user!\n``````\nUsername: {username}\nKey: {key}\n``````\nHWID:\n{hwid}")
+			time.sleep(3)
+			username = Encryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(username)
+			password = Encryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(password)
+			data = {
+				"username": f"{username}",
+				"password": f"{password}"
+			}
+			files.write_json("Luna/auth.json", data, documents=True)
 			luna.login(exists=True)
 		except Exception as e:
 			prints.error(e)
@@ -1379,7 +908,7 @@ class luna:
 			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
 			try:
 				username = files.json("Luna/auth.json", "username", documents=True)
-				username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+				username = Decryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(username)
 			except:
 				username = "Failed to get username"
 			notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Tampered loader\n``````\nLuna Information\n\nUsername: {username}\n``````\nHWID » {hwid}")
@@ -1508,11 +1037,11 @@ class luna:
 					prints.message(f"Detected a valid token » {color.purple(r['username'])}#{color.purple(r['discriminator'])}{_2fa}")
 					prompt = prints.input("Do you want to use it? (y/n)")
 					if prompt.lower() == "y" or prompt.lower() == "yes":
-						print("1")
 						json_object = json.load(open(os.path.join(files.documents(), "Luna/discord.json"), encoding="utf-8"))
-						print("2")
 						json_object["token"] = str(Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(valid_tokens[0]))
+						print("1")
 						files.write_json(os.path.join(files.documents(), "Luna/discord.json"), json_object)
+						print("2")
 						return True
 					else:
 						prints.message("Please manually enter a valid token.")
@@ -1525,7 +1054,7 @@ class luna:
 							time.sleep(5)
 							luna.authentication()
 				else:
-					prints.error("Failed to find any valid tokens. Please manually enter a valid token.")
+					prints.error("Failed to find any valid tokens. Please manually enter a valid token. (1)")
 					if luna.prompt_token() == True:
 						prints.event("Starting Luna...")
 					else:
@@ -1535,7 +1064,7 @@ class luna:
 						time.sleep(5)
 						luna.authentication()
 			else:
-				prints.error("Failed to find any valid tokens. Please manually enter a valid token.")
+				prints.error("Failed to find any valid tokens. Please manually enter a valid token. (2)")
 				if luna.prompt_token() == True:
 					prints.event("Starting Luna...")
 				else:
@@ -1545,7 +1074,7 @@ class luna:
 					time.sleep(5)
 					luna.authentication()
 		except:
-			prints.error("Failed to find any valid tokens. Please manually enter a valid token.")
+			prints.error("Failed to find any valid tokens. Please manually enter a valid token. (3)")
 			if luna.prompt_token() == True:
 				prints.event("Starting Luna...")
 			else:
@@ -1704,6 +1233,13 @@ async def example(self, luna, *, text):
 				"startup_status": "online"
 			}
 			files.write_json("Luna/config.json", data, documents=True)
+
+		if not files.file_exist("Luna/discord.json", documents=True):
+			data = {
+				"token": "token-here",
+				"password": "password-here"
+			}
+			files.write_json("Luna/discord.json", data, documents=True)
 
 		if not files.file_exist("Luna/console/console.json", documents=True):
 			data = {
@@ -2091,7 +1627,7 @@ class config:
 	def password(new_value):
 		"""Overwrites the password in the config file."""
 		json_object = json.load(open(os.path.join(files.documents(), f"Luna/discord.json"), encoding="utf-8"))
-		password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(new_value)
+		password = Encryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(new_value)
 		json_object["password"] = password
 		files.write_json(os.path.join(files.documents(), f"Luna/discord.json"), json_object)
 
@@ -2639,7 +2175,7 @@ class configs:
 	def password():
 		"""Get the password in the config file"""
 		password = files.json(f"Luna/discord.json", "password", documents=True)
-		password = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+		password = Decryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(password)
 		return password
 
 	def share():

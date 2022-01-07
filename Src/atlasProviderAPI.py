@@ -24,8 +24,8 @@ class Atlas:
         try:
             socket = self.socket
             socket.connect((self.host, self.port))
+            self.isConnected = True
             if self._send(socket, f"OpCode=0;Caller={self.app_id};").split(";")[0].split("=")[1] == "8":
-                self.isConnected = True
                 self._send(socket, f"OpCode=9;CipherSpec=2;")
                 return True
             else:
@@ -40,12 +40,13 @@ class Atlas:
         except Exception as e:
             raise CustomError(e)
 
-    def _disconnect(self):
+    def _disconnect(self): # nothing wrong with this, weird, ik
         try:
-            socket = self.socket
+            
             if self.isConnected:
-                #payloadID = Decryption(self.app_token).CEA256(self._send(socket, Encryption(self.app_token).CEA256(f"OpCode=6;")))
-                socket.close()
+                #payloadID = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=6;")))
+                self.socket.close()
+                self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         except Exception as e:
             raise CustomError(f"Error: ".format(e))
 
@@ -53,11 +54,11 @@ class Atlas:
     def Login(self, username: str, password: str):
         socket = self.socket
         try:
-            payloadID = Decryption(self.app_token).CEA256(self._send(socket, Encryption(self.app_token).CEA256(f"OpCode=10;UserHandle={username};"))) # What the fuck is this? -Nshout
+            payloadID = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=10;UserHandle={username};"))) # What the fuck is this? -Nshout
             responseCode = payloadID.split(";")[0].split("=")[1]
             responseResult = payloadID.split(";")[1].split("=")[1]
             if responseCode == "8" and responseResult == "Identified!":
-                AuthReponse = Decryption(self.app_token).CEA256(self._send(socket, Encryption(self.app_token).CEA256(f"OpCode=4;AuthOpCode=1;UserHandle={username};UserPass={password};")))
+                AuthReponse = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=4;AuthOpCode=1;UserHandle={username};UserPass={password};")))
                 AuthCode = AuthReponse.split(";")[0].split("=")[1]
                 AuthMessage = AuthReponse.split(";")[1].split("=")[1]
                 if AuthCode == "8":
@@ -80,7 +81,7 @@ class Atlas:
     def Register(self, username: str, password: str):
         socket = self.socket
         try:
-            RegisterPayload = Decryption(self.app_token).CEA256(self._send(socket, Encryption(self.app_token).CEA256(f"OpCode=4;AuthOpCode=2;UserFullname={username};UserHandle={username};UserPass={password};UserEmail={username}@nomail.com;")))
+            RegisterPayload = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=4;AuthOpCode=2;UserFullname={username};UserHandle={username};UserPass={password};UserEmail={username}@nomail.com;")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -101,7 +102,7 @@ class Atlas:
     def InitAppUser(self, hwid: str): # Must be authenticated (See docs)
         socket = self.socket
         try:
-            RegisterPayload = Decryption(self.app_token).CEA256(self._send(socket, Encryption(self.app_token).CEA256(f"OpCode=5;AppOpCode=1;HWID={hwid};")))
+            RegisterPayload = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=5;AppOpCode=1;HWID={hwid};")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -122,7 +123,7 @@ class Atlas:
     def DropAppUser(self): # Must be authenticated (See docs)
         socket = self.socket
         try:
-            RegisterPayload = Decryption(self.app_token).CEA256(self._send(socket, Encryption(self.app_token).CEA256(f"OpCode=5;AppOpCode=2;")))
+            RegisterPayload = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=5;AppOpCode=2;")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -140,12 +141,12 @@ class Atlas:
     def RedeemEntitlement(self, LicenseKey: str, applicationSKU: str): # Must be authenticated (See docs)
         socket = self.socket
         try:
-            RegisterPayload = Decryption(self.app_token).CEA256(self._send(socket, Encryption(self.app_token).CEA256(f"OpCode=5;AppOpCode=3;SLK={LicenseKey};SKU={applicationSKU};")))
+            RegisterPayload = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=5;AppOpCode=3;SLK={LicenseKey};SKU={applicationSKU};")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
                 match responseResult:
-                    case "SLActivated":
+                    case "SLActivated": # the functions that are being called are missing (self) i think
                         return True
                     case "SLActivationFailed":
                         raise CustomError("An issue occured while activating the specified license key")
@@ -158,7 +159,7 @@ class Atlas:
     def ValidateEntitlement(self, applicationSKU: str): # Must be authenticated (See docs)
         socket = self.socket
         try:
-            RegisterPayload = Decryption(self.app_token).CEA256(self._send(socket, Encryption(self.app_token).CEA256(f"OpCode=5;AppOpCode=4;SKU={applicationSKU};")))
+            RegisterPayload = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=5;AppOpCode=4;SKU={applicationSKU};")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -180,7 +181,7 @@ class Atlas:
     def SetUserHWID(self, hwid: str): # Must be authenticated (See docs)
         socket = self.socket
         try:
-            RegisterPayload = Decryption(self.app_token).CEA256(self._send(socket, Encryption(self.app_token).CEA256(f"OpCode=5;AppOpCode=5;HWID={hwid};")))
+            RegisterPayload = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=5;AppOpCode=5;HWID={hwid};")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -198,7 +199,7 @@ class Atlas:
     def ValidateUserHWID(self, hwid: str): # Must be authenticated (See docs)
         socket = self.socket
         try:
-            RegisterPayload = Decryption(self.app_token).CEA256(self._send(socket, Encryption(self.app_token).CEA256(f"OpCode=5;AppOpCode=6;HWID={hwid};")))
+            RegisterPayload = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=5;AppOpCode=6;HWID={hwid};")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -218,7 +219,7 @@ class Atlas:
     def GetAppUserRole(self): # Must be authenticated (See docs)
         socket = self.socket
         try:
-            RegisterPayload = Decryption(self.app_token).CEA256(self._send(socket, Encryption(self.app_token).CEA256(f"OpCode=5;AppOpCode=7;")))
+            RegisterPayload = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=5;AppOpCode=7;")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
