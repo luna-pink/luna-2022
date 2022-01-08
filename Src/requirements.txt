@@ -4,8 +4,6 @@ pyPrivnote
 httpx
 dhooks
 gtts
-colorama
-AuthGG
 tqdm
 win10toast
 pypresence
