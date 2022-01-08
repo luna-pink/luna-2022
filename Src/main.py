@@ -28,11 +28,10 @@ import pypresence
 import pyPrivnote as pn
 import ctypes.wintypes as wintypes
 
-from CEA256 import *
 from gtts import gTTS
 from ctypes import windll
 from notifypy import Notify
-from os import error, name, system
+from os import error, name, remove, system
 from datetime import datetime
 from pypresence import Presence
 from discord.ext import commands
@@ -49,6 +48,7 @@ from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFou
 
 antiraid = False
 antiinvite = False
+antiupper = False
 
 active_protections = 0
 active_list = []
@@ -68,9 +68,9 @@ privacy = False
 copycat = None
 chargesniper = False
 
-developer_mode = False
+developer_mode = True
 beta = False
-version = '3.2.0'
+version = '3.2.1'
 
 r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 updater_url = r["updater"]
@@ -219,9 +219,9 @@ bufsize = wintypes._COORD(102, 9001)
 windll.kernel32.SetConsoleScreenBufferSize(hdl, bufsize)
 
 # ///////////////////////////////////////////////////////////////
-# Changed CEA256 for Auth
+# Changed CEA256
 
-class Misc_Changed:
+class Misc:
     def GenerateKey():
         characters = string.ascii_letters + string.digits
         generate_string = "".join(random.sample(characters, 32))
@@ -239,7 +239,7 @@ class Misc_Changed:
         normal_numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
         normal_low = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "u", "v", "x", "y", "z"]
         normal_caps = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "U", "V", "X", "Y", "Z"]
-        ciphered_low = ["c", "e", "a", "b", "i", "f", "d", "h", "g", "n", "l", "k", "q", "j", "r", "p", "o", "m", "u", "s", "y", "x", "v"]
+        ciphered_low = ["c", "e", "a", "b", "i", "f", "d", "h", "g", "n", "l", "k", "q", "j", "r", "p", "o", "m", "u", "s", "y", "x", "v", "z"]
         ciphered_caps = ["C", "E", "A", "B", "I", "F", "D", "H", "G", "N", "L", "K", "Q", "J", "R", "P", "O", "M", "U", "S", "Y", "X", "V", "Z"]
         ciphered_numbers = ["0", "5", "3", "2", "8", "1", "9", "7", "4", "6"]
         text_length = len(plaintext)
@@ -267,7 +267,7 @@ class Misc_Changed:
         normal_numbers =  ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
         normal_low = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "u", "v", "x", "y", "z"]
         normal_caps = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "U", "V", "X", "Y", "Z"]
-        ciphered_low = ["c", "e", "a", "b", "i", "f", "d", "h", "g", "n", "l", "k", "q", "j", "r", "p", "o", "m", "u", "s", "y", "x", "v"]
+        ciphered_low = ["c", "e", "a", "b", "i", "f", "d", "h", "g", "n", "l", "k", "q", "j", "r", "p", "o", "m", "u", "s", "y", "x", "v", "z"]
         ciphered_caps = ["C", "E", "A", "B", "I", "F", "D", "H", "G", "N", "L", "K", "Q", "J", "R", "P", "O", "M", "U", "S", "Y", "X", "V", "Z"]
         ciphered_numbers = ["0", "5", "3", "2", "8", "1", "9", "7", "4", "6"]
         text_length = len(encodedtext)
@@ -292,18 +292,18 @@ class Misc_Changed:
         return "".join(plain_text)
         
 
-class Encryption_Changed:
-    def __init__(self, key = Misc_Changed.GenerateKey(), encoding = 1):
+class Encryption:
+    def __init__(self, key = Misc.GenerateKey(), encoding = 1):
         self.key = key
         self.encoding = encoding
 
-    def CEA256_Changed(self, plain_text):
+    def CEA256(self, plain_text):
 
         ################# VARIABLES >>
 
         key_value = 0
         temp_value = 0
-        cipher_encoded = Misc_Changed.CipherEncode(plain_text)
+        cipher_encoded = Misc.CipherEncode(plain_text)
         temp_data = ""
         semi_encryption = []
         final_dencryption = []
@@ -332,7 +332,7 @@ class Encryption_Changed:
             encrypted_decimals.append(x * key_value)
 
         for x in encrypted_decimals:
-            semi_encryption.append(f"{Misc_Changed.XOR(str(x), self.key)}:")
+            semi_encryption.append(f"{Misc.XOR(str(x), self.key)}:")
 
         temp_data = "".join(semi_encryption)
         length = len(temp_data) - 1
@@ -343,12 +343,12 @@ class Encryption_Changed:
         return base64.b64encode(f"{temp_data}".encode()).decode()
 
 
-class Decryption_Changed:
+class Decryption:
     def __init__(self, key, encoding = 1):
         self.key = key
         self.encoding = encoding
 
-    def CEA256_Changed(self, encoded_text):
+    def CEA256(self, encoded_text):
 
         ################# VARIABLES >>
 
@@ -376,7 +376,7 @@ class Decryption_Changed:
         splits += 1
         
         for x in range(splits):
-            split_data.append(int(f"{Misc_Changed.XOR(cipher_encoded.split(':')[x], self.key)}"))
+            split_data.append(int(f"{Misc.XOR(cipher_encoded.split(':')[x], self.key)}"))
         
         for x in range(len(self.key)):
             key_decimals.append(ord(self.key[x]))
@@ -391,7 +391,196 @@ class Decryption_Changed:
         for x in plain_decimals:
             decrypted_text_one.append(chr(x))
 
-        decrypted_data = Misc_Changed.CipherDecode("".join(decrypted_text_one))
+        decrypted_data = Misc.CipherDecode("".join(decrypted_text_one))
+
+        return decrypted_data
+
+###
+# CEAShim LTSB (Long Term Support Base)
+# This version of CEA is designed to be a Fork of the original CEA that only receives updates when the server receives a CEA update.
+# Do not update this file as the server will not accept it as a valid cipher hash. (This feature is not yet implemented)
+# For all other purposes not pertaining to authentication via the AtlasProviderAPI, please use the original CEA.
+### 
+
+class CEAMisc:
+    def GetShimVersion():
+        """
+        The function that returns the version of the shim.
+        This is used to determine if the shim is compatible with the current implementation that is built into the Atlas Gateway Server.
+        """
+        return "AtlasProviderAPI-CEA-SHIM - 1.0.0"
+
+    def GenerateKey():
+        characters = string.ascii_letters + string.digits
+        generate_string = "".join(random.sample(characters, 32))
+        return generate_string
+
+    def XOR(ptext, key):
+        xored = []
+        for x in range(len(ptext)):
+            xored.append(chr(ord(ptext[x]) ^ ord(key[x % len(key)])))
+            
+        
+        return "".join(xored)
+
+    def CipherEncode(plaintext):
+        normal_numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+        normal_low = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "u", "v", "x", "y", "z"]
+        normal_caps = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "U", "V", "X", "Y", "Z"]
+        ciphered_low = ["c", "e", "a", "b", "i", "f", "d", "h", "g", "n", "l", "k", "q", "j", "r", "p", "o", "m", "u", "s", "y", "x", "v", "z"]
+        ciphered_caps = ["C", "E", "A", "B", "I", "F", "D", "H", "G", "N", "L", "K", "Q", "J", "R", "P", "O", "M", "U", "S", "Y", "X", "V", "Z"]
+        ciphered_numbers = ["0", "5", "3", "2", "8", "1", "9", "7", "4", "6"]
+        text_length = len(plaintext)
+        encoded_text = []
+
+        for x in range(text_length):
+            if plaintext[x] in normal_low:
+                index = normal_low.index(plaintext[x])
+                ciphered_letter = ciphered_low[index]
+                encoded_text.append(ciphered_letter)
+            elif plaintext[x] in normal_caps:
+                index = normal_caps.index(plaintext[x])
+                ciphered_letter = ciphered_caps[index]
+                encoded_text.append(ciphered_letter)
+            elif plaintext[x] in normal_numbers:
+                index = normal_numbers.index(plaintext[x])
+                ciphered_letter = ciphered_numbers[index]
+                encoded_text.append(ciphered_letter)
+            else:
+                encoded_text.append(plaintext[x])
+        
+        return "".join(encoded_text)
+
+    def CipherDecode(encodedtext):
+        normal_numbers =  ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+        normal_low = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "u", "v", "x", "y", "z"]
+        normal_caps = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "U", "V", "X", "Y", "Z"]
+        ciphered_low = ["c", "e", "a", "b", "i", "f", "d", "h", "g", "n", "l", "k", "q", "j", "r", "p", "o", "m", "u", "s", "y", "x", "v", "z"]
+        ciphered_caps = ["C", "E", "A", "B", "I", "F", "D", "H", "G", "N", "L", "K", "Q", "J", "R", "P", "O", "M", "U", "S", "Y", "X", "V", "Z"]
+        ciphered_numbers = ["0", "5", "3", "2", "8", "1", "9", "7", "4", "6"]
+        text_length = len(encodedtext)
+        plain_text = []
+
+        for x in range(text_length):
+            if encodedtext[x] in ciphered_low:
+                index = ciphered_low.index(encodedtext[x])
+                normal_letter = normal_low[index]
+                plain_text.append(normal_letter)
+            elif encodedtext[x] in ciphered_caps:
+                index = ciphered_caps.index(encodedtext[x])
+                normal_letter = normal_caps[index]
+                plain_text.append(normal_letter)
+            elif encodedtext[x] in ciphered_numbers:
+                index = ciphered_numbers.index(encodedtext[x])
+                normal_letter = normal_numbers[index]
+                plain_text.append(normal_letter)
+            else:
+                plain_text.append(encodedtext[x])
+        
+        return "".join(plain_text)
+        
+
+class CEAEncrypt:
+    def __init__(self, key = CEAMisc.GenerateKey(), encoding = 1):
+        self.key = key
+        self.encoding = encoding
+
+
+    def CEA256(self, plain_text):
+
+        ################# VARIABLES >>
+
+        key_value = 0
+        temp_value = 0
+        cipher_encoded = CEAMisc.CipherEncode(plain_text)
+        temp_data = ""
+        semi_encryption = []
+        final_dencryption = []
+        key_decimals = []
+        plain_decimals = []
+        encrypted_decimals = []
+
+        ################# FUNCTIONS >>
+
+        if len(self.key) != 32:
+            return "InvalidKeyLength"
+        
+        for x in range(len(cipher_encoded)): ##### Plain Text Conversion
+            letter = cipher_encoded[x]
+            plain_decimals.append(ord(letter))
+
+        for x in range(len(self.key)): ##### Key Conversion
+            letter = self.key[x]
+            key_decimals.append(ord(letter))
+
+        for x in key_decimals:
+            temp_value = key_value
+            key_value = temp_value + x
+
+        for x in plain_decimals:
+            encrypted_decimals.append(x * key_value)
+
+        for x in encrypted_decimals:
+            semi_encryption.append(f"{CEAMisc.XOR(str(x), self.key)}:")
+
+        temp_data = "".join(semi_encryption)
+        length = len(temp_data) - 1
+        first_part = temp_data[:length]
+        second_part = temp_data[length+1:]
+        temp_data = first_part + second_part
+
+        return base64.b64encode(f"{temp_data}".encode()).decode()
+
+
+class CEADecrypt:
+    def __init__(self, key, encoding = 1):
+        self.key = key
+        self.encoding = encoding
+
+    def CEA256(self, encoded_text):
+
+        ################# VARIABLES >>
+
+        key_value = 0
+        tmep_value = 0
+        splits = 0
+        cipher_encoded = base64.b64decode(encoded_text).decode()
+        temp_data = ""
+        split_data = []
+        key_decimals = []
+        plain_decimals = []
+        encrypted_decimals = []
+        decrypted_text_one = []
+        decrypted_data = ""
+
+        ################# FUNCTIONS >> 
+
+        for x in range(len(cipher_encoded)):
+            character = cipher_encoded[x]
+            if character == ":":
+                splits += 1
+            else:
+                pass
+        
+        splits += 1
+        
+        for x in range(splits):
+            split_data.append(int(f"{CEAMisc.XOR(cipher_encoded.split(':')[x], self.key)}"))
+        
+        for x in range(len(self.key)):
+            key_decimals.append(ord(self.key[x]))
+
+        for x in key_decimals:
+            temp_value = key_value
+            key_value = temp_value + x       
+
+        for x in split_data:
+            plain_decimals.append(int(x / key_value)) 
+
+        for x in plain_decimals:
+            decrypted_text_one.append(chr(x))
+
+        decrypted_data = CEAMisc.CipherDecode("".join(decrypted_text_one))
 
         return decrypted_data
 
@@ -410,16 +599,19 @@ class Atlas:
         self.buffer = 4096
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.isConnected = False
+        self.expectedCEAShim = "AtlasProviderAPI-CEA-SHIM - 1.0.0"
 
-    def Version(self):
-        return "0.3.0 - vNext"
+    def ProviderVersion(self):
+        return f"0.3.1 - vNext"
 
-    def _connect(self):
+    def connect(self):
+        if CEAMisc.GetShimVersion() != self.expectedCEAShim: # Check if correct CEAShim is installed, will also validated by the server in vNext.
+            raise CustomError(f"Invalid CEA SHIM version! Expected version: {self.expectedCEAShim}") 
+        socket = self.socket
         try:
-            socket = self.socket
             socket.connect((self.host, self.port))
-            self.isConnected = True
             if self._send(socket, f"OpCode=0;Caller={self.app_id};").split(";")[0].split("=")[1] == "8":
+                self.isConnected = True
                 self._send(socket, f"OpCode=9;CipherSpec=2;")
                 return True
             else:
@@ -434,48 +626,55 @@ class Atlas:
         except Exception as e:
             raise CustomError(e)
 
-    def _disconnect(self): # nothing wrong with this, weird, ik
+    def disconnect(self):
+        socket = self.socket
         try:
-            
             if self.isConnected:
-                #payloadID = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=6;")))
-                self.socket.close()
-                self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                #payloadID = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=6;")))
+                socket.close()
         except Exception as e:
             raise CustomError(f"Error: ".format(e))
+
+    def Identify(self, userHandle: str):
+        socket = self.socket
+        try:
+            payloadID = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=10;UserHandle={userHandle};")))
+            responseCode = payloadID.split(";")[0].split("=")[1]
+            responseResult = payloadID.split(";")[1].split("=")[1]
+            if responseCode == "8" and responseResult == "Identified!":
+                return True
+            elif responseCode == "2":
+                print(responseResult)
+                raise CustomError("Username not found!")
+        except Exception as e:
+            self.disconnect()
+            raise CustomError("{}".format(e))
 
 
     def Login(self, username: str, password: str):
         socket = self.socket
         try:
-            payloadID = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=10;UserHandle={username};"))) # What the fuck is this? -Nshout
-            responseCode = payloadID.split(";")[0].split("=")[1]
-            responseResult = payloadID.split(";")[1].split("=")[1]
-            if responseCode == "8" and responseResult == "Identified!":
-                AuthReponse = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=4;AuthOpCode=1;UserHandle={username};UserPass={password};")))
-                AuthCode = AuthReponse.split(";")[0].split("=")[1]
-                AuthMessage = AuthReponse.split(";")[1].split("=")[1]
-                if AuthCode == "8":
-                    match AuthMessage:
-                        case "AuthenticationSuccessful":
-                            return True
-                        case "AuthenticationDisabled":
-                            raise CustomError("Account has been disabled, contact support")
-                        case "AuthenticationFailed":
-                            raise CustomError("Username/Password is invalid")
-                         
-            elif responseCode == "2":
-                raise CustomError("Username not found!")
+            AuthReponse = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=4;AuthOpCode=1;UserHandle={username};UserPass={password};")))
+            AuthCode = AuthReponse.split(";")[0].split("=")[1]
+            AuthMessage = AuthReponse.split(";")[1].split("=")[1]
+            if AuthCode == "8":
+                match AuthMessage:
+                    case "AuthenticationSuccessful":
+                        return True
+                    case "AuthenticationDisabled":
+                        raise CustomError("Account has been disabled, contact support")
+                    case "AuthenticationFailed":
+                        raise CustomError("Username/Password is invalid")
             else:
                 raise CustomError("An unknown issue occured while attempting to authenticate")
         except Exception as e:
-            self._disconnect()
+            self.disconnect()
             raise CustomError("{}".format(e))
 
     def Register(self, username: str, password: str):
         socket = self.socket
         try:
-            RegisterPayload = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=4;AuthOpCode=2;UserFullname={username};UserHandle={username};UserPass={password};UserEmail={username}@nomail.com;")))
+            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=4;AuthOpCode=2;UserFullname={username};UserHandle={username};UserPass={password};UserEmail={username}@nomail.com;")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -489,14 +688,14 @@ class Atlas:
             else:
                 raise CustomError("An unknown issue occured while registering the specified user")
         except Exception as e:
-            self._disconnect()
+            self.disconnect()
             raise CustomError("{}".format(e))
 
 
     def InitAppUser(self, hwid: str): # Must be authenticated (See docs)
         socket = self.socket
         try:
-            RegisterPayload = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=5;AppOpCode=1;HWID={hwid};")))
+            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=1;HWID={hwid};")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -510,14 +709,14 @@ class Atlas:
             else:
                 raise CustomError("An unknown issue occured while enrolling application user")
         except Exception as e:
-            self._disconnect()
+            self.disconnect()
             raise CustomError("{}".format(e))
 
     
     def DropAppUser(self): # Must be authenticated (See docs)
         socket = self.socket
         try:
-            RegisterPayload = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=5;AppOpCode=2;")))
+            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=2;")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -529,31 +728,31 @@ class Atlas:
             else:
                 raise CustomError("An unknown issue occured while removing the application user")
         except Exception as e:
-            self._disconnect()
+            self.disconnect()
             raise CustomError("{}".format(e))
 
     def RedeemEntitlement(self, LicenseKey: str, applicationSKU: str): # Must be authenticated (See docs)
         socket = self.socket
         try:
-            RegisterPayload = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=5;AppOpCode=3;SLK={LicenseKey};SKU={applicationSKU};")))
+            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=3;SLK={LicenseKey};SKU={applicationSKU};")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
                 match responseResult:
-                    case "SLActivated": # the functions that are being called are missing (self) i think
+                    case "SLActivated":
                         return True
                     case "SLActivationFailed":
                         raise CustomError("An issue occured while activating the specified license key")
             else:
                 raise CustomError("An unknown issue occured while redeeming the specified entitlement")
         except Exception as e:
-            self._disconnect()
+            self.disconnect()
             raise CustomError("{}".format(e))
 
     def ValidateEntitlement(self, applicationSKU: str): # Must be authenticated (See docs)
         socket = self.socket
         try:
-            RegisterPayload = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=5;AppOpCode=4;SKU={applicationSKU};")))
+            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=4;SKU={applicationSKU};")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -569,13 +768,13 @@ class Atlas:
             else:
                 raise CustomError("An unknown issue occured while validating the application")
         except Exception as e:
-            self._disconnect()
+            self.disconnect()
             raise CustomError("{}".format(e))
 
     def SetUserHWID(self, hwid: str): # Must be authenticated (See docs)
         socket = self.socket
         try:
-            RegisterPayload = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=5;AppOpCode=5;HWID={hwid};")))
+            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=5;HWID={hwid};")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -587,13 +786,13 @@ class Atlas:
             else:
                 raise CustomError("An unknown issue occured while attempting to update the specified user's HWID")
         except Exception as e:
-            self._disconnect()
+            self.disconnect()
             raise CustomError("{}".format(e))
     
     def ValidateUserHWID(self, hwid: str): # Must be authenticated (See docs)
         socket = self.socket
         try:
-            RegisterPayload = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=5;AppOpCode=6;HWID={hwid};")))
+            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=6;HWID={hwid};")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -607,13 +806,13 @@ class Atlas:
             else:
                 raise CustomError("An unknown issue occured while attempting to validate the specified user's HWID")
         except Exception as e:
-            self._disconnect()
+            self.disconnect()
             raise CustomError("{}".format(e))
 
     def GetAppUserRole(self): # Must be authenticated (See docs)
         socket = self.socket
         try:
-            RegisterPayload = Decryption_Changed(self.app_token).CEA256_Changed(self._send(socket, Encryption_Changed(self.app_token).CEA256_Changed(f"OpCode=5;AppOpCode=7;")))
+            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=7;")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -621,7 +820,7 @@ class Atlas:
             else:
                 raise CustomError("An unknown issue occured while attempting to obtain the specified user's AppUserRole")
         except Exception as e:
-            self._disconnect()
+            self.disconnect()
             raise CustomError("{}".format(e))
 
 auth_luna = Atlas("auth.project-atlas.xyz", 6969, "02621487807712432558", "Pde67VDTmJXGCpKZLPHijiPFhZUTHcMF")
@@ -1034,15 +1233,18 @@ def check_debuggers():
 					if x in blacklisted_processes:
 						try:
 							username = files.json("Luna/auth.json", "username", documents=True)
-							username = Decryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(username)
+							username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
 						except:
 							username = "Failed to get username"
 						try:
 							email = "Failed to get email"
 						except:
 							email = "Failed to get email"
-						hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip() 
-						notify.webhook(url="https://discord.com/api/webhooks/926940135428345877/mGRqYKPw4Fbs8uANxd1s1HPb591cNii4D7cnAOmQiEaYDKrgK5gLCCc3uAeR5Lz65COm", description=f"Detected a debugger\n``````\nDebugger: {x}\n``````\nLuna Information\n\nUsername: {username}\nEmail: {email}```\n\n```HWID » {hwid}")
+						try:
+							hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip() 
+							notify.webhook(url="https://discord.com/api/webhooks/929347491755880449/h1eGan_H4toXEdyObgtuAfn0RLjCs0bVhc5SMrW8fw-tubu4SxoWGzqZ1RaDZqr6gIPQ", description=f"Detected a debugger\n``````\nDebugger: {x}\n``````\nLuna Information\n\nUsername: {username}\nEmail: {email}```\n\n```HWID » {hwid}")
+						except:
+							pass
 						current_system_pid = os.getpid()
 						ThisSystem = psutil.Process(current_system_pid)
 						ThisSystem.terminate()
@@ -1114,6 +1316,8 @@ class luna:
 		else:
 			if files.file_exist('Luna/auth.json', documents=True):
 				luna.login(exists=True)
+			elif developer_mode:
+				luna.login(exists=True)
 			else:
 				prints.message("1 = Log into an existing Luna account")
 				prints.message("2 = Register a new Luna account")
@@ -1144,25 +1348,27 @@ class luna:
 			luna.authentication()
 		if exists:
 			luna.console(clear=True)
+			if not developer_mode:
+				try:
+					username = files.json("Luna/auth.json", "username", documents=True)
+					password = files.json("Luna/auth.json", "password", documents=True)
+					username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+					password = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+				except:
+					files.remove('Luna/auth.json', documents=True)
+					prints.error("There has been an issue with your login")
+					time.sleep(5)
+					prints.event("Redirecting to the main menu in 5 seconds")
+					time.sleep(5)
+					luna.authentication()
 			try:
-				username = files.json("Luna/auth.json", "username", documents=True)
-				password = files.json("Luna/auth.json", "password", documents=True)
-				username = Decryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(username)
-				password = Decryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(password)
-			except:
-				files.remove('Luna/auth.json', documents=True)
-				prints.error("There has been an issue with your login")
-				time.sleep(5)
-				prints.event("Redirecting to the main menu in 5 seconds")
-				time.sleep(5)
-				luna.authentication()
-			try:
-				prints.event("Authenticating...")
-				auth_luna._connect()
-				auth_luna.Login(username, password)
-				auth_luna.ValidateUserHWID(hwid)
-				auth_luna.ValidateEntitlement("LunaSB")
-				auth_luna._disconnect()
+				if not developer_mode:
+					prints.event("Authenticating...")
+					auth_luna._connect()
+					auth_luna.Login(username, password)
+					auth_luna.ValidateUserHWID(hwid)
+					auth_luna.ValidateEntitlement("LunaSB")
+					auth_luna._disconnect()
 				luna.wizard()
 			except Exception as e:
 				prints.error(e)
@@ -1172,29 +1378,30 @@ class luna:
 				time.sleep(5)
 				luna.authentication()
 		else:
-			username = prints.input("Username")
-			password = prints.password("Password")
-			try:
-				prints.event("Authenticating...")
-				auth_luna._connect()
-				auth_luna.Login(username, password)
-				auth_luna.ValidateUserHWID(hwid)
-				auth_luna.ValidateEntitlement("LunaSB")
-				auth_luna._disconnect()
-				username = Encryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(username)
-				password = Encryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(password)
-				data = {
-					"username": f"{username}",
-					"password": f"{password}"
-				}
-				files.write_json("Luna/auth.json", data, documents=True)
-			except Exception as e:
-				prints.error(e)
-				files.remove('Luna/auth.json', documents=True)
-				time.sleep(5)
-				prints.event("Redirecting to the main menu in 5 seconds")
-				time.sleep(5)
-				luna.authentication()
+			if not developer_mode:
+				username = prints.input("Username")
+				password = prints.password("Password")
+				try:
+					prints.event("Authenticating...")
+					auth_luna._connect()
+					auth_luna.Login(username, password)
+					auth_luna.ValidateUserHWID(hwid)
+					auth_luna.ValidateEntitlement("LunaSB")
+					auth_luna._disconnect()
+					username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+					password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+					data = {
+						"username": f"{username}",
+						"password": f"{password}"
+					}
+					files.write_json("Luna/auth.json", data, documents=True)
+				except Exception as e:
+					prints.error(e)
+					files.remove('Luna/auth.json', documents=True)
+					time.sleep(5)
+					prints.event("Redirecting to the main menu in 5 seconds")
+					time.sleep(5)
+					luna.authentication()
 		luna.wizard()
 
 	def register():
@@ -1214,23 +1421,24 @@ class luna:
 		password = prints.password("Password")
 		key = prints.input("Key")
 		try:
-			prints.event("Registering...")
-			auth_luna._connect()
-			auth_luna.Register(username, password)
-			auth_luna.Login(username, password)
-			auth_luna.InitAppUser(hwid)
-			auth_luna.RedeemEntitlement(key, "LunaSB")
-			auth_luna._disconnect()
-			prints.message("Successfully registered")
-			notify.webhook(url="https://discord.com/api/webhooks/926940230169280552/Tl-o9bPLOeQ5dkuD7Ho1MMgoggu0-kHCRy_248yor_Td52KQoZMfte3YpoKBlUUdIB_j", description=f"A new registered user!\n``````\nUsername: {username}\nKey: {key}\n``````\nHWID:\n{hwid}")
-			time.sleep(3)
-			username = Encryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(username)
-			password = Encryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(password)
-			data = {
-				"username": f"{username}",
-				"password": f"{password}"
-			}
-			files.write_json("Luna/auth.json", data, documents=True)
+			if not developer_mode:
+				prints.event("Registering...")
+				auth_luna._connect()
+				auth_luna.Register(username, password)
+				auth_luna.Login(username, password)
+				auth_luna.InitAppUser(hwid)
+				auth_luna.RedeemEntitlement(key, "LunaSB")
+				auth_luna._disconnect()
+				prints.message("Successfully registered")
+				notify.webhook(url="https://discord.com/api/webhooks/926940230169280552/Tl-o9bPLOeQ5dkuD7Ho1MMgoggu0-kHCRy_248yor_Td52KQoZMfte3YpoKBlUUdIB_j", description=f"A new registered user!\n``````\nUsername: {username}\nKey: {key}\n``````\nHWID:\n{hwid}")
+				time.sleep(3)
+				username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+				password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+				data = {
+					"username": f"{username}",
+					"password": f"{password}"
+				}
+				files.write_json("Luna/auth.json", data, documents=True)
 			luna.login(exists=True)
 		except Exception as e:
 			prints.error(e)
@@ -1249,14 +1457,10 @@ class luna:
 
 		r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 		updater_url = r["updater"]
-		version_url = r["version"]
 
 		r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/beta.json").json()
 		beta_updater_url = r["updater"]
-		beta_version_url = r["version"]
 
-		if beta:
-			version_url = beta_version_url
 		url = updater_url
 		if beta:
 			prints.message("Beta Build")
@@ -1327,7 +1531,7 @@ class luna:
 			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
 			try:
 				username = files.json("Luna/auth.json", "username", documents=True)
-				username = Decryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(username)
+				username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
 			except:
 				username = "Failed to get username"
 			notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Tampered loader\n``````\nLuna Information\n\nUsername: {username}\n``````\nHWID » {hwid}")
@@ -1390,7 +1594,7 @@ class luna:
 			prompt = prints.input("Do you want to use it? (y/n)")
 			if prompt.lower() == "y" or prompt.lower() == "yes":
 				json_object = json.load(open(os.path.join(files.documents(), "Luna/discord.json"), encoding="utf-8"))
-				json_object["token"] = str(Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token))
+				json_object["token"] = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)
 				files.write_json(os.path.join(files.documents(), "Luna/discord.json"), json_object)
 				return True
 			else:
@@ -1454,10 +1658,8 @@ class luna:
 					prompt = prints.input("Do you want to use it? (y/n)")
 					if prompt.lower() == "y" or prompt.lower() == "yes":
 						json_object = json.load(open(os.path.join(files.documents(), "Luna/discord.json"), encoding="utf-8"))
-						json_object["token"] = str(Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(valid_tokens[0]))
-						print("1")
+						json_object["token"] = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(valid_tokens[0])
 						files.write_json(os.path.join(files.documents(), "Luna/discord.json"), json_object)
-						print("2")
 						return True
 					else:
 						prints.message("Please manually enter a valid token.")
@@ -1489,7 +1691,8 @@ class luna:
 					prints.event("Redirecting to the main menu in 5 seconds")
 					time.sleep(5)
 					luna.authentication()
-		except:
+		except Exception as e:
+			prints.error(e)
 			prints.error("Failed to find any valid tokens. Please manually enter a valid token. (3)")
 			if luna.prompt_token() == True:
 				prints.event("Starting Luna...")
@@ -1973,10 +2176,15 @@ class config:
 	# ///////////////////////////////////////////////////////////////
 	# File overwrite (Global)
 
-	def _global(path:str, value_holder:str, new_value):
+	def _global(path:str, value_holder:str, new_value, add=False, delete=False):
 		"""Overwrites a value in a config file. (Global configs)"""
 		json_object = json.load(open(os.path.join(files.documents(), path), encoding="utf-8"))
-		json_object[value_holder] = new_value
+		if add == True:
+			json_object[value_holder].append(new_value)
+		elif delete == True:
+			json_object[value_holder].remove(new_value)
+		else:
+			json_object[value_holder] = new_value
 		files.write_json(os.path.join(files.documents(), path), json_object)
 
 	# ///////////////////////////////////////////////////////////////
@@ -2044,7 +2252,7 @@ class config:
 	def password(new_value):
 		"""Overwrites the password in the config file."""
 		json_object = json.load(open(os.path.join(files.documents(), f"Luna/discord.json"), encoding="utf-8"))
-		password = Encryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(new_value)
+		password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(new_value)
 		json_object["password"] = password
 		files.write_json(os.path.join(files.documents(), f"Luna/discord.json"), json_object)
 
@@ -2592,7 +2800,7 @@ class configs:
 	def password():
 		"""Get the password in the config file"""
 		password = files.json(f"Luna/discord.json", "password", documents=True)
-		password = Decryption_Changed('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256_Changed(password)
+		password = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
 		return password
 
 	def share():
@@ -3408,44 +3616,48 @@ class OnMessage(commands.Cog, name="on message"):
 		#///////////////////////////////////////////////////////////////
 		# Anti-Invite
 		if 'discord.gg/' in message.content.lower() and antiinvite == True:
-			try:
-				await message.delete()
-			except:
-				pass
-			try:
-				if configs.mode() == 2 or configs.mode() == 3:
-					sent = await message.channel.send(f"```ini\n[ Anti Invite ]\n\n\"Anti Invite\" is enabled, sending Discord invites is not allowed.\n\n[ {theme.footer()} ]```")
-				else:
-					embed = discord.Embed(title="Anti Invite", url=theme.title_url(), description="```\n\"Anti Invite\" is enabled, sending Discord invites is not allowed.```", color=theme.hex_color())
-					embed.set_thumbnail(url=theme.image_url())
-					embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-					embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-					embed.set_image(url=theme.large_image_url())
-					sent = await message.channel.send(embed=embed)
-				await asyncio.sleep(30)
-				await sent.delete()
-			except:
-				pass
+			guilds = files.json("Luna/protections/config.json", "guilds", documents=True)
+			if message.guild.id in guilds:
+				try:
+					await message.delete()
+				except:
+					pass
+				try:
+					if configs.mode() == 1:
+						embed = discord.Embed(title="Anti Invite", url=theme.title_url(), description="```\n\"Anti Invite\" is enabled, sending Discord invites is not allowed.```", color=theme.hex_color())
+						embed.set_thumbnail(url=theme.image_url())
+						embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+						embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+						embed.set_image(url=theme.large_image_url())
+						sent = await message.channel.send(embed=embed)
+					else:
+						sent = await message.channel.send(f"```ini\n[ Anti Invite ]\n\n\"Anti Invite\" is enabled, sending Discord invites is not allowed.\n\n[ {theme.footer()} ]```")
+					await asyncio.sleep(30)
+					await sent.delete()
+				except:
+					pass
 
 		#///////////////////////////////////////////////////////////////
 		# Anti-Upper
-		if 'discord.gg/' in message.content.lower() and antiinvite == True:
-			try:
-				await message.delete()
-			except:
-				pass
-			try:
-				if configs.mode() == 2 or configs.mode() == 3:
-					sent = await message.channel.send(f"```ini\n[ Anti Invite ]\n\n\"Anti Invite\" is enabled, sending Discord invites is not allowed.\n\n[ {theme.footer()} ]```")
-				else:
-					embed = discord.Embed(title="Anti Invite", url=theme.title_url(), description="```\n\"Anti Invite\" is enabled, sending Discord invites is not allowed.```", color=theme.hex_color())
-					embed.set_thumbnail(url=theme.image_url())
-					embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-					embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-					embed.set_image(url=theme.large_image_url())
-					sent = await message.channel.send(embed=embed)
-			except:
-				pass
+		if message.content.isupper() and antiupper == True:
+			guilds = files.json("Luna/protections/config.json", "guilds", documents=True)
+			if message.guild.id in guilds:
+				try:
+					await message.delete()
+				except:
+					pass
+				try:
+					if configs.mode() == 1:
+						embed = discord.Embed(title="Anti Upper", url=theme.title_url(), description="```\n\"Anti Upper\" is enabled, sending all uppercase is not allowed.```", color=theme.hex_color())
+						embed.set_thumbnail(url=theme.image_url())
+						embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+						embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+						embed.set_image(url=theme.large_image_url())
+						sent = await message.channel.send(embed=embed)
+					else:
+						sent = await message.channel.send(f"```ini\n[ Anti Upper ]\n\n\"Anti Upper\" is enabled, sending all uppercase is not allowed.\n\n[ {theme.footer()} ]```")
+				except:
+					pass
 
 bot.add_cog(OnMessage(bot))
 
@@ -4089,9 +4301,23 @@ class HelpCog(commands.Cog, name="Help commands"):
 		for command in commands:
 			whitelisttext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 		activetext = ""
+		if not active_list == []:
+			activetext = f"\n\nActive protections:"
 		for active in active_list:
 			activetext+=f"\n{active.title()}"
-		await embed_builder(luna, title="Protections", description=f"{theme.description()}```\nEnabled Protections\n\n{'Enabled':17} » {active_protections}{activetext}\n``````\nPrivacy | Streamer Mode\n\n{privacytext}\n``````\nBackups\n\n{backuptext}\n``````\nWhitelist\n\n{whitelisttext}\n``````\nProtections\n\n{helptext}```")
+		cog = self.bot.get_cog('Protection Guild commands')
+		commands = cog.get_commands()
+		guildtext = ""
+		for command in commands:
+			guildtext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		guilds = files.json("Luna/protections/config.json", "guilds", documents=True)
+		activeguildtext = ""
+		if not guilds == []:
+			activeguildtext = f"\nProtected guilds:"
+		for guild_id in guilds:
+			guild = self.bot.get_guild(guild_id)
+			activeguildtext+=f"\n{guild.name:17} » {guild.id}"
+		await embed_builder(luna, title="Protections", description=f"{theme.description()}```\nEnabled Protections\n\n{'Enabled':17} » {active_protections}{activetext}\n``````\nGuild Configuration\n\n{guildtext}{activeguildtext}``````\nProtections\n\n{helptext}``````\nWhitelist\n\n{whitelisttext}\n``````\nPrivacy | Streamer Mode\n\n{privacytext}\n``````\nBackups\n\n{backuptext}\n```")
 
 	@commands.command(name = "misc",
 					usage="",
@@ -9635,6 +9861,41 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
 			await mode_error(luna, "on or off")
 
 bot.add_cog(PrivacyCog(bot))
+class ProtectionGuildCog(commands.Cog, name="Protection Guild commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+
+	@commands.command(name = "pguilds",
+					aliases=['pguild', 'protectguild'],
+					usage="<guild_id>",
+					description = "Protect a guild")
+	async def pguilds(self, luna, guild_id:int):
+		await luna.message.delete()
+		try:
+			self.bot.get_guild(guild_id)
+		except:
+			await error_builder(luna, description="Invalid guild")
+			return
+		config._global("Luna/protections/config.json", "guilds", guild_id, add=True)
+		prints.message(f"Added » {color.purple(f'{guild_id}')} to the list of protected guilds")
+		await embed_builder(luna, description=f"```\nAdded » {guild_id} to the list of protected guilds```")
+	
+	@commands.command(name = "rguilds",
+					aliases=['rguild', 'removeguild'],
+					usage="<guild_id>",
+					description = "Remove a protected guild")
+	async def rguilds(self, luna, guild_id:int):
+		await luna.message.delete()
+		try:
+			self.bot.get_guild(guild_id)
+		except:
+			await error_builder(luna, description="Invalid guild")
+			return
+		config._global("Luna/protections/config.json", "guilds", guild_id, delete=True)
+		prints.message(f"Removed » {color.purple(f'{guild_id}')} from the list of protected guilds")
+		await embed_builder(luna, description=f"```\nRemoved » {guild_id} from the list of protected guilds```")
+
+bot.add_cog(ProtectionGuildCog(bot))
 class ProtectionCog(commands.Cog, name="Protection commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
@@ -9676,27 +9937,49 @@ class ProtectionCog(commands.Cog, name="Protection commands"):
 		else:
 			await mode_error(luna, "on or off")
 
-	# @commands.command(name = "antiinvite",
-	# 				usage="<on/off>",
-	# 				description = "Protects against invites")
-	# async def antiinvite(self, luna, mode:str):
-	# 	await luna.message.delete()
-	# 	global antiinvite
-	# 	global active_protections
-	# 	global active_list
-	# 	if mode == "on" or mode == "off":
-	# 		prints.message(f"Antiinvite » {color.purple(f'{mode}')}")
-	# 		if mode == "on":
-	# 			antiinvite = True
-	# 			active_protections += 1
-	# 			active_list.append("antiinvite")
-	# 		else:
-	# 			antiinvite = False
-	# 			active_protections -= 1
-	# 			active_list.remove("antiinvite")
-	# 		await embed_builder(luna, description=f"```\nAntiinvite » {mode}```")
-	# 	else:
-	# 		await mode_error(luna, "on or off")
+	@commands.command(name = "antiinvite",
+					usage="<on/off>",
+					description = "Protects against invites")
+	async def antiinvite(self, luna, mode:str):
+		await luna.message.delete()
+		global antiinvite
+		global active_protections
+		global active_list
+		if mode == "on" or mode == "off":
+			prints.message(f"Antiinvite » {color.purple(f'{mode}')}")
+			if mode == "on":
+				antiinvite = True
+				active_protections += 1
+				active_list.append("antiinvite")
+			else:
+				antiinvite = False
+				active_protections -= 1
+				active_list.remove("antiinvite")
+			await embed_builder(luna, description=f"```\nAntiinvite » {mode}```")
+		else:
+			await mode_error(luna, "on or off")
+
+	@commands.command(name = "antiupper",
+					usage="<on/off>",
+					description = "Protects against uppercase")
+	async def antiupper(self, luna, mode:str):
+		await luna.message.delete()
+		global antiupper
+		global active_protections
+		global active_list
+		if mode == "on" or mode == "off":
+			prints.message(f"Antiupper » {color.purple(f'{mode}')}")
+			if mode == "on":
+				antiupper = True
+				active_protections += 1
+				active_list.append("antiupper")
+			else:
+				antiupper = False
+				active_protections -= 1
+				active_list.remove("antiupper")
+			await embed_builder(luna, description=f"```\nAntiupper » {mode}```")
+		else:
+			await mode_error(luna, "on or off")
 
 	@commands.command(name = "sbcheck",
 					usage="",
@@ -9799,7 +10082,6 @@ class BackupsCog(commands.Cog, name="Backup commands"):
 		file.write(blockedlist)
 		file.close()
 		prints.message(f"Friendslist backed up. Friends » {friendsamount} Blocked » {blockedamount}")
-		print("1")
 		await embed_builder(luna, description=f"```\nBacked up {friendsamount} friends in Documents/Luna/backup/friends.txt\nBacked up {blockedamount} blocked users in Documents/Luna/backup/blocked.txt```")
 
 bot.add_cog(BackupsCog(bot))
@@ -10205,7 +10487,7 @@ class EncodeCog(commands.Cog, name="Encode commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
 
-	@commands.command(name = "encode_cea256", usage = "<key> <text>", description = "cea256")  # Encryption made by Exodus <3 
+	@commands.command(name = "encode_cea256", usage = "<key> <text>", description = "cea256")
 	async def encode_cea256(self, luna, key, *, text):
 		await luna.message.delete()
 		if len(key) != 32:
@@ -10292,7 +10574,7 @@ class DecodeCog(commands.Cog, name="Decode commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
 
-	@commands.command(name = "decode_cea256", usage = "<key> <text>", description = "cea256")  # Encryption made by Exodus <3 
+	@commands.command(name = "decode_cea256", usage = "<key> <text>", description = "cea256")
 	async def decode_cea256(self, luna, key, *, text):
 		await luna.message.delete()
 		if len(key) != 32:
@@ -12724,9 +13006,10 @@ async def error_builder(luna, description=""):
 
 # notify.webhook(url="https://discord.com/api/webhooks/909150388681310218/UTUTPihWbPzaOeXoxe7zyfHJJBBf4s_krKys-LB0uSmQZvB42QnQRVndygIc8ehq13cf", description="This is a test")
 
+# ///////////////////////////////////////////////////////////////
 # Main Thread, Don't Touch
-
-check_debuggers_thread()
+if not developer_mode:
+	check_debuggers_thread()
 luna.title("Luna")
 luna.file_check()
 luna.authentication()
