@@ -49,9 +49,25 @@ from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFou
 antiraid = False
 antiinvite = False
 antiupper = False
+antiphishing = False
 
 active_protections = 0
 active_list = []
+
+phishing_list = [
+	"discordgg.",
+	"withereum.com",
+	"amazon.com/exec/obidos",
+	"csgo500.org",
+	"steamconmunity",
+	"steamcommunuty",
+	"steamconmunuty",
+	"steamcommunity.ru",
+	"crypto24cap",
+	"steamcummynutu.ru",
+	"discordgifts.one",
+	"discordgifts"
+]
 
 # ///////////////////////////////////////////////////////////////
 # Luna Protections
@@ -68,9 +84,9 @@ privacy = False
 copycat = None
 chargesniper = False
 
-developer_mode = True
+developer_mode = False
 beta = False
-version = '3.2.1'
+version = '3.2.0'
 
 r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 updater_url = r["updater"]
@@ -591,237 +607,236 @@ class CustomError(Exception):
      pass
 
 class Atlas:
-    def __init__(self, host: str, port: int, app_id: str, app_token: str):
-        self.app_id = app_id
-        self.app_token = app_token
-        self.host = host
-        self.port = port
-        self.buffer = 4096
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.isConnected = False
-        self.expectedCEAShim = "AtlasProviderAPI-CEA-SHIM - 1.0.0"
+	def __init__(self, host: str, port: int, app_id: str, app_token: str):
+		self.app_id = app_id
+		self.app_token = app_token
+		self.host = host
+		self.port = port
+		self.buffer = 4096
+		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.isConnected = False
+		self.expectedCEAShim = "AtlasProviderAPI-CEA-SHIM - 1.0.0"
 
-    def ProviderVersion(self):
-        return f"0.3.1 - vNext"
+	def ProviderVersion(self):
+		return f"0.3.1 - vNext"
 
-    def connect(self):
-        if CEAMisc.GetShimVersion() != self.expectedCEAShim: # Check if correct CEAShim is installed, will also validated by the server in vNext.
-            raise CustomError(f"Invalid CEA SHIM version! Expected version: {self.expectedCEAShim}") 
-        socket = self.socket
-        try:
-            socket.connect((self.host, self.port))
-            if self._send(socket, f"OpCode=0;Caller={self.app_id};").split(";")[0].split("=")[1] == "8":
-                self.isConnected = True
-                self._send(socket, f"OpCode=9;CipherSpec=2;")
-                return True
-            else:
-                pass
-        except Exception as e:
-            raise CustomError(e)
-            
-    def _send(self, socket, payload: str):
-        try:
-            socket.send(payload.encode("utf-8"))
-            return socket.recv(self.buffer).decode("utf-8")
-        except Exception as e:
-            raise CustomError(e)
+	def connect(self):
+		if CEAMisc.GetShimVersion() != self.expectedCEAShim: # Check if correct CEAShim is installed, will also validated by the server in vNext.
+			raise CustomError(f"Invalid CEA SHIM version! Expected version: {self.expectedCEAShim}") 
+		socket = self.socket
+		try:
+			socket.connect((self.host, self.port))
+			if self._send(socket, f"OpCode=0;Caller={self.app_id};").split(";")[0].split("=")[1] == "8":
+				self.isConnected = True
+				self._send(socket, f"OpCode=9;CipherSpec=2;")
+				return True
+			else:
+				pass
+		except Exception as e:
+			raise CustomError(e)
+			
+	def _send(self, socket, payload: str):
+		try:
+			socket.send(payload.encode("utf-8"))
+			return socket.recv(self.buffer).decode("utf-8")
+		except Exception as e:
+			raise CustomError(e)
 
-    def disconnect(self):
-        socket = self.socket
-        try:
-            if self.isConnected:
-                #payloadID = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=6;")))
-                socket.close()
-        except Exception as e:
-            raise CustomError(f"Error: ".format(e))
+	def disconnect(self):
+		try:
+			if self.isConnected:
+				self.socket.close()
+				self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		except Exception as e:
+			raise CustomError("{}".format(e))
 
-    def Identify(self, userHandle: str):
-        socket = self.socket
-        try:
-            payloadID = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=10;UserHandle={userHandle};")))
-            responseCode = payloadID.split(";")[0].split("=")[1]
-            responseResult = payloadID.split(";")[1].split("=")[1]
-            if responseCode == "8" and responseResult == "Identified!":
-                return True
-            elif responseCode == "2":
-                print(responseResult)
-                raise CustomError("Username not found!")
-        except Exception as e:
-            self.disconnect()
-            raise CustomError("{}".format(e))
-
-
-    def Login(self, username: str, password: str):
-        socket = self.socket
-        try:
-            AuthReponse = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=4;AuthOpCode=1;UserHandle={username};UserPass={password};")))
-            AuthCode = AuthReponse.split(";")[0].split("=")[1]
-            AuthMessage = AuthReponse.split(";")[1].split("=")[1]
-            if AuthCode == "8":
-                match AuthMessage:
-                    case "AuthenticationSuccessful":
-                        return True
-                    case "AuthenticationDisabled":
-                        raise CustomError("Account has been disabled, contact support")
-                    case "AuthenticationFailed":
-                        raise CustomError("Username/Password is invalid")
-            else:
-                raise CustomError("An unknown issue occured while attempting to authenticate")
-        except Exception as e:
-            self.disconnect()
-            raise CustomError("{}".format(e))
-
-    def Register(self, username: str, password: str):
-        socket = self.socket
-        try:
-            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=4;AuthOpCode=2;UserFullname={username};UserHandle={username};UserPass={password};UserEmail={username}@nomail.com;")))
-            responseCode = RegisterPayload.split(";")[0].split("=")[1]
-            responseResult = RegisterPayload.split(";")[1].split("=")[1]
-            if responseCode == "8":
-                match responseResult:
-                    case "Success":
-                        return True
-                    case "UserAlreadyExists":
-                        raise CustomError("User already exists")
-                    case "AccountRegistrationFailed":
-                        raise CustomError("Registration failed")
-            else:
-                raise CustomError("An unknown issue occured while registering the specified user")
-        except Exception as e:
-            self.disconnect()
-            raise CustomError("{}".format(e))
+	def Identify(self, userHandle: str):
+		socket = self.socket
+		try:
+			payloadID = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=10;UserHandle={userHandle};")))
+			responseCode = payloadID.split(";")[0].split("=")[1]
+			responseResult = payloadID.split(";")[1].split("=")[1]
+			if responseCode == "8" and responseResult == "Identified!":
+				return True
+			elif responseCode == "2":
+				print(responseResult)
+				raise CustomError("Username not found!")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
 
 
-    def InitAppUser(self, hwid: str): # Must be authenticated (See docs)
-        socket = self.socket
-        try:
-            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=1;HWID={hwid};")))
-            responseCode = RegisterPayload.split(";")[0].split("=")[1]
-            responseResult = RegisterPayload.split(";")[1].split("=")[1]
-            if responseCode == "8":
-                match responseResult:
-                    case "AppUserRegistrationSuccessful":
-                        return True
-                    case "AppUserRegistrationFailed":
-                        raise CustomError("Unable to register as application user")
-                    case "AppUserHWIDRegistrationFailed":
-                        raise CustomError("Unable to register as application user HWID not accepted by server")
-            else:
-                raise CustomError("An unknown issue occured while enrolling application user")
-        except Exception as e:
-            self.disconnect()
-            raise CustomError("{}".format(e))
+	def Login(self, username: str, password: str):
+		socket = self.socket
+		try:
+			AuthReponse = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=4;AuthOpCode=1;UserHandle={username};UserPass={password};")))
+			AuthCode = AuthReponse.split(";")[0].split("=")[1]
+			AuthMessage = AuthReponse.split(";")[1].split("=")[1]
+			if AuthCode == "8":
+				match AuthMessage:
+					case "AuthenticationSuccessful":
+						return True
+					case "AuthenticationDisabled":
+						raise CustomError("Account has been disabled, contact support")
+					case "AuthenticationFailed":
+						raise CustomError("Username/Password is invalid")
+			else:
+				raise CustomError("An unknown issue occured while attempting to authenticate")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
 
-    
-    def DropAppUser(self): # Must be authenticated (See docs)
-        socket = self.socket
-        try:
-            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=2;")))
-            responseCode = RegisterPayload.split(";")[0].split("=")[1]
-            responseResult = RegisterPayload.split(";")[1].split("=")[1]
-            if responseCode == "8":
-                match responseResult:
-                    case "AppUserDeRegistrationSuccessful":
-                        return True
-                    case "AppUserDeRegistrationFailed":
-                        raise CustomError("Unable to deallocate the specified application user")
-            else:
-                raise CustomError("An unknown issue occured while removing the application user")
-        except Exception as e:
-            self.disconnect()
-            raise CustomError("{}".format(e))
+	def Register(self, username: str, password: str):
+		socket = self.socket
+		try:
+			RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=4;AuthOpCode=2;UserFullname={username};UserHandle={username};UserPass={password};UserEmail={username}@nomail.com;")))
+			responseCode = RegisterPayload.split(";")[0].split("=")[1]
+			responseResult = RegisterPayload.split(";")[1].split("=")[1]
+			if responseCode == "8":
+				match responseResult:
+					case "Success":
+						return True
+					case "UserAlreadyExists":
+						raise CustomError("User already exists")
+					case "AccountRegistrationFailed":
+						raise CustomError("Registration failed")
+			else:
+				raise CustomError("An unknown issue occured while registering the specified user")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
 
-    def RedeemEntitlement(self, LicenseKey: str, applicationSKU: str): # Must be authenticated (See docs)
-        socket = self.socket
-        try:
-            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=3;SLK={LicenseKey};SKU={applicationSKU};")))
-            responseCode = RegisterPayload.split(";")[0].split("=")[1]
-            responseResult = RegisterPayload.split(";")[1].split("=")[1]
-            if responseCode == "8":
-                match responseResult:
-                    case "SLActivated":
-                        return True
-                    case "SLActivationFailed":
-                        raise CustomError("An issue occured while activating the specified license key")
-            else:
-                raise CustomError("An unknown issue occured while redeeming the specified entitlement")
-        except Exception as e:
-            self.disconnect()
-            raise CustomError("{}".format(e))
 
-    def ValidateEntitlement(self, applicationSKU: str): # Must be authenticated (See docs)
-        socket = self.socket
-        try:
-            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=4;SKU={applicationSKU};")))
-            responseCode = RegisterPayload.split(";")[0].split("=")[1]
-            responseResult = RegisterPayload.split(";")[1].split("=")[1]
-            if responseCode == "8":
-                match responseResult:
-                    case "UserEntitlementValid":
-                        return True
-                    case "SKUValidationFailed": # SKU should be embedded as constant, has tampering/use of incorrect version been detected?
-                        raise CustomError("An issue occured while validating the specified application") 
-                    case "SKUInvalid":
-                        raise CustomError("The specified user is not licensed to use the specified application")
-                    case "UserEntitlementInvalid":
-                        raise CustomError("The specified user is not licensed to use the specified application")
-            else:
-                raise CustomError("An unknown issue occured while validating the application")
-        except Exception as e:
-            self.disconnect()
-            raise CustomError("{}".format(e))
+	def InitAppUser(self, hwid: str): # Must be authenticated (See docs)
+		socket = self.socket
+		try:
+			RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=1;HWID={hwid};")))
+			responseCode = RegisterPayload.split(";")[0].split("=")[1]
+			responseResult = RegisterPayload.split(";")[1].split("=")[1]
+			if responseCode == "8":
+				match responseResult:
+					case "AppUserRegistrationSuccessful":
+						return True
+					case "AppUserRegistrationFailed":
+						raise CustomError("Unable to register as application user")
+					case "AppUserHWIDRegistrationFailed":
+						raise CustomError("Unable to register as application user HWID not accepted by server")
+			else:
+				raise CustomError("An unknown issue occured while enrolling application user")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
 
-    def SetUserHWID(self, hwid: str): # Must be authenticated (See docs)
-        socket = self.socket
-        try:
-            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=5;HWID={hwid};")))
-            responseCode = RegisterPayload.split(";")[0].split("=")[1]
-            responseResult = RegisterPayload.split(";")[1].split("=")[1]
-            if responseCode == "8":
-                match responseResult:
-                    case "HWIDUpdated":
-                        return True
-                    case "HWIDUpdateFailed":
-                        raise CustomError("An issue occured while attempting to update the specified user's HWID") 
-            else:
-                raise CustomError("An unknown issue occured while attempting to update the specified user's HWID")
-        except Exception as e:
-            self.disconnect()
-            raise CustomError("{}".format(e))
-    
-    def ValidateUserHWID(self, hwid: str): # Must be authenticated (See docs)
-        socket = self.socket
-        try:
-            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=6;HWID={hwid};")))
-            responseCode = RegisterPayload.split(";")[0].split("=")[1]
-            responseResult = RegisterPayload.split(";")[1].split("=")[1]
-            if responseCode == "8":
-                match responseResult:
-                    case "HardwareIDValid":
-                        return True
-                    case "HardwareIDInvalid":
-                        raise CustomError("The submitted hardware ID is invalid")
-                    case "HardwareIDNotSet":
-                        raise CustomError("No hardware ID has been set for the specified user")
-            else:
-                raise CustomError("An unknown issue occured while attempting to validate the specified user's HWID")
-        except Exception as e:
-            self.disconnect()
-            raise CustomError("{}".format(e))
 
-    def GetAppUserRole(self): # Must be authenticated (See docs)
-        socket = self.socket
-        try:
-            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=7;")))
-            responseCode = RegisterPayload.split(";")[0].split("=")[1]
-            responseResult = RegisterPayload.split(";")[1].split("=")[1]
-            if responseCode == "8":
-                return responseResult
-            else:
-                raise CustomError("An unknown issue occured while attempting to obtain the specified user's AppUserRole")
-        except Exception as e:
-            self.disconnect()
-            raise CustomError("{}".format(e))
+	def DropAppUser(self): # Must be authenticated (See docs)
+		socket = self.socket
+		try:
+			RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=2;")))
+			responseCode = RegisterPayload.split(";")[0].split("=")[1]
+			responseResult = RegisterPayload.split(";")[1].split("=")[1]
+			if responseCode == "8":
+				match responseResult:
+					case "AppUserDeRegistrationSuccessful":
+						return True
+					case "AppUserDeRegistrationFailed":
+						raise CustomError("Unable to deallocate the specified application user")
+			else:
+				raise CustomError("An unknown issue occured while removing the application user")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
+
+	def RedeemEntitlement(self, LicenseKey: str, applicationSKU: str): # Must be authenticated (See docs)
+		socket = self.socket
+		try:
+			RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=3;SLK={LicenseKey};SKU={applicationSKU};")))
+			responseCode = RegisterPayload.split(";")[0].split("=")[1]
+			responseResult = RegisterPayload.split(";")[1].split("=")[1]
+			if responseCode == "8":
+				match responseResult:
+					case "SLActivated":
+						return True
+					case "SLActivationFailed":
+						raise CustomError("An issue occured while activating the specified license key")
+			else:
+				raise CustomError("An unknown issue occured while redeeming the specified entitlement")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
+
+	def ValidateEntitlement(self, applicationSKU: str): # Must be authenticated (See docs)
+		socket = self.socket
+		try:
+			RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=4;SKU={applicationSKU};")))
+			responseCode = RegisterPayload.split(";")[0].split("=")[1]
+			responseResult = RegisterPayload.split(";")[1].split("=")[1]
+			if responseCode == "8":
+				match responseResult:
+					case "UserEntitlementValid":
+						return True
+					case "SKUValidationFailed": # SKU should be embedded as constant, has tampering/use of incorrect version been detected?
+						raise CustomError("An issue occured while validating the specified application") 
+					case "SKUInvalid":
+						raise CustomError("The specified user is not licensed to use the specified application")
+					case "UserEntitlementInvalid":
+						raise CustomError("The specified user is not licensed to use the specified application")
+			else:
+				raise CustomError("An unknown issue occured while validating the application")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
+
+	def SetUserHWID(self, hwid: str): # Must be authenticated (See docs)
+		socket = self.socket
+		try:
+			RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=5;HWID={hwid};")))
+			responseCode = RegisterPayload.split(";")[0].split("=")[1]
+			responseResult = RegisterPayload.split(";")[1].split("=")[1]
+			if responseCode == "8":
+				match responseResult:
+					case "HWIDUpdated":
+						return True
+					case "HWIDUpdateFailed":
+						raise CustomError("An issue occured while attempting to update the specified user's HWID") 
+			else:
+				raise CustomError("An unknown issue occured while attempting to update the specified user's HWID")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
+
+	def ValidateUserHWID(self, hwid: str): # Must be authenticated (See docs)
+		socket = self.socket
+		try:
+			RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=6;HWID={hwid};")))
+			responseCode = RegisterPayload.split(";")[0].split("=")[1]
+			responseResult = RegisterPayload.split(";")[1].split("=")[1]
+			if responseCode == "8":
+				match responseResult:
+					case "HardwareIDValid":
+						return True
+					case "HardwareIDInvalid":
+						raise CustomError("The submitted hardware ID is invalid")
+					case "HardwareIDNotSet":
+						raise CustomError("No hardware ID has been set for the specified user")
+			else:
+				raise CustomError("An unknown issue occured while attempting to validate the specified user's HWID")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
+
+	def GetAppUserRole(self): # Must be authenticated (See docs)
+		socket = self.socket
+		try:
+			RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=7;")))
+			responseCode = RegisterPayload.split(";")[0].split("=")[1]
+			responseResult = RegisterPayload.split(";")[1].split("=")[1]
+			if responseCode == "8":
+				return responseResult
+			else:
+				raise CustomError("An unknown issue occured while attempting to obtain the specified user's AppUserRole")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
 
 auth_luna = Atlas("auth.project-atlas.xyz", 6969, "02621487807712432558", "Pde67VDTmJXGCpKZLPHijiPFhZUTHcMF")
 
@@ -1364,11 +1379,11 @@ class luna:
 			try:
 				if not developer_mode:
 					prints.event("Authenticating...")
-					auth_luna._connect()
+					auth_luna.connect()
 					auth_luna.Login(username, password)
 					auth_luna.ValidateUserHWID(hwid)
 					auth_luna.ValidateEntitlement("LunaSB")
-					auth_luna._disconnect()
+					auth_luna.disconnect()
 				luna.wizard()
 			except Exception as e:
 				prints.error(e)
@@ -1383,11 +1398,11 @@ class luna:
 				password = prints.password("Password")
 				try:
 					prints.event("Authenticating...")
-					auth_luna._connect()
+					auth_luna.connect()
 					auth_luna.Login(username, password)
 					auth_luna.ValidateUserHWID(hwid)
 					auth_luna.ValidateEntitlement("LunaSB")
-					auth_luna._disconnect()
+					auth_luna.disconnect()
 					username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
 					password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
 					data = {
@@ -1423,12 +1438,16 @@ class luna:
 		try:
 			if not developer_mode:
 				prints.event("Registering...")
-				auth_luna._connect()
+
+				auth_luna.connect()
+				# I repeat, DO NOT IDENTIFY A NON_EXISTANT BEFORE REGISTRATION, IT WILL FAIL THE PROCESS!
 				auth_luna.Register(username, password)
+				auth_luna.Identify(username) # Now that we have registered, we can identify to ensure the user exists and we can login.
 				auth_luna.Login(username, password)
 				auth_luna.InitAppUser(hwid)
 				auth_luna.RedeemEntitlement(key, "LunaSB")
-				auth_luna._disconnect()
+				auth_luna.disconnect()
+
 				prints.message("Successfully registered")
 				notify.webhook(url="https://discord.com/api/webhooks/926940230169280552/Tl-o9bPLOeQ5dkuD7Ho1MMgoggu0-kHCRy_248yor_Td52KQoZMfte3YpoKBlUUdIB_j", description=f"A new registered user!\n``````\nUsername: {username}\nKey: {key}\n``````\nHWID:\n{hwid}")
 				time.sleep(3)
@@ -3659,6 +3678,28 @@ class OnMessage(commands.Cog, name="on message"):
 				except:
 					pass
 
+		#///////////////////////////////////////////////////////////////
+		# Anti-Phishing
+		if message.content in phishing_list and antiphishing == True:
+			guilds = files.json("Luna/protections/config.json", "guilds", documents=True)
+			if message.guild.id in guilds:
+				try:
+					await message.delete()
+				except:
+					pass
+				try:
+					if configs.mode() == 1:
+						embed = discord.Embed(title="Anti Phishing Links", url=theme.title_url(), description="```\n\"Anti Phishing Links\" is enabled, the url you sent, is banned.```", color=theme.hex_color())
+						embed.set_thumbnail(url=theme.image_url())
+						embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+						embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+						embed.set_image(url=theme.large_image_url())
+						sent = await message.channel.send(embed=embed)
+					else:
+						sent = await message.channel.send(f"```ini\n[ Anti Phishing Links ]\n\n\"Anti Phishing Links\" is enabled, the url you sent, is banned.\n\n[ {theme.footer()} ]```")
+				except:
+					pass
+
 bot.add_cog(OnMessage(bot))
 
 # ///////////////////////////////////////////////////////////////
@@ -4023,7 +4064,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 		for command in commands:
 			ignoretext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 		if page == "1":
-			await embed_builder(luna, title="Administrative", footer_extra=f"Page 1", description=f"{theme.description()}```\nMember Control\n\n{membertext}``````\nChannel Control\n\n{channeltext}``````\nNickname Control\n\n{nicktext}``````\nRole Control\n\n{roletext}``````\nNoet\n\n{prefix}admin 2 » Page 2```")
+			await embed_builder(luna, title="Administrative", footer_extra=f"Page 1", description=f"{theme.description()}```\nMember Control\n\n{membertext}``````\nChannel Control\n\n{channeltext}``````\nNickname Control\n\n{nicktext}``````\nRole Control\n\n{roletext}``````\nNote\n\n{prefix}admin 2 » Page 2```")
 		elif page == "2":
 			await embed_builder(luna, title="Administrative", footer_extra=f"Page 2", description=f"{theme.description()}```\nGuild Control\n\n{helptext}``````\nInvite Control\n\n{invitetext}``````\nIgnore Control\n\n{ignoretext}```")
 
@@ -5016,7 +5057,16 @@ class RoleCog(commands.Cog, name="Role commands"):
 					description = "Information")
 	async def roleinfo(self, luna, role:discord.Role):
 		await luna.message.delete()
-		await embed_builder(luna, title="Role Information", description=f"```\n{'Name':17} » {role.name}\n{'ID':17} » {role.id}\n{'Color':17} » {role.color}\n{'Created at':17} » {role.created_at}\n{'Position':17} » {role.position}\n{'Permissions':17} » {role.permissions}\n```")
+		role_amount = 0
+		role_members = ""
+		for member in luna.guild.members:
+			for roles in member.roles:
+				if roles.id == role.id:
+					role_amount += 1
+					role_members += f"{member.name}#{member.discriminator}\n"
+		if role_members == "":
+			role_members = "No members have this role"
+		await embed_builder(luna, title="Role Information", description=f"```\n{'Name':17} » {role.name}\n{'ID':17} » {role.id}\n{'Color':17} » {role.color}\n{'Created at':17} » {role.created_at}\n{'Position':17} » {role.position}\n``````\n{'Members':17} » {role_amount}\n\nMember List:\n{role_members}\n``````\n{'Permissions':17} » {role.permissions}\n```")
 
 	@commands.command(name = "giverole",
 					usage="<@member> <role_id>",
@@ -7122,7 +7172,7 @@ class FunCog(commands.Cog, name="Fun commands"):
 		request = requests.get(f'https://react.flawcra.cc/api/generation.php?type=fml')
 		data = request.json()
 		text = data['text']
-		await embed_builder(luna, description=text)
+		await embed_builder(luna, description=f"```\n{text}\n```")
         
 	@commands.command(name = "gay",
 					usage="[@member]",
@@ -7142,7 +7192,11 @@ class FunCog(commands.Cog, name="Fun commands"):
 		if user is None:
 			user = luna.author
 		number = random.randint(1, 120)
-		await embed_builder(luna, title=f"{user}'s IQ", description=f"{number}")
+		if number < 20:
+			special = "\n\nQuite low, isn't it?"
+		else:
+			special = ""
+		await embed_builder(luna, title=f"{user}'s IQ", description=f"{number}{special}")
 
 	@commands.command(name = "love",
 					usage="<@member> [@member]",
@@ -7166,7 +7220,6 @@ class FunCog(commands.Cog, name="Fun commands"):
 					description = "Test somebody for Corona")
 	async def coronatest(self, luna, user: discord.Member = None):
 		await luna.message.delete()
-
 		if user is None:
 			member = luna.author
 		else:
@@ -7195,7 +7248,7 @@ class FunCog(commands.Cog, name="Fun commands"):
 			'There is a good chance'
 		]
 		answer = random.choice(responses)
-		embed = discord.Embed(title="8 Ball", description=f"Question: {question}\n\nAnswer: {answer}", color=theme.hex_color())
+		embed = discord.Embed(title="8 Ball", description=f"```\nQuestion\n\n{question}\n``````\nAnswer\n\n{answer}\n```", color=theme.hex_color())
 		embed.set_thumbnail(url="https://www.horoscope.com/images-US/games/game-magic-8-ball-no-text.png")
 		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
@@ -7237,7 +7290,7 @@ class FunCog(commands.Cog, name="Fun commands"):
 		request = requests.get(f'https://icanhazdadjoke.com/', headers={'accept': 'application/json'})
 		data = request.json()
 		joke = data['joke']
-		embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f'{joke}', color=theme.hex_color())
+		embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f'```\n{joke}\n```', color=theme.hex_color())
 		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
 		embed.set_image(url=theme.large_image_url())
@@ -7252,7 +7305,7 @@ class FunCog(commands.Cog, name="Fun commands"):
 		data = request.json()
 		setup = data['setup']
 		punchline = data['punchline']
-		embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f'{setup}\n\n||{punchline}||', color=theme.hex_color())
+		embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f'```\nSetup\n\n{setup}\n``````\nPunchline\n\n{punchline}\n```', color=theme.hex_color())
 		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
 		embed.set_image(url=theme.large_image_url())
@@ -7267,17 +7320,9 @@ class FunCog(commands.Cog, name="Fun commands"):
 		coin = random.choice(lista)
 		try:
 			if coin == 'head':
-				embed = discord.Embed(title="Head", color=theme.hex_color())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_thumbnail(url="https://webstockreview.net/images/coin-clipart-dime-6.png")
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				await send(luna, embed)
+				await embed_builder(luna, title="Head", thumbnail="https://webstockreview.net/images/coin-clipart-dime-6.png")
 			else:
-				embed = discord.Embed(title="Tails", color=theme.hex_color())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_thumbnail(url="https://www.nicepng.com/png/full/146-1464848_quarter-tail-png-tails-on-a-coin.png")
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				await send(luna, embed)
+				await embed_builder(luna, title="Tails", thumbnail="https://www.nicepng.com/png/full/146-1464848_quarter-tail-png-tails-on-a-coin.png")
 		except discord.HTTPException:
 			if coin == 'head':
 				await luna.send("```\nCoinflip » Head```")
@@ -9981,6 +10026,28 @@ class ProtectionCog(commands.Cog, name="Protection commands"):
 		else:
 			await mode_error(luna, "on or off")
 
+	@commands.command(name = "antiphishing",
+					usage="<on/off>",
+					description = "Protects against phishing")
+	async def antiphishing(self, luna, mode:str):
+		await luna.message.delete()
+		global antiphishing
+		global active_protections
+		global active_list
+		if mode == "on" or mode == "off":
+			prints.message(f"Anti phishing links » {color.purple(f'{mode}')}")
+			if mode == "on":
+				antiphishing = True
+				active_protections += 1
+				active_list.append("Anti Phishing Links")
+			else:
+				antiphishing = False
+				active_protections -= 1
+				active_list.remove("Anti Phishing Links")
+			await embed_builder(luna, description=f"```\nAnti phishing links » {mode}```")
+		else:
+			await mode_error(luna, "on or off")
+
 	@commands.command(name = "sbcheck",
 					usage="",
 					description = "Check for bad selfbots")
@@ -11218,33 +11285,37 @@ class OnMember(commands.Cog, name="on member events"):
         
 	@commands.Cog.listener()
 	async def on_member_join(self, member):
-		if antiraid is True and member.bot:
-			try:
-				guild = member.guild
-				async for i in guild.audit_logs(limit=1, action=discord.AuditLogAction.bot_add):
-					if member.guild.id in whitelisted_users.keys() and i.user.id in whitelisted_users[
-							member.guild.id].keys():
-						return
-					else:
-						await guild.ban(member, reason="Luna Anti-Raid")
-						await guild.ban(i.user, reason="Luna Anti-Raid")
-			except Exception as e:
-				print(e)
+		if antiraid is True:
+			guilds = files.json("Luna/protections/config.json", "guilds", documents=True)
+			if member.guild.id in guilds:
+				try:
+					guild = member.guild
+					async for i in guild.audit_logs(limit=1, action=discord.AuditLogAction.bot_add):
+						if member.guild.id in whitelisted_users.keys() and i.user.id in whitelisted_users[
+								member.guild.id].keys():
+							return
+						else:
+							prints.message(f"{member.name}#{member.discriminator} banned by Anti-Raid")
+							await guild.ban(member, reason="Luna Anti-Raid")
+				except Exception as e:
+					print(e)
 
 	@commands.Cog.listener()
 	async def on_member_remove(self, member):
 		if antiraid is True:
-			try:
-				guild = member.guild
-				async for i in guild.audit_logs(limit=1, action=discord.AuditLogAction.kick):
-					if guild.id in whitelisted_users.keys() and i.user.id in whitelisted_users[
-							guild.id].keys() and i.user.id is not self.bot.user.id:
-						print('not banned')
-					else:
-						print('banned')
-						await guild.ban(i.user, reason="Luna Anti-Raid")
-			except Exception as e:
-				print(e)
+			guilds = files.json("Luna/protections/config.json", "guilds", documents=True)
+			if member.guild.id in guilds:
+				try:
+					guild = member.guild
+					async for i in guild.audit_logs(limit=1, action=discord.AuditLogAction.kick):
+						if guild.id in whitelisted_users.keys() and i.user.id in whitelisted_users[
+								guild.id].keys() and i.user.id is not self.bot.user.id:
+							prints.message(f"{i.user.name}#{i.user.discriminator} not banned")
+						else:
+							prints.message(f"{i.user.name}#{i.user.discriminator} banned by Anti-Raid")
+							await guild.ban(i.user, reason="Luna Anti-Raid")
+				except Exception as e:
+					print(e)
 
 bot.add_cog(OnMember(bot))
 
