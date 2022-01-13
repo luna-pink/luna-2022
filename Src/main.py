@@ -86,7 +86,7 @@ chargesniper = False
 
 developer_mode = False
 beta = False
-version = '3.2.0'
+version = '3.2.6'
 
 r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 updater_url = r["updater"]
@@ -127,7 +127,6 @@ import pyPrivnote
 import subprocess
 import pypresence
 import ctypes.wintypes as wintypes
-from CEA256 import *
 from gtts import gTTS
 from discord import *
 from ctypes import windll
@@ -659,7 +658,6 @@ class Atlas:
 			if responseCode == "8" and responseResult == "Identified!":
 				return True
 			elif responseCode == "2":
-				print(responseResult)
 				raise CustomError("Username not found!")
 		except Exception as e:
 			self.disconnect()
@@ -834,6 +832,26 @@ class Atlas:
 				return responseResult
 			else:
 				raise CustomError("An unknown issue occured while attempting to obtain the specified user's AppUserRole")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
+
+	def CheckLicenseKeyValidity(self, LicenseKey: str): # Must be authenticated (See docs)
+		socket = self.socket
+		try:
+			RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=8;SLK={LicenseKey};")))
+			responseCode = RegisterPayload.split(";")[0].split("=")[1]
+			responseResult = RegisterPayload.split(";")[1].split("=")[1]
+			if responseCode == "8":
+				match responseResult:
+					case "SLKValid":
+						return True
+					case "SLKInvalid":
+						raise CustomError("The specified license key is invalid")
+					case "SLKValidationFailed":
+						raise CustomError("An issue occured while attempting to validate the specified license key")
+			else:
+				raise CustomError("An unknown issue occured while attempting to validate the specified user's HWID")
 		except Exception as e:
 			self.disconnect()
 			raise CustomError("{}".format(e))
@@ -1215,7 +1233,7 @@ def check_debuggers():
             "Cheat Engine.exe",
             "procdump.exe",
             "ida.exe",
-            "WireShark.exe",
+            "Wireshark.exe",
             "vboxservice.exe",
             "vboxtray.exe",
             "vmtoolsd.exe",
@@ -1228,7 +1246,6 @@ def check_debuggers():
             "prl_cc.exe",
             "prl_tools.exe",
             "xenservice.exe",
-            "qemu-ga.exe",
             "joeboxcontrol.exe",
             "joeboxserver.exe",
             "filemon.exe",
@@ -1250,14 +1267,10 @@ def check_debuggers():
 							username = files.json("Luna/auth.json", "username", documents=True)
 							username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
 						except:
-							username = "Failed to get username"
-						try:
-							email = "Failed to get email"
-						except:
-							email = "Failed to get email"
+							username = "Not Logged In! Caution advised."
 						try:
 							hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip() 
-							notify.webhook(url="https://discord.com/api/webhooks/929347491755880449/h1eGan_H4toXEdyObgtuAfn0RLjCs0bVhc5SMrW8fw-tubu4SxoWGzqZ1RaDZqr6gIPQ", description=f"Detected a debugger\n``````\nDebugger: {x}\n``````\nLuna Information\n\nUsername: {username}\nEmail: {email}```\n\n```HWID » {hwid}")
+							notify.webhook(url="https://discord.com/api/webhooks/929347491755880449/h1eGan_H4toXEdyObgtuAfn0RLjCs0bVhc5SMrW8fw-tubu4SxoWGzqZ1RaDZqr6gIPQ", description=f"Detected a debugger\n``````\nDebugger: {x}\n``````\nLuna Information\n\nUsername: {username}\n``````\nHWID » {hwid}")
 						except:
 							pass
 						current_system_pid = os.getpid()
@@ -1278,15 +1291,26 @@ def check_debuggers_thread():
 # ///////////////////////////////////////////////////////////////
 # Print Functions
 
-logo = f"""
-       .                                         o                                    *
-                        *                                 +       .-.,=`````=.  +
-                 O         _|            .                         `=/_       \                o
- .                         _|        _|    _|  _|_|_|      _|_|_|   |  `=._    |       .
-            +              _|        _|    _|  _|    _|  _|    _|  . \     `=./`, 
-                           _|        _|    _|  _|    _|  _|    _|     `=.__.=` `=`
-    *                +     _|_|_|_|    _|_|_|  _|    _|    _|_|_|            *    
-                           .                      o                                       +
+# logo = f"""
+#        .                                         o                                    *
+#                         *                                 +        .-.,="``"=.  +
+#                  O         _|            .                         `=/_       \                o
+#  .                         _|        _|    _|  _|_|_|      _|_|_|   |  `=._    |       .
+#             +              _|        _|    _|  _|    _|  _|    _|  . \     `=./`, 
+#                            _|        _|    _|  _|    _|  _|    _|     `=.__.=` `=`
+#     *                +     _|_|_|_|    _|_|_|  _|    _|    _|_|_|            *    
+#                            .                      o                                       +
+# """
+
+logo = f"""  *                        o              +                 *                 .
+       O                     .              .                      .                   *
+               .                ██╗     ██╗   ██╗███╗  ██╗ █████╗    .-.,="``"=. +            |
+ .                     *        ██║     ██║   ██║████╗ ██║██╔══██╗   `=/_       \           - o -
+                                ██║     ██║   ██║██╔██╗██║███████║    |  '=._    |      .     |
+            |              +    ██║     ██║   ██║██║╚████║██╔══██║  *  \     `=./`, 
+    *     - o -                 ███████╗╚██████╔╝██║ ╚███║██║  ██║      `=.__.=` `=`             O
+            |        .          ╚══════╝ ╚═════╝ ╚═╝  ╚══╝╚═╝  ╚═╝             *    
+                              .                      o                    .                  +
 """
 
 def clear():
@@ -1380,6 +1404,7 @@ class luna:
 				if not developer_mode:
 					prints.event("Authenticating...")
 					auth_luna.connect()
+					auth_luna.Identify(username)
 					auth_luna.Login(username, password)
 					auth_luna.ValidateUserHWID(hwid)
 					auth_luna.ValidateEntitlement("LunaSB")
@@ -1399,6 +1424,8 @@ class luna:
 				try:
 					prints.event("Authenticating...")
 					auth_luna.connect()
+					auth_luna.Identify(username)
+					auth_luna.Login(username, password)
 					auth_luna.Login(username, password)
 					auth_luna.ValidateUserHWID(hwid)
 					auth_luna.ValidateEntitlement("LunaSB")
@@ -1440,6 +1467,7 @@ class luna:
 				prints.event("Registering...")
 
 				auth_luna.connect()
+				auth_luna.CheckLicenseKeyValidity(key)
 				# I repeat, DO NOT IDENTIFY A NON_EXISTANT BEFORE REGISTRATION, IT WILL FAIL THE PROCESS!
 				auth_luna.Register(username, password)
 				auth_luna.Identify(username) # Now that we have registered, we can identify to ensure the user exists and we can login.
@@ -1560,15 +1588,16 @@ class luna:
 		"""Logs in the bot."""
 		luna.console(clear=True)
 
-		try:
-			path = getattr(sys, '_MEIPASS', os.getcwd())
-			cogs_path = path + "\\cogs"
-			luna.loader_check()
-			for filename in os.listdir(cogs_path):
-				if filename.endswith(".py"):
-					bot.load_extension(f"cogs.{filename[:-3]}")
-		except:
-			pass
+		# try:
+		# 	path = getattr(sys, '_MEIPASS', os.getcwd())
+		# 	cogs_path = path + "\\cogs"
+		# 	luna.loader_check()
+		# 	for filename in os.listdir(cogs_path):
+		# 		if filename.endswith(".py"):
+		# 			bot.load_extension(f"cogs.{filename[:-3]}")
+		# except:
+		# 	pass
+
 		try:
 			token = files.json("Luna/discord.json", "token", documents=True)
 			headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)}
@@ -1579,7 +1608,7 @@ class luna:
 			bot.run(Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token))
 		except Exception as e:
 			files.remove('Luna/discord.json', documents=True)
-			prints.error("Failed to log into token")
+			prints.error(e)
 			time.sleep(5)
 			prints.event("Redirecting to the main menu in 5 seconds")
 			time.sleep(5)
@@ -1691,7 +1720,7 @@ class luna:
 							time.sleep(5)
 							luna.authentication()
 				else:
-					prints.error("Failed to find any valid tokens. Please manually enter a valid token. (1)")
+					prints.error("Failed to find any valid tokens. Please manually enter a valid token.")
 					if luna.prompt_token() == True:
 						prints.event("Starting Luna...")
 					else:
@@ -1701,7 +1730,7 @@ class luna:
 						time.sleep(5)
 						luna.authentication()
 			else:
-				prints.error("Failed to find any valid tokens. Please manually enter a valid token. (2)")
+				prints.error("Failed to find any valid tokens. Please manually enter a valid token.")
 				if luna.prompt_token() == True:
 					prints.event("Starting Luna...")
 				else:
@@ -1710,9 +1739,8 @@ class luna:
 					prints.event("Redirecting to the main menu in 5 seconds")
 					time.sleep(5)
 					luna.authentication()
-		except Exception as e:
-			prints.error(e)
-			prints.error("Failed to find any valid tokens. Please manually enter a valid token. (3)")
+		except:
+			prints.error("Failed to find any valid tokens. Please manually enter a valid token.")
 			if luna.prompt_token() == True:
 				prints.event("Starting Luna...")
 			else:
@@ -3175,7 +3203,6 @@ def update_thread():
 			time.sleep(900)
 
 bot = commands.Bot(bot_prefix, self_bot=True, case_insensitive=True, guild_subscription_options=GuildSubscriptionOptions.off(), status=statuscon())
-
 @bot.event
 async def on_ready():
 	"""Prints a ready log."""
@@ -3183,6 +3210,7 @@ async def on_ready():
 		notify.toast(message=f"Logged into {bot.user}\nLuna Version » {version}")
 	if files.json("Luna/webhooks/webhooks.json", "login", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
 		notify.webhook(url=webhook.login_url(), name="login", description=f"Logged into {bot.user}")
+
 	luna.console(clear=True)
 	command_count = len(bot.commands)
 	cog = bot.get_cog('Custom commands')
@@ -3193,7 +3221,6 @@ async def on_ready():
 			custom_command_count += 1
 	except:
 		custom_command_count = 0
-	prefix = files.json("Luna/config.json", "prefix", documents=True)
 	print(motd.center(os.get_terminal_size().columns))
 	if beta:
 		print("Beta Build".center(os.get_terminal_size().columns))
@@ -3202,10 +3229,68 @@ async def on_ready():
 			prints.message("You are not a beta user, Luna will close in 5 seconds.")
 			time.sleep(5)
 			os._exit(0)
-	print()
-	print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-	print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends")
-	print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+	prefix = files.json("Luna/config.json", "prefix", documents=True)
+	console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+	if console_mode == "2":
+		mode = int(files.json("Luna/config.json", "mode", documents=True))
+		errorlog = files.json("Luna/config.json", "error_log", documents=True)
+		riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
+		themesvar = files.json("Luna/config.json", "theme", documents=True)
+		deletetimer = int(files.json("Luna/config.json", "delete_timer", documents=True))
+		startup_status = files.json("Luna/config.json", "startup_status", documents=True)
+		nitro_sniper = files.json("Luna/snipers/nitro.json", "sniper", documents=True)
+		giveawayjoiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
+		delay_in_minutes = int(files.json("Luna/snipers/giveaway.json", "delay_in_minutes", documents=True))
+		giveaway_server_joiner = files.json("Luna/snipers/giveaway.json", "guild_joiner", documents=True)
+		if mode == 1:
+			mode = "Embed"
+		elif mode == 2:
+			mode = "Text"
+		elif mode == 3:
+			mode = "Indent"
+		else:
+			mode = "Unknown"
+		if afkstatus == 1:
+			afk = "on"
+		else:
+			afk = "off"
+		if themesvar == "default":
+			pass
+		else:
+			themesvar = themesvar[:-5]
+		bot_user = f"{bot.user}"
+		ui_user = f" {color.purple('User:')} {bot_user:<26}"
+		ui_guilds = f" {color.purple('Guilds:')} {len(bot.guilds):<24}"
+		ui_friends = f" {color.purple('Friends:')} {len(bot.user.friends):<23}"
+		ui_prefix = f" {color.purple('Prefix:')} {prefix:<24}"
+		ui_mode = f" {color.purple('Mode:')} {mode:<26}"
+		ui_theme = f" {color.purple('Theme:')} {themesvar:<25}"
+		ui_commands = f" {color.purple('Commands:')} {command_count-custom_command_count:<22}"
+		ui_commands_custom = f" {color.purple('Custom Commands:')} {custom_command_count:<15}"
+		ui_nitro_sniper = f" {color.purple('Nitro Sniper:')} {nitro_sniper}"
+		ui_giveaway_sniper = f" {color.purple('Giveaway Joiner:')} {giveawayjoiner}"
+		ui_giveaway_delay = f" {color.purple('Giveaway Delay:')} {delay_in_minutes}"
+		ui_giveaway_joiner = f" {color.purple('Giveaway Guilds:')} {giveaway_server_joiner}"
+		ui_afk = f" {color.purple('AFK Messager:')} {afk}"
+		ui_riskmode = f" {color.purple('Riskmode:')} {riskmode}"
+		ui_errorlog = f" {color.purple('Errorlog:')} {errorlog}"
+		ui_deletetimer = f" {color.purple('Delete Timer:')} {deletetimer}"
+		ui_startup = f" {color.purple('Startup Status:')} {startup_status}"
+		print()
+		print(f"               ═════════════ {color.purple('User')} ═════════════      ═══════════ {color.purple('Settings')} ═══════════")
+		print(f"               {ui_user}     {ui_prefix}")
+		print(f"               {ui_guilds}     {ui_theme}")
+		print(f"               {ui_friends}     {ui_nitro_sniper}")
+		print(f"               ════════════════════════════════      {ui_giveaway_sniper}")
+		print(f"               ═════════════ {color.purple('Luna')} ═════════════      {ui_riskmode}")
+		print(f"               {ui_commands}     {ui_deletetimer}")
+		print(f"               {ui_commands_custom}     {ui_startup}")
+		print(f"               ════════════════════════════════      ════════════════════════════════\n")
+	else:
+		print()
+		print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+		print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends")
+		print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
 	print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
 	prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 	debugger_thread = threading.Thread(target=uptime_thread)
@@ -3718,8 +3803,8 @@ class OnDelete(commands.Cog, name="on delete"):
 			if mention in message.content:
 				if files.json("Luna/notifications/toasts.json", "ghostpings", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
 					notify.toast(message=f"You have been ghostpinged\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
-				if files.json("Luna/webhooks/webhooks.json", "ghostpings", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.ghostping_url() == "webhook-url-here":
-					notify.webhook(url=webhook.ghostping_url(), name="ghostpings", description=f"You have been ghostpinged\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
+				if files.json("Luna/webhooks/webhooks.json", "ghostpings", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.ghostpings_url() == "webhook-url-here":
+					notify.webhook(url=webhook.ghostpings_url(), name="ghostpings", description=f"You have been ghostpinged\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
 				print()
 				prints.sniper(f"{color.purple('You have been ghostpinged')}")
 				prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
@@ -3915,7 +4000,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 					usage="[command]",
 					description = "Display the help message",
 					aliases = ['h', '?'])
-	async def help (self, luna, commandName:str=None):
+	async def help(self, luna, commandName:str=None):
 		await luna.message.delete()
 		prefix = files.json("Luna/config.json", "prefix", documents=True)
 
@@ -4409,6 +4494,11 @@ class HelpCog(commands.Cog, name="Help commands"):
 		errorlog = files.json("Luna/config.json", "error_log", documents=True)
 		riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
 		themesvar = files.json("Luna/config.json", "theme", documents=True)
+		console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+		if console_mode == "2":
+			console_mode = "information"
+		else:
+			console_mode = "standard"
 		if themesvar == "default":
 			pass
 		else:
@@ -4448,7 +4538,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 		helptext = ""
 		for command in commands:
 			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		await embed_builder(luna, title="Settings", description=f"{theme.description()}```\nYour current settings\n\nError logging     » {errorlog}\nAuto delete timer » {deletetimer}\nStartup status    » {startup_status}\nRiskmode          » {riskmode}\nTheme             » {themesvar}\nDescription       » {theme_description}\nSelfbot detection » {selfbotdetection}\nMention notify    » {pings}\n``````\nYour current theme settings\n\nTheme             » {themesvar}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSettings\n\n{helptext}```")
+		await embed_builder(luna, title="Settings", description=f"{theme.description()}```\nYour current settings\n\nError logging     » {errorlog}\nAuto delete timer » {deletetimer}\nStartup status    » {startup_status}\nTheme             » {themesvar}\nConsole Mode      » {console_mode}\nRiskmode          » {riskmode}\nDescription       » {theme_description}\nSelfbot detection » {selfbotdetection}\nMention notify    » {pings}\n``````\nYour current theme settings\n\nTheme             » {themesvar}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSettings\n\n{helptext}```")
 
 	@commands.command(name = "sharing",
 					usage="",
@@ -4552,7 +4642,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 			beta_info = f" Beta Build"
 		else:
 			beta_info = ""
-		await embed_builder(luna, description=f"```\nMOTD\n\n{motd}\n``````\nVersion\n\n{version}{beta_info}\n``````\nUptime\n\n{hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds\n``````\nCommands\n\n{command_count-custom_command_count}\n``````\nCustom commands\n\n{custom_command_count}\n``````\nEnviroment\n\nLanguage   » Python\nDiscord.py » {discord.__version__}\n``````\nPublic server invite\n\nhttps://discord.gg/Kxyv7NHVED\n``````\nCustomer only server invite\n\nhttps://discord.gg/3FGEaCnZST\n``````\nWebsite\n\nhttps://team-luna.org\n```")
+		await embed_builder(luna, description=f"```\nMOTD\n\n{motd}\n``````\nVersion\n\n{version}{beta_info}\n``````\nUptime\n\n{hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds\n``````\nCommands\n\n{command_count-custom_command_count}\n``````\nCustom commands\n\n{custom_command_count}\n``````\nEnviroment\n\nDiscord.py » {discord.__version__}\n``````\nPublic server invite\n\nhttps://discord.gg/Kxyv7NHVED\n``````\nCustomer only server invite\n\nhttps://discord.gg/3FGEaCnZST\n``````\nWebsite\n\nhttps://team-luna.org\n```")
 
 	@commands.command(name = "repeat",
 						usage="",
@@ -4900,10 +4990,10 @@ class MemberCog(commands.Cog, name="Member commands"):
 		await luna.message.delete()
 		role = discord.utils.get(luna.guild.roles, name="Muted")
 		if not role:
-			role = await luna.guild.create_role(name="Muted", reason="Mute role")
+			role = await luna.guild.create_role(name="Muted")
 			for channel in luna.guild.channels:
 				await channel.set_permissions(role, send_messages=False)
-		await user.add_roles(role, reason="Mute")
+		await user.add_roles(role)
 		await embed_builder(luna, title="Mute", description=f"```\n{user.mention} has been muted\n\nReason » {reason}```")
 
 	@commands.command(name = "unmute",
@@ -5200,7 +5290,7 @@ class NickCog(commands.Cog, name="Nickname commands"):
 	async def nick(self, luna, *, name:str):
 		await luna.message.delete()
 		await luna.author.edit(nick=name)
-		await embed_builder(luna, title="Nickname", description=f"```\nChanged nickname of {member.name}#{member.discriminator} to » {name}```")
+		await embed_builder(luna, title="Nickname", description=f"```\nChanged nickname to » {name}```")
 	
 	@commands.command(name = "nickmember",
 					usage="<@member> <name>",
@@ -9870,15 +9960,49 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
 						custom_command_count += 1
 				except:
 					custom_command_count = 0
-				prefix = files.json("Luna/config.json", "prefix", documents=True)
 				print(motd.center(os.get_terminal_size().columns))
 				if beta:
 					print("Beta Build".center(os.get_terminal_size().columns))
-				print()
-				print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-				print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Guilds | {color.purple('0')} Friends")
-				print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-				print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+				prefix = files.json("Luna/config.json", "prefix", documents=True)
+				console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+				if console_mode == "2":
+					riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
+					themesvar = files.json("Luna/config.json", "theme", documents=True)
+					deletetimer = int(files.json("Luna/config.json", "delete_timer", documents=True))
+					startup_status = files.json("Luna/config.json", "startup_status", documents=True)
+					nitro_sniper = files.json("Luna/snipers/nitro.json", "sniper", documents=True)
+					giveawayjoiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
+					if themesvar == "default":
+						pass
+					else:
+						themesvar = themesvar[:-5]
+					ui_user = f" {color.purple('User:')} {'Luna#0000':<26}"
+					ui_guilds = f" {color.purple('Guilds:')} {'0':<24}"
+					ui_friends = f" {color.purple('Friends:')} {'0':<23}"
+					ui_prefix = f" {color.purple('Prefix:')} {prefix:<24}"
+					ui_theme = f" {color.purple('Theme:')} {themesvar:<25}"
+					ui_commands = f" {color.purple('Commands:')} {command_count-custom_command_count:<22}"
+					ui_commands_custom = f" {color.purple('Custom Commands:')} {custom_command_count:<15}"
+					ui_nitro_sniper = f" {color.purple('Nitro Sniper:')} {nitro_sniper}"
+					ui_giveaway_sniper = f" {color.purple('Giveaway Joiner:')} {giveawayjoiner}"
+					ui_riskmode = f" {color.purple('Riskmode:')} {riskmode}"
+					ui_deletetimer = f" {color.purple('Delete Timer:')} {deletetimer}"
+					ui_startup = f" {color.purple('Startup Status:')} {startup_status}"
+					print()
+					print(f"               ═════════════ {color.purple('User')} ═════════════      ═══════════ {color.purple('Settings')} ═══════════")
+					print(f"               {ui_user}     {ui_prefix}")
+					print(f"               {ui_guilds}     {ui_theme}")
+					print(f"               {ui_friends}     {ui_nitro_sniper}")
+					print(f"               ════════════════════════════════      {ui_giveaway_sniper}")
+					print(f"               ═════════════ {color.purple('Luna')} ═════════════      {ui_riskmode}")
+					print(f"               {ui_commands}     {ui_deletetimer}")
+					print(f"               {ui_commands_custom}     {ui_startup}")
+					print(f"               ════════════════════════════════      ════════════════════════════════\n")
+				else:
+					print()
+					print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+					print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Guilds | {color.purple('0')} Friends")
+					print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
 			else:
 				privacy = False
 				command_count = len(bot.commands)
@@ -9890,20 +10014,56 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
 						custom_command_count += 1
 				except:
 					custom_command_count = 0
-				prefix = files.json("Luna/config.json", "prefix", documents=True)
 				print(motd.center(os.get_terminal_size().columns))
 				if beta:
 					print("Beta Build".center(os.get_terminal_size().columns))
-				print()
-				print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-				print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends")
-				print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-				print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+				prefix = files.json("Luna/config.json", "prefix", documents=True)
+				console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+				if console_mode == "2":
+					riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
+					themesvar = files.json("Luna/config.json", "theme", documents=True)
+					deletetimer = int(files.json("Luna/config.json", "delete_timer", documents=True))
+					startup_status = files.json("Luna/config.json", "startup_status", documents=True)
+					nitro_sniper = files.json("Luna/snipers/nitro.json", "sniper", documents=True)
+					giveawayjoiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
+					if themesvar == "default":
+						pass
+					else:
+						themesvar = themesvar[:-5]
+					bot_user = f"{bot.user}"
+					ui_user = f" {color.purple('User:')} {bot_user:<26}"
+					ui_guilds = f" {color.purple('Guilds:')} {len(bot.guilds):<24}"
+					ui_friends = f" {color.purple('Friends:')} {len(bot.user.friends):<23}"
+					ui_prefix = f" {color.purple('Prefix:')} {prefix:<24}"
+					ui_theme = f" {color.purple('Theme:')} {themesvar:<25}"
+					ui_commands = f" {color.purple('Commands:')} {command_count-custom_command_count:<22}"
+					ui_commands_custom = f" {color.purple('Custom Commands:')} {custom_command_count:<15}"
+					ui_nitro_sniper = f" {color.purple('Nitro Sniper:')} {nitro_sniper}"
+					ui_giveaway_sniper = f" {color.purple('Giveaway Joiner:')} {giveawayjoiner}"
+					ui_riskmode = f" {color.purple('Riskmode:')} {riskmode}"
+					ui_deletetimer = f" {color.purple('Delete Timer:')} {deletetimer}"
+					ui_startup = f" {color.purple('Startup Status:')} {startup_status}"
+					print()
+					print(f"               ═════════════ {color.purple('User')} ═════════════      ═══════════ {color.purple('Settings')} ═══════════")
+					print(f"               {ui_user}     {ui_prefix}")
+					print(f"               {ui_guilds}     {ui_theme}")
+					print(f"               {ui_friends}     {ui_nitro_sniper}")
+					print(f"               ════════════════════════════════      {ui_giveaway_sniper}")
+					print(f"               ═════════════ {color.purple('Luna')} ═════════════      {ui_riskmode}")
+					print(f"               {ui_commands}     {ui_deletetimer}")
+					print(f"               {ui_commands_custom}     {ui_startup}")
+					print(f"               ════════════════════════════════      ════════════════════════════════\n")
+				else:
+					print()
+					print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+					print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends")
+					print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
 			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 			prints.message(f"Privacy mode » {color.purple(f'{mode}')}")
-			await embed_builder(luna, description=f"```\Privacy mode » {mode}```")
+			await embed_builder(ctx, description=f"```\Privacy mode » {mode}```")
 		else:
-			await mode_error(luna, "on or off")
+			await mode_error(ctx, "on or off")
 
 bot.add_cog(PrivacyCog(bot))
 class ProtectionGuildCog(commands.Cog, name="Protection Guild commands"):
@@ -10242,12 +10402,45 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 			print(motd.center(os.get_terminal_size().columns))
 			if beta:
 				print("Beta Build".center(os.get_terminal_size().columns))
-			print()
-			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-			print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Guilds | {color.purple('0')} Friends")
-			print(f"                           {color.purple('[')}+{color.purple(']')} {newprefix}\n")
-			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+			console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+			if console_mode == "2":
+				riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
+				themesvar = files.json("Luna/config.json", "theme", documents=True)
+				deletetimer = int(files.json("Luna/config.json", "delete_timer", documents=True))
+				startup_status = files.json("Luna/config.json", "startup_status", documents=True)
+				nitro_sniper = files.json("Luna/snipers/nitro.json", "sniper", documents=True)
+				giveawayjoiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
+				if themesvar == "default":
+					pass
+				else:
+					themesvar = themesvar[:-5]
+				ui_user = f" {color.purple('User:')} {'Luna#0000':<26}"
+				ui_guilds = f" {color.purple('Guilds:')} {'0':<24}"
+				ui_friends = f" {color.purple('Friends:')} {'0':<23}"
+				ui_prefix = f" {color.purple('Prefix:')} {newprefix:<24}"
+				ui_theme = f" {color.purple('Theme:')} {themesvar:<25}"
+				ui_commands = f" {color.purple('Commands:')} {command_count-custom_command_count:<22}"
+				ui_commands_custom = f" {color.purple('Custom Commands:')} {custom_command_count:<15}"
+				ui_nitro_sniper = f" {color.purple('Nitro Sniper:')} {nitro_sniper}"
+				ui_giveaway_sniper = f" {color.purple('Giveaway Joiner:')} {giveawayjoiner}"
+				ui_riskmode = f" {color.purple('Riskmode:')} {riskmode}"
+				ui_deletetimer = f" {color.purple('Delete Timer:')} {deletetimer}"
+				ui_startup = f" {color.purple('Startup Status:')} {startup_status}"
+				print()
+				print(f"               ═════════════ {color.purple('User')} ═════════════      ═══════════ {color.purple('Settings')} ═══════════")
+				print(f"               {ui_user}     {ui_prefix}")
+				print(f"               {ui_guilds}     {ui_theme}")
+				print(f"               {ui_friends}     {ui_nitro_sniper}")
+				print(f"               ════════════════════════════════      {ui_giveaway_sniper}")
+				print(f"               ═════════════ {color.purple('Luna')} ═════════════      {ui_riskmode}")
+				print(f"               {ui_commands}     {ui_deletetimer}")
+				print(f"               {ui_commands_custom}     {ui_startup}")
+				print(f"               ════════════════════════════════      ════════════════════════════════\n")
+			else:
+				print()
+				print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+				print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Guilds | {color.purple('0')} Friends")
+				print(f"                           {color.purple('[')}+{color.purple(']')} {newprefix}\n")
 		else:
 			command_count = len(bot.commands)
 			cog = bot.get_cog('Custom commands')
@@ -10261,12 +10454,48 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 			print(motd.center(os.get_terminal_size().columns))
 			if beta:
 				print("Beta Build".center(os.get_terminal_size().columns))
-			print()
-			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-			print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends")
-			print(f"                           {color.purple('[')}+{color.purple(']')} {newprefix}\n")
-			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+			console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+			if console_mode == "2":
+				riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
+				themesvar = files.json("Luna/config.json", "theme", documents=True)
+				deletetimer = int(files.json("Luna/config.json", "delete_timer", documents=True))
+				startup_status = files.json("Luna/config.json", "startup_status", documents=True)
+				nitro_sniper = files.json("Luna/snipers/nitro.json", "sniper", documents=True)
+				giveawayjoiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
+				if themesvar == "default":
+					pass
+				else:
+					themesvar = themesvar[:-5]
+				bot_user = f"{bot.user}"
+				ui_user = f" {color.purple('User:')} {bot_user:<26}"
+				ui_guilds = f" {color.purple('Guilds:')} {len(bot.guilds):<24}"
+				ui_friends = f" {color.purple('Friends:')} {len(bot.user.friends):<23}"
+				ui_prefix = f" {color.purple('Prefix:')} {newprefix:<24}"
+				ui_theme = f" {color.purple('Theme:')} {themesvar:<25}"
+				ui_commands = f" {color.purple('Commands:')} {command_count-custom_command_count:<22}"
+				ui_commands_custom = f" {color.purple('Custom Commands:')} {custom_command_count:<15}"
+				ui_nitro_sniper = f" {color.purple('Nitro Sniper:')} {nitro_sniper}"
+				ui_giveaway_sniper = f" {color.purple('Giveaway Joiner:')} {giveawayjoiner}"
+				ui_riskmode = f" {color.purple('Riskmode:')} {riskmode}"
+				ui_deletetimer = f" {color.purple('Delete Timer:')} {deletetimer}"
+				ui_startup = f" {color.purple('Startup Status:')} {startup_status}"
+				print()
+				print(f"               ═════════════ {color.purple('User')} ═════════════      ═══════════ {color.purple('Settings')} ═══════════")
+				print(f"               {ui_user}     {ui_prefix}")
+				print(f"               {ui_guilds}     {ui_theme}")
+				print(f"               {ui_friends}     {ui_nitro_sniper}")
+				print(f"               ════════════════════════════════      {ui_giveaway_sniper}")
+				print(f"               ═════════════ {color.purple('Luna')} ═════════════      {ui_riskmode}")
+				print(f"               {ui_commands}     {ui_deletetimer}")
+				print(f"               {ui_commands_custom}     {ui_startup}")
+				print(f"               ════════════════════════════════      ════════════════════════════════\n")
+			else:
+				print()
+				print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+				print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends")
+				print(f"                           {color.purple('[')}+{color.purple(']')} {newprefix}\n")
+		print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+		prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 		prints.message(f"Prefix changed to {color.purple(f'{newprefix}')}")
 		await embed_builder(ctx, description=f"```\nPrefix changed to {newprefix}```")
 
@@ -10459,7 +10688,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 
 	@commands.command(name = "selfbotdetection",
 					usage="<on/off>",
-					description = "Selfbot detection")
+					description = "Sb detection")
 	async def selfbotdetection(self, luna, mode:str):
 		await luna.message.delete()
 		if mode == "on" or mode == "off":
@@ -10483,29 +10712,190 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 
 	@commands.command(name = "password",
 					usage="<new_password>",
-					description = "Change password config")
+					description = "Change password")
 	async def password(self, luna, password:str):
 		await luna.message.delete()
 		await embed_builder(luna, description=f"```\nChanged password to » {password}```")
 		prints.message(f"Changed password to » {color.purple(f'{password}')}")
 		config.password(f"{password}")
 
+	@commands.command(name = "console",
+					usage="<1/2>",
+					description = "Change console mode")
+	async def console(self, ctx, mode:str):
+		await ctx.message.delete()
+		if mode == "1" or mode == "2":
+			config._global("Luna/console/console.json", "mode", mode)
+			prints.message(f"Console mode » {color.purple(f'{mode}')}")
+			await embed_builder(ctx, description=f"```\nConsole mode » {mode}```")
+			luna.console(clear=True)
+			if privacy:
+				command_count = len(bot.commands)
+				cog = bot.get_cog('Custom commands')
+				try:
+					custom = cog.get_commands()
+					custom_command_count = 0
+					for command in custom:
+						custom_command_count += 1
+				except:
+					custom_command_count = 0
+				prefix = files.json("Luna/config.json", "prefix", documents=True)
+				print(motd.center(os.get_terminal_size().columns))
+				if beta:
+					print("Beta Build".center(os.get_terminal_size().columns))
+				prefix = files.json("Luna/config.json", "prefix", documents=True)
+				console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+				if console_mode == "2":
+					riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
+					themesvar = files.json("Luna/config.json", "theme", documents=True)
+					deletetimer = int(files.json("Luna/config.json", "delete_timer", documents=True))
+					startup_status = files.json("Luna/config.json", "startup_status", documents=True)
+					nitro_sniper = files.json("Luna/snipers/nitro.json", "sniper", documents=True)
+					giveawayjoiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
+					if themesvar == "default":
+						pass
+					else:
+						themesvar = themesvar[:-5]
+					ui_user = f" {color.purple('User:')} {'Luna#0000':<26}"
+					ui_guilds = f" {color.purple('Guilds:')} {'0':<24}"
+					ui_friends = f" {color.purple('Friends:')} {'0':<23}"
+					ui_prefix = f" {color.purple('Prefix:')} {prefix:<24}"
+					ui_theme = f" {color.purple('Theme:')} {themesvar:<25}"
+					ui_commands = f" {color.purple('Commands:')} {command_count-custom_command_count:<22}"
+					ui_commands_custom = f" {color.purple('Custom Commands:')} {custom_command_count:<15}"
+					ui_nitro_sniper = f" {color.purple('Nitro Sniper:')} {nitro_sniper}"
+					ui_giveaway_sniper = f" {color.purple('Giveaway Joiner:')} {giveawayjoiner}"
+					ui_riskmode = f" {color.purple('Riskmode:')} {riskmode}"
+					ui_deletetimer = f" {color.purple('Delete Timer:')} {deletetimer}"
+					ui_startup = f" {color.purple('Startup Status:')} {startup_status}"
+					print()
+					print(f"               ═════════════ {color.purple('User')} ═════════════      ═══════════ {color.purple('Settings')} ═══════════")
+					print(f"               {ui_user}     {ui_prefix}")
+					print(f"               {ui_guilds}     {ui_theme}")
+					print(f"               {ui_friends}     {ui_nitro_sniper}")
+					print(f"               ════════════════════════════════      {ui_giveaway_sniper}")
+					print(f"               ═════════════ {color.purple('Luna')} ═════════════      {ui_riskmode}")
+					print(f"               {ui_commands}     {ui_deletetimer}")
+					print(f"               {ui_commands_custom}     {ui_startup}")
+					print(f"               ════════════════════════════════      ════════════════════════════════\n")
+				else:
+					print()
+					print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+					print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Guilds | {color.purple('0')} Friends")
+					print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+			else:
+				command_count = len(bot.commands)
+				cog = bot.get_cog('Custom commands')
+				try:
+					custom = cog.get_commands()
+					custom_command_count = 0
+					for command in custom:
+						custom_command_count += 1
+				except:
+					custom_command_count = 0
+				prefix = files.json("Luna/config.json", "prefix", documents=True)
+				print(motd.center(os.get_terminal_size().columns))
+				if beta:
+					print("Beta Build".center(os.get_terminal_size().columns))
+				prefix = files.json("Luna/config.json", "prefix", documents=True)
+				console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+				if console_mode == "2":
+					riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
+					themesvar = files.json("Luna/config.json", "theme", documents=True)
+					deletetimer = int(files.json("Luna/config.json", "delete_timer", documents=True))
+					startup_status = files.json("Luna/config.json", "startup_status", documents=True)
+					nitro_sniper = files.json("Luna/snipers/nitro.json", "sniper", documents=True)
+					giveawayjoiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
+					if themesvar == "default":
+						pass
+					else:
+						themesvar = themesvar[:-5]
+					bot_user = f"{bot.user}"
+					ui_user = f" {color.purple('User:')} {bot_user:<26}"
+					ui_guilds = f" {color.purple('Guilds:')} {len(bot.guilds):<24}"
+					ui_friends = f" {color.purple('Friends:')} {len(bot.user.friends):<23}"
+					ui_prefix = f" {color.purple('Prefix:')} {prefix:<24}"
+					ui_theme = f" {color.purple('Theme:')} {themesvar:<25}"
+					ui_commands = f" {color.purple('Commands:')} {command_count-custom_command_count:<22}"
+					ui_commands_custom = f" {color.purple('Custom Commands:')} {custom_command_count:<15}"
+					ui_nitro_sniper = f" {color.purple('Nitro Sniper:')} {nitro_sniper}"
+					ui_giveaway_sniper = f" {color.purple('Giveaway Joiner:')} {giveawayjoiner}"
+					ui_riskmode = f" {color.purple('Riskmode:')} {riskmode}"
+					ui_deletetimer = f" {color.purple('Delete Timer:')} {deletetimer}"
+					ui_startup = f" {color.purple('Startup Status:')} {startup_status}"
+					print()
+					print(f"               ═════════════ {color.purple('User')} ═════════════      ═══════════ {color.purple('Settings')} ═══════════")
+					print(f"               {ui_user}     {ui_prefix}")
+					print(f"               {ui_guilds}     {ui_theme}")
+					print(f"               {ui_friends}     {ui_nitro_sniper}")
+					print(f"               ════════════════════════════════      {ui_giveaway_sniper}")
+					print(f"               ═════════════ {color.purple('Luna')} ═════════════      {ui_riskmode}")
+					print(f"               {ui_commands}     {ui_deletetimer}")
+					print(f"               {ui_commands_custom}     {ui_startup}")
+					print(f"               ════════════════════════════════      ════════════════════════════════\n")
+				else:
+					print()
+					print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+					print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends")
+					print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+		else:
+			await mode_error(ctx, "1 or 2")
+
 	@commands.command(name = "reload",
 					usage="",
 					description = "Reload custom commands")
 	async def reload(self, ctx):
 		await ctx.message.delete()
-		path = getattr(sys, '_MEIPASS', os.getcwd())
-		cogs_path = path + "\\cogs"
-		luna.loader_check()
-		for filename in os.listdir(cogs_path):
-			if filename.endswith(".py"):
-				bot.reload_extension(f"cogs.{filename[:-3]}")
-		prints.message(f"Reloaded custom commands")
-		await embed_builder(ctx, description=f"```\nReloaded custom commands```")
+		prefix = files.json("Luna/config.json", "prefix", documents=True)
+		# path = getattr(sys, '_MEIPASS', os.getcwd())
+		# cogs_path = path + "\\cogs"
+		# luna.loader_check()
+		# for filename in os.listdir(cogs_path):
+		# 	if filename.endswith(".py"):
+		# 		bot.reload_extension(f"cogs.{filename[:-3]}")
+		# prints.message(f"Reloaded custom commands")
+		# await embed_builder(ctx, description=f"```\nReloaded custom commands```")
+		await embed_builder(ctx, description=f"```\nReload has been disabled until further notice, use {prefix}restart instead```")
 
 bot.add_cog(SettingsCog(bot))
+class CustomCog(commands.Cog, name="Custom commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+	try:
+		file = open(os.path.join(files.documents(), "Luna/custom/custom.py"), "r")
+		file_data = file.read()
+		if "sys.modules" in str(file_data):
+			prints.error("Using sys.modules is not allowed.")
+			time.sleep(5)
+			os._exit(0)
+		if "inspect" and "import" in str(file_data):
+			prints.error("Importing inspect is not allowed.")
+			time.sleep(5)
+			os._exit(0)
+		if "dill" and "import" in str(file_data):
+			prints.error("Importing dill is not allowed.")
+			time.sleep(5)
+			os._exit(0)
+		if "exec" in str(file_data):
+			prints.error("Using exec is not allowed.")
+			time.sleep(5)
+			os._exit(0)
+		if "auth_luna" in str(file_data):
+			prints.error("\"auth_luna\" not allowed.")
+			time.sleep(5)
+			os._exit(0)
+		if "atlas" in str(file_data):
+			prints.error("\"atlas\" not allowed.")
+			time.sleep(5)
+			os._exit(0)
+		exec(file_data)
+	except Exception as e:
+		prints.error(e)
+		os.system('pause')
 
+bot.add_cog(CustomCog(bot))
 class ShareCog(commands.Cog, name="Share commands"):
     def __init__(self, bot:commands.bot):
         self.bot = bot
@@ -12732,6 +13122,8 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 					description = "Updates Luna")
 	async def update(self, luna):
 		await luna.message.delete()
+		r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
+		version_url = r["version"]
 		if developer_mode:
 			await embed_builder(luna, title="Update", description=f"```\nDeveloper mode active! No updates will be downloaded.```")
 		elif version == version_url:
@@ -12750,23 +13142,23 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 					description = "Restart Luna")
 	async def restart(self, luna):
 		await luna.message.delete()
-		if configs.mode() == 2:
-			sent = await luna.send(f"```ini\n[ Restarting ]\n\nAllow up to 5 seconds\n\n[ {theme.footer()} ]```")
-			await asyncio.sleep(3)
-			await sent.delete()
-		if configs.mode() == 3:
-			sent = await luna.send(f"> **Restarting**\n> \n> Allow up to 5 seconds\n> \n> {theme.footer()}")
-			await asyncio.sleep(3)
-			await sent.delete()
-		else:
-			embed = discord.Embed(title="Restarting", url=theme.title_url(), description=f"```\nAllow up to 5 seconds```", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			sent = await luna.send(embed=embed)
-			await asyncio.sleep(3)
-			await sent.delete()
+		# if configs.mode() == 2:
+		# 	sent = await luna.send(f"```ini\n[ Restarting ]\n\nAllow up to 5 seconds\n\n[ {theme.footer()} ]```")
+		# 	await asyncio.sleep(3)
+		# 	await sent.delete()
+		# if configs.mode() == 3:
+		# 	sent = await luna.send(f"> **Restarting**\n> \n> Allow up to 5 seconds\n> \n> {theme.footer()}")
+		# 	await asyncio.sleep(3)
+		# 	await sent.delete()
+		# else:
+		# 	embed = discord.Embed(title="Restarting", url=theme.title_url(), description=f"```\nAllow up to 5 seconds```", color=theme.hex_color())
+		# 	embed.set_thumbnail(url=theme.image_url())
+		# 	embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+		# 	embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+		# 	embed.set_image(url=theme.large_image_url())
+		# 	sent = await luna.send(embed=embed)
+		# 	await asyncio.sleep(3)
+		# 	await sent.delete()
 		restart_program()
 
 	@commands.command(name = "shutdown",
@@ -12800,9 +13192,8 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 					description = "Clear the console")
 	async def clear(self, ctx):
 		await ctx.message.delete()
-
+		luna.console(clear=True)
 		if privacy:
-			luna.console(clear=True)
 			command_count = len(bot.commands)
 			cog = bot.get_cog('Custom commands')
 			try:
@@ -12816,14 +13207,47 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 			print(motd.center(os.get_terminal_size().columns))
 			if beta:
 				print("Beta Build".center(os.get_terminal_size().columns))
-			print()
-			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-			print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Guilds | {color.purple('0')} Friends")
-			print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+			prefix = files.json("Luna/config.json", "prefix", documents=True)
+			console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+			if console_mode == "2":
+				riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
+				themesvar = files.json("Luna/config.json", "theme", documents=True)
+				deletetimer = int(files.json("Luna/config.json", "delete_timer", documents=True))
+				startup_status = files.json("Luna/config.json", "startup_status", documents=True)
+				nitro_sniper = files.json("Luna/snipers/nitro.json", "sniper", documents=True)
+				giveawayjoiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
+				if themesvar == "default":
+					pass
+				else:
+					themesvar = themesvar[:-5]
+				ui_user = f" {color.purple('User:')} {'Luna#0000':<26}"
+				ui_guilds = f" {color.purple('Guilds:')} {'0':<24}"
+				ui_friends = f" {color.purple('Friends:')} {'0':<23}"
+				ui_prefix = f" {color.purple('Prefix:')} {prefix:<24}"
+				ui_theme = f" {color.purple('Theme:')} {themesvar:<25}"
+				ui_commands = f" {color.purple('Commands:')} {command_count-custom_command_count:<22}"
+				ui_commands_custom = f" {color.purple('Custom Commands:')} {custom_command_count:<15}"
+				ui_nitro_sniper = f" {color.purple('Nitro Sniper:')} {nitro_sniper}"
+				ui_giveaway_sniper = f" {color.purple('Giveaway Joiner:')} {giveawayjoiner}"
+				ui_riskmode = f" {color.purple('Riskmode:')} {riskmode}"
+				ui_deletetimer = f" {color.purple('Delete Timer:')} {deletetimer}"
+				ui_startup = f" {color.purple('Startup Status:')} {startup_status}"
+				print()
+				print(f"               ═════════════ {color.purple('User')} ═════════════      ═══════════ {color.purple('Settings')} ═══════════")
+				print(f"               {ui_user}     {ui_prefix}")
+				print(f"               {ui_guilds}     {ui_theme}")
+				print(f"               {ui_friends}     {ui_nitro_sniper}")
+				print(f"               ════════════════════════════════      {ui_giveaway_sniper}")
+				print(f"               ═════════════ {color.purple('Luna')} ═════════════      {ui_riskmode}")
+				print(f"               {ui_commands}     {ui_deletetimer}")
+				print(f"               {ui_commands_custom}     {ui_startup}")
+				print(f"               ════════════════════════════════      ════════════════════════════════\n")
+			else:
+				print()
+				print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+				print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Guilds | {color.purple('0')} Friends")
+				print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
 		else:
-			luna.console(clear=True)
 			command_count = len(bot.commands)
 			cog = bot.get_cog('Custom commands')
 			try:
@@ -12837,12 +13261,49 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 			print(motd.center(os.get_terminal_size().columns))
 			if beta:
 				print("Beta Build".center(os.get_terminal_size().columns))
-			print()
-			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-			print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends")
-			print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+			prefix = files.json("Luna/config.json", "prefix", documents=True)
+			console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+			if console_mode == "2":
+				riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
+				themesvar = files.json("Luna/config.json", "theme", documents=True)
+				deletetimer = int(files.json("Luna/config.json", "delete_timer", documents=True))
+				startup_status = files.json("Luna/config.json", "startup_status", documents=True)
+				nitro_sniper = files.json("Luna/snipers/nitro.json", "sniper", documents=True)
+				giveawayjoiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
+				if themesvar == "default":
+					pass
+				else:
+					themesvar = themesvar[:-5]
+				bot_user = f"{bot.user}"
+				ui_user = f" {color.purple('User:')} {bot_user:<26}"
+				ui_guilds = f" {color.purple('Guilds:')} {len(bot.guilds):<24}"
+				ui_friends = f" {color.purple('Friends:')} {len(bot.user.friends):<23}"
+				ui_prefix = f" {color.purple('Prefix:')} {prefix:<24}"
+				ui_theme = f" {color.purple('Theme:')} {themesvar:<25}"
+				ui_commands = f" {color.purple('Commands:')} {command_count-custom_command_count:<22}"
+				ui_commands_custom = f" {color.purple('Custom Commands:')} {custom_command_count:<15}"
+				ui_nitro_sniper = f" {color.purple('Nitro Sniper:')} {nitro_sniper}"
+				ui_giveaway_sniper = f" {color.purple('Giveaway Joiner:')} {giveawayjoiner}"
+				ui_riskmode = f" {color.purple('Riskmode:')} {riskmode}"
+				ui_deletetimer = f" {color.purple('Delete Timer:')} {deletetimer}"
+				ui_startup = f" {color.purple('Startup Status:')} {startup_status}"
+				print()
+				print(f"               ═════════════ {color.purple('User')} ═════════════      ═══════════ {color.purple('Settings')} ═══════════")
+				print(f"               {ui_user}     {ui_prefix}")
+				print(f"               {ui_guilds}     {ui_theme}")
+				print(f"               {ui_friends}     {ui_nitro_sniper}")
+				print(f"               ════════════════════════════════      {ui_giveaway_sniper}")
+				print(f"               ═════════════ {color.purple('Luna')} ═════════════      {ui_riskmode}")
+				print(f"               {ui_commands}     {ui_deletetimer}")
+				print(f"               {ui_commands_custom}     {ui_startup}")
+				print(f"               ════════════════════════════════      ════════════════════════════════\n")
+			else:
+				print()
+				print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+				print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends")
+				print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+		print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+		prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 
 	@commands.command(name = "covid",
 					aliases=['corona'],
@@ -13079,8 +13540,13 @@ async def error_builder(luna, description=""):
 
 # ///////////////////////////////////////////////////////////////
 # Main Thread, Don't Touch
+
 if not developer_mode:
 	check_debuggers_thread()
+
+if os.path.splitext(__file__)[1] == ".pyc":
+	os._exit(0)
+
 luna.title("Luna")
 luna.file_check()
 luna.authentication()

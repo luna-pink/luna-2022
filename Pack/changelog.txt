@@ -1,1 +1,6 @@
-[!] Fixed Luna crashing on login for some people
+[+] Added (prefix)console
+[+] Added second console design (change with console command)
+[!] Fixed issue with ghostping webhook
+[/] Improved security
+[/] Improved (prefix)settings
+[/] Changed console logo

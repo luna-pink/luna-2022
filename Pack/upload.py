@@ -94,6 +94,9 @@ async def on_ready():
     announcement_channel = upload_guild.get_channel(announcement_channel_id)
     ping_role = upload_guild.get_role(luna_role)
 
+# ///////////////////////////////////////////////////////////////
+# With Mention
+
     announcement = f"""{ping_role.mention}
 
 > Luna {version} has been released.
@@ -102,6 +105,18 @@ async def on_ready():
 > Use (p)update or restart Luna to force the update.
 > 
 > Changelogs in #changelogs"""
+
+# ///////////////////////////////////////////////////////////////
+# Without Mention
+
+#     announcement = f"""> Luna {version} has been released.
+# > 
+# > Wait 15 minutes for Luna to automatically update it.
+# > Use (p)update or restart Luna to force the update.
+# > 
+# > Changelogs in #changelogs"""
+
+# ///////////////////////////////////////////////////////////////
 
     if not overwrite:
         try:
