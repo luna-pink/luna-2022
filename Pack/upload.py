@@ -16,6 +16,7 @@ version_url = r["version"]
 print()
 print(f"Current version: {version_url}")
 version = input("What should the new version be?: ")
+print()
 
 # ///////////////////////////////////////////////////////////////
 
