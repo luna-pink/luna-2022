@@ -4661,7 +4661,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 			beta_info = f" Beta Build"
 		else:
 			beta_info = ""
-		await embed_builder(luna, description=f"```\nMOTD\n\n{motd}\n``````\nVersion\n\n{version}{beta_info}\n``````\nUptime\n\n{hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds\n``````\nCommands\n\n{command_count-custom_command_count}\n``````\nCustom commands\n\n{custom_command_count}\n``````\nEnviroment\n\nDiscord.py » {discord.__version__}\n``````\nPublic server invite\n\nhttps://discord.gg/Kxyv7NHVED\n``````\nCustomer only server invite\n\nhttps://discord.gg/3FGEaCnZST\n``````\nWebsite\n\nhttps://team-luna.org\n```")
+		await embed_builder(luna, description=f"```\nMOTD\n\n{motd}\n``````\nVersion\n\n{version}{beta_info}\n``````\nUptime\n\n{hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds\n``````\nCommands\n\n{command_count-custom_command_count}\n``````\nCustom commands\n\n{custom_command_count}\n``````\nEnviroment\n\nDiscord.py » {discord.__version__}\n``````\nPublic server invite\n\nhttps://discord.gg/rnq876Kcd7\n``````\nCustomer only server invite\n\nhttps://discord.gg/3FGEaCnZST\n``````\nWebsite\n\nhttps://team-luna.org\n```")
 
 	@commands.command(name = "repeat",
 						usage="",
