@@ -4045,16 +4045,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 				if configs.error_log() == "console":
 					prints.error(f"No command found with name or alias {color.purple(commandName)}")
 				else:
-					embed = discord.Embed(
-						title="Error",
-						description=f"```\nNo command found with name or alias {commandName}```",
-						color=0xff0000
-					)
-					embed.set_thumbnail(url=theme.image_url())
-					embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-					embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-					embed.set_image(url=theme.large_image_url())
-					await send(luna, embed)
+					await error_builder(luna, f"```\nNo command found with name or alias {commandName}```")
 			else:
 				if configs.mode() == 2:
 					aliases = commandName2.aliases
@@ -5690,12 +5681,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
 				if configs.error_log() == "console":
 					prints.error("Invalid name length, needs to be over 3 characters long")
 				else:
-					embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nInvalid name length, needs to be over 3 characters long```", color=0xff0000)
-					embed.set_thumbnail(url=theme.image_url())
-					embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-					embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-					embed.set_image(url=theme.large_image_url())
-					await send(luna, embed)
+					await error_builder(luna, description=f"```\nInvalid name length, needs to be over 3 characters long```")
 
 	@commands.command(name = "stopanimguild",
 						usage="",
@@ -7504,12 +7490,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 			if configs.error_log() == "console":
 				prints.error(f"A note already exists with the name » {color.purple(name)}")
 			else:
-				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nA note already exists with the name » {name}```", color=0xff0000)
-				embed.set_thumbnail(url=theme.image_url())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				embed.set_image(url=theme.large_image_url())
-				await send(luna, embed)
+				await error_builder(luna, description=f"```\nA note already exists with the name » {name}```")
 		else:
 			file = open(os.path.join(files.documents(), f"Luna/notes/{name}.txt"), "w")
 			file.write(str(text))
@@ -7532,12 +7513,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 			if configs.error_log() == "console":
 				prints.error(f"No note exists with the name » {color.purple(name)}")
 			else:
-				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nNo note exists with the name » {name}```", color=0xff0000)
-				embed.set_thumbnail(url=theme.image_url())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				embed.set_image(url=theme.large_image_url())
-				await send(luna, embed)
+				await error_builder(luna, description=f"```\nNo note exists with the name » {name}```")
 		else:
 			os.rename(os.path.join(files.documents(), f"Luna/notes/{name}.txt"),os.path.join(files.documents(), f"Luna/notes/{themename}.txt"))
 			prints.message(f"Edited note {name} to » {color.purple(themename)}")
@@ -7568,12 +7544,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 			if configs.error_log() == "console":
 				prints.error(f"There is no note called » {color.purple(name)}")
 			else:
-				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nThere is no note called » {name}```", color=0xff0000)
-				embed.set_thumbnail(url=theme.image_url())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				embed.set_image(url=theme.large_image_url())
-				await send(luna, embed)
+				await error_builder(luna, description=f"```\nThere is no note called » {name}```")
 
 	@commands.command(name = "sendnote",
 					usage="<name>",
@@ -7585,12 +7556,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 			if configs.error_log() == "console":
 				prints.error(f"No note exists with the name » {color.purple(name)}")
 			else:
-				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nNo note exists with the name » {name}```", color=0xff0000)
-				embed.set_thumbnail(url=theme.image_url())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				embed.set_image(url=theme.large_image_url())
-				await send(luna, embed)
+				await error_builder(luna, description=f"```\nNo note exists with the name » {name}```")
 		else:
 			if name.endswith('.txt'):
 				name = name[:-4]
@@ -7606,12 +7572,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 			if configs.error_log() == "console":
 				prints.error(f"No note exists with the name » {color.purple(name)}")
 			else:
-				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nNo note exists with the name » {name}```", color=0xff0000)
-				embed.set_thumbnail(url=theme.image_url())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				embed.set_image(url=theme.large_image_url())
-				await send(luna, embed)
+				await error_builder(luna, description=f"```\nNo note exists with the name » {name}```")
 		else:
 			file = open(os.path.join(files.documents(), f"Luna/notes/{name}.txt"), "r")
 			file_data = file.read()
@@ -7619,12 +7580,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 				if configs.error_log() == "console":
 					prints.error(f"The note is empty")
 				else:
-					embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nThe note is empty```", color=0xff0000)
-					embed.set_thumbnail(url=theme.image_url())
-					embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-					embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-					embed.set_image(url=theme.large_image_url())
-					await send(luna, embed)
+					await error_builder(luna, description=f"```\nThe note is empty```")
 			else:
 				embed = discord.Embed(title="Notes", description=f"```\nContent of {name}.txt ↴\n\n{str(file_data)}```", color=theme.hex_color())
 				embed.set_thumbnail(url=theme.image_url())
@@ -8637,12 +8593,9 @@ class UtilsCog(commands.Cog, name="Util commands"):
 					description = "Change Hypesquad house")
 	async def hypesquad(self, luna, house:str):
 		await luna.message.delete()
-		with open('./config.json') as f:
-			config = json.load(f)
-		token = config.get('token')
 		request = requests.session()
 		headers = {
-			'Authorization': token,
+			'Authorization': user_token,
 			'Content-Type': 'application/json'
 		}
 
@@ -8654,7 +8607,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 			payload = {'house_id': 3}
 
 		try:
-			request.post('https://discordapp.com/api/v6/hypesquad/online', headers=headers, json=payload)
+			request.post('https://discordapp.com/api/v9/hypesquad/online', headers=headers, json=payload)
 			prints.message(f"Successfully set your hypesquad house to {house}")
 			embed = discord.Embed(title="Hypesquad", url=theme.title_url(), description=f"```\nSuccessfully set your hypesquad house to {house}```", color=theme.hex_color())
 			embed.set_thumbnail(url=theme.image_url())
@@ -8663,15 +8616,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 			embed.set_image(url=theme.large_image_url())
 			await send(luna, embed)
 		except:
-			if configs.error_log() == "console":
-				prints.error("Failed to set your hypesquad house")
-			else:
-				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nFailed to set your hypesquad house```", color=0xff0000)
-				embed.set_thumbnail(url=theme.image_url())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				embed.set_image(url=theme.large_image_url())
-				await send(luna, embed)
+			await error_builder(luna, description=f"```\nFailed to set your hypesquad house```")
 
 	@commands.command(name = "acceptfriends",
 					usage="",
@@ -9450,12 +9395,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 					prints.error(f"{_token} failed to join {invitelink}")
 					pass
 		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "proxyjoin",
 					usage="<invitelink>",
@@ -9484,12 +9424,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 					prints.error(f"[PROXY] {_token} failed to join {invitelink}")
 					pass
 		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "raidspam",
 					usage="<channel_id> <amount> <message>",
@@ -9511,12 +9446,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 					prints.error(f"{_token} failed to send {message}")
 					pass
 		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "proxyspam",
 					usage="<channel_id> <amount> <message>",
@@ -9547,12 +9477,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 					prints.error(f"{_token} failed to send {message}")
 					pass
 		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "raidmassping",
 					usage="<channel_id> <delay> <amount>",
@@ -9601,12 +9526,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 			if configs.error_log() == "console":
 				prints.error("Riskmode is disabled")
 			else:
-				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-				embed.set_thumbnail(url=theme.image_url())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				embed.set_image(url=theme.large_image_url())
-				await send(luna, embed)
+				await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "raidmassping",
 					usage="<channel_id> <delay> <amount>",
@@ -9655,12 +9575,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 			if configs.error_log() == "console":
 				prints.error("Riskmode is disabled")
 			else:
-				embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-				embed.set_thumbnail(url=theme.image_url())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				embed.set_image(url=theme.large_image_url())
-				await send(luna, embed)
+				await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "raidleave",
 					usage="<server_id>",
@@ -9681,12 +9596,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 					prints.error(f"{_token} failed to leave {server_id}")
 					pass
 		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "proxyleave",
 					usage="<server_id>",
@@ -9715,12 +9625,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 					prints.error(f"[PROXY] {_token} failed to leave {server_id}")
 					pass
 		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "raidreact",
 					usage="<channel_id> <message_id> <emoji>",
@@ -9740,12 +9645,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 					prints.error(f"{_token} failed to react on {message_id}")
 					pass
 		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "proxyreact",
 					usage="<channel_id> <message_id> <emoji>",
@@ -9773,12 +9673,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 					prints.error(f"{_token} failed to react on {message_id}")
 					pass
 		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 bot.add_cog(RaidCog(bot))
 
@@ -9807,12 +9702,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 			except Exception:
 				pass
 		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "messtoken",
 					usage="<token>",
@@ -9845,12 +9735,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 			except Exception:
 				return
 		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+			await error_builder(luna, description="```\nRiskmode is disabled```")
         
 	@commands.command(name = "massban",
 					usage="<guild_id>",
@@ -9877,12 +9762,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 						await asyncio.sleep(2)
 			prints.message(f"Finished banning in » {color.purple(elapsed)}s")
 		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "masskick",
 					usage="<guild_id>",
@@ -9909,12 +9789,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 						await asyncio.sleep(2)
 			prints.message(f"Finished kicking in » {color.purple(elapsed)}s")
 		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "annihilate",
 					aliases=['destroy', 'wipe', 'nukeserver'],
@@ -9955,7 +9830,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 						prints.error(f"Failed to delete role » {color.purple(role)}")
 			prints.message(f"Finished deleting in » {color.purple(elapsed)}ms")
 		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
+			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 bot.add_cog(NukingCog(bot))
 class PrivacyCog(commands.Cog, name="Privacy commands"):
