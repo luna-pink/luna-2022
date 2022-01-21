@@ -1,10 +1,11 @@
-import discord
-import requests
-from discord import *
-from CEA256 import *
-from discord.ext import commands
 import json
 import os
+
+import discord
+import requests
+from CEA256 import *
+from discord import *
+from discord.ext import commands
 
 # ///////////////////////////////////////////////////////////////
 
@@ -12,8 +13,10 @@ r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 updater_url = r["updater"]
 version_url = r["version"]
 
+print()
 print(f"Current version: {version_url}")
 version = input("What should the new version be?: ")
+print()
 
 # ///////////////////////////////////////////////////////////////
 
@@ -92,6 +95,9 @@ async def on_ready():
     announcement_channel = upload_guild.get_channel(announcement_channel_id)
     ping_role = upload_guild.get_role(luna_role)
 
+# ///////////////////////////////////////////////////////////////
+# With Mention
+
     announcement = f"""{ping_role.mention}
 
 > Luna {version} has been released.
@@ -100,6 +106,18 @@ async def on_ready():
 > Use (p)update or restart Luna to force the update.
 > 
 > Changelogs in #changelogs"""
+
+# ///////////////////////////////////////////////////////////////
+# Without Mention
+
+#     announcement = f"""> Luna {version} has been released.
+# > 
+# > Wait 15 minutes for Luna to automatically update it.
+# > Use (p)update or restart Luna to force the update.
+# > 
+# > Changelogs in #changelogs"""
+
+# ///////////////////////////////////////////////////////////////
 
     if not overwrite:
         try:

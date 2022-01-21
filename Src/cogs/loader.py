@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import re
 import sys
@@ -25,7 +27,6 @@ import pyPrivnote
 import subprocess
 import pypresence
 import ctypes.wintypes as wintypes
-from CEA256 import *
 from gtts import gTTS
 from discord import *
 from ctypes import windll

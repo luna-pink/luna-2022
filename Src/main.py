@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import re
 import sys
@@ -17,31 +19,60 @@ import psutil
 import typing
 import aiohttp
 import asyncio
-import discord
 import hashlib
 import pwinput
 import requests
+import platform
 import threading
 import subprocess
 import pypresence
+
 import pyPrivnote as pn
 import ctypes.wintypes as wintypes
-from CEA256 import *
+
 from gtts import gTTS
-from discord import *
 from ctypes import windll
 from notifypy import Notify
-from os import error, name, system
+from os import error, name, remove, system
 from datetime import datetime
 from pypresence import Presence
 from discord.ext import commands
 from urllib.request import urlopen
 from urllib.parse import non_hierarchical, quote_plus
 from time import localtime, strftime
-from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFound, has_permissions
+
+import discord
+from discord import *
+from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFound, core, has_permissions
 
 # ///////////////////////////////////////////////////////////////
 # Luna Variables
+
+antiraid = False
+antiinvite = False
+antiupper = False
+antiphishing = False
+
+active_protections = 0
+active_list = []
+
+phishing_list = [
+	"discordgg.",
+	"withereum.com",
+	"amazon.com/exec/obidos",
+	"csgo500.org",
+	"steamconmunity",
+	"steamcommunuty",
+	"steamconmunuty",
+	"steamcommunity.ru",
+	"crypto24cap",
+	"steamcummynutu.ru",
+	"discordgifts.one",
+	"discordgifts"
+]
+
+# ///////////////////////////////////////////////////////////////
+# Luna Protections
 
 cooldown = []
 nitro_cooldown = []
@@ -51,14 +82,13 @@ afk_reset = 0
 user_token = ""
 whitelisted_users = {}
 crosshairmode = 0
-antiraid = False
 privacy = False
 copycat = None
 chargesniper = False
 
 developer_mode = False
 beta = False
-version = '3.1.1'
+version = '3.2.6'
 
 r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 updater_url = r["updater"]
@@ -99,7 +129,6 @@ import pyPrivnote
 import subprocess
 import pypresence
 import ctypes.wintypes as wintypes
-from CEA256 import *
 from gtts import gTTS
 from discord import *
 from ctypes import windll
@@ -205,6 +234,631 @@ STDOUT = -11
 hdl = windll.kernel32.GetStdHandle(STDOUT)
 bufsize = wintypes._COORD(102, 9001)
 windll.kernel32.SetConsoleScreenBufferSize(hdl, bufsize)
+
+# ///////////////////////////////////////////////////////////////
+# Changed CEA256
+
+class Misc:
+    def GenerateKey():
+        characters = string.ascii_letters + string.digits
+        generate_string = "".join(random.sample(characters, 32))
+        return generate_string
+
+    def XOR(ptext, key):
+        xored = []
+        for x in range(len(ptext)):
+            xored.append(chr(ord(ptext[x]) ^ ord(key[x % len(key)])))
+            
+        
+        return "".join(xored)
+
+    def CipherEncode(plaintext):
+        normal_numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+        normal_low = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "u", "v", "x", "y", "z"]
+        normal_caps = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "U", "V", "X", "Y", "Z"]
+        ciphered_low = ["c", "e", "a", "b", "i", "f", "d", "h", "g", "n", "l", "k", "q", "j", "r", "p", "o", "m", "u", "s", "y", "x", "v", "z"]
+        ciphered_caps = ["C", "E", "A", "B", "I", "F", "D", "H", "G", "N", "L", "K", "Q", "J", "R", "P", "O", "M", "U", "S", "Y", "X", "V", "Z"]
+        ciphered_numbers = ["0", "5", "3", "2", "8", "1", "9", "7", "4", "6"]
+        text_length = len(plaintext)
+        encoded_text = []
+
+        for x in range(text_length):
+            if plaintext[x] in normal_low:
+                index = normal_low.index(plaintext[x])
+                ciphered_letter = ciphered_low[index]
+                encoded_text.append(ciphered_letter)
+            elif plaintext[x] in normal_caps:
+                index = normal_caps.index(plaintext[x])
+                ciphered_letter = ciphered_caps[index]
+                encoded_text.append(ciphered_letter)
+            elif plaintext[x] in normal_numbers:
+                index = normal_numbers.index(plaintext[x])
+                ciphered_letter = ciphered_numbers[index]
+                encoded_text.append(ciphered_letter)
+            else:
+                encoded_text.append(plaintext[x])
+        
+        return "".join(encoded_text)
+
+    def CipherDecode(encodedtext):
+        normal_numbers =  ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+        normal_low = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "u", "v", "x", "y", "z"]
+        normal_caps = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "U", "V", "X", "Y", "Z"]
+        ciphered_low = ["c", "e", "a", "b", "i", "f", "d", "h", "g", "n", "l", "k", "q", "j", "r", "p", "o", "m", "u", "s", "y", "x", "v", "z"]
+        ciphered_caps = ["C", "E", "A", "B", "I", "F", "D", "H", "G", "N", "L", "K", "Q", "J", "R", "P", "O", "M", "U", "S", "Y", "X", "V", "Z"]
+        ciphered_numbers = ["0", "5", "3", "2", "8", "1", "9", "7", "4", "6"]
+        text_length = len(encodedtext)
+        plain_text = []
+
+        for x in range(text_length):
+            if encodedtext[x] in ciphered_low:
+                index = ciphered_low.index(encodedtext[x])
+                normal_letter = normal_low[index]
+                plain_text.append(normal_letter)
+            elif encodedtext[x] in ciphered_caps:
+                index = ciphered_caps.index(encodedtext[x])
+                normal_letter = normal_caps[index]
+                plain_text.append(normal_letter)
+            elif encodedtext[x] in ciphered_numbers:
+                index = ciphered_numbers.index(encodedtext[x])
+                normal_letter = normal_numbers[index]
+                plain_text.append(normal_letter)
+            else:
+                plain_text.append(encodedtext[x])
+        
+        return "".join(plain_text)
+        
+
+class Encryption:
+    def __init__(self, key = Misc.GenerateKey(), encoding = 1):
+        self.key = key
+        self.encoding = encoding
+
+    def CEA256(self, plain_text):
+
+        ################# VARIABLES >>
+
+        key_value = 0
+        temp_value = 0
+        cipher_encoded = Misc.CipherEncode(plain_text)
+        temp_data = ""
+        semi_encryption = []
+        final_dencryption = []
+        key_decimals = []
+        plain_decimals = []
+        encrypted_decimals = []
+
+        ################# FUNCTIONS >>
+
+        if len(self.key) != 32:
+            return "InvalidKeyLength"
+        
+        for x in range(len(cipher_encoded)): ##### Plain Text Conversion
+            letter = cipher_encoded[x]
+            plain_decimals.append(ord(letter))
+
+        for x in range(len(self.key)): ##### Key Conversion
+            letter = self.key[x]
+            key_decimals.append(ord(letter))
+
+        for x in key_decimals:
+            temp_value = key_value
+            key_value = temp_value + x
+
+        for x in plain_decimals:
+            encrypted_decimals.append(x * key_value)
+
+        for x in encrypted_decimals:
+            semi_encryption.append(f"{Misc.XOR(str(x), self.key)}:")
+
+        temp_data = "".join(semi_encryption)
+        length = len(temp_data) - 1
+        first_part = temp_data[:length]
+        second_part = temp_data[length+1:]
+        temp_data = first_part + second_part
+
+        return base64.b64encode(f"{temp_data}".encode()).decode()
+
+
+class Decryption:
+    def __init__(self, key, encoding = 1):
+        self.key = key
+        self.encoding = encoding
+
+    def CEA256(self, encoded_text):
+
+        ################# VARIABLES >>
+
+        key_value = 0
+        tmep_value = 0
+        splits = 0
+        cipher_encoded = base64.b64decode(encoded_text).decode()
+        temp_data = ""
+        split_data = []
+        key_decimals = []
+        plain_decimals = []
+        encrypted_decimals = []
+        decrypted_text_one = []
+        decrypted_data = ""
+
+        ################# FUNCTIONS >> 
+
+        for x in range(len(cipher_encoded)):
+            character = cipher_encoded[x]
+            if character == ":":
+                splits += 1
+            else:
+                pass
+        
+        splits += 1
+        
+        for x in range(splits):
+            split_data.append(int(f"{Misc.XOR(cipher_encoded.split(':')[x], self.key)}"))
+        
+        for x in range(len(self.key)):
+            key_decimals.append(ord(self.key[x]))
+
+        for x in key_decimals:
+            temp_value = key_value
+            key_value = temp_value + x       
+
+        for x in split_data:
+            plain_decimals.append(int(x / key_value)) 
+
+        for x in plain_decimals:
+            decrypted_text_one.append(chr(x))
+
+        decrypted_data = Misc.CipherDecode("".join(decrypted_text_one))
+
+        return decrypted_data
+
+###
+# CEAShim LTSB (Long Term Support Base)
+# This version of CEA is designed to be a Fork of the original CEA that only receives updates when the server receives a CEA update.
+# Do not update this file as the server will not accept it as a valid cipher hash. (This feature is not yet implemented)
+# For all other purposes not pertaining to authentication via the AtlasProviderAPI, please use the original CEA.
+### 
+
+class CEAMisc:
+    def GetShimVersion():
+        """
+        The function that returns the version of the shim.
+        This is used to determine if the shim is compatible with the current implementation that is built into the Atlas Gateway Server.
+        """
+        return "AtlasProviderAPI-CEA-SHIM - 1.0.0"
+
+    def GenerateKey():
+        characters = string.ascii_letters + string.digits
+        generate_string = "".join(random.sample(characters, 32))
+        return generate_string
+
+    def XOR(ptext, key):
+        xored = []
+        for x in range(len(ptext)):
+            xored.append(chr(ord(ptext[x]) ^ ord(key[x % len(key)])))
+            
+        
+        return "".join(xored)
+
+    def CipherEncode(plaintext):
+        normal_numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+        normal_low = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "u", "v", "x", "y", "z"]
+        normal_caps = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "U", "V", "X", "Y", "Z"]
+        ciphered_low = ["c", "e", "a", "b", "i", "f", "d", "h", "g", "n", "l", "k", "q", "j", "r", "p", "o", "m", "u", "s", "y", "x", "v", "z"]
+        ciphered_caps = ["C", "E", "A", "B", "I", "F", "D", "H", "G", "N", "L", "K", "Q", "J", "R", "P", "O", "M", "U", "S", "Y", "X", "V", "Z"]
+        ciphered_numbers = ["0", "5", "3", "2", "8", "1", "9", "7", "4", "6"]
+        text_length = len(plaintext)
+        encoded_text = []
+
+        for x in range(text_length):
+            if plaintext[x] in normal_low:
+                index = normal_low.index(plaintext[x])
+                ciphered_letter = ciphered_low[index]
+                encoded_text.append(ciphered_letter)
+            elif plaintext[x] in normal_caps:
+                index = normal_caps.index(plaintext[x])
+                ciphered_letter = ciphered_caps[index]
+                encoded_text.append(ciphered_letter)
+            elif plaintext[x] in normal_numbers:
+                index = normal_numbers.index(plaintext[x])
+                ciphered_letter = ciphered_numbers[index]
+                encoded_text.append(ciphered_letter)
+            else:
+                encoded_text.append(plaintext[x])
+        
+        return "".join(encoded_text)
+
+    def CipherDecode(encodedtext):
+        normal_numbers =  ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+        normal_low = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "u", "v", "x", "y", "z"]
+        normal_caps = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "U", "V", "X", "Y", "Z"]
+        ciphered_low = ["c", "e", "a", "b", "i", "f", "d", "h", "g", "n", "l", "k", "q", "j", "r", "p", "o", "m", "u", "s", "y", "x", "v", "z"]
+        ciphered_caps = ["C", "E", "A", "B", "I", "F", "D", "H", "G", "N", "L", "K", "Q", "J", "R", "P", "O", "M", "U", "S", "Y", "X", "V", "Z"]
+        ciphered_numbers = ["0", "5", "3", "2", "8", "1", "9", "7", "4", "6"]
+        text_length = len(encodedtext)
+        plain_text = []
+
+        for x in range(text_length):
+            if encodedtext[x] in ciphered_low:
+                index = ciphered_low.index(encodedtext[x])
+                normal_letter = normal_low[index]
+                plain_text.append(normal_letter)
+            elif encodedtext[x] in ciphered_caps:
+                index = ciphered_caps.index(encodedtext[x])
+                normal_letter = normal_caps[index]
+                plain_text.append(normal_letter)
+            elif encodedtext[x] in ciphered_numbers:
+                index = ciphered_numbers.index(encodedtext[x])
+                normal_letter = normal_numbers[index]
+                plain_text.append(normal_letter)
+            else:
+                plain_text.append(encodedtext[x])
+        
+        return "".join(plain_text)
+        
+
+class CEAEncrypt:
+    def __init__(self, key = CEAMisc.GenerateKey(), encoding = 1):
+        self.key = key
+        self.encoding = encoding
+
+
+    def CEA256(self, plain_text):
+
+        ################# VARIABLES >>
+
+        key_value = 0
+        temp_value = 0
+        cipher_encoded = CEAMisc.CipherEncode(plain_text)
+        temp_data = ""
+        semi_encryption = []
+        final_dencryption = []
+        key_decimals = []
+        plain_decimals = []
+        encrypted_decimals = []
+
+        ################# FUNCTIONS >>
+
+        if len(self.key) != 32:
+            return "InvalidKeyLength"
+        
+        for x in range(len(cipher_encoded)): ##### Plain Text Conversion
+            letter = cipher_encoded[x]
+            plain_decimals.append(ord(letter))
+
+        for x in range(len(self.key)): ##### Key Conversion
+            letter = self.key[x]
+            key_decimals.append(ord(letter))
+
+        for x in key_decimals:
+            temp_value = key_value
+            key_value = temp_value + x
+
+        for x in plain_decimals:
+            encrypted_decimals.append(x * key_value)
+
+        for x in encrypted_decimals:
+            semi_encryption.append(f"{CEAMisc.XOR(str(x), self.key)}:")
+
+        temp_data = "".join(semi_encryption)
+        length = len(temp_data) - 1
+        first_part = temp_data[:length]
+        second_part = temp_data[length+1:]
+        temp_data = first_part + second_part
+
+        return base64.b64encode(f"{temp_data}".encode()).decode()
+
+
+class CEADecrypt:
+    def __init__(self, key, encoding = 1):
+        self.key = key
+        self.encoding = encoding
+
+    def CEA256(self, encoded_text):
+
+        ################# VARIABLES >>
+
+        key_value = 0
+        tmep_value = 0
+        splits = 0
+        cipher_encoded = base64.b64decode(encoded_text).decode()
+        temp_data = ""
+        split_data = []
+        key_decimals = []
+        plain_decimals = []
+        encrypted_decimals = []
+        decrypted_text_one = []
+        decrypted_data = ""
+
+        ################# FUNCTIONS >> 
+
+        for x in range(len(cipher_encoded)):
+            character = cipher_encoded[x]
+            if character == ":":
+                splits += 1
+            else:
+                pass
+        
+        splits += 1
+        
+        for x in range(splits):
+            split_data.append(int(f"{CEAMisc.XOR(cipher_encoded.split(':')[x], self.key)}"))
+        
+        for x in range(len(self.key)):
+            key_decimals.append(ord(self.key[x]))
+
+        for x in key_decimals:
+            temp_value = key_value
+            key_value = temp_value + x       
+
+        for x in split_data:
+            plain_decimals.append(int(x / key_value)) 
+
+        for x in plain_decimals:
+            decrypted_text_one.append(chr(x))
+
+        decrypted_data = CEAMisc.CipherDecode("".join(decrypted_text_one))
+
+        return decrypted_data
+
+# ///////////////////////////////////////////////////////////////
+# Auth API Module
+
+class CustomError(Exception):
+     pass
+
+class Atlas:
+	def __init__(self, host: str, port: int, app_id: str, app_token: str):
+		self.app_id = app_id
+		self.app_token = app_token
+		self.host = host
+		self.port = port
+		self.buffer = 4096
+		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.isConnected = False
+		self.expectedCEAShim = "AtlasProviderAPI-CEA-SHIM - 1.0.0"
+
+	def ProviderVersion(self):
+		return f"0.3.1 - vNext"
+
+	def connect(self):
+		if CEAMisc.GetShimVersion() != self.expectedCEAShim: # Check if correct CEAShim is installed, will also validated by the server in vNext.
+			raise CustomError(f"Invalid CEA SHIM version! Expected version: {self.expectedCEAShim}") 
+		socket = self.socket
+		try:
+			socket.connect((self.host, self.port))
+			if self._send(socket, f"OpCode=0;Caller={self.app_id};").split(";")[0].split("=")[1] == "8":
+				self.isConnected = True
+				self._send(socket, f"OpCode=9;CipherSpec=2;")
+				return True
+			else:
+				pass
+		except Exception as e:
+			raise CustomError(e)
+			
+	def _send(self, socket, payload: str):
+		try:
+			socket.send(payload.encode("utf-8"))
+			return socket.recv(self.buffer).decode("utf-8")
+		except Exception as e:
+			raise CustomError(e)
+
+	def disconnect(self):
+		try:
+			if self.isConnected:
+				self.socket.close()
+				self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		except Exception as e:
+			raise CustomError("{}".format(e))
+
+	def Identify(self, userHandle: str):
+		socket = self.socket
+		try:
+			payloadID = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=10;UserHandle={userHandle};")))
+			responseCode = payloadID.split(";")[0].split("=")[1]
+			responseResult = payloadID.split(";")[1].split("=")[1]
+			if responseCode == "8" and responseResult == "Identified!":
+				return True
+			elif responseCode == "2":
+				raise CustomError("Username not found!")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
+
+
+	def Login(self, username: str, password: str):
+		socket = self.socket
+		try:
+			AuthReponse = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=4;AuthOpCode=1;UserHandle={username};UserPass={password};")))
+			AuthCode = AuthReponse.split(";")[0].split("=")[1]
+			AuthMessage = AuthReponse.split(";")[1].split("=")[1]
+			if AuthCode == "8":
+				match AuthMessage:
+					case "AuthenticationSuccessful":
+						return True
+					case "AuthenticationDisabled":
+						raise CustomError("Account has been disabled, contact support")
+					case "AuthenticationFailed":
+						raise CustomError("Username/Password is invalid")
+			else:
+				raise CustomError("An unknown issue occured while attempting to authenticate")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
+
+	def Register(self, username: str, password: str):
+		socket = self.socket
+		try:
+			RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=4;AuthOpCode=2;UserFullname={username};UserHandle={username};UserPass={password};UserEmail={username}@nomail.com;")))
+			responseCode = RegisterPayload.split(";")[0].split("=")[1]
+			responseResult = RegisterPayload.split(";")[1].split("=")[1]
+			if responseCode == "8":
+				match responseResult:
+					case "Success":
+						return True
+					case "UserAlreadyExists":
+						raise CustomError("User already exists")
+					case "AccountRegistrationFailed":
+						raise CustomError("Registration failed")
+			else:
+				raise CustomError("An unknown issue occured while registering the specified user")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
+
+
+	def InitAppUser(self, hwid: str): # Must be authenticated (See docs)
+		socket = self.socket
+		try:
+			RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=1;HWID={hwid};")))
+			responseCode = RegisterPayload.split(";")[0].split("=")[1]
+			responseResult = RegisterPayload.split(";")[1].split("=")[1]
+			if responseCode == "8":
+				match responseResult:
+					case "AppUserRegistrationSuccessful":
+						return True
+					case "AppUserRegistrationFailed":
+						raise CustomError("Unable to register as application user")
+					case "AppUserHWIDRegistrationFailed":
+						raise CustomError("Unable to register as application user HWID not accepted by server")
+			else:
+				raise CustomError("An unknown issue occured while enrolling application user")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
+
+
+	def DropAppUser(self): # Must be authenticated (See docs)
+		socket = self.socket
+		try:
+			RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=2;")))
+			responseCode = RegisterPayload.split(";")[0].split("=")[1]
+			responseResult = RegisterPayload.split(";")[1].split("=")[1]
+			if responseCode == "8":
+				match responseResult:
+					case "AppUserDeRegistrationSuccessful":
+						return True
+					case "AppUserDeRegistrationFailed":
+						raise CustomError("Unable to deallocate the specified application user")
+			else:
+				raise CustomError("An unknown issue occured while removing the application user")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
+
+	def RedeemEntitlement(self, LicenseKey: str, applicationSKU: str): # Must be authenticated (See docs)
+		socket = self.socket
+		try:
+			RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=3;SLK={LicenseKey};SKU={applicationSKU};")))
+			responseCode = RegisterPayload.split(";")[0].split("=")[1]
+			responseResult = RegisterPayload.split(";")[1].split("=")[1]
+			if responseCode == "8":
+				match responseResult:
+					case "SLActivated":
+						return True
+					case "SLActivationFailed":
+						raise CustomError("An issue occured while activating the specified license key")
+			else:
+				raise CustomError("An unknown issue occured while redeeming the specified entitlement")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
+
+	def ValidateEntitlement(self, applicationSKU: str): # Must be authenticated (See docs)
+		socket = self.socket
+		try:
+			RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=4;SKU={applicationSKU};")))
+			responseCode = RegisterPayload.split(";")[0].split("=")[1]
+			responseResult = RegisterPayload.split(";")[1].split("=")[1]
+			if responseCode == "8":
+				match responseResult:
+					case "UserEntitlementValid":
+						return True
+					case "SKUValidationFailed": # SKU should be embedded as constant, has tampering/use of incorrect version been detected?
+						raise CustomError("An issue occured while validating the specified application") 
+					case "SKUInvalid":
+						raise CustomError("The specified user is not licensed to use the specified application")
+					case "UserEntitlementInvalid":
+						raise CustomError("The specified user is not licensed to use the specified application")
+			else:
+				raise CustomError("An unknown issue occured while validating the application")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
+
+	def SetUserHWID(self, hwid: str): # Must be authenticated (See docs)
+		socket = self.socket
+		try:
+			RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=5;HWID={hwid};")))
+			responseCode = RegisterPayload.split(";")[0].split("=")[1]
+			responseResult = RegisterPayload.split(";")[1].split("=")[1]
+			if responseCode == "8":
+				match responseResult:
+					case "HWIDUpdated":
+						return True
+					case "HWIDUpdateFailed":
+						raise CustomError("An issue occured while attempting to update the specified user's HWID") 
+			else:
+				raise CustomError("An unknown issue occured while attempting to update the specified user's HWID")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
+
+	def ValidateUserHWID(self, hwid: str): # Must be authenticated (See docs)
+		socket = self.socket
+		try:
+			RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=6;HWID={hwid};")))
+			responseCode = RegisterPayload.split(";")[0].split("=")[1]
+			responseResult = RegisterPayload.split(";")[1].split("=")[1]
+			if responseCode == "8":
+				match responseResult:
+					case "HardwareIDValid":
+						return True
+					case "HardwareIDInvalid":
+						raise CustomError("The submitted hardware ID is invalid")
+					case "HardwareIDNotSet":
+						raise CustomError("No hardware ID has been set for the specified user")
+			else:
+				raise CustomError("An unknown issue occured while attempting to validate the specified user's HWID")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
+
+	def GetAppUserRole(self): # Must be authenticated (See docs)
+		socket = self.socket
+		try:
+			RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=7;")))
+			responseCode = RegisterPayload.split(";")[0].split("=")[1]
+			responseResult = RegisterPayload.split(";")[1].split("=")[1]
+			if responseCode == "8":
+				return responseResult
+			else:
+				raise CustomError("An unknown issue occured while attempting to obtain the specified user's AppUserRole")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
+
+	def CheckLicenseKeyValidity(self, LicenseKey: str): # Must be authenticated (See docs)
+		socket = self.socket
+		try:
+			RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=8;SLK={LicenseKey};")))
+			responseCode = RegisterPayload.split(";")[0].split("=")[1]
+			responseResult = RegisterPayload.split(";")[1].split("=")[1]
+			if responseCode == "8":
+				match responseResult:
+					case "SLKValid":
+						return True
+					case "SLKInvalid":
+						raise CustomError("The specified license key is invalid")
+					case "SLKValidationFailed":
+						raise CustomError("An issue occured while attempting to validate the specified license key")
+			else:
+				raise CustomError("An unknown issue occured while attempting to validate the specified user's HWID")
+		except Exception as e:
+			self.disconnect()
+			raise CustomError("{}".format(e))
+
+auth_luna = Atlas("auth.project-atlas.xyz", 6969, "02621487807712432558", "Pde67VDTmJXGCpKZLPHijiPFhZUTHcMF")
 
 # ///////////////////////////////////////////////////////////////
 # ANSI Colors & Gradients
@@ -493,10 +1147,10 @@ class files:
 	def write_json(path, content, documents=False):
 		"""Writes a json file"""
 		if documents:
-			with open(os.path.join(files.documents(), path), "w", encoding="utf-8") as f:
+			with open(os.path.join(files.documents(), path), "w") as f:
 				f.write(json.dumps(content, indent=4))
 		else:
-			with open(path, "w", encoding="utf-8") as f:
+			with open(path, "w") as f:
 				f.write(json.dumps(content, indent=4))
 	def read_file(path, documents=False):
 		"""Reads a file"""
@@ -552,40 +1206,60 @@ def is_running(process_name):
 def check_debuggers():
 	while True:
 		blacklisted_processes = [
-			"MegaDumper.exe",
-			"ETC.exe",
-			"dnspy.exe",
-			"dnspy-x86.exe",
-			"JustDecompile.exe",
-			"dotPeek64.exe",
-			"de4dot.exe",
-			"MegaDumper.exe",
-			"Dumper.exe",
-			"NetGuard.exe",
-			"Koi.exe",
-			"ConfuserEx.exe",
-			"Confuser.exe",
-			"Unpack.exe",
-			"Fiddler.exe",
-			"HTTPDEBUGGER.exe",
-			"HTTP Debugger.exe",
-			"HTTPDebuggerPro.exe",
-			"HTTP Debugger Pro.exe",
-			"HTTP Debugger (32 bit).exe",
-			"HTTP Debugger (64 bit).exe",
-			"HTTP Debugger Pro.exe",
-			"HTTPDebuggerUI.exe",
-			"HTTP Debugger Windows Service.exe",
-			"HTTPDebuggerSvc.exe",
-			"dnSpy.exe",
-			"dnSpy v5.0.10 (x64).exe",
-			"Cheat Engine.exe",
-			"procdump.exe",
-			"ida.exe",
-			"WireShark.exe"
-			"wireshark.exe"
-			"Wireshark.exe"
-		]
+            "MegaDumper.exe",
+            "ETC.exe",
+            "dnspy.exe",
+            "dnspy-x86.exe",
+            "JustDecompile.exe",
+            "dotPeek64.exe",
+            "de4dot.exe",
+            "MegaDumper.exe",
+            "Dumper.exe",
+            "NetGuard.exe",
+            "Koi.exe",
+            "ConfuserEx.exe",
+            "Confuser.exe",
+            "Unpack.exe",
+            "Fiddler.exe",
+            "HTTPDEBUGGER.exe",
+            "HTTP Debugger.exe",
+            "HTTPDebuggerPro.exe",
+            "HTTP Debugger Pro.exe",
+            "HTTP Debugger (32 bit).exe",
+            "HTTP Debugger (64 bit).exe",
+            "HTTP Debugger Pro.exe",
+            "HTTPDebuggerUI.exe",
+            "HTTP Debugger Windows Service.exe",
+            "HTTPDebuggerSvc.exe",
+            "dnSpy v5.0.10 (x64).exe",
+            "Cheat Engine.exe",
+            "procdump.exe",
+            "ida.exe",
+            "Wireshark.exe",
+            "vboxservice.exe",
+            "vboxtray.exe",
+            "vmtoolsd.exe",
+            "vmwaretray.exe",
+            "vmwareuser",
+            "VGAuthService.exe",
+            "vmacthlp.exe",
+            "vmsrvc.exe",
+            "vmusrvc.exe",
+            "prl_cc.exe",
+            "prl_tools.exe",
+            "xenservice.exe",
+            "joeboxcontrol.exe",
+            "joeboxserver.exe",
+            "filemon.exe",
+            "regmon.exe",
+            "dbgview.exe",
+            "diskmon.exe",
+            "windbg.exe",
+            "procmon.exe",
+            "immunitydebugger.exe",
+            "x32dbg.exe",
+            "x64dbg.exe",
+        ]
 		for x in subprocess.Popen('tasklist', stdin=subprocess.PIPE, stderr=subprocess.PIPE, stdout=subprocess.PIPE).communicate()[0].decode().splitlines():
 			try:
 				if ".exe" in x:
@@ -595,13 +1269,12 @@ def check_debuggers():
 							username = files.json("Luna/auth.json", "username", documents=True)
 							username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
 						except:
-							username = "Failed to get username"
+							username = "Not Logged In! Caution advised."
 						try:
-							email = auth_admin.fetchUserInfo(username=username)['email']
+							hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip() 
+							notify.webhook(url="https://discord.com/api/webhooks/929347491755880449/h1eGan_H4toXEdyObgtuAfn0RLjCs0bVhc5SMrW8fw-tubu4SxoWGzqZ1RaDZqr6gIPQ", description=f"Detected a debugger\n``````\nDebugger: {x}\n``````\nLuna Information\n\nUsername: {username}\n``````\nHWID » {hwid}")
 						except:
-							email = "Failed to get email"
-						hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip() 
-						notify.webhook(url="https://discord.com/api/webhooks/926940135428345877/mGRqYKPw4Fbs8uANxd1s1HPb591cNii4D7cnAOmQiEaYDKrgK5gLCCc3uAeR5Lz65COm", description=f"Detected a debugger\n``````\nDebugger: {x}\n``````\nLuna Information\n\nUsername: {username}\nEmail: {email}```\n\n```HWID » {hwid}")
+							pass
 						current_system_pid = os.getpid()
 						ThisSystem = psutil.Process(current_system_pid)
 						ThisSystem.terminate()
@@ -620,21 +1293,36 @@ def check_debuggers_thread():
 # ///////////////////////////////////////////////////////////////
 # Print Functions
 
-logo = f"""
-       .                                         o                                    *
-                        *                                 +       .-.,=`````=.  +
-                 O         _|            .                         `=/_       \                o
- .                         _|        _|    _|  _|_|_|      _|_|_|   |  `=._    |       .
-            +              _|        _|    _|  _|    _|  _|    _|  . \     `=./`, 
-                           _|        _|    _|  _|    _|  _|    _|     `=.__.=` `=`
-    *                +     _|_|_|_|    _|_|_|  _|    _|    _|_|_|            *    
-                           .                      o                                       +
+# logo = f"""
+#        .                                         o                                    *
+#                         *                                 +        .-.,="``"=.  +
+#                  O         _|            .                         `=/_       \                o
+#  .                         _|        _|    _|  _|_|_|      _|_|_|   |  `=._    |       .
+#             +              _|        _|    _|  _|    _|  _|    _|  . \     `=./`, 
+#                            _|        _|    _|  _|    _|  _|    _|     `=.__.=` `=`
+#     *                +     _|_|_|_|    _|_|_|  _|    _|    _|_|_|            *    
+#                            .                      o                                       +
+# """
+
+logo = f"""  *                        o              +                 *                 .
+       O                     .              .                      .                   *
+               .                ██╗     ██╗   ██╗███╗  ██╗ █████╗    .-.,="``"=. +            |
+ .                     *        ██║     ██║   ██║████╗ ██║██╔══██╗   `=/_       \           - o -
+                                ██║     ██║   ██║██╔██╗██║███████║    |  '=._    |      .     |
+            |              +    ██║     ██║   ██║██║╚████║██╔══██║  *  \     `=./`, 
+    *     - o -                 ███████╗╚██████╔╝██║ ╚███║██║  ██║      `=.__.=` `=`             O
+            |        .          ╚══════╝ ╚═════╝ ╚═╝  ╚══╝╚═╝  ╚═╝             *    
+                              .                      o                    .                  +
 """
 
 def clear():
     os.system("cls")
 
 def restart_program():
+	if files.json("Luna/notifications/toasts.json", "login", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
+		notify.toast(message=f"Restarting Luna...")
+	if files.json("Luna/webhooks/webhooks.json", "login", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
+		notify.webhook(url=webhook.login_url(), name="login", description=f"Restarting Luna...")
 	python = sys.executable
 	os.execl(python, python, *sys.argv)
 
@@ -646,483 +1334,12 @@ def Randprntsc():
 # ///////////////////////////////////////////////////////////////
 # Class AUTH
 
-class luna_admin:
-    def __init__(self, auth_key: str):
-        """ 
-        #### Requires a authorization key which can be found in the application settings
-        """
-        self.authorization = auth_key
-
-    def fetchUserInfo(self, username: str):
-        """ 
-        ## Fetches information about the given user
-        ```
-        from AuthGG.admin import AdminClient
-        
-        client = AdminClient("authorization_key")
-        
-        username = input("Username: ")
-
-        try:
-            status = client.fetchUserInfo(username)
-            print(status['email']) # prints out the email
-        except Exception as e:
-            print(e)            
-        ```
-        You can replace 'email' with the following options
-        ### Available Options
-        - username
-        - email
-        - rank
-        - hwid
-        - variable 
-        - lastlogin
-        - lastip
-        - expiry
-        """
-
-        r = requests.get(f"https://developers.auth.gg/USERS/?type=fetch&authorization={self.authorization}&user={username}")             
-        if r.json()['status'] == "success":
-            information = {
-                "username": r.json()['username'],
-                "email": r.json()['email'],
-                "rank": r.json()['rank'],
-                "hwid": r.json()['hwid'],
-                "variable": r.json()['variable'],
-                "lastlogin": r.json()['lastlogin'],
-                "lastip": r.json()['lastip'],
-                "expiry": r.json()['expiry']
-            }
-            return information
-        else:
-            raise error_handler.FailedTask(message="Failed Fetching User Information!")
-
-    def changeUserPassword(self, username: str, password: str):
-        """
-        ## Changes the provided users password 
-        ```
-        from AuthGG.admin import AdminClient
-
-        client = AdminClient("authorization_key")
-
-        try:
-            client.changeUserPassword(username='razu', password='razu')        
-
-            # continue
-        except Exception as e:
-            print(e)   
-        ```
-        """
-
-        r = requests.get(f"https://developers.auth.gg/USERS/?type=changepw&authorization={self.authorization}&user={username}&password={password}")             
-        if r.json()['status'] == "success":
-            return True
-        else:
-            raise error_handler.FailedTask(message="Failed Changing Users Password!")
-
-    def getHWID(self, username: str):
-        """
-        Grabs the users HWID
-        ```
-        from AuthGG.admin import AdminClient
-
-        client = AdminClient("authorization_key")
-
-        try:
-            client.getHWID(username='razu')
-
-            # continue
-        except Exception as e:
-            print(e)
-        ```
-        """
-
-        r = requests.get(f"https://developers.auth.gg/HWID/?type=fetch&authorization={self.authorization}&user={username}")             
-        if r.json()['status'] == "success":
-            return r.json()['value']
-        else:
-            raise error_handler.FailedTask(message="Failed Grabbing Users HWID!")        
-
-    def resetHWID(self, username: str):
-        """
-        ## Reset the provided users HWID
-        ```
-        from AuthGG.admin import AdminClient
-
-        client = AdminClient("authorization_key")
-
-        try:
-            client.resetHWID(username='razu')        
-
-            # continue
-        except Exception as e:
-            print(e)            
-        ```
-        """
-        r = requests.get(f"https://developers.auth.gg/HWID/?type=reset&authorization={self.authorization}&user={username}")             
-        if r.json()['status'] == "success":
-            return True
-        else:
-            raise error_handler.FailedTask(message="Failed Resetting Users HWID!")        
-
-    def deleteUser(self, username: str):
-        """
-        Deletes a user from your Auth.GG application
-        ```
-        from AuthGG.admin import AdminClient
-        
-        client = AdminClient("authorization_key")
-        
-        username = input("Username: ")
-
-        try:
-            status = client.deleteUser(username)
-            
-            # continue
-        except Exception as e:
-            print(e)        
-        ```
-        """
-
-        r = requests.get(f"https://developers.auth.gg/USERS/?type=delete&authorization={self.authorization}&user={username}")             
-        if r.json()['status'] == "success":
-            return True
-        else:
-            raise error_handler.FailedTask(message="Failed Deleting User!")
-
-    def getUserCount(self):
-        """
-        Get the user count of your application
-        ```
-        from AuthGG.admin import AdminClient
-
-        client = AdminClient("authorization_key")
-
-        try:
-            status = client.getUserCount()
-            print(status)
-        except Exception as e:
-            print(e)        
-        ```
-        """
-        r = requests.get(f"https://developers.auth.gg/USERS/?type=count&authorization={self.authorization}")
-        if r.json()['status'] == "success":
-            jsonResponse = r.json()["value"]
-            return jsonResponse
-        else:
-            raise error_handler.ErrorConnecting()
-
-class luna_logging:
-    def __init__(self, aid: str, apikey: str, secret: str):
-        self.aid = aid
-        self.apikey = apikey
-        self.secret = secret
-
-
-    def sendData(self, username: str, message: str):
-        """ 
-        Enable Custom Logs.
-        ```
-        from AuthGG.logging import Logging
-        client = Loggging(aid='', apikey='', secret='')
-        try:
-            client.sendData(username='AuthGG', message='Deleted User')
-        except:
-            pass   
-        ```
-        """
-
-        data = {
-            "type": "log",
-            "action": message,
-            "pcuser": socket.gethostname(),
-            "username": username,
-            "aid": self.aid,
-            "secret": self.secret,
-            "apikey": self.apikey
-        }
-        r = requests.post(f"https://api.auth.gg/v1/", data=data)        
-        response = r.json()
-        if response['result'] == "success":
-            return True
-        else:
-            raise error_handler.ErrorConnecting()
-
-class luna_client:
-    def __init__(self, api_key, aid, application_secret):
-        """
-        API key can be found in the user settings
-        AID can also be found in the user settings
-        Application Secret can be easily found on the home page of https://auth.gg/
-        """
-
-        self.api_key = api_key
-        self.aid = aid
-        self.application_secret = application_secret
-
-    def login(self, username: str, password: str):
-        """
-        Allow the user to login
-        ```
-        client = Client(api_key="api_key", aid="aid", application_secret="secret")
-
-        username = input("Username: ")
-        password = input("Password: ")
-
-        try:
-            client.login(username, password)
-            
-            # clear console and redirect
-        except Exception as e:
-            print(e)
-        ```
-        """
-
-        hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-        data = {
-            "type": "login",
-            "secret": self.application_secret,
-            "apikey": self.api_key,
-            "aid": self.aid,
-            "username": username,
-            "password": password,
-            "hwid": hwid
-        }
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded"
-        }
-        r = requests.post("https://api.auth.gg/v1/", data=data, headers=headers)
-        response = r.json()
-        if response["result"] == "success":
-            return True
-        elif response["result"] == "invalid_details":
-            raise error_handler.InvalidPassword()
-        elif response["result"] == "invalid_hwid":
-            raise error_handler.InvalidHWID()
-        elif response["result"] == "time_expired":
-            raise error_handler.SubscriptionExpired()
-        elif response["result"] == "hwid_updated":
-            return True
-        else:
-            raise error_handler.ErrorConnecting()
-
-    def register(self, license_key: str, email:str, username: str, password: str):
-        """
-        Easily register users
-        ```
-        from AuthGG.client import Client
-
-        client = Client(api_key="api_key", aid="aid", application_secret="secret")
-
-        email = input("Email: ")
-        license_key = input("License: ")
-        username = input("Username: ")
-        password = input("Password: ")
-
-        try:
-            client.register(email=email, username=username, password=password, license_key=license_key)
-
-            # successfully registerd
-        except Exception as e:
-            print(e)
-        ```
-        """
-
-        hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-        data = {
-            "type": "register",
-            "secret": self.application_secret,
-            "apikey": self.api_key,
-            "aid": self.aid,
-            "username": username,
-            "password": password,
-            "hwid": hwid,
-            "email": email,
-            "license": license_key
-        }       
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded"
-        }
-        r = requests.post("https://api.auth.gg/v1/", data=data, headers=headers)        
-        response = r.json()["result"]
-        if response == "success":
-            return True
-        elif response == "invalid_license":
-            raise error_handler.InvalidLicense()
-        elif response == "email_used":
-            raise error_handler.UserError(message="email_used")
-        elif response == "invalid_username":
-            raise error_handler.UserError(message="invalid_username")               
-        else:
-            raise error_handler.ErrorConnecting()         
-
-    def forgotPassword(self, username: str):
-        """
-        Sends a reset password email to the given user
-        ```
-        from AuthGG.client import Client
-
-        client = Client(api_key="api_key", aid="aid", application_secret="secret")
-
-        username = input("Username: ")
-
-        try:
-            client.forgotPassword(username)
-
-            # successfully sent
-        except Exception as e:
-            print(e)        
-        ```
-        """
-
-        data = {
-            "type": "forgotpw",
-            "secret": self.application_secret,
-            "apikey": self.api_key,
-            "aid": self.aid,
-            "username": username
-        }           
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded"
-        }
-        r = requests.post("https://api.auth.gg/v1/", data=data, headers=headers)        
-        response = r.json()["result"]  
-        info = r.json()["info"]      
-        if response == "success":
-            return True
-        elif response == "failed":
-            return f"{info}"
-        else:
-            raise error_handler.ErrorConnecting()
-
-    def changePassword(self, username: str, password: str, newPassword: str):
-        """
-        Changes the password for that user.
-        ```
-        from AuthGG.client import Client
-
-        client = Client(api_key="api_key", aid="aid", application_secret="secret")
-
-        username = input("Username: ")
-        password = input("Password: ")
-        newPassword = input("New Password: ")
-
-        try:
-            client.changePassword(username=username, password=password, newPassword=newPassword)
-
-            # successfully changed password
-        except Exception as e:
-            print(e)        
-        ```
-        """
-
-        data = {
-            "type": "changepw",
-            "secret": self.application_secret,
-            "apikey": self.api_key,
-            "aid": self.aid,
-            "username": username,
-            "password": password,
-            "newpassword": newPassword
-        }           
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded"
-        }
-        r = requests.post("https://api.auth.gg/v1/", data=data, headers=headers)       
-        response = r.json()["response"]
-        if response == "success":
-            return True
-        elif response == "invalid_details":
-            raise error_handler.UserError(message="invalid_details")
-        else:
-            raise error_handler.ErrorConnecting()
-
-class error_handler:
-	class InvalidPassword(Exception):
-		"""Raised when the users password is incorrect"""
-		def __init__(self):
-			self.message = "The given password is incorrect!"
-			super().__init__(self.message)
-
-	class InvalidLicense(Exception):
-		"""Raised when the provided key is invalid!"""
-		def __init__(self):
-			self.message = "The given key is invalid!"
-			super().__init__(self.message)
-
-	class ErrorConnecting(Exception):
-		"""Raised when the connection to Luna auth is unstable or offline"""
-		def __init__(self):
-			self.message = "We had problems connecting to Luna."
-			super().__init__(self.message)        
-
-	class SubscriptionExpired(Exception):
-		"""Raised when a users subscription is expired"""
-		def __init__(self):
-			self.message = "Your subscription is expired."
-			super().__init__(self.message)
-
-	class InvalidHWID(Exception):
-		"""Raised when a users HWID is invalid"""
-		def __init__(self):
-			self.message = "Your hwid is invalid or the account is logged to another HWID."
-			super().__init__(self.message)
-
-	class UserError(Exception):
-		"""Raised when a user has an error registering"""
-		def __init__(self, message):
-			if message == "email_used":
-				self.message = "That key has been already used!"
-			elif message == "invalid_username":
-				self.message = "That username is already taken!"
-			elif message == "invalid_details":
-				self.message = "Your details are incorrect!"
-			elif message == "failed":
-				self.message = "Failed to complete that task!"
-			else:
-				pass
-
-			super().__init__(self.message)     
-
-	class FailedTask(Exception):
-		def __init__(self, message):
-			self.message = message
-			super().__init__(self.message)
-
 motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ').read().decode('utf-8')
-auth = luna_client(api_key="485477744381137547167158333254493", aid="940932", application_secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
-auth_log = luna_logging(apikey="485477744381137547167158333254493", aid="940932", secret="1fZDchzE3iZyiq0Ir5nAaFZ0p1c00zkqLc5")
-auth_admin = luna_admin("SGCGIKAOTOHA")
 
 # ///////////////////////////////////////////////////////////////
 # Class Luna
 
 class luna:
-
-	def email_check(username):
-		if not username == "Sosa": # Sosa http block (Ignore)
-			try:
-				email = auth_admin.fetchUserInfo(username=username)['email']
-				email = email.lower()
-				if not email.startswith("luna"):
-					hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-					notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Invalid login\n``````\nLuna Information\n\nUsername: {username}\nSpecial: {email}\n``````\nHWID » {hwid}")
-					prints.error("Invalid login")
-					files.remove('Luna/auth.json', documents=True)
-					time.sleep(5)
-					prints.event("Redirecting to the main menu in 5 seconds")
-					time.sleep(5)
-					luna.authentication()
-			except Exception as e:
-				email = "None"
-				hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-				notify.webhook(url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v", description=f"Invalid login\n``````\nLuna Information\n\nUsername: {username}\nSpecial: {email}\n``````\nHWID » {hwid}\n``````\nError Information\n\n{e}")
-				prints.error("Invalid login")
-				files.remove('Luna/auth.json', documents=True)
-				time.sleep(5)
-				prints.event("Redirecting to the main menu in 5 seconds")
-				time.sleep(5)
-				luna.authentication()
 
 	def authentication():
 		"""
@@ -1139,6 +1356,8 @@ class luna:
 			luna.update()
 		else:
 			if files.file_exist('Luna/auth.json', documents=True):
+				luna.login(exists=True)
+			elif developer_mode:
 				luna.login(exists=True)
 			else:
 				prints.message("1 = Log into an existing Luna account")
@@ -1159,25 +1378,39 @@ class luna:
 		"""
 		The authentication login function
 		"""
+		try:
+			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
+		except:
+			files.remove('Luna/auth.json', documents=True)
+			prints.error("There has been an issue with authenticating your hardware")
+			time.sleep(5)
+			prints.event("Redirecting to the main menu in 5 seconds")
+			time.sleep(5)
+			luna.authentication()
 		if exists:
 			luna.console(clear=True)
+			if not developer_mode:
+				try:
+					username = files.json("Luna/auth.json", "username", documents=True)
+					password = files.json("Luna/auth.json", "password", documents=True)
+					username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+					password = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+				except:
+					files.remove('Luna/auth.json', documents=True)
+					prints.error("There has been an issue with your login")
+					time.sleep(5)
+					prints.event("Redirecting to the main menu in 5 seconds")
+					time.sleep(5)
+					luna.authentication()
 			try:
-				username = files.json("Luna/auth.json", "username", documents=True)
-				password = files.json("Luna/auth.json", "password", documents=True)
-				username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-				password = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
-			except:
-				files.remove('Luna/auth.json', documents=True)
-				prints.error("There has been an issue with your login")
-				time.sleep(5)
-				prints.event("Redirecting to the main menu in 5 seconds")
-				time.sleep(5)
-				auth.authentication()
-			try:
-				prints.event("Authenticating...")
-				auth.login(username=username, password=password)
-				# luna.email_check(username)
-				auth_log.sendData(username=username, message="Logged in")
+				if not developer_mode:
+					prints.event("Authenticating...")
+					auth_luna.connect()
+					auth_luna.Identify(username)
+					auth_luna.Login(username, password)
+					auth_luna.ValidateUserHWID(hwid)
+					auth_luna.ValidateEntitlement("LunaSB")
+					auth_luna.disconnect()
 				luna.wizard()
 			except Exception as e:
 				prints.error(e)
@@ -1187,13 +1420,67 @@ class luna:
 				time.sleep(5)
 				luna.authentication()
 		else:
-			username = prints.input("Username")
-			password = prints.password("Password")
-			try:
-				prints.event("Authenticating...")
-				auth.login(username=username, password=password)
-				# luna.email_check(username)
-				auth_log.sendData(username=username, message="Logged in")
+			if not developer_mode:
+				username = prints.input("Username")
+				password = prints.password("Password")
+				try:
+					prints.event("Authenticating...")
+					auth_luna.connect()
+					auth_luna.Identify(username)
+					auth_luna.Login(username, password)
+					auth_luna.Login(username, password)
+					auth_luna.ValidateUserHWID(hwid)
+					auth_luna.ValidateEntitlement("LunaSB")
+					auth_luna.disconnect()
+					username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+					password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+					data = {
+						"username": f"{username}",
+						"password": f"{password}"
+					}
+					files.write_json("Luna/auth.json", data, documents=True)
+				except Exception as e:
+					prints.error(e)
+					files.remove('Luna/auth.json', documents=True)
+					time.sleep(5)
+					prints.event("Redirecting to the main menu in 5 seconds")
+					time.sleep(5)
+					luna.authentication()
+		luna.wizard()
+
+	def register():
+		"""
+		The authentication register function
+		"""
+		try:
+			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
+		except:
+			files.remove('Luna/auth.json', documents=True)
+			prints.error("There has been an issue with authenticating your hardware")
+			time.sleep(5)
+			prints.event("Redirecting to the main menu in 5 seconds")
+			time.sleep(5)
+			luna.authentication()
+		username = prints.input("Username")
+		password = prints.password("Password")
+		key = prints.input("Key")
+		try:
+			if not developer_mode:
+				prints.event("Registering...")
+
+				auth_luna.connect()
+				auth_luna.CheckLicenseKeyValidity(key)
+				# I repeat, DO NOT IDENTIFY A NON_EXISTANT BEFORE REGISTRATION, IT WILL FAIL THE PROCESS!
+				auth_luna.Register(username, password)
+				auth_luna.Identify(username) # Now that we have registered, we can identify to ensure the user exists and we can login.
+				auth_luna.Login(username, password)
+				auth_luna.InitAppUser(hwid)
+				auth_luna.RedeemEntitlement(key, "LunaSB")
+				auth_luna.disconnect()
+
+				prints.message("Successfully registered")
+				notify.webhook(url="https://discord.com/api/webhooks/926940230169280552/Tl-o9bPLOeQ5dkuD7Ho1MMgoggu0-kHCRy_248yor_Td52KQoZMfte3YpoKBlUUdIB_j", description=f"A new registered user!\n``````\nUsername: {username}\nKey: {key}\n``````\nHWID:\n{hwid}")
+				time.sleep(3)
 				username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
 				password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
 				data = {
@@ -1201,36 +1488,6 @@ class luna:
 					"password": f"{password}"
 				}
 				files.write_json("Luna/auth.json", data, documents=True)
-			except Exception as e:
-				prints.error(e)
-				files.remove('Luna/auth.json', documents=True)
-				time.sleep(5)
-				prints.event("Redirecting to the main menu in 5 seconds")
-				time.sleep(5)
-				luna.authentication()
-
-	def register():
-		"""
-		The authentication register function
-		"""
-		username = prints.input("Username")
-		password = prints.password("Password")
-		key = prints.input("Key")
-		try:
-			prints.event("Registering...")
-			auth.register(email=key, username=username, password=password, license_key=key)
-			auth_log.sendData(username=username, message="Registered")
-			prints.message("Successfully registered")
-			hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
-			notify.webhook(url="https://discord.com/api/webhooks/926940230169280552/Tl-o9bPLOeQ5dkuD7Ho1MMgoggu0-kHCRy_248yor_Td52KQoZMfte3YpoKBlUUdIB_j", description=f"A new registered user!\n``````\nUsername: {username}\nKey: {key}\n``````\nHWID:\n{hwid}")
-			time.sleep(3)
-			username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-			password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
-			data = {
-				"username": f"{username}",
-				"password": f"{password}"
-			}
-			files.write_json("Luna/auth.json", data, documents=True)
 			luna.login(exists=True)
 		except Exception as e:
 			prints.error(e)
@@ -1249,21 +1506,15 @@ class luna:
 
 		r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 		updater_url = r["updater"]
-		version_url = r["version"]
 
 		r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/beta.json").json()
 		beta_updater_url = r["updater"]
-		beta_version_url = r["version"]
 
-		if beta:
-			version_url = beta_version_url
 		url = updater_url
-		version = version_url
 		if beta:
 			prints.message("Beta Build")
-			version = beta_version_url
 			url = beta_updater_url
-		prints.event(f"Downloading Luna {version}...")
+		prints.event(f"Downloading Updater...")
 		from clint.textui import progress
 		r = requests.get(url, stream=True)
 		with open('Updater.exe', 'wb') as f:
@@ -1307,7 +1558,7 @@ class luna:
 			prints.error(e)
 			prints.message("Running a file check in 5 seconds")
 			time.sleep(5)
-			luna.file_check()
+			luna.file_check(console=True)
 		print(color.logo_gradient(f"""{logo_variable}"""))
 
 	def title(text):
@@ -1339,17 +1590,15 @@ class luna:
 		"""Logs in the bot."""
 		luna.console(clear=True)
 
-		try:
-			path = getattr(sys, '_MEIPASS', os.getcwd())
-			cogs_path = path + "\\cogs"
-
-			luna.loader_check()
-
-			for filename in os.listdir(cogs_path):
-				if filename.endswith(".py"):
-					bot.load_extension(f"cogs.{filename[:-3]}")
-		except:
-			pass
+		# try:
+		# 	path = getattr(sys, '_MEIPASS', os.getcwd())
+		# 	cogs_path = path + "\\cogs"
+		# 	luna.loader_check()
+		# 	for filename in os.listdir(cogs_path):
+		# 		if filename.endswith(".py"):
+		# 			bot.load_extension(f"cogs.{filename[:-3]}")
+		# except:
+		# 	pass
 
 		try:
 			token = files.json("Luna/discord.json", "token", documents=True)
@@ -1361,7 +1610,7 @@ class luna:
 			bot.run(Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token))
 		except Exception as e:
 			files.remove('Luna/discord.json', documents=True)
-			prints.error("Failed to log into token")
+			prints.error(e)
 			time.sleep(5)
 			prints.event("Redirecting to the main menu in 5 seconds")
 			time.sleep(5)
@@ -1395,7 +1644,7 @@ class luna:
 			prompt = prints.input("Do you want to use it? (y/n)")
 			if prompt.lower() == "y" or prompt.lower() == "yes":
 				json_object = json.load(open(os.path.join(files.documents(), "Luna/discord.json"), encoding="utf-8"))
-				json_object["token"] = str(Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token))
+				json_object["token"] = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)
 				files.write_json(os.path.join(files.documents(), "Luna/discord.json"), json_object)
 				return True
 			else:
@@ -1458,10 +1707,8 @@ class luna:
 					prints.message(f"Detected a valid token » {color.purple(r['username'])}#{color.purple(r['discriminator'])}{_2fa}")
 					prompt = prints.input("Do you want to use it? (y/n)")
 					if prompt.lower() == "y" or prompt.lower() == "yes":
-						print("1")
 						json_object = json.load(open(os.path.join(files.documents(), "Luna/discord.json"), encoding="utf-8"))
-						print("2")
-						json_object["token"] = str(Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(valid_tokens[0]))
+						json_object["token"] = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(valid_tokens[0])
 						files.write_json(os.path.join(files.documents(), "Luna/discord.json"), json_object)
 						return True
 					else:
@@ -1512,7 +1759,24 @@ class luna:
 
 	def file_check(console=False):
 		"""Run a check for the files, create if needed."""
-		clear()
+		luna.console(clear=True)
+
+		if console:
+			now = datetime.now()
+			hour = now.hour
+
+			if hour < 12:
+				greeting = "Good morning"
+			elif hour < 18:
+				greeting = "Good afternoon"
+			else:
+				greeting = "Good evening"
+
+			username = files.json("Luna/auth.json", "username", documents=True)
+			username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+			prints.message(f"{greeting}, {color.purple(username)}.")
+			time.sleep(3)
+			prints.message("We are getting Luna ready for you.")
 
 		# ///////////////////////////////////////////////////////////////
 		# Folder Creation
@@ -1538,6 +1802,9 @@ class luna:
 		if not files.file_exist("Luna/backup", documents=True):
 			files.create_folder("Luna/backup", documents=True)
 
+		if not files.file_exist("Luna/backup/guilds", documents=True):
+			files.create_folder("Luna/backup/guilds", documents=True)
+
 		if not files.file_exist("Luna/resources", documents=True):
 			files.create_folder("Luna/resources", documents=True)
 
@@ -1555,6 +1822,9 @@ class luna:
 
 		if not files.file_exist("Luna/privnote", documents=True):
 			files.create_folder("Luna/privnote", documents=True)
+		
+		if not files.file_exist("Luna/protections", documents=True):
+			files.create_folder("Luna/protections", documents=True)
 
 		if not files.file_exist("Luna/dumping", documents=True):
 			files.create_folder("Luna/dumping", documents=True)
@@ -1600,6 +1870,23 @@ async def example(self, luna, *, text):
 			files.write_file("Luna/custom/custom.py", content, documents=True)
 
 		# ///////////////////////////////////////////////////////////////
+		# Protection Files
+
+		if not files.file_exist("Luna/protections/config.json", documents=True):
+			data = {
+				"footer": True,
+				"guilds": []
+			}
+			files.write_json("Luna/protections/config.json", data, documents=True)
+
+		if not files.file_exist("Luna/protections/invite.json", documents=True):
+			data = {
+				"delete": True,
+				"action": "warn"
+			}
+			files.write_json("Luna/protections/invite.json", data, documents=True)
+
+		# ///////////////////////////////////////////////////////////////
 		# Json Files
 
 		if not files.file_exist("Luna/rpc.json", documents=True):
@@ -1619,13 +1906,6 @@ async def example(self, luna, *, text):
 			}
 			files.write_json("Luna/rpc.json", data, documents=True)
 
-		if not files.file_exist("Luna/discord.json", documents=True):
-			data = {
-				"token": "token-here",
-				"password": "password-here",
-			}
-			files.write_json("Luna/discord.json", data, documents=True)
-
 		if not files.file_exist("Luna/config.json", documents=True):
 			data = {
 				"prefix": ".",
@@ -1639,6 +1919,13 @@ async def example(self, luna, *, text):
 				"startup_status": "online"
 			}
 			files.write_json("Luna/config.json", data, documents=True)
+
+		if not files.file_exist("Luna/discord.json", documents=True):
+			data = {
+				"token": "token-here",
+				"password": "password-here"
+			}
+			files.write_json("Luna/discord.json", data, documents=True)
 
 		if not files.file_exist("Luna/console/console.json", documents=True):
 			data = {
@@ -1814,8 +2101,7 @@ async def example(self, luna, *, text):
 			files.write_json("Luna/webhooks/webhooks.json", data, documents=True)
 
 		if console:
-			luna.console()
-			print("Checking files...")
+			time.sleep(5)
 
 # ///////////////////////////////////////////////////////////////
 # Print Functions
@@ -1825,7 +2111,7 @@ def get_prefix():
 	return prefix
 
 class prints:
-    luna.file_check()
+    luna.file_check(console=False)
     try:
         if files.json("Luna/console/console.json", "spacers", documents=True) == True:
             spacer_2 = " " + files.json("Luna/console/console.json", "spacer", documents=True) + " "
@@ -1837,8 +2123,8 @@ class prints:
             spacer_1 = ""
         else:
             spacer_1 = " "
-    except:
-        luna.file_check(console=True)
+    except Exception as e:
+        print(e)
     def command(text:str):
         """Prints a command log."""
         if files.json("Luna/console/console.json", "timestamp", documents=True) == True:
@@ -1952,6 +2238,20 @@ class notify:
 # Config Functions
 
 class config:
+	# ///////////////////////////////////////////////////////////////
+	# File overwrite (Global)
+
+	def _global(path:str, value_holder:str, new_value, add=False, delete=False):
+		"""Overwrites a value in a config file. (Global configs)"""
+		json_object = json.load(open(os.path.join(files.documents(), path), encoding="utf-8"))
+		if add == True:
+			json_object[value_holder].append(new_value)
+		elif delete == True:
+			json_object[value_holder].remove(new_value)
+		else:
+			json_object[value_holder] = new_value
+		files.write_json(os.path.join(files.documents(), path), json_object)
+
 	# ///////////////////////////////////////////////////////////////
 	# File overwrite (Config)
 
@@ -2921,14 +3221,14 @@ def update_thread():
 			time.sleep(900)
 
 bot = commands.Bot(bot_prefix, self_bot=True, case_insensitive=True, guild_subscription_options=GuildSubscriptionOptions.off(), status=statuscon())
-
 @bot.event
 async def on_ready():
 	"""Prints a ready log."""
 	if files.json("Luna/notifications/toasts.json", "login", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
-		notify.toast(message=f"Logged into {bot.user}")
+		notify.toast(message=f"Logged into {bot.user}\nLuna Version » {version}")
 	if files.json("Luna/webhooks/webhooks.json", "login", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
 		notify.webhook(url=webhook.login_url(), name="login", description=f"Logged into {bot.user}")
+
 	luna.console(clear=True)
 	command_count = len(bot.commands)
 	cog = bot.get_cog('Custom commands')
@@ -2939,7 +3239,6 @@ async def on_ready():
 			custom_command_count += 1
 	except:
 		custom_command_count = 0
-	prefix = files.json("Luna/config.json", "prefix", documents=True)
 	print(motd.center(os.get_terminal_size().columns))
 	if beta:
 		print("Beta Build".center(os.get_terminal_size().columns))
@@ -2948,10 +3247,68 @@ async def on_ready():
 			prints.message("You are not a beta user, Luna will close in 5 seconds.")
 			time.sleep(5)
 			os._exit(0)
-	print()
-	print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-	print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends")
-	print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+	prefix = files.json("Luna/config.json", "prefix", documents=True)
+	console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+	if console_mode == "2":
+		mode = int(files.json("Luna/config.json", "mode", documents=True))
+		errorlog = files.json("Luna/config.json", "error_log", documents=True)
+		riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
+		themesvar = files.json("Luna/config.json", "theme", documents=True)
+		deletetimer = int(files.json("Luna/config.json", "delete_timer", documents=True))
+		startup_status = files.json("Luna/config.json", "startup_status", documents=True)
+		nitro_sniper = files.json("Luna/snipers/nitro.json", "sniper", documents=True)
+		giveawayjoiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
+		delay_in_minutes = int(files.json("Luna/snipers/giveaway.json", "delay_in_minutes", documents=True))
+		giveaway_server_joiner = files.json("Luna/snipers/giveaway.json", "guild_joiner", documents=True)
+		if mode == 1:
+			mode = "Embed"
+		elif mode == 2:
+			mode = "Text"
+		elif mode == 3:
+			mode = "Indent"
+		else:
+			mode = "Unknown"
+		if afkstatus == 1:
+			afk = "on"
+		else:
+			afk = "off"
+		if themesvar == "default":
+			pass
+		else:
+			themesvar = themesvar[:-5]
+		bot_user = f"{bot.user}"
+		ui_user = f" {color.purple('User:')} {bot_user:<26}"
+		ui_guilds = f" {color.purple('Guilds:')} {len(bot.guilds):<24}"
+		ui_friends = f" {color.purple('Friends:')} {len(bot.user.friends):<23}"
+		ui_prefix = f" {color.purple('Prefix:')} {prefix:<24}"
+		ui_mode = f" {color.purple('Mode:')} {mode:<26}"
+		ui_theme = f" {color.purple('Theme:')} {themesvar:<25}"
+		ui_commands = f" {color.purple('Commands:')} {command_count-custom_command_count:<22}"
+		ui_commands_custom = f" {color.purple('Custom Commands:')} {custom_command_count:<15}"
+		ui_nitro_sniper = f" {color.purple('Nitro Sniper:')} {nitro_sniper}"
+		ui_giveaway_sniper = f" {color.purple('Giveaway Joiner:')} {giveawayjoiner}"
+		ui_giveaway_delay = f" {color.purple('Giveaway Delay:')} {delay_in_minutes}"
+		ui_giveaway_joiner = f" {color.purple('Giveaway Guilds:')} {giveaway_server_joiner}"
+		ui_afk = f" {color.purple('AFK Messager:')} {afk}"
+		ui_riskmode = f" {color.purple('Riskmode:')} {riskmode}"
+		ui_errorlog = f" {color.purple('Errorlog:')} {errorlog}"
+		ui_deletetimer = f" {color.purple('Delete Timer:')} {deletetimer}"
+		ui_startup = f" {color.purple('Startup Status:')} {startup_status}"
+		print()
+		print(f"               ═════════════ {color.purple('User')} ═════════════      ═══════════ {color.purple('Settings')} ═══════════")
+		print(f"               {ui_user}     {ui_prefix}")
+		print(f"               {ui_guilds}     {ui_theme}")
+		print(f"               {ui_friends}     {ui_nitro_sniper}")
+		print(f"               ════════════════════════════════      {ui_giveaway_sniper}")
+		print(f"               ═════════════ {color.purple('Luna')} ═════════════      {ui_riskmode}")
+		print(f"               {ui_commands}     {ui_deletetimer}")
+		print(f"               {ui_commands_custom}     {ui_startup}")
+		print(f"               ════════════════════════════════      ════════════════════════════════\n")
+	else:
+		print()
+		print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+		print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends")
+		print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
 	print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
 	prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 	debugger_thread = threading.Thread(target=uptime_thread)
@@ -2977,9 +3334,45 @@ class OnMessage(commands.Cog, name="on message"):
 		if message.author == self.bot.user:
 			return
 		try:
-			if files.json("Luna/snipers/nitro.json", "sniper", documents=True) == "on" and 'discord.gift/' in message.content:
-				elapsed_snipe = '%.3fs' % (time.time() - sniped_start_time)
+			global nitro_cooldown
+			if files.json("Luna/snipers/nitro.json", "sniper", documents=True) == "on" and 'discord.gift/' in message.content.lower():
+				elapsed_snipe = '%.4fs' % (time.time() - sniped_start_time)
 				code = re.search("discord.gift/(.*)", message.content).group(1)
+				if len(code) >= 16:
+					code = code[:16]
+					async with httpx.AsyncClient() as client:
+						start_time = time.time()
+						result = await client.post(f'https://discordapp.com/api/v9/entitlements/gift-codes/{code}/redeem', json={'channel_id': message.channel.id}, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+						elapsed = '%.3fs' % (time.time() - start_time)
+					if 'nitro' in str(result.content):
+						status = 'Nitro successfully redeemed'
+					elif 'This gift has been redeemed already' in str(result.content):
+						status = 'Has been redeemed already'
+					else:
+						status = 'Unknown gift code'
+
+					if nitro_cooldown.count(code) == 0:
+						nitro_cooldown.append(code)
+						
+						print()
+						prints.sniper(color.purple(status))
+						prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
+						prints.sniper(f"Channel | {color.purple(f'{message.channel}')}")
+						prints.sniper(f"Author  | {color.purple(f'{message.author}')}")
+						prints.sniper(f"Code    | {color.purple(f'{code}')}")
+						prints.sniper(color.purple('Elapsed Times'))
+						prints.sniper(f"Sniped  | {color.purple(f'{elapsed_snipe}')}")
+						prints.sniper(f"Request | {color.purple(f'{elapsed}')}")
+						print()
+
+						if files.json("Luna/notifications/toasts.json", "nitro", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
+							notify.toast(message=f"{status}\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
+						if files.json("Luna/webhooks/webhooks.json", "nitro", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.nitro_url() == "webhook-url-here":
+							notify.webhook(url=webhook.nitro_url(), name="nitro", description=f"{status}\nServer » {message.guild}\nChannel » {message.channel}\nAuthor » {message.author}\nCode » {code}\nElapsed Times\nSniped » {elapsed_snipe}\nRequest » {elapsed}")
+			
+			elif files.json("Luna/snipers/nitro.json", "sniper", documents=True) == "on" and 'discord.com/gifts' in message.content.lower():
+				elapsed_snipe = '%.4fs' % (time.time() - sniped_start_time)
+				code = re.search("discord.com/gifts/(.*)", message.content).group(1)
 				if len(code) >= 16:
 					async with httpx.AsyncClient() as client:
 						start_time = time.time()
@@ -2992,7 +3385,6 @@ class OnMessage(commands.Cog, name="on message"):
 					else:
 						status = 'Unknown gift code'
 
-					global nitro_cooldown
 					if nitro_cooldown.count(code) == 0:
 						nitro_cooldown.append(code)
 						
@@ -3184,7 +3576,7 @@ class OnMessage(commands.Cog, name="on message"):
 
 		if share == "on":
 			if message.author.id == user_id:
-				if f"{prefix}help" in message.content:
+				if f"{prefix}help" in message.content.lower():
 					prints.shared("help")
 					if configs.mode() == 2:
 						sent = await message.channel.send(f"```ini\n[ {theme.title()} ]\n\n{theme.description()}Coming soon\n\n[ {theme.footer()} ]```")
@@ -3227,7 +3619,7 @@ class OnMessage(commands.Cog, name="on message"):
 				if configs.mode() == 2:
 					sent = await message.channel.send(f"```ini\n[ AFK ]\n\n{afkmessage}\n\n[ {theme.footer()} ]```")
 				else:
-					embed = discord.Embed(title="AFK", url=theme.title_url(), description=f"{afkmessage}", color=theme.hex_color())
+					embed = discord.Embed(title="AFK", url=theme.title_url(), description=f"```\n{afkmessage}```", color=theme.hex_color())
 					embed.set_thumbnail(url=theme.image_url())
 					embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 					embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
@@ -3242,7 +3634,7 @@ class OnMessage(commands.Cog, name="on message"):
 		# ///////////////////////////////////////////////////////////////
 		# Mention
 
-		if f'<@{self.bot.user.id}>' in message.content or f'<@!{self.bot.user.id}>' in message.content:
+		if f'<@{self.bot.user.id}>' in message.content or f'<@!{self.bot.user.id}>' in message.content.lower():
 			if files.json("Luna/notifications/toasts.json", "pings", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
 				notify.toast(message=f"You have been mentioned\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
 			if files.json("Luna/webhooks/webhooks.json", "pings", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.pings_url() == "webhook-url-here":
@@ -3255,8 +3647,8 @@ class OnMessage(commands.Cog, name="on message"):
 				prints.sniper(f"Author  | {color.purple(f'{message.author}')}")
 				print()
 			
-			#///////////////////////////////////////////////////////////////
-			# Selfbot Detection - Embed
+		#///////////////////////////////////////////////////////////////
+		# Selfbot Detection - Embed
 
 		if message.author.bot == False:
 			if message.author == self.bot.user:
@@ -3265,7 +3657,7 @@ class OnMessage(commands.Cog, name="on message"):
 				embeds = message.embeds
 				for embed in embeds:
 					global cooldown
-					if embed is not None and cooldown.count(message.author.id) == 0 and not ("https://" or "http://" or "cdn.discordapp.com" or ".png" or ".gif" or "www.") in message.content:
+					if embed is not None and cooldown.count(message.author.id) == 0 and not ("https://" or "http://" or "cdn.discordapp.com" or ".png" or ".gif" or "www.") in message.content.lower():
 						cooldown.append(message.author.id)
 						if files.json("Luna/snipers/selfbot.json", "sniper", documents=True) == "on":
 							if files.json("Luna/notifications/toasts.json", "selfbot", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
@@ -3302,7 +3694,10 @@ class OnMessage(commands.Cog, name="on message"):
 					else:
 						pass
 
-		if 'privnote.com' in message.content:
+		#///////////////////////////////////////////////////////////////
+		# Privnote Sniper
+
+		if 'privnote.com' in message.content.lower():
 			elapsed_snipe = '%.3fs' % (time.time() - sniped_start_time)
 			privnote_sniper = files.json(f"Luna/snipers/privnote.json", "sniper", documents=True)
 			if privnote_sniper == "on":
@@ -3340,9 +3735,74 @@ class OnMessage(commands.Cog, name="on message"):
 					print()
 			else:
 				return
-		
-		else:
-			return
+
+		#///////////////////////////////////////////////////////////////
+		# Anti-Invite
+		if 'discord.gg/' in message.content.lower() and antiinvite == True:
+			guilds = files.json("Luna/protections/config.json", "guilds", documents=True)
+			if message.guild.id in guilds:
+				try:
+					await message.delete()
+				except:
+					pass
+				try:
+					if configs.mode() == 1:
+						embed = discord.Embed(title="Anti Invite", url=theme.title_url(), description="```\n\"Anti Invite\" is enabled, sending Discord invites is not allowed.```", color=theme.hex_color())
+						embed.set_thumbnail(url=theme.image_url())
+						embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+						embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+						embed.set_image(url=theme.large_image_url())
+						sent = await message.channel.send(embed=embed)
+					else:
+						sent = await message.channel.send(f"```ini\n[ Anti Invite ]\n\n\"Anti Invite\" is enabled, sending Discord invites is not allowed.\n\n[ {theme.footer()} ]```")
+					await asyncio.sleep(30)
+					await sent.delete()
+				except:
+					pass
+
+		#///////////////////////////////////////////////////////////////
+		# Anti-Upper
+		if message.content.isupper() and antiupper == True:
+			guilds = files.json("Luna/protections/config.json", "guilds", documents=True)
+			if message.guild.id in guilds:
+				try:
+					await message.delete()
+				except:
+					pass
+				try:
+					if configs.mode() == 1:
+						embed = discord.Embed(title="Anti Upper", url=theme.title_url(), description="```\n\"Anti Upper\" is enabled, sending all uppercase is not allowed.```", color=theme.hex_color())
+						embed.set_thumbnail(url=theme.image_url())
+						embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+						embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+						embed.set_image(url=theme.large_image_url())
+						sent = await message.channel.send(embed=embed)
+					else:
+						sent = await message.channel.send(f"```ini\n[ Anti Upper ]\n\n\"Anti Upper\" is enabled, sending all uppercase is not allowed.\n\n[ {theme.footer()} ]```")
+				except:
+					pass
+
+		#///////////////////////////////////////////////////////////////
+		# Anti-Phishing
+		if message.content in phishing_list and antiphishing == True:
+			guilds = files.json("Luna/protections/config.json", "guilds", documents=True)
+			if message.guild.id in guilds:
+				try:
+					await message.delete()
+				except:
+					pass
+				try:
+					if configs.mode() == 1:
+						embed = discord.Embed(title="Anti Phishing Links", url=theme.title_url(), description="```\n\"Anti Phishing Links\" is enabled, the url you sent, is banned.```", color=theme.hex_color())
+						embed.set_thumbnail(url=theme.image_url())
+						embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+						embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+						embed.set_image(url=theme.large_image_url())
+						sent = await message.channel.send(embed=embed)
+					else:
+						sent = await message.channel.send(f"```ini\n[ Anti Phishing Links ]\n\n\"Anti Phishing Links\" is enabled, the url you sent, is banned.\n\n[ {theme.footer()} ]```")
+				except:
+					pass
 
 bot.add_cog(OnMessage(bot))
 
@@ -3362,8 +3822,8 @@ class OnDelete(commands.Cog, name="on delete"):
 			if mention in message.content:
 				if files.json("Luna/notifications/toasts.json", "ghostpings", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
 					notify.toast(message=f"You have been ghostpinged\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
-				if files.json("Luna/webhooks/webhooks.json", "ghostpings", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.ghostping_url() == "webhook-url-here":
-					notify.webhook(url=webhook.ghostping_url(), name="ghostpings", description=f"You have been ghostpinged\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
+				if files.json("Luna/webhooks/webhooks.json", "ghostpings", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.ghostpings_url() == "webhook-url-here":
+					notify.webhook(url=webhook.ghostpings_url(), name="ghostpings", description=f"You have been ghostpinged\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
 				print()
 				prints.sniper(f"{color.purple('You have been ghostpinged')}")
 				prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
@@ -3393,12 +3853,17 @@ bot.add_cog(OnTyping(bot))
 # ///////////////////////////////////////////////////////////////
 # On Command Event
 
+last_used = ""
+
 class OnCommand(commands.Cog, name="on command"):
 	def __init__(self, bot:commands.Bot):
 		self.bot = bot
 		
 	@commands.Cog.listener()
 	async def on_command(self, luna:commands.Context):
+		global last_used
+		if not luna.command.name == "repeat":
+			last_used = luna.command.name
 		prints.command(luna.command.name)
 		theme_json = files.json("Luna/config.json", "theme", documents=True)
 		try:
@@ -3426,7 +3891,10 @@ class OnCommandErrorCog(commands.Cog, name="on command error"):
 		error_str = str(error)
 		error = getattr(error, 'original', error)
 		if isinstance(error, commands.CommandOnCooldown):
-			await luna.message.delete()
+			try:
+				await luna.message.delete()
+			except:
+				pass
 			day = round(error.retry_after/86400)
 			hour = round(error.retry_after/3600)
 			minute = round(error.retry_after/60)
@@ -3454,7 +3922,7 @@ class OnCommandErrorCog(commands.Cog, name="on command error"):
 		if isinstance(error, CommandNotFound):
 			try:
 				await luna.message.delete()
-			except Exception:
+			except:
 				pass
 			prefix = files.json("Luna/config.json", "prefix", documents=True)
 			helptext = ""
@@ -3486,29 +3954,57 @@ class OnCommandErrorCog(commands.Cog, name="on command error"):
 		elif isinstance(error, CheckFailure):
 			try:
 				await luna.message.delete()
-			except Exception:
+			except:
 				pass
 			await error_builder(luna, f"```\n{error}```")
 		elif isinstance(error, commands.MissingRequiredArgument):
 			try:
 				await luna.message.delete()
-			except Exception:
+			except:
 				pass
 			await error_builder(luna, f"```\nMissing arguments\n\n{error}```")
 		elif isinstance(error, MissingPermissions):
 			try:
 				await luna.message.delete()
-			except Exception:
+			except:
 				pass
 			await error_builder(luna, f"```\nMissing permissions\n\n{error}```")
+		elif isinstance(error, commands.CommandInvokeError):
+			try:
+				await luna.message.delete()
+			except:
+				pass
+			await error_builder(luna, f"```\n{error}```")
 		elif "Cannot send an empty message" in error_str:
 			try:
 				await luna.message.delete()
-			except Exception:
+			except:
 				pass
 			await error_builder(luna, f"```\n{error}```")
+		elif "Cannot send messages to this user" in error_str:
+			try:
+				await luna.message.delete()
+			except:
+				pass
+			await error_builder(luna, f"```\nCannot send a message to this user\n\n{error}```")
+		elif "Cannot send messages in this channel" in error_str:
+			try:
+				await luna.message.delete()
+			except:
+				pass
+			await error_builder(luna, f"```\nCannot send a message in this channel\n\n{error}```")
+		elif "Cannot send files bigger than" in error_str:
+			try:
+				await luna.message.delete()
+			except:
+				pass
+			await error_builder(luna, f"```\nCannot send files bigger than 8MB\n\n{error}```")
 		else:
-			pass
+			try:
+				await luna.message.delete()
+			except:
+				pass
+			await error_builder(luna, f"```\n{error}```")
 
 bot.add_cog(OnCommandErrorCog(bot))
 
@@ -3523,7 +4019,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 					usage="[command]",
 					description = "Display the help message",
 					aliases = ['h', '?'])
-	async def help (self, luna, commandName:str=None):
+	async def help(self, luna, commandName:str=None):
 		await luna.message.delete()
 		prefix = files.json("Luna/config.json", "prefix", documents=True)
 
@@ -3628,12 +4124,12 @@ class HelpCog(commands.Cog, name="Help commands"):
 			custom_command_count = 0
 			for command in custom:
 				custom_command_count += 1
-			await embed_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}game             » Game commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Current guild profile\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}about            » Luna information\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
+			await embed_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}game             » Game commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Current guild profile\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}about            » Luna information\n{prefix}repeat           » Repeat last used command\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
 
 	@commands.command(name = "admin",
-						usage="",
+						usage="[2]",
 						description = "Administrative commands")
-	async def admin(self, luna):
+	async def admin(self, luna, page:str = "1"):
 		await luna.message.delete()
 		prefix = files.json("Luna/config.json", "prefix", documents=True)
 		cog = self.bot.get_cog('Administrative commands')
@@ -3641,7 +4137,40 @@ class HelpCog(commands.Cog, name="Help commands"):
 		helptext = ""
 		for command in commands:
 			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		await embed_builder(luna, title="Administrative", description=f"{theme.description()}```\n{helptext}```")
+		cog = self.bot.get_cog('Channel commands')
+		commands = cog.get_commands()
+		channeltext = ""
+		for command in commands:
+			channeltext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Member commands')
+		commands = cog.get_commands()
+		membertext = ""
+		for command in commands:
+			membertext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Nickname commands')
+		commands = cog.get_commands()
+		nicktext = ""
+		for command in commands:
+			nicktext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Role commands')
+		commands = cog.get_commands()
+		roletext = ""
+		for command in commands:
+			roletext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Invite commands')
+		commands = cog.get_commands()
+		invitetext = ""
+		for command in commands:
+			invitetext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		cog = self.bot.get_cog('Ignore commands')
+		commands = cog.get_commands()
+		ignoretext = ""
+		for command in commands:
+			ignoretext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		if page == "1":
+			await embed_builder(luna, title="Administrative", footer_extra=f"Page 1", description=f"{theme.description()}```\nMember Control\n\n{membertext}``````\nChannel Control\n\n{channeltext}``````\nNickname Control\n\n{nicktext}``````\nRole Control\n\n{roletext}``````\nNote\n\n{prefix}admin 2 » Page 2```")
+		elif page == "2":
+			await embed_builder(luna, title="Administrative", footer_extra=f"Page 2", description=f"{theme.description()}```\nGuild Control\n\n{helptext}``````\nInvite Control\n\n{invitetext}``````\nIgnore Control\n\n{ignoretext}```")
 
 	@commands.command(name = "profile",
 					usage="",
@@ -3832,7 +4361,27 @@ class HelpCog(commands.Cog, name="Help commands"):
 			helptext = ""
 			for command in commands:
 				helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-			await embed_builder(luna, title="Abusive commands", description=f"{theme.description()}```\n{helptext}```")
+			cog = self.bot.get_cog('Guild commands')
+			commands = cog.get_commands()
+			guildtext = ""
+			for command in commands:
+				guildtext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+			cog = self.bot.get_cog('Mass commands')
+			commands = cog.get_commands()
+			masstext = ""
+			for command in commands:
+				masstext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+			cog = self.bot.get_cog('All commands')
+			commands = cog.get_commands()
+			alltext = ""
+			for command in commands:
+				alltext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+			cog = self.bot.get_cog('Spam commands')
+			commands = cog.get_commands()
+			spamtext = ""
+			for command in commands:
+				spamtext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+			await embed_builder(luna, title="Abusive commands", description=f"{theme.description()}```\nSpam\n\n{spamtext}\n``````\nGuild\n\n{guildtext}\n``````\nMass\n\n{masstext}\n``````\nAll\n\n{alltext}\n``````\nGeneral\n\n{helptext}\n```")
 		else:
 			await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -3896,7 +4445,24 @@ class HelpCog(commands.Cog, name="Help commands"):
 		whitelisttext = ""
 		for command in commands:
 			whitelisttext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		await embed_builder(luna, title="Protections", description=f"{theme.description()}```\nPrivacy | Streamer Mode\n\n{privacytext}\n``````\nBackups\n\n{backuptext}\n``````\nWhitelist\n\n{whitelisttext}\n``````\nProtections\n\n{helptext}```")
+		activetext = ""
+		if not active_list == []:
+			activetext = f"\n\nActive protections:"
+		for active in active_list:
+			activetext+=f"\n{active.title()}"
+		cog = self.bot.get_cog('Protection Guild commands')
+		commands = cog.get_commands()
+		guildtext = ""
+		for command in commands:
+			guildtext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+		guilds = files.json("Luna/protections/config.json", "guilds", documents=True)
+		activeguildtext = ""
+		if not guilds == []:
+			activeguildtext = f"\nProtected guilds:"
+		for guild_id in guilds:
+			guild = self.bot.get_guild(guild_id)
+			activeguildtext+=f"\n{guild.name:17} » {guild.id}"
+		await embed_builder(luna, title="Protections", description=f"{theme.description()}```\nEnabled Protections\n\n{'Enabled':17} » {active_protections}{activetext}\n``````\nGuild Configuration\n\n{guildtext}{activeguildtext}``````\nProtections\n\n{helptext}``````\nWhitelist\n\n{whitelisttext}\n``````\nPrivacy | Streamer Mode\n\n{privacytext}\n``````\nBackups\n\n{backuptext}\n```")
 
 	@commands.command(name = "misc",
 					usage="",
@@ -3947,6 +4513,11 @@ class HelpCog(commands.Cog, name="Help commands"):
 		errorlog = files.json("Luna/config.json", "error_log", documents=True)
 		riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
 		themesvar = files.json("Luna/config.json", "theme", documents=True)
+		console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+		if console_mode == "2":
+			console_mode = "information"
+		else:
+			console_mode = "standard"
 		if themesvar == "default":
 			pass
 		else:
@@ -3986,7 +4557,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 		helptext = ""
 		for command in commands:
 			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		await embed_builder(luna, title="Settings", description=f"{theme.description()}```\nYour current settings\n\nError logging     » {errorlog}\nAuto delete timer » {deletetimer}\nStartup status    » {startup_status}\nRiskmode          » {riskmode}\nTheme             » {themesvar}\nDescription       » {theme_description}\nSelfbot detection » {selfbotdetection}\nMention notify    » {pings}\n``````\nYour current theme settings\n\nTheme             » {themesvar}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSettings\n\n{helptext}```")
+		await embed_builder(luna, title="Settings", description=f"{theme.description()}```\nYour current settings\n\nError logging     » {errorlog}\nAuto delete timer » {deletetimer}\nStartup status    » {startup_status}\nTheme             » {themesvar}\nConsole Mode      » {console_mode}\nRiskmode          » {riskmode}\nDescription       » {theme_description}\nSelfbot detection » {selfbotdetection}\nMention notify    » {pings}\n``````\nYour current theme settings\n\nTheme             » {themesvar}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSettings\n\n{helptext}```")
 
 	@commands.command(name = "sharing",
 					usage="",
@@ -4090,7 +4661,15 @@ class HelpCog(commands.Cog, name="Help commands"):
 			beta_info = f" Beta Build"
 		else:
 			beta_info = ""
-		await embed_builder(luna, description=f"```\nMoto of the day\n\n{motd}\n``````\nVersion\n\n{version}{beta_info}\n``````\nUptime\n\n{hour:02d}:{minute:02d}:{second:02d}\n``````\nCommands\n\n{command_count-custom_command_count}\n``````\nCustom commands\n\n{custom_command_count}\n``````\nPublic server invite\n\nhttps://discord.gg/Kxyv7NHVED\n``````\nCustomer only server invite\n\nhttps://discord.gg/3FGEaCnZST\n``````\nWebsite\n\nhttps://team-luna.org\n```")
+		await embed_builder(luna, description=f"```\nMOTD\n\n{motd}\n``````\nVersion\n\n{version}{beta_info}\n``````\nUptime\n\n{hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds\n``````\nCommands\n\n{command_count-custom_command_count}\n``````\nCustom commands\n\n{custom_command_count}\n``````\nEnviroment\n\nDiscord.py » {discord.__version__}\n``````\nPublic server invite\n\nhttps://discord.gg/rnq876Kcd7\n``````\nCustomer only server invite\n\nhttps://discord.gg/3FGEaCnZST\n``````\nWebsite\n\nhttps://team-luna.org\n```")
+
+	@commands.command(name = "repeat",
+						usage="",
+						description = "Repeat last used command")
+	async def repeat(self, luna):
+		await luna.message.delete()
+		prefix = files.json("Luna/config.json", "prefix", documents=True)
+		await luna.send(f"{prefix}{last_used}")
 
 	@commands.command(name = "search",
 						usage="<command>",
@@ -4153,6 +4732,18 @@ class ProfileCog(commands.Cog, name="Profile commands"):
 		requests.patch('https://discordapp.com/api/v9/users/@me/settings', json=payload, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
 		await embed_builder(luna, description="```\nSet status to offline/invisible```")
 
+	@commands.command(name = "startup",
+					usage="<online/idle/dnd/offline>",
+					description = "Startup")
+	async def startup(self, luna, mode:str):
+		await luna.message.delete()
+		if mode == "online" or mode == "idle" or mode == "dnd" or mode == "offline":
+			prints.message(f"Startup status » {color.purple(f'{mode}')}")
+			config.startup_status(mode)
+			await embed_builder(luna, description=f"```\nStartup status » {mode}```")
+		else:
+			await mode_error(luna, "online, idle, dnd or offline")
+
 bot.add_cog(ProfileCog(bot))
 class StatusCog(commands.Cog, name="Animated statuses"):
 	def __init__(self, bot:commands.bot):
@@ -4177,9 +4768,153 @@ class StatusCog(commands.Cog, name="Animated statuses"):
 		await embed_builder(luna, description=f"```\nRemoved custom status```")
 
 bot.add_cog(StatusCog(bot))
-class AdminCog(commands.Cog, name="Administrative commands"):
+class ChannelCog(commands.Cog, name="Channel commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
+
+	@commands.command(name = "channelinfo",
+					usage="<#channel>",
+					description = "Information")
+	async def channelinfo(self, luna, channel:discord.TextChannel):
+		await luna.message.delete()
+		await embed_builder(luna, title="Channel Information", description=f"```\n{'Name':17} » {channel.name}\n{'ID':17} » {channel.id}\n{'Created at':17} » {channel.created_at}\n{'Category':17} » {channel.category}\n{'Position':17} » {channel.position}\n{'Topic':17} » {channel.topic}\n{'Is NSFW?':17} » {channel.is_nsfw()}\n```")
+
+	@commands.command(name = "textchannel",
+					usage="<name>",
+					description = "Create a text channel")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def textchannel(self, luna, name:str):
+		await luna.message.delete()
+		channel = await luna.guild.create_text_channel(name)
+		await embed_builder(luna, description=f"```\nCreated text channel » {channel.mention}```")
+
+	@commands.command(name = "voicechannel",
+					usage="<name>",
+					description = "Create a voice channel")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def voicechannel(self, luna, name:str):
+		await luna.message.delete()
+		channel = await luna.guild.create_voice_channel(name)
+		await embed_builder(luna, description=f"```\nCreated voice channel » {channel.mention}```")
+
+	@commands.command(name = "stagechannel",
+					usage="<name>",
+					description = "Create a stage channel")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def stagechannel(self, luna, name:str):
+		await luna.message.delete()
+		payload = {
+			'name': f"{name}",
+			'type': 13
+			}
+		this = requests.post(f'https://discordapp.com/api/v9/guilds/{luna.guild.id}/channels', json=payload, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+		await embed_builder(luna, description=f"```\nCreated stage channel » {name}```")
+
+	@commands.command(name = "newschannel",
+					usage="<name>",
+					description = "Create a news channel")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def newschannel(self, luna, name:str):
+		await luna.message.delete()
+		payload = {
+			'name': f"{name}",
+			'type': 5
+			}
+		requests.post(f'https://discordapp.com/api/v9/guilds/{luna.guild.id}/channels', json=payload, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+		await embed_builder(luna, description=f"```\nCreated news channel » {name}```")
+
+	@commands.command(name = "renamechannel",
+					usage="<#channel> <name>",
+					description = "Rename channel")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def renamechannel(self, luna, channel:discord.TextChannel, name:str):
+		await luna.message.delete()
+		await channel.edit(name=name)
+		await embed_builder(luna, description=f"```\nRenamed {luna.channel.name} to » {channel.mention}```")
+
+	@commands.command(name = "deletechannel",
+					usage="<#channel>",
+					description = "Delete a channel")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def deletechannel(self, luna, channel:discord.TextChannel):
+		await luna.message.delete()
+		await channel.delete()
+		await embed_builder(luna, description=f"```\nDeleted channel » {channel.mention}```")
+
+	@commands.command(name = "slowmode",
+					usage="<seconds>",
+					description = "Set slowmode")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def slowmode(self, luna, seconds:int):
+		await luna.message.delete()
+		if seconds < 0:
+			await embed_builder(luna, title="Slowmode", description=f"```\nThe slowmode can't be negative```")
+			return
+		if seconds == 0:
+			await luna.channel.edit(slowmode_delay=0)
+			await embed_builder(luna, title="Slowmode", description=f"```\nDisabled slowmode```")
+			return
+		await luna.channel.edit(slowmode_delay=seconds)
+		await embed_builder(luna, title="Slowmode", description=f"```\nSet slowmode to » {seconds} seconds```")
+
+	@commands.command(name = "removeslowmode",
+					usage="",
+					description = "Remove slowmode")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def removeslowmode(self, luna):
+		await luna.message.delete()
+		await luna.channel.edit(slowmode_delay=0)
+		await embed_builder(luna, title="Slowmode", description=f"```\nRemoved slowmode```")
+
+	@commands.command(name = "lock",
+					usage="<#channel>",
+					description = "Lock a channel")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def lock(self, luna, channel:discord.TextChannel):
+		await luna.message.delete()
+		await channel.set_permissions(luna.guild.default_role, send_messages=False)
+		await channel.edit(name="🔒-locked")
+		await embed_builder(luna, description=f"```\nLocked channel » {channel.mention}```")
+
+	@commands.command(name = "unlock",
+					usage="<#channel>",
+					description = "Unlock a channel")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def unlock(self, luna, channel:discord.TextChannel):
+		await luna.message.delete()
+		await channel.set_permissions(luna.guild.default_role, send_messages=True)
+		await channel.edit(name="🔒-unlocked")
+		await embed_builder(luna, description=f"```\nUnlocked channel » {channel.mention}```")
+
+	@commands.command(name = "category",
+					usage="<name>",
+					description = "Create a category")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def category(self, luna, name:str):
+		await luna.message.delete()
+		category = await luna.guild.create_category_channel(name)
+		await embed_builder(luna, description=f"```\nCreated category » {category.mention}```")
+
+	@commands.command(name = "deletecategory",
+					usage="<category_id>",
+					description = "Delete a category")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def deletecategory(self, luna, category:discord.CategoryChannel):
+		await luna.message.delete()
+		await category.delete()
+		await embed_builder(luna, description=f"```\nDeleted category » {category.mention}```")
 
 	@commands.command(name = "purge",
 					usage="<amount>",
@@ -4191,41 +4926,46 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 				await message.delete()
 			except:
 				pass
-
-	@has_permissions(manage_channels=True) 
+ 
 	@commands.command(name = "nuke",
 					usage="[#channel]",
-					description = "Nuke a channel")
-	async def nuke(self, luna, channel: discord.TextChannel = None):
-		nuke_channel = discord.utils.get(luna.guild.channels, name=luna.channel.name, position=luna.channel.position)
-		if channel == None:
-			new_channel = await nuke_channel.clone(reason="Has been Nuked")
-			await nuke_channel.delete()
-			embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nThis channel has been nuked```", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await new_channel.send(embed=embed)
-			return
-		nuke_channel = discord.utils.get(luna.guild.channels, name=channel.name, position=luna.channel.position)
-		if nuke_channel is not None:
-			new_channel = await nuke_channel.clone(reason="Has been Nuked")
-			await nuke_channel.delete()
-			embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"```\nThis channel has been nuked```", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await new_channel.send(embed=embed)
-			return
+					description = "Nuke the channel")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def nuke(self, luna, channel:discord.TextChannel=None):
+		await luna.message.delete()
+		if channel is None:
+			channel = luna.channel
+		new_channel = await channel.clone()
+		await new_channel.edit(position=channel.position)
+		await channel.delete()
+		await embed_builder(new_channel, description=f"```\nThis channel has been nuked```")
+
+bot.add_cog(ChannelCog(bot))
+class MemberCog(commands.Cog, name="Member commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+
+	@commands.command(name = "userinfo",
+					usage="[user_id]",
+					description = "User information")
+	async def userinfo(self, luna, user:discord.Member=None):
+		await luna.message.delete()
+		if user is None:
+			user = luna.author
+		r = requests.get(f'https://discordapp.com/api/v9/users/{user.id}', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'}).json()
+		req = await bot.http.request(discord.http.Route("GET", "/users/{uid}", uid=user.id))
+		banner_id = req["banner"]
+		if banner_id:
+			banner_url = f"https://cdn.discordapp.com/banners/{user.id}/{banner_id}?size=1024"
 		else:
-			await error_builder(luna, description=f"```\nNo channel named {channel.name} was found!```")
-			return
+			banner_url = None
+		await embed_builder(luna, title="User information", thumbnail=user.avatar_url, large_image=banner_url, description=f"```\nGeneral Information\n\n{'User':12} » {user.name}#{user.discriminator}\n{'ID':12} » {user.id}\n{'Status':12} » {user.status}\n{'Bot':12} » {user.bot}\n{'Public Flags':12} » {r['public_flags']}\n{'Banner Color':12} » {r['banner_color']}\n{'Accent Color':12} » {r['accent_color']}\n``````\nCreated at:\n{user.created_at}\n``````\nImage Information\n\nAvatar URL:\n{user.avatar_url}\n\nBanner URL:\n{banner_url}\n```")
 
 	@commands.command(name = "whois",
 					usage="<@member>",
-					description = "Show information the user")
+					description = "Guild member information")
+	@commands.guild_only()
 	async def whois(self, luna, user: discord.Member = None):
 		await luna.message.delete()
 		if user is None:
@@ -4253,180 +4993,636 @@ class AdminCog(commands.Cog, name="Administrative commands"):
 					description = "Report a user")
 	async def report(self, luna, message_id:str, *, reason:str):
 		await luna.message.delete()
-		try:
-			payload = {
-				'message_id': message_id,
-				'reason': reason
+		payload = {
+			'message_id': message_id,
+			'reason': reason
+		}
+		requests.post('https://discordapp.com/api/v9/report', json=payload, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+		await embed_builder(luna, title="Report", description=f"```\nMessage {message_id} has been reported\n\nReason » {reason}```")
+
+	@commands.command(name = "mute",
+					usage="<@member> [reason]",
+					description = "Mute a user")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def mute(self, luna, user: discord.Member, *, reason:str=None):
+		await luna.message.delete()
+		role = discord.utils.get(luna.guild.roles, name="Muted")
+		if not role:
+			role = await luna.guild.create_role(name="Muted")
+			for channel in luna.guild.channels:
+				await channel.set_permissions(role, send_messages=False)
+		await user.add_roles(role)
+		await embed_builder(luna, title="Mute", description=f"```\n{user.name}#{user.discriminator} has been muted\n\nReason » {reason}```")
+
+	@commands.command(name = "unmute",
+					usage="<@member> [reason]",
+					description = "Unmute a user")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def unmute(self, luna, user: discord.Member, *, reason:str=None):
+		await luna.message.delete()
+		role = discord.utils.get(luna.guild.roles, name="Muted")
+		if not role:
+			await embed_builder(luna, title="Unmute", description="No mute role found")
+			return
+		await user.remove_roles(role, reason="Unmute")
+		await embed_builder(luna, title="Unmute", description=f"```\n{user.name}#{user.discriminator} has been unmuted\n\nReason » {reason}```")
+
+	@commands.command(name = "timeout",
+					usage="<user> <time>",
+					description = "Time out a user")
+	@commands.guild_only()
+	@has_permissions(ban_members=True)
+	async def timeout(self, luna, user:discord.Member, time:int):
+		await luna.message.delete()
+		payload = {
+			'user_id': user.id,
+			'duration': time
 			}
-			requests.post('https://discordapp.com/api/v9/report', json=payload, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
-			await embed_builder(luna, title="Report", url=theme.title_url(), description=f"Message {message_id} has been reported\n\nReason » {reason}")
-		except Exception as e:
-			await error_builder(luna, description=e)
+		requests.post(f'https://discordapp.com/api/v9/guilds/{luna.guild.id}/bans', json=payload, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+		await embed_builder(luna, description=f"```\nTime out » {user.name}#{user.discriminator} for {time} seconds```")
+
+	@commands.command(name = "kick",
+					usage="<@member> [reason]",
+					description = "Kick a user")
+	@commands.guild_only()
+	@has_permissions(kick_members=True)
+	async def kick(self, luna, user: discord.Member, *, reason:str=None):
+		await luna.message.delete()
+		await user.kick(reason=reason)
+		await embed_builder(luna, title="Kick", description=f"```\n{user.name}#{user.discriminator} has been kicked\n\nReason » {reason}```")
+
+	@commands.command(name = "softban",
+					usage="<@member> [reason]",
+					description = "Softban a user")
+	@commands.guild_only()
+	@has_permissions(ban_members=True)
+	async def softban(self, luna, user: discord.Member, *, reason:str=None):
+		await luna.message.delete()
+		await user.ban(reason=reason)
+		await user.unban(reason=reason)
+		await embed_builder(luna, title="Softban", description=f"```\n{user.name}#{user.discriminator} has been softbanned\n\nReason » {reason}```")
 
 	@commands.command(name = "ban",
-					usage="<@member>",
-					description = "Bans a user")
+					usage="<@member> [reason]",
+					description = "Ban a user")
+	@commands.guild_only()
 	@has_permissions(ban_members=True)
-	async def ban(self, luna, user: discord.Member = None, *, reason: str = None):
+	async def ban(self, luna, user: discord.Member, *, reason:str=None):
 		await luna.message.delete()
-		if user == None:
-			await error_builder(luna, title="Ban Error", description=f"Who do you want banned? Please mention an user")
-			return
-		elif user == luna.author:
-			await error_builder(luna, title="Ban Error", description=f"You can't ban yourself, Please mention someone else")
-			return
-		else:
-			pass
-		try:
-			await user.ban(reason=reason)
-			await embed_builder(luna, title="Ban", url=theme.title_url(), description=f"User {user.mention}({user.id}) has been banned\n\nReason » {reason}")
-		except Exception as e:
-			await error_builder(luna, description=e)
+		await user.ban(reason=reason)
+		await embed_builder(luna, title="Ban", description=f"```\n{user.name}#{user.discriminator} has been banned\n\nReason » {reason}```")
 
 	@commands.command(name = "unban",
 					usage="<user_id>",
 					description = "Unban a user")
+	@commands.guild_only()
 	@has_permissions(ban_members=True)
-	async def unban(self, luna, user: discord.Member = None):
+	async def unban(self, luna, user_id:int):
 		await luna.message.delete()
-		if user == None:
-			await error_builder(luna, title="Ban Error", description=f"Who do you want unbanned? Please specify the user id")
-			return
-		elif user == luna.author:
-			await error_builder(luna, title="Ban Error", description=f"You can't unban yourself, Please specify someone elses user id")
-			return
-		else:
-			pass
-		try:
-			user1 = await self.bot.fetch_user(user)
-			await luna.guild.unban(user1)
-			await embed_builder(luna, title="Ban", url=theme.title_url(), description=f"User {user.mention} ({user.id}) has been unbanned")
-		except Exception as e:
-			await error_builder(luna, description=e)
+		banned_users = await luna.guild.bans()
+		for ban_entry in banned_users:
+			user = ban_entry.user
+			if user.id == user_id:
+				await luna.guild.unban(user)
+				await embed_builder(luna, title="Unban", description=f"```\n{user.name}#{user.discriminator} has been unbanned```")
+				return
+		await embed_builder(luna, title="Unban", description=f"```\nNo banned user with the id {user_id} was found```")
 
-	@commands.command(name = "kick",
+	@commands.command(name = "bans",
+					usage="[guild_id]",
+					description = "List all bans")
+	@commands.guild_only()
+	@has_permissions(ban_members=True)
+	async def bans(self, luna, guild_id:int=None):
+		await luna.message.delete()
+		if guild_id is not None:
+			guild = discord.utils.get(self.bot.guilds, id=guild_id)
+			bans = await guild.bans()
+		else:
+			guild = luna.guild
+			bans = await guild.bans()
+		if len(bans) == 0:
+			await embed_builder(luna, title=f"Bans in {guild.name}", description=f"```\nNo users are banned in {guild.name}```")
+			return
+		bans = [f"{b.user.name}#{b.user.discriminator} | {b.user.id}" for b in bans]
+		bans = "\n".join(bans)
+		await embed_builder(luna, title=f"Bans in {guild.name}", description=f"```{bans}```")
+
+	@commands.command(name = "savebans",
+					usage="[guild_id]",
+					description = "Save bans")
+	@commands.guild_only()
+	@has_permissions(ban_members=True)
+	async def savebans(self, luna, guild_id:int=None):
+		await luna.message.delete()
+		if guild_id is not None:
+			guild = discord.utils.get(self.bot.guilds, id=guild_id)
+			bans = await guild.bans()
+		else:
+			guild = luna.guild
+			bans = await guild.bans()
+		if len(bans) == 0:
+			await embed_builder(luna, title=f"Bans in {guild.name}", description=f"```\nNo users are banned in {guild.name}```")
+			return
+		bans = [f"{b.user.name}#{b.user.discriminator} | {b.user.id}" for b in bans]
+		bans = "\n".join(bans)
+		files.create_folder(f"Luna/backup/guilds/{guild.name}", documents=True)
+		files.write_file(f"Luna/backup/guilds/{guild.name}/bans.txt", bans, documents=True)
+		await embed_builder(luna, title=f"Saved Bans", description=f"```\nSaved all bans in Luna/backup/guilds/{guild.name}/bans.txt\n``````{bans}```")
+
+	@commands.command(name = "loadbans",
+					usage="[guild_id]",
+					description = "Load bans")
+	@commands.guild_only()
+	@has_permissions(ban_members=True)
+	async def loadbans(self, luna, guild_id:int=None):
+		await luna.message.delete()
+		if guild_id is not None:
+			guild = discord.utils.get(self.bot.guilds, id=guild_id)
+		else:
+			guild = luna.guild
+		if not files.file_exist(f"Luna/backup/guilds/{guild.name}", documents=True):
+			await embed_builder(luna, title=f"Load bans", description=f"```\nNo bans were found in Luna/backup/{guild.name}/bans.txt```")
+			return
+		bans = files.read_file(f"Luna/backup/guilds/{guild.name}/bans.txt", documents=True)
+		bans = bans.split("\n")
+		for ban in bans:
+			if ban == "":
+				continue
+			user_id = int(ban.split(" | ")[1])
+			user = discord.utils.get(guild.members, id=user_id)
+			await guild.ban(user)
+		await embed_builder(luna, title=f"Load bans", description=f"```\nLoaded all bans from Luna/backup/guilds/{guild.name}/bans.txt```")
+
+bot.add_cog(MemberCog(bot))
+class RoleCog(commands.Cog, name="Role commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+	
+	@commands.command(name = "roleinfo",
+					usage="<@role>",
+					description = "Information")
+	async def roleinfo(self, luna, role:discord.Role):
+		await luna.message.delete()
+		role_amount = 0
+		role_members = ""
+		for member in luna.guild.members:
+			for roles in member.roles:
+				if roles.id == role.id:
+					role_amount += 1
+					role_members += f"{member.name}#{member.discriminator}\n"
+		if role_members == "":
+			role_members = "No members have this role"
+		await embed_builder(luna, title="Role Information", description=f"```\n{'Name':17} » {role.name}\n{'ID':17} » {role.id}\n{'Color':17} » {role.color}\n{'Created at':17} » {role.created_at}\n{'Position':17} » {role.position}\n``````\n{'Members':17} » {role_amount}\n\nMember List:\n{role_members}\n``````\n{'Permissions':17} » {role.permissions}\n```")
+
+	@commands.command(name = "giverole",
+					usage="<@member> <role_id>",
+					description = "Give a role")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def giverole(self, luna, member:discord.Member, role_id:int):
+		await luna.message.delete()
+		role = discord.utils.get(luna.guild.roles, id=role_id)
+		if role is None:
+			await embed_builder(luna, title="Give role", description=f"```\nNo role with the id {role_id} was found```")
+			return
+		await member.add_roles(role)
+		await embed_builder(luna, title="Give role", description=f"```\nGave {member.name}#{member.discriminator} role » {role.name}```")
+
+	@commands.command(name = "giveallroles",
 					usage="<@member>",
-					description = "Kicks a user")
-	@has_permissions(kick_members=True)
-	async def kick(self, luna, user: discord.Member = None, *, reason: str = None):
+					description = "Give all roles")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def giveallroles(self, luna, member:discord.Member):
 		await luna.message.delete()
-		if user == None:
-			if configs.error_log() == "console":
-				prints.error("Who do you want kicked? Please mention an user")
-			else:
-				embed = discord.Embed(title="Kick Error", url=theme.title_url(), description=f"Who do you want Kicked? Please mention an user.", color=theme.hex_color())
-				embed.set_thumbnail(url=theme.image_url())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				embed.set_image(url=theme.large_image_url())
-				await send(luna, embed)
-				return
-		elif user == luna.author:
-			if configs.error_log() == "console":
-				prints.error("You can't kick yourself, Please mention someone else")
-			else:
-				embed = discord.Embed(title="Kick Error", url=theme.title_url(), description=f"You can't kick yourself, Please mention someone else.", color=theme.hex_color())
-				embed.set_thumbnail(url=theme.image_url())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				embed.set_image(url=theme.large_image_url())
-				await send(luna, embed)
-				return
-		else:
-			pass
-		try:
-			await user.kick(reason=reason)
-			embed = discord.Embed(title="Kick", url=theme.title_url(), description=f"User {user.mention} ({user.id}) has been kicked.\n\nReason: {reason}", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
-		except Exception as e:
-			prints.error(e)
+		for role in luna.guild.roles:
+			if role.name == "@everyone":
+				continue
+			await member.add_roles(role)
+		await embed_builder(luna, title="Give all roles", description=f"```\nGave all roles to » {member.name}#{member.discriminator}```")
 
-	@commands.command(name = "kickgc",
+	@commands.command(name = "allroles",
 					usage="",
-					description = "Kick all in the group channel")
-	async def kickgc(self, luna):
+					description = "Give all roles")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def allroles(self, luna):
 		await luna.message.delete()
-		if isinstance(luna.message.channel, discord.GroupChannel):
-			for recipient in luna.message.channel.recipients:
-				await luna.message.channel.remove_recipients(recipient)
+		for member in luna.guild.members:
+			for role in luna.guild.roles:
+				if role.name == "@everyone":
+					continue
+				await member.add_roles(role)
+		await embed_builder(luna, title="Give all roles", description=f"```\nGave all members all roles```")
 
-	@commands.command(name = "leavegc",
-					usage="",
-					description = "Leave the group channel")
-	async def leavegc(self, luna):
+	@commands.command(name = "removeallroles",
+					usage="<@member>",
+					description = "Remove all roles")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)	
+	async def removeallroles(self, luna, member:discord.Member):
 		await luna.message.delete()
-		if isinstance(luna.message.channel, discord.GroupChannel):
-			await luna.message.channel.leave()
+		for role in luna.guild.roles:
+			if role.name == "@everyone":
+				continue
+			await member.remove_roles(role)
+		await embed_builder(luna, title="Remove all roles", description=f"```\nRemoved all roles from » {member.name}#{member.discriminator}```")
+
+	@commands.command(name = "removerole",
+					usage="<@member> <role_id>",
+					description = "Remove a role")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def removerole(self, luna, member:discord.Member, role_id:int):
+		await luna.message.delete()
+		role = discord.utils.get(luna.guild.roles, id=role_id)
+		if role is None:
+			await embed_builder(luna, title="Remove role", description=f"```\nNo role with the id {role_id} was found```")
+			return	
+		await member.remove_roles(role)
+		await embed_builder(luna, title="Remove role", description=f"```\nRemoved role {role.name} from » {member.name}#{member.discriminator}```")
+
+	@commands.command(name = "createrole",
+					usage="<role_name>",
+					description = "Create a role")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def createrole(self, luna, *, role_name:str):
+		await luna.message.delete()
+		role = await luna.guild.create_role(name=role_name)
+		await embed_builder(luna, title="Create role", description=f"```\nCreated role » {role.name}```")
+
+	@commands.command(name = "renamerole",
+					usage="<role_id> <name>",
+					description = "Rename a role")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def renamerole(self, luna, role_id:int, *, name:str):
+		await luna.message.delete()
+		role = discord.utils.get(luna.guild.roles, id=role_id)
+		if role is None:
+			await embed_builder(luna, title="Rename role", description=f"```\nNo role with the id {role_id} was found```")
+			return
+		await role.edit(name=name)
+		await embed_builder(luna, title="Rename role", description=f"```\nRenamed role {role.name} to » {name}```")
+
+	@commands.command(name = "renameroles",
+					usage="<name>",
+					description = "Rename all roles")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def renameroles(self, luna, *, name:str):
+		await luna.message.delete()
+		for role in luna.guild.roles:
+			if role.name == "@everyone":
+				continue
+			await role.edit(name=name)
+		await embed_builder(luna, title="Rename all roles", description=f"```\nRenamed all roles to » {name}```")
+
+	@commands.command(name = "deleterole",
+					usage="<role_id>",
+					description = "Delete a role")
+	@commands.guild_only()
+	@has_permissions(manage_roles=True)
+	async def deleterole(self, luna, role_id:int):
+		await luna.message.delete()
+		role = discord.utils.get(luna.guild.roles, id=role_id)
+		if role is None:
+			await embed_builder(luna, title="Delete role", description=f"```\nNo role with the id {role_id} was found```")
+			return
+		await role.delete()
+		await embed_builder(luna, title="Delete role", description=f"```\nDeleted role » {role.name}```")
+
+bot.add_cog(RoleCog(bot))
+class NickCog(commands.Cog, name="Nickname commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
 
 	@commands.command(name = "nick",
-					aliases=['nickname'],
-					usage="",
-					description = "Change your nickname")
-	async def nick(self, luna, *, name):
-		await luna.message.delete()
-		try:
-			await luna.message.author.edit(nick=name)
-			embed = discord.Embed(title="Nickname", url=theme.title_url(), description=f"```\nSuccessfully changed your nickname to: {name}```", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
-		except Exception as e:
-			if configs.error_log() == "console":
-				prints.error(e)
-			else:
-				embed = discord.Embed(title="Error", url=theme.title_url(), description=e, color=0xff0000)
-				embed.set_thumbnail(url=theme.image_url())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				embed.set_image(url=theme.large_image_url())
-				await send(luna, embed)
-
-	@commands.command(name = "guildname",
 					usage="<name>",
-					description = "Change the guild name")
-	async def guildname(self, luna, *, name:str):
+					description = "Change nickname")
+	@commands.guild_only()
+	@has_permissions(manage_nicknames=True)
+	async def nick(self, luna, *, name:str):
 		await luna.message.delete()
-		await luna.guild.edit(name=name)
-		embed = discord.Embed(title="Servername", url=theme.title_url(), description=f"```\nSuccessfully changed the servername to: {name}```", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await luna.author.edit(nick=name)
+		await embed_builder(luna, title="Nickname", description=f"```\nChanged nickname to » {name}```")
+	
+	@commands.command(name = "nickmember",
+					usage="<@member> <name>",
+					description = "Change nickname")
+	@commands.guild_only()
+	@has_permissions(manage_nicknames=True)
+	async def nickmember(self, luna, member:discord.Member, *, name:str):
+		await luna.message.delete()
+		await member.edit(nick=name)
+		await embed_builder(luna, title="Nickname", description=f"```\nChanged nickname of {member.name}#{member.discriminator} to » {name}```")
 
 	@commands.command(name = "nickall",
 					usage="<name>",
-					description = "Change everyone's nickname")
+					description = "Change nickname of everyone")
+	@commands.guild_only()
+	@has_permissions(manage_nicknames=True)
 	async def nickall(self, luna, *, name:str):
 		await luna.message.delete()
-		for user in list(luna.guild.members):
-			try:
-				await user.edit(nick=name)
-			except:
-				pass
-		embed = discord.Embed(title="Nickall", url=theme.title_url(), description=f"```\nSuccessfully changed the nickname of every member to: {name}```", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		for member in luna.guild.members:
+			await member.edit(nick=name)
+		await embed_builder(luna, title="Nickall", description=f"```\nChanged nickname of everyone to » {name}```")
 
-	@commands.command(name = "rchannels",
-					usage="<name>",
-					description = "Change every channel")
-	async def rchannels(self, luna, *, name):
+	@commands.command(name = "clearnick",
+					usage="[@member]",
+					description = "Clear nickname")
+	@commands.guild_only()
+	@has_permissions(manage_nicknames=True)
+	async def clearnick(self, luna, member:discord.Member=None):
 		await luna.message.delete()
-		for channel in luna.guild.channels:
-			await channel.edit(name=name)
+		if member is None:
+			member = luna.author
+		await member.edit(nick=None)
+		await embed_builder(luna, title="Clearnick", description=f"```\nCleared nickname of » {member.name}#{member.discriminator}```")
 
+	@commands.command(name = "clearallnick",
+					usage="",
+					description = "Clear all nicknames")
+	@commands.guild_only()
+	@has_permissions(manage_nicknames=True)
+	async def clearallnick(self, luna):
+		await luna.message.delete()
+		for member in luna.guild.members:
+			await member.edit(nick=None)
+		await embed_builder(luna, title="Clearnick", description=f"```\nCleared nickname of everyone```")
+
+bot.add_cog(NickCog(bot))
+class InviteCog(commands.Cog, name="Invite commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+
+	@commands.command(name = "inviteinfo",
+					usage="<invite>",
+					description = "Invite information")
+	@commands.guild_only()
+	async def inviteinfo(self, luna, invite:str):
+		await luna.message.delete()
+		invite = await self.bot.get_invite(invite)
+		if invite is None:
+			await embed_builder(luna, title="Invite info", description=f"```\nNo invite with the id {invite} was found```")
+			return
+		await embed_builder(luna, title="Invite info", description=f"```\nInvite » {invite.code}\nCreated at » {invite.created_at}\nChannel » {invite.channel.mention}\nGuild » {invite.guild.name}\nCreated by » {invite.inviter.name}#{invite.inviter.discriminator}\nMax uses » {invite.max_uses}\nUses » {invite.uses}```")
+
+	@commands.command(name = "invite",
+					usage="[channel_id] [age] [uses]",
+					description = "Invite")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def invite(self, luna, channel_id:int=None, max_age:int=0, max_uses:int=0):
+		await luna.message.delete()
+		if channel_id is None:
+			channel = luna.channel
+		else:
+			channel = discord.utils.get(luna.guild.channels, id=channel_id)
+		if channel is None:
+			await embed_builder(luna, title="Invite", description=f"```\nNo channel with the id » {channel_id} was found```")
+			return
+		invite = await channel.create_invite(max_age=max_age, max_uses=max_uses)
+		await embed_builder(luna, title="Invite", description=f"```\nCreated invite » {invite.url}```")
+
+	@commands.command(name = "delinvite",
+					usage="<invite_id>",
+					description = "Delete invite")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def delinvite(self, luna, invite_id:int):
+		await luna.message.delete()
+		invite = discord.utils.get(luna.guild.invites, id=invite_id)
+		if invite is None:
+			await embed_builder(luna, title="Delete invite", description=f"```\nNo invite with the id » {invite_id} was found```")
+			return
+		await invite.delete()
+		await embed_builder(luna, title="Delete invite", description=f"```\nDeleted invite » {invite.url}```")	
+
+	@commands.command(name = "delallinvite",
+					usage="",
+					description = "Delete all invites")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def delallinvite(self, luna):
+		await luna.message.delete()
+		for invite in luna.guild.invites:
+			await invite.delete()
+		await embed_builder(luna, title="Delete invite", description=f"```\nDeleted all invites```")
+
+	@commands.command(name = "invitelist",
+					usage="",
+					description = "List all invites")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def invitelist(self, luna):	
+		await luna.message.delete()
+		invites = luna.guild.invites
+		if len(invites) == 0:
+			await embed_builder(luna, title="Invite list", description=f"```\nNo invites were found```")
+			return
+		invite_list = ""
+		for invite in invites:
+			invite_list += f"{invite.url}\n"
+		await embed_builder(luna, title="Invite list", description=f"```\n{invite_list}```")
+
+	@commands.command(name = "invitechannel",
+					usage="<channel_id>",
+					description = "Channel invites")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def invitelistchannel(self, luna, channel_id:int):
+		await luna.message.delete()
+		channel = discord.utils.get(luna.guild.channels, id=channel_id)
+		if channel is None:
+			await embed_builder(luna, title="Invite list", description=f"```\nNo channel with the id » {channel_id} was found```")
+			return	
+		invites = channel.invites
+		if len(invites) == 0:
+			await embed_builder(luna, title="Invite list", description=f"```\nNo invites were found```")
+			return
+		invite_list = ""
+		for invite in invites:
+			invite_list += f"{invite.url}\n"
+		await embed_builder(luna, title="Invite list", description=f"```\n{invite_list}```")
+
+	@commands.command(name = "inviteguild",
+					usage="",
+					description = "Invites of a guild")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def invitelistguild(self, luna):
+		await luna.message.delete()
+		invites = luna.guild.invites
+		if len(invites) == 0:
+			await embed_builder(luna, title="Invite list", description=f"```\nNo invites were found```")
+			return
+		invite_list = ""
+		for invite in invites:
+			invite_list += f"{invite.url}\n"
+		await embed_builder(luna, title="Invite list", description=f"```\n{invite_list}```")
+
+	@commands.command(name = "inviteuser",
+					usage="<user_id>",
+					description = "Invites of a user")
+	@commands.guild_only()
+	@has_permissions(manage_channels=True)
+	async def invitelistuser(self, luna, user_id:int):
+		await luna.message.delete()
+		user = discord.utils.get(luna.guild.members, id=user_id)
+		if user is None:
+			await embed_builder(luna, title="Invite list", description=f"```\nNo user with the id » {user_id} was found```")
+			return
+		invites = user.invites
+		if len(invites) == 0:
+			await embed_builder(luna, title="Invite list", description=f"```\nNo invites were found```")
+			return
+		invite_list = ""
+		for invite in invites:
+			invite_list += f"{invite.url}\n"
+		await embed_builder(luna, title="Invite list", description=f"```\n{invite_list}```")
+
+bot.add_cog(InviteCog(bot))
+class AdminCog(commands.Cog, name="Administrative commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+
+	@commands.command(name = "guildname",
+					usage="<name>",
+					description = "Change guild name")
+	@commands.guild_only()
+	@has_permissions(manage_guild=True)
+	async def guildname(self, luna, *, name:str):
+		await luna.message.delete()
+		await luna.guild.edit(name=name)
+		await embed_builder(luna, title="Guildname", description=f"```\nChanged the name of the guild to » {name}```")
+
+	@commands.command(name = "guildimage",
+					usage="<image_url>",
+					description = "Change guild image")
+	@commands.guild_only()
+	@has_permissions(manage_guild=True)
+	async def guildimage(self, luna, *, image_url:str):
+		await luna.message.delete()
+		await luna.guild.edit(icon=image_url)
+		await embed_builder(luna, title="Guildimage", description=f"```\nChanged the image of the guild to » {image_url}```")
+
+	@commands.command(name = "guildbanner",
+					usage="<image_url>",
+					description = "Change guild banner")
+	@commands.guild_only()
+	@has_permissions(manage_guild=True)
+	async def guildbanner(self, luna, *, image_url:str):
+		await luna.message.delete()
+		await luna.guild.edit(banner=image_url)
+		await embed_builder(luna, title="Guildbanner", description=f"```\nChanged the banner of the guild to » {image_url}```")
+
+	@commands.command(name = "getguildimage",
+					usage="[guild_id]",
+					description = "Get the guild image")
+	@commands.guild_only()
+	@has_permissions(manage_guild=True)
+	async def getguildimage(self, luna, guild_id:int=None):
+		await luna.message.delete()
+		if guild_id is None:
+			guild_id = luna.guild.id
+		guild = discord.utils.get(luna.guilds, id=guild_id)
+		if guild is None:
+			await embed_builder(luna, title="Guildimage", description=f"```\nNo guild with the id » {guild_id} was found```")
+			return
+		await embed_builder(luna, title="Guildimage", description=f"```\n{guild.icon_url}```")
+
+	@commands.command(name = "getguildbanner",
+					usage="[guild_id]",
+					description = "Get the guild banner")
+	@commands.guild_only()
+	@has_permissions(manage_guild=True)
+	async def getguildbanner(self, luna, guild_id:int=None):
+		await luna.message.delete()
+		if guild_id is None:
+			guild_id = luna.guild.id
+		guild = discord.utils.get(luna.guilds, id=guild_id)
+		if guild is None:
+			await embed_builder(luna, title="Guildbanner", description=f"```\nNo guild with the id » {guild_id} was found```")
+			return
+		await embed_builder(luna, title="Guildbanner", description=f"```\n{guild.banner_url}```")
+
+	@commands.command(name = "guildinfo",
+					usage="[guild_id]",
+					description = "Guild information")
+	@commands.guild_only()
+	@has_permissions(manage_guild=True)
+	async def guildinfo(self, luna, guild_id:int=None):
+		await luna.message.delete()
+		if guild_id is None:
+			guild = luna.guild
+		else:
+			guild = discord.utils.get(bot.guilds, id=guild_id)
+			if guild is None:
+				await embed_builder(luna, title="Guildinfo", description=f"```\nNo guild with the id {guild_id} was found```")
+				return
+		await embed_builder(luna, title="Guildinfo", thumbnail=guild.icon_url, large_image=guild.banner_url, description=f"```\nGeneral Information\n\n{'Guild':<17} » {guild.name}\n{'ID':17} » {guild.id}\n{'Owner':17} » {guild.owner}\n{'Created at':17} » {guild.created_at}\n{'Boost':17} » {guild.premium_subscription_count}\n{'Boost status':17} » {guild.premium_subscription_count is not None}\n{'Region':17} » {guild.region}\n{'Verification':17} » {guild.verification_level}\n``````\nMember Information\n\n{'Member count':17} » {guild.member_count}\n``````\nChannel Information\n\n{'Text channels':17} » {len(guild.text_channels)}\n{'Voice channels':17} » {len(guild.voice_channels)}\n``````\nRole Information\n\n{'Role count':17} » {len(guild.roles)}```")
+				
 bot.add_cog(AdminCog(bot))
 
+ignore_list = []
+
+class IgnoreCog(commands.Cog, name="Ignore commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+
+	@commands.command(name = "ignore",
+					usage="<@user>",
+					description = "Ignore user DMs")
+	async def ignore(self, luna, *, user:discord.Member):
+		await luna.message.delete()
+		global ignore_list
+		if user.id in ignore_list:
+			await embed_builder(luna, title="Ignore", description=f"```\n{user} is already ignored```")
+			return
+		ignore_list.append(user.id)
+		await embed_builder(luna, title="Ignore", description=f"```\n{user} is now ignored```")
+
+	@commands.command(name = "unignore",
+					usage="<@user>",
+					description = "Unignore user DMs")
+	async def unignore(self, luna, *, user:discord.Member):
+		await luna.message.delete()
+		global ignore_list
+		if user.id not in ignore_list:
+			await embed_builder(luna, title="Unignore", description=f"```\n{user} is not ignored```")
+			return
+		ignore_list.remove(user.id)
+		await embed_builder(luna, title="Unignore", description=f"```\n{user} is now unignored```")
+
+	@commands.command(name = "ignorelist",
+					usage="",
+					description = "List ignored users")
+	async def ignorelist(self, luna):
+		await luna.message.delete()
+		global ignore_list
+		if len(ignore_list) == 0:
+			await embed_builder(luna, title="Ignorelist", description=f"```\nNo users are ignored```")
+			return
+		await embed_builder(luna, title="Ignorelist", description=f"```\n{ignore_list}```")
+
+	@commands.command(name = "ignorelistclear",
+					usage="",
+					description = "Clear ignore list")
+	async def ignorelistclear(self, luna):
+		await luna.message.delete()
+		global ignore_list
+		if len(ignore_list) == 0:
+			await embed_builder(luna, title="Ignorelist", description=f"```\nNo users are ignored```")
+			return
+		ignore_list.clear()
+		await embed_builder(luna, title="Ignorelist", description=f"```\nIgnore list is now cleared```")
+
+bot.add_cog(IgnoreCog(bot))
 class AnimatedCog(commands.Cog, name="Animated commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
@@ -6016,145 +7212,66 @@ class FunCog(commands.Cog, name="Fun commands"):
 	@commands.command(name = "shoot",
 					usage="<@member>",
 					description = "Shoot up someone")
-	async def shoot(self, luna, user: discord.Member = None):
+	async def shoot(self, luna, user: discord.Member):
 		await luna.message.delete()
-		if user == None:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"Who do you want to shoot up? Please mention someone.", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await luna.send(embed=embed)
-			return
-		else:
-			embed = discord.Embed(description=f"{user.mention} got shot up!", color=theme.hex_color())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url="https://media1.tenor.com/images/cfb7817a23645120d4baba2dcb9205e0/tenor.gif")
-			await luna.send(embed=embed)
+		await embed_builder(luna, description=f"{user.mention},  got shot up!", large_image="https://media1.tenor.com/images/cfb7817a23645120d4baba2dcb9205e0/tenor.gif", thumbnail="None", footer="None")
 
 	@commands.command(name = "feed",
 					usage="<@member>",
 					description = "Feed someone")
-	async def feed(self, luna, user: discord.Member = None):
+	async def feed(self, luna, user: discord.Member):
 		await luna.message.delete()
-		if user == None:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"Who do you want to feed? Please mention someone.", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await luna.send(embed=embed)
-			return
-		else:
-			r = requests.get("https://nekos.life/api/v2/img/feed").json()
-			embed = discord.Embed(description=f"{luna.author.mention} feeds {user.mention}", color=theme.hex_color())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=str(r['url']))
-			await luna.send(embed=embed)
+		r = requests.get("https://nekos.life/api/v2/img/feed").json()
+		await embed_builder(luna, description=f"{luna.author.mention} feeds {user.mention}", large_image=str(r['url']), thumbnail="None", footer="None")
+
+	@commands.command(name = "bite",
+					usage="<@member>",
+					description = "Bite someone")
+	async def bite(self, luna, user: discord.Member):
+		await luna.message.delete()
+		gif_list = ["https://c.tenor.com/MKjNSLL4dGoAAAAC/bite-cute.gif", "https://c.tenor.com/aKzAQ_cFsFEAAAAC/arms-bite.gif", "https://c.tenor.com/4j3hMz-dUz0AAAAC/anime-love.gif", "https://c.tenor.com/TX6YHUnHJk4AAAAC/mao-amatsuka-gj-bu.gif"]
+		await embed_builder(luna, description=f"{user.mention} got bitten by {luna.author.mention}!", large_image=random.choice(gif_list), thumbnail="None", footer="None")
 
 	@commands.command(name = "kiss",
 					usage="<@member>",
 					description = "Kiss someone")
-	async def kiss(self, luna, user: discord.Member = None):
+	async def kiss(self, luna, user: discord.Member):
 		await luna.message.delete()
-		if user == None:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"Who do you want to kiss? Please mention someone.", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await luna.send(embed=embed)
-			return
-		else:
-			r = requests.get("https://nekos.life/api/v2/img/kiss").json()
-			embed = discord.Embed(description=f"{luna.author.mention} kisses {user.mention}", color=theme.hex_color())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=str(r['url']))
-			await luna.send(embed=embed)
+		r = requests.get("https://nekos.life/api/v2/img/kiss").json()
+		await embed_builder(luna, description=f"{user.mention} got kissed by {luna.author.mention}!", large_image=str(r['url']), thumbnail="None", footer="None")
 
 	@commands.command(name = "hug",
 					usage="<@member>",
 					description = "Hug someone")
-	async def hug(self, luna, user: discord.Member = None):
+	async def hug(self, luna, user: discord.Member):
 		await luna.message.delete()
-		if user == None:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"Who do you want to hug? Please mention someone.", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await luna.send(embed=embed)
-			return
-		else:
-			r = requests.get("https://nekos.life/api/v2/img/hug").json()
-			embed = discord.Embed(description=f"{luna.author.mention} hugs {user.mention}", color=theme.hex_color())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=str(r['url']))
-			await luna.send(embed=embed)
+		r = requests.get("https://nekos.life/api/v2/img/hug").json()
+		await embed_builder(luna, description=f"{user.mention} got hugged by {luna.author.mention}!", large_image=str(r['url']), thumbnail="None", footer="None")
+
 
 	@commands.command(name = "pat",
 					usage="<@member>",
 					description = "Pat someone")
-	async def pat(self, luna, user: discord.Member = None):
+	async def pat(self, luna, user: discord.Member):
 		await luna.message.delete()
-		if user == None:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"Who do you want to pat? Please mention someone.", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await luna.send(embed=embed)
-			return
-		else:
-			r = requests.get("https://nekos.life/api/v2/img/pat").json()
-			embed = discord.Embed(description=f"{luna.author.mention} pats {user.mention}", color=theme.hex_color())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=str(r['url']))
+		r = requests.get("https://nekos.life/api/v2/img/pat").json()
+		await embed_builder(luna, description=f"{luna.author.mention} pats {user.mention}", large_image=str(r['url']), thumbnail="None", footer="None")
 
 	@commands.command(name = "slap",
 					usage="<@member>",
 					description = "Slap someone")
-	async def slap(self, luna, user: discord.Member = None):
+	async def slap(self, luna, user: discord.Member):
 		await luna.message.delete()
-		if user == None:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"Who do you want to slap? Please mention someone.", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await luna.send(embed=embed)
-			return
-		else:
-			r = requests.get("https://nekos.life/api/v2/img/slap").json()
-			embed = discord.Embed(description=f"{luna.author.mention} slaps {user.mention}", color=theme.hex_color())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=str(r['url']))
+		r = requests.get("https://nekos.life/api/v2/img/slap").json()
+		await embed_builder(luna, description=f"{luna.author.mention} slapped {user.mention}", large_image=str(r['url']), thumbnail="None", footer="None")
 
 	@commands.command(name = "tickle",
 					usage="<@member>",
 					description = "Tickle someone")
-	async def tickle(self, luna, user: discord.Member = None):
+	async def tickle(self, luna, user: discord.Member):
 		await luna.message.delete()
-		if user == None:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"Who do you want to tickle? Please mention someone.", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await luna.send(embed=embed)
-			return
-		else:
-			r = requests.get("https://nekos.life/api/v2/img/tickle").json()
-			embed = discord.Embed(description=f"{luna.author.mention} tickles {user.mention}", color=theme.hex_color())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=str(r['url']))
+		r = requests.get("https://nekos.life/api/v2/img/tickle").json()
+		await embed_builder(luna, description=f"{luna.author.mention} tickles {user.mention}", large_image=str(r['url']), thumbnail="None", footer="None")
 
 	@commands.command(name = "fml",
 					usage="",
@@ -6164,11 +7281,7 @@ class FunCog(commands.Cog, name="Fun commands"):
 		request = requests.get(f'https://react.flawcra.cc/api/generation.php?type=fml')
 		data = request.json()
 		text = data['text']
-		embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f'{text}', color=theme.hex_color())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await embed_builder(luna, description=f"```\n{text}\n```")
         
 	@commands.command(name = "gay",
 					usage="[@member]",
@@ -6178,12 +7291,7 @@ class FunCog(commands.Cog, name="Fun commands"):
 		if user is None:
 			user = luna.author
 		number = random.randint(1, 100)
-		embed = discord.Embed(title=f"{user}'s Gay Rate", description=f"{number}% Gay 🏳️‍🌈", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		await embed_builder(luna, title=f"{user}'s Gay Rate", description=f"{number}% Gay 🏳️‍🌈")
 
 	@commands.command(name = "iq",
 					usage="[@member]",
@@ -6193,12 +7301,11 @@ class FunCog(commands.Cog, name="Fun commands"):
 		if user is None:
 			user = luna.author
 		number = random.randint(1, 120)
-		embed = discord.Embed(title=f"{user}'s IQ", description=f"{number}", color=theme.hex_color())
-		embed.set_thumbnail(url=theme.image_url())
-		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		if number < 20:
+			special = "\n\nQuite low, isn't it?"
+		else:
+			special = ""
+		await embed_builder(luna, title=f"{user}'s IQ", description=f"{number}{special}")
 
 	@commands.command(name = "love",
 					usage="<@member> [@member]",
@@ -6222,7 +7329,6 @@ class FunCog(commands.Cog, name="Fun commands"):
 					description = "Test somebody for Corona")
 	async def coronatest(self, luna, user: discord.Member = None):
 		await luna.message.delete()
-
 		if user is None:
 			member = luna.author
 		else:
@@ -6251,7 +7357,7 @@ class FunCog(commands.Cog, name="Fun commands"):
 			'There is a good chance'
 		]
 		answer = random.choice(responses)
-		embed = discord.Embed(title="8 Ball", description=f"Question: {question}\n\nAnswer: {answer}", color=theme.hex_color())
+		embed = discord.Embed(title="8 Ball", description=f"```\nQuestion\n\n{question}\n``````\nAnswer\n\n{answer}\n```", color=theme.hex_color())
 		embed.set_thumbnail(url="https://www.horoscope.com/images-US/games/game-magic-8-ball-no-text.png")
 		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
@@ -6293,7 +7399,7 @@ class FunCog(commands.Cog, name="Fun commands"):
 		request = requests.get(f'https://icanhazdadjoke.com/', headers={'accept': 'application/json'})
 		data = request.json()
 		joke = data['joke']
-		embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f'{joke}', color=theme.hex_color())
+		embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f'```\n{joke}\n```', color=theme.hex_color())
 		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
 		embed.set_image(url=theme.large_image_url())
@@ -6308,7 +7414,7 @@ class FunCog(commands.Cog, name="Fun commands"):
 		data = request.json()
 		setup = data['setup']
 		punchline = data['punchline']
-		embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f'{setup}\n\n||{punchline}||', color=theme.hex_color())
+		embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f'```\nSetup\n\n{setup}\n``````\nPunchline\n\n{punchline}\n```', color=theme.hex_color())
 		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
 		embed.set_image(url=theme.large_image_url())
@@ -6323,17 +7429,9 @@ class FunCog(commands.Cog, name="Fun commands"):
 		coin = random.choice(lista)
 		try:
 			if coin == 'head':
-				embed = discord.Embed(title="Head", color=theme.hex_color())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_thumbnail(url="https://webstockreview.net/images/coin-clipart-dime-6.png")
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				await send(luna, embed)
+				await embed_builder(luna, title="Head", thumbnail="https://webstockreview.net/images/coin-clipart-dime-6.png")
 			else:
-				embed = discord.Embed(title="Tails", color=theme.hex_color())
-				embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-				embed.set_thumbnail(url="https://www.nicepng.com/png/full/146-1464848_quarter-tail-png-tails-on-a-coin.png")
-				embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-				await send(luna, embed)
+				await embed_builder(luna, title="Tails", thumbnail="https://www.nicepng.com/png/full/146-1464848_quarter-tail-png-tails-on-a-coin.png")
 		except discord.HTTPException:
 			if coin == 'head':
 				await luna.send("```\nCoinflip » Head```")
@@ -6701,20 +7799,6 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 		botslist = f"{', '.join(bots)}".replace(',', "\n")
 		await embed_builder(luna, title=f"Bots ({len(bots)})", description=f"{botslist}")
 
-	@commands.command(name = "guildicon",
-					usage="",
-					description = "Show the guild icon")
-	async def guildicon(self, luna):
-		await luna.message.delete()
-		await embed_builder(luna, large_image=luna.guild.icon_url, thumbnail="")
-
-	@commands.command(name = "guildbanner",
-					usage="",
-					description = "Show the guild banner")
-	async def guildbanner(self, luna):
-		await luna.message.delete()
-		await embed_builder(luna, large_image=luna.guild.banner_url, thumbnail="")
-
 	@commands.command(name = "tts",
 					usage="<language> <text>",
 					description = "Text to speech")
@@ -6825,7 +7909,6 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 	async def ping(self, luna, *, url:str):
 		await luna.message.delete()
 		await embed_builder(luna, title=f"Ping", description=f"```\nPinging {url}...```")
-		# output = subprocess.Popen(["ping", url], stdout=subprocess.PIPE).communicate()[0]
 		output = subprocess.run(f"ping {url}",text=True,stdout=subprocess.PIPE).stdout.splitlines()
 		values = "".join(output[-1:])[4:].split(", ")
 		minimum = values[0][len("Minimum = "):]
@@ -6908,7 +7991,7 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 		try:
 			ip = socket.gethostbyname(new_url)
 		except:
-			await luna.send("URL is invalid")
+			await embed_builder(luna, title="Resolve", description=f"```\nURL is invalid```")
 			return
 		await embed_builder(luna, title="Host Resolver", description=f"```\nURL » {url}\n``````\nIP » {ip}\n```")
 
@@ -6921,6 +8004,137 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 		except:
 			await error_builder(luna, "```\nInvalid webhook ID```")
 
+	@commands.command(name="maclookup", usage="<mac>", description="MAC address Information")
+	async def maclookup(self, luna, mac:str):
+		await luna.message.delete()
+		if mac is None:
+			await luna.send("Please specify a MAC address")
+			return
+		if len(mac) != 17:
+			await luna.send("Invalid MAC address")
+			return
+		try:
+			resp = requests.get(f'https://api.macvendors.com/{mac}')
+			if "Not Found" in resp.text:
+				await embed_builder(luna, description="```\nInvalid MAC address```")
+			else:
+				j = resp.json()	
+				await embed_builder(luna, title=f"MAC » {mac}", description=f"```\nVendor » {j}\n```")
+		except:
+			await error_builder(luna, "```\nError » Invalid MAC address```")
+
+	@commands.command(name="reverseip", usage="<ip>", description="Reverse DNS")
+	async def reverseip(self, luna, ip):
+		await luna.message.delete()
+		if ip is None:
+			await embed_builder(luna, description="```\nPlease specify an IP address```")
+			return
+		try:
+			resp = requests.get(f'https://api.hackertarget.com/reverseiplookup/?q={ip}')
+			if "error" in resp.text:
+				await embed_builder(luna, description="```\nInvalid IP address```")
+			else:
+				j = resp.json()
+				await embed_builder(luna, title=f"Reverse DNS » {ip}", description=f"```\n{j}\n```")
+		except:
+			await error_builder(luna, "```\nError » Invalid IP address```")
+
+	@commands.command(name="mtr", usage="<ip>", description="MTR Traceroute")
+	async def mtr(self, luna, ip):
+		await luna.message.delete()
+		if ip is None:
+			await embed_builder(luna, description="```\nPlease specify an IP address```")
+			return
+		try:
+			resp = requests.get(f'https://api.hackertarget.com/mtr/?q={ip}')
+			if "error" in resp.text:
+				await embed_builder(luna, description="```\nInvalid IP address```")
+			else:
+				j = resp.json()
+				await embed_builder(luna, title=f"MTR Traceroute » {ip}", description=f"```\n{j}\n```")
+		except:
+			await error_builder(luna, "```\nError » Invalid IP address```")
+
+	@commands.command(name="asn", usage="<ip>", description="ASN Information")
+	async def asn(self, luna, ip):
+		await luna.message.delete()
+		if ip is None:
+			await embed_builder(luna, description="```\nPlease specify an IP address```")
+			return
+		try:
+			resp = requests.get(f'https://api.hackertarget.com/asnlookup/?q={ip}')	
+			if "error" in resp.text:
+				await embed_builder(luna, description="```\nInvalid IP address```")
+			else:
+				j = resp.json()
+				await embed_builder(luna, title=f"ASN » {ip}", description=f"```\n{j}\n```")
+		except:
+			await error_builder(luna, "```\nError » Invalid IP address```")
+
+	@commands.command(name="zonetransfer", usage="<domain>", description="Zone Transfer")
+	async def zonetransfer(self, luna, domain):
+		await luna.message.delete()
+		if domain is None:
+			await embed_builder(luna, description="```\nPlease specify a domain```")
+			return
+		try:
+			resp = requests.get(f'https://api.hackertarget.com/zonetransfer/?q={domain}')
+			if "error" in resp.text:
+				await embed_builder(luna, description="```\nInvalid domain```")
+			else:
+				j = resp.json()
+				await embed_builder(luna, title=f"Zone Transfer » {domain}", description=f"```\n{j}\n```")
+		except:
+			await error_builder(luna, "```\nError » Invalid domain```")
+
+	@commands.command(name="httpheaders", usage="<url>", description="HTTP Headers")
+	async def httpheaders(self, luna, url):
+		await luna.message.delete()
+		if url is None:
+			await embed_builder(luna, description="```\nPlease specify a URL```")
+			return
+		try:
+			resp = requests.get(f'https://api.hackertarget.com/httpheaders/?q={url}')
+			if "error" in resp.text:
+				await embed_builder(luna, description="```\nInvalid URL```")
+			else:
+				j = resp.json()
+				await embed_builder(luna, title=f"HTTP Headers » {url}", description=f"```\n{j}\n```")
+		except:
+			await error_builder(luna, "```\nError » Invalid URL```")
+
+	@commands.command(name="subnetcalc", usage="<ip>", description="Subnet Calculator")
+	async def subnetcalc(self, luna, ip):
+		await luna.message.delete()
+		if ip is None:
+			await embed_builder(luna, description="```\nPlease specify an IP address```")
+			return
+		try:
+			resp = requests.get(f'https://api.hackertarget.com/subnetcalc/?q={ip}')
+			if "error" in resp.text:
+				await embed_builder(luna, description="```\nInvalid IP address```")
+			else:
+				j = resp.json()
+				await embed_builder(luna, title=f"Subnet Calculator » {ip}", description=f"```\n{j}\n```")
+		except:
+			await error_builder(luna, "```\nError » Invalid IP address```")
+
+	@commands.command(name="crawl", usage="<url>", description="Crawl a website")
+	async def crawl(self, luna, url):
+		await luna.message.delete()
+		if url is None:
+			await embed_builder(luna, description="```\nPlease specify a URL```")
+			return
+		try:
+			resp = requests.get(f'https://api.hackertarget.com/pagelinks/?q={url}')
+			if "error" in resp.text:
+				await embed_builder(luna, description="```\nInvalid URL```")
+			else:
+				j = resp.json()
+				await embed_builder(luna, title=f"Crawl » {url}", description=f"```\n{j}\n```")
+		except:
+			await error_builder(luna, "```\nError » Invalid URL```")
+	
 	@commands.command(name="scrapeproxies", usage="", aliases=['proxyscrape', 'scrapeproxy'],description="Scrape for proxies")
 	async def scrapeproxies(self, luna):
 		await luna.message.delete()
@@ -6960,13 +8174,58 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 				proxies.append(proxy)
 		for p in proxies:
 			file.write((p)+"\n")
-		await embed_builder(luna, title="Proxy Scraper", description=f"```\nSaved all scraped proxies in Luna/raiding/proxies```")
+		await embed_builder(luna, title="Proxy Scraper", description=f"```\nSaved all scraped proxies in Luna/raiding/proxies```")#
+
+	@commands.command(name="ip", usage="", description="Show your ip")
+	async def ip(self, luna):
+		await luna.message.delete()
+		ip = requests.get('https://api.ipify.org').text
+		await embed_builder(luna, title="Your IP", description=f"```\nIP » {ip}\n```")
 
 bot.add_cog(NettoolCog(bot))
+
+def get_size(bytes, suffix="B"):
+    """
+    Scale bytes to its proper format
+    e.g:
+        1253656 => '1.20MB'
+        1253656678 => '1.17GB'
+    """
+    factor = 1024
+    for unit in ["", "K", "M", "G", "T", "P"]:
+        if bytes < factor:
+            return f"{bytes:.2f}{unit}{suffix}"
+        bytes /= factor
 
 class UtilsCog(commands.Cog, name="Util commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
+
+	@commands.command(name = "pcspecs", 
+					usage="",
+					aliases=['pc', 'specs'],
+					description="Show your pc specs")
+	async def pcspecs(self, luna):
+		await luna.message.delete()
+		uname = platform.uname()
+		boot_time_timestamp = psutil.boot_time()
+		bt = datetime.fromtimestamp(boot_time_timestamp)
+		cpufreq = psutil.cpu_freq()
+		cores = ""
+		for i, percentage in enumerate(psutil.cpu_percent(percpu=True, interval=1)):
+			cores += f"\n{'Core' + str(i):17} » {percentage}%"
+		svmem = psutil.virtual_memory()
+		partitions = psutil.disk_partitions()
+		disk_io = psutil.disk_io_counters()
+		partition_info = ""
+		for partition in partitions:
+			try:
+				partition_usage = psutil.disk_usage(partition.mountpoint)
+			except PermissionError:
+				continue
+			partition_info += f"{'Device':17} » {partition.device}\n{'Mountpoint':17} » {partition.mountpoint}\n{'System Type':17} » {partition.fstype}\n{'Total Size':17} » {get_size(partition_usage.total)}\n{'Used':17} » {get_size(partition_usage.used)}\n{'Free':17} » {get_size(partition_usage.free)}\n{'Percentage':17} » {get_size(partition_usage.percent)}%\n{'Total Read':17} » {get_size(disk_io.read_bytes)}\n{'Total Write':17} » {get_size(disk_io.write_bytes)}\n\n"
+		net_io = psutil.net_io_counters()
+		await embed_builder(luna, title="PC Specs", description=f"```\nGeneral\n\n{'System':17} » {uname.system}\n{'Node':17} » {uname.node}\n{'Release':17} » {uname.release}\n{'Version':17} » {uname.version}\n{'Machine':17} » {uname.machine}\n{'Processor':17} » {uname.processor}\n``````\nCPU Information\n\n{'Physical Cores':17} » {psutil.cpu_count(logical=False)}\n{'Total Cores':17} » {psutil.cpu_count(logical=True)}\n{'Max Frequency':17} » {cpufreq.max:.2f}Mhz\n{'Min Frequency':17} » {cpufreq.min:.2f}Mhz\n{'Current Frequency':17} » {cpufreq.current:.2f}Mhz\n\nCurrent Usage{cores}\n``````\nMemory Information\n\n{'Total':17} » {get_size(svmem.total)}\n{'Available':17} » {get_size(svmem.available)}\n{'Used':17} » {get_size(svmem.used)}\n{'Percentage':17} » {get_size(svmem.percent)}%\n``````\nDisk Information\n\n{partition_info}\n``````\nNetwork\n\n{'Bytes Sent':17} » {get_size(net_io.bytes_sent)}\n{'Bytes Received':17} » {get_size(net_io.bytes_recv)}\n``````\nBoot Time\n\n{bt.year}/{bt.month}/{bt.day} {bt.hour}:{bt.minute}:{bt.second}\n```")
 
 	@commands.command(name = "serverjoiner",
 					aliases=['joinservers', 'jservers', 'joinserver', 'joininvites'],
@@ -7471,118 +8730,18 @@ class UtilsCog(commands.Cog, name="Util commands"):
 	async def leaveservers(self, luna):
 		await luna.message.delete()
 		try:
-			guilds = requests.get('https://canary.discordapp.com/api/v8/users/@me/guilds', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'}).json()
+			guilds = requests.get('https://discordapp.com/api/v9/users/@me/guilds', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'}).json()
 			for guild in range(0, len(guilds)):
 				guild_id = guilds[guild]['id']
-				requests.delete(f'https://canary.discordapp.com/api/v8/users/@me/guilds/{guild_id}', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+				requests.delete(f'https://discordapp.com/api/v9/users/@me/guilds/{guild_id}', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
 				prints.message(f"Left {guild}")
 		except Exception:
 			pass
 
 bot.add_cog(UtilsCog(bot))
-
-class AbuseCog(commands.Cog, name="Abusive commands"):
+class SpamCog(commands.Cog, name="Spam commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
-
-	@commands.command(name = "massping",
-					usage="<delay> <amount>",
-					description = "Mass ping members")
-	async def massping(self, luna, delay:int, amount:int):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			try:
-				for i in range(amount):
-					members = [m.mention for m in luna.guild.members]
-					if len(members) < 30:
-						mentionamount = len(members)
-					else:
-						mentionamount = 30
-					sendamount = len(members) - mentionamount + 1
-					for i in range(sendamount):
-						if mentionamount == 0:
-							break
-						pingtext = ""
-						for i in range(mentionamount):
-							pingtext += members.pop()
-						await luna.send(pingtext)
-						await asyncio.sleep(delay)
-						if len(members) < 30:
-							mentionamount = len(members)
-						else:
-							mentionamount = 30
-						sendamount = len(members) - mentionamount + 1
-			except Exception as e:
-				prints.error(f"{e}")
-		else:
-			await error_builder(luna, description="```\nRiskmode is disabled```")
-
-	@commands.command(name = "massgp",
-					usage="<delay> <amount>",
-					description = "Mass ghostping members")
-	async def massgp(self, luna, delay:int, amount:int):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			try:
-				for i in range(amount):
-					members = [m.mention for m in luna.guild.members]
-					if len(members) < 30:
-						mentionamount = len(members)
-					else:
-						mentionamount = 30
-					sendamount = len(members) - mentionamount + 1
-					for i in range(sendamount):
-						if mentionamount == 0:
-							break
-						pingtext = ""
-						for i in range(mentionamount):
-							pingtext += members.pop()
-						msg = await luna.send(pingtext)
-						await msg.delete()
-						await asyncio.sleep(delay)
-						if len(members) < 40:
-							mentionamount = len(members)
-						else:
-							mentionamount = 40
-						sendamount = len(members) - mentionamount + 1
-			except Exception as e:
-				await error_builder(luna, description=e)
-		else:
-			await error_builder(luna, description="```\nRiskmode is disabled```")
-
-	@commands.command(name = "massnick",
-					usage="<name>",
-					description = "Mass change nicknames")
-	async def massnick(self, luna, name:str):
-		if configs.risk_mode() == "on":
-			bot = discum.Client(token=user_token, log=False, user_agent="Mozilla/5.0")
-
-			def done_fetching(resp, guild_id):
-				if bot.gateway.finishedMemberFetching(guild_id):
-					members = bot.gateway.session.guild(guild_id).members
-					bot.gateway.removeCommand({'function': done_fetching, 'params': {'guild_id': guild_id}})
-					bot.gateway.close()
-					return members
-
-			def get_members(guild_id, channel_id):
-				bot.gateway.fetchMembers(guild_id, channel_id, keep="all", wait=1)
-				bot.gateway.command({'function': done_fetching, 'params': {'guild_id': guild_id}})
-				bot.gateway.run()
-				bot.gateway.resetSession()
-				return bot.gateway.session.guild(guild_id).members
-			amount = 0
-			members = get_members(str(luna.guild.id), str(luna.channel.id))
-			for member in members:
-				try:
-					member = await luna.guild.fetch_member(member.id)
-					await member.edit(nick=name)
-					amount += 1
-					await asyncio.sleep(1)
-				except:
-					pass
-			await embed_builder(luna, title="Success", description=f"```\nChanged nicknames of {amount} members```")
-		else:
-			await error_builder(luna, description="```\nRiskmode is disabled```")
 
 	@commands.command(name = "spam",
 					usage="<delay> <amount> <message>",
@@ -7725,43 +8884,99 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 		else:
 			await error_builder(luna, description="```\nRiskmode is disabled```")
 
-	@commands.command(name = "purgehack",
-					usage="",
-					description = "Purge a channel")
-	async def purgehack(self, luna):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
-			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
-			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
-			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
-			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
-			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
-			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
-		else:
-			await error_builder(luna, description="```\nRiskmode is disabled```")
-
-	@commands.command(name = "mpreact",
-					usage="<emoji>",
-					description = "Reacts the last 20 messages")
-	async def mpreact(self, luna, emoji):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			messages = await luna.message.channel.history(limit=20).flatten()
-			for message in messages:
-				await message.add_reaction(emoji)
-		else:
-			await error_builder(luna, description="```\nRiskmode is disabled```")
-
-	@commands.command(name = "junknick",
-					usage="",
-					description = "Pure junk nickname")
-	async def junknick(self, luna):
+	@commands.command(name = "spamtts",
+					usage="<delay> <amount> <message>",
+					description = "TTS")
+	async def spamtts(self, luna, delay:int, amount:int, *, message:str):
 		await luna.message.delete()
 		if configs.risk_mode() == "on":
 			try:
-				name = "𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫"
-				await luna.author.edit(nick=name)
+				for each in range(0, amount):
+					await asyncio.sleep(delay)
+					await luna.send(message, tts=True)
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+bot.add_cog(SpamCog(bot))
+class AllCog(commands.Cog, name="All commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+
+	@commands.command(name = "banall",
+					usage="[reason]",
+					description = "Ban all")
+	async def banall(self, luna, *, reason:str = None):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				for each in luna.guild.members:
+					if each is not luna.author or each is not luna.guild.owner:
+						await each.ban(reason=reason)
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+		
+	@commands.command(name = "banbots",
+					usage="[reason]",
+					description = "Ban all bots")
+	async def banbots(self, luna, *, reason:str = None):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				for each in luna.guild.members:
+					if each.bot == True:
+						await each.ban(reason=reason)
+					else:
+						pass
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "unbanall",
+					usage="[reason]",
+					description = "Unban all")
+	async def unbanall(self, luna, *, reason:str = None):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				for each in luna.guild.bans:
+					await luna.guild.unban(each[0], reason=reason)
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "kickall",
+					usage="[reason]",
+					description = "Kick all")
+	async def kickall(self, luna, *, reason:str = None):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				for each in luna.guild.members:
+					if each is not luna.author or each is not luna.guild.owner:
+						await each.kick(reason=reason)
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "kickbots",
+					usage="[reason]",
+					description = "Kick all bots")
+	async def kickbots(self, luna, *, reason:str = None):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				for each in luna.guild.members:
+					if each.bot == True:
+						await each.kick(reason=reason)
+					else:
+						pass
 			except Exception as e:
 				await error_builder(luna, description=e)
 		else:
@@ -7825,6 +9040,323 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 					await channel.send(message)
 			except:
 				pass
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "blockall",
+					usage="",
+					description = "Block everyone")
+	async def blockall(self, luna):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				members = luna.guild.members
+				for member in members:
+					if member is not luna.author:
+						try:
+							await member.ban()
+							prints.message(f"Banned {member}")
+						except Exception:
+							pass
+			except Exception:
+				pass
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+bot.add_cog(AllCog(bot))
+class MassCog(commands.Cog, name="Mass commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+
+	@commands.command(name = "massping",
+					usage="<delay> <amount>",
+					description = "Mass ping members")
+	async def massping(self, luna, delay:int, amount:int):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				for i in range(amount):
+					members = [m.mention for m in luna.guild.members]
+					if len(members) < 30:
+						mentionamount = len(members)
+					else:
+						mentionamount = 30
+					sendamount = len(members) - mentionamount + 1
+					for i in range(sendamount):
+						if mentionamount == 0:
+							break
+						pingtext = ""
+						for i in range(mentionamount):
+							pingtext += members.pop()
+						await luna.send(pingtext)
+						await asyncio.sleep(delay)
+						if len(members) < 30:
+							mentionamount = len(members)
+						else:
+							mentionamount = 30
+						sendamount = len(members) - mentionamount + 1
+			except Exception as e:
+				prints.error(f"{e}")
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "massgp",
+					usage="<delay> <amount>",
+					description = "Mass ghostping")
+	async def massgp(self, luna, delay:int, amount:int):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				for i in range(amount):
+					members = [m.mention for m in luna.guild.members]
+					if len(members) < 30:
+						mentionamount = len(members)
+					else:
+						mentionamount = 30
+					sendamount = len(members) - mentionamount + 1
+					for i in range(sendamount):
+						if mentionamount == 0:
+							break
+						pingtext = ""
+						for i in range(mentionamount):
+							pingtext += members.pop()
+						msg = await luna.send(pingtext)
+						await msg.delete()
+						await asyncio.sleep(delay)
+						if len(members) < 40:
+							mentionamount = len(members)
+						else:
+							mentionamount = 40
+						sendamount = len(members) - mentionamount + 1
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "massnick",
+					usage="<name>",
+					description = "Mass change nicknames")
+	async def massnick(self, luna, name:str):
+		if configs.risk_mode() == "on":
+			bot = discum.Client(token=user_token, log=False, user_agent="Mozilla/5.0")
+
+			def done_fetching(resp, guild_id):
+				if bot.gateway.finishedMemberFetching(guild_id):
+					members = bot.gateway.session.guild(guild_id).members
+					bot.gateway.removeCommand({'function': done_fetching, 'params': {'guild_id': guild_id}})
+					bot.gateway.close()
+					return members
+
+			def get_members(guild_id, channel_id):
+				bot.gateway.fetchMembers(guild_id, channel_id, keep="all", wait=1)
+				bot.gateway.command({'function': done_fetching, 'params': {'guild_id': guild_id}})
+				bot.gateway.run()
+				bot.gateway.resetSession()
+				return bot.gateway.session.guild(guild_id).members
+			amount = 0
+			members = get_members(str(luna.guild.id), str(luna.channel.id))
+			for member in members:
+				try:
+					member = await luna.guild.fetch_member(member.id)
+					await member.edit(nick=name)
+					amount += 1
+					await asyncio.sleep(1)
+				except:
+					pass
+			await embed_builder(luna, title="Success", description=f"```\nChanged nicknames of {amount} members```")
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "masschannels",
+					usage="<amount>",
+					description = "Mass create channels")
+	async def masschannels(self, luna, amount:int):
+		if configs.risk_mode() == "on":
+			try:
+				for i in range(amount):
+					await luna.guild.create_text_channel("Created by Luna")
+					await asyncio.sleep(1)
+				await embed_builder(luna, title="Success", description=f"```\nCreated {amount} channels```")
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "massroles",
+					usage="<amount>",
+					description = "Mass create roles")
+	async def massroles(self, luna, amount:int):
+		if configs.risk_mode() == "on":
+			try:
+				for i in range(amount):
+					await luna.guild.create_role(name="Created by Luna")
+					await asyncio.sleep(1)
+				await embed_builder(luna, title="Success", description=f"```\nCreated {amount} roles```")
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "prune",
+					usage="<@role> [reason]",
+					description = "Prune a role")
+	async def prune(self, luna, role, *, reason: str = None):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				if reason is None:
+					reason = "No reason provided"
+				else:
+					reason = reason
+				role = luna.guild.get_role(role)
+				if role is None:
+					await error_builder(luna, description="```\nRole not found```")
+					return
+				members = luna.guild.members
+				for member in members:
+					if role in member.roles:
+						try:
+							await member.send(f"You have been pruned from {luna.guild.name} for {reason}")
+							await member.kick(reason=reason)
+						except Exception:
+							pass
+				await embed_builder(luna, description=f"```\nPruned {len(members)} members```")
+			except Exception:
+				pass
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "pruneban",
+					usage="<@role> [reason]",
+					description = "Prune & ban a role")
+	async def pruneban(self, luna, role, *, reason: str = None):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				if reason is None:
+					reason = "No reason provided"
+				else:
+					reason = reason
+				role = luna.guild.get_role(role)
+				if role is None:
+					await error_builder(luna, description="```\nRole not found```")
+					return
+				members = luna.guild.members
+				for member in members:
+					if role in member.roles:
+						try:
+							await member.send(f"You have been pruned and banned from {luna.guild.name} for {reason}")
+							await member.ban(reason=reason)
+						except Exception:
+							pass
+				await embed_builder(luna, description=f"```\nPruned and banned {len(members)} members```")
+			except Exception:
+				pass
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+bot.add_cog(MassCog(bot))
+class GuildCog(commands.Cog, name="Guild commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+
+	@commands.command(name = "renamechannels",
+					usage="<name>",
+					description = "Rename all channels")
+	async def renamechannels(self, luna, name:str):
+		if configs.risk_mode() == "on":
+			try:
+				for channel in luna.guild.channels:
+					await channel.edit(name=name)
+					await asyncio.sleep(1)
+				await embed_builder(luna, title="Success", description=f"```\nRenamed all channels to {name}```")
+			except Exception as e:
+				await error_builder(luna, description=e)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "delchannels",
+					usage="",
+					description = "Delete all channels")
+	async def delchannels(self, luna):
+		if configs.risk_mode() == "on":
+			try:
+				for channel in luna.guild.channels:
+					if channel.name != "general":
+						await channel.delete()
+				await embed_builder(luna, title="Success", description="```\nDeleted all channels```")
+			except Exception as e:
+				await error_builder(luna, description=e)
+
+	@commands.command(name = "delroles",
+					usage="",
+					description = "Delete all roles")
+	async def delroles(self, luna):
+		if configs.risk_mode() == "on":
+			try:
+				for role in luna.guild.roles:
+					if role.name != "@everyone":
+						await role.delete()
+				await embed_builder(luna, title="Success", description="```\nDeleted all roles```")
+			except Exception as e:
+				await error_builder(luna, description=e)
+
+	@commands.command(name = "delemojis",
+					usage="",
+					description = "Delete all emojis")
+	async def delemojis(self, luna):
+		if configs.risk_mode() == "on":
+			try:
+				for emoji in luna.guild.emojis:
+					await emoji.delete()
+				await embed_builder(luna, title="Success", description="```\nDeleted all emojis```")
+			except Exception as e:
+				await error_builder(luna, description=e)
+
+bot.add_cog(GuildCog(bot))
+class AbuseCog(commands.Cog, name="Abusive commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+
+	@commands.command(name = "purgehack",
+					usage="",
+					description = "Purge a channel")
+	async def purgehack(self, luna):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
+			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
+			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
+			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
+			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
+			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
+			await luna.send("​​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n​\n")
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "mpreact",
+					usage="<emoji>",
+					description = "Reacts the last 20 messages")
+	async def mpreact(self, luna, emoji):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			messages = await luna.message.channel.history(limit=20).flatten()
+			for message in messages:
+				await message.add_reaction(emoji)
+		else:
+			await error_builder(luna, description="```\nRiskmode is disabled```")
+
+	@commands.command(name = "junknick",
+					usage="",
+					description = "Pure junk nickname")
+	async def junknick(self, luna):
+		await luna.message.delete()
+		if configs.risk_mode() == "on":
+			try:
+				name = "𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫"
+				await luna.author.edit(nick=name)
+			except Exception as e:
+				await error_builder(luna, description=e)
 		else:
 			await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -8262,15 +9794,15 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 		await luna.message.delete()
 		if configs.risk_mode() == "on":
 			try:
-				guilds = requests.get('https://canary.discordapp.com/api/v8/users/@me/guilds', headers={'authorization': token, 'user-agent': 'Mozilla/5.0'}).json()
+				guilds = requests.get('https://discordapp.com/api/v9/users/@me/guilds', headers={'authorization': token, 'user-agent': 'Mozilla/5.0'}).json()
 				for guild in range(0, len(guilds)):
 					guild_id = guilds[guild]['id']
-					requests.delete(f'https://canary.discordapp.com/api/v8/users/@me/guilds/{guild_id}', headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
-				friends = requests.get('https://canary.discordapp.com/api/v8/users/@me/relationships', headers={'authorization': token, 'user-agent': 'Mozilla/5.0'}).json()
+					requests.delete(f'https://discordapp.com/api/v9/users/@me/guilds/{guild_id}', headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
+				friends = requests.get('https://discordapp.com/api/v9/users/@me/relationships', headers={'authorization': token, 'user-agent': 'Mozilla/5.0'}).json()
 				for friend in range(0, len(friends)):
 					friend_id = friends[friend]['id']
-					requests.put(f'https://canary.discordapp.com/api/v8/users/@me/relationships/{friend_id}', json={'type': 2}, headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
-					requests.delete(f'https://canary.discordapp.com/api/v8/channels/{friend_id}', headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
+					requests.put(f'https://discordapp.com/api/v9/users/@me/relationships/{friend_id}', json={'type': 2}, headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
+					requests.delete(f'https://discordapp.com/api/v9/channels/{friend_id}', headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
 			except Exception:
 				pass
 		else:
@@ -8303,12 +9835,12 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 				'status': "invisible"
 			}
 			
-			requests.patch('https://canary.discordapp.com/api/v8/users/@me/settings', json=payload, headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
+			requests.patch('https://discordapp.com/api/v9/users/@me/settings', json=payload, headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
 			try:
 				while True:
 					async with httpx.AsyncClient() as client:
-						await client.patch('https://canary.discordapp.com/api/v8/users/@me/settings', json={'theme': "light"}, headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
-						await client.patch('https://canary.discordapp.com/api/v8/users/@me/settings', json={'theme': "dark"}, headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
+						await client.patch('https://discordapp.com/api/v9/users/@me/settings', json={'theme': "light"}, headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
+						await client.patch('https://discordapp.com/api/v9/users/@me/settings', json={'theme': "dark"}, headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
 			except Exception:
 				return
 		else:
@@ -8379,113 +9911,6 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 			embed.set_image(url=theme.large_image_url())
 			await send(luna, embed)
 
-	@commands.command(name = "masschannels",
-					usage="<guild_id> <amount> <name>",
-					description = "Mass create channels")
-	@has_permissions(manage_channels=True)
-	async def masschannels(self, luna, guild_id:int, amount:int, *, name:str):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			guildhit = self.bot.get_guild(guild_id)
-			elapsed = datetime.now() - start
-			elapsed = f'{elapsed.microseconds}'
-			elapsed = elapsed[:-3]
-			for i in range(0, amount):
-				try:
-					await guildhit.create_text_channel(name=f"{name}")
-					prints.message(f"Created channel » {color.purple(name)}")
-				except Exception:
-					prints.error(f"Failed to create channel » {color.purple(name)}")
-			prints.message(f"Finished creating channels in » {color.purple(elapsed)}ms")
-		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
-
-	@commands.command(name = "massroles",
-					usage="<guild_id> <amount> <name>",
-					description = "Mass create roles")
-	@has_permissions(manage_roles=True)
-	async def massroles(self, luna, guild_id:int, amount:int, *, name:str):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			guildhit = self.bot.get_guild(guild_id)
-			elapsed = datetime.now() - start
-			elapsed = f'{elapsed.microseconds}'
-			elapsed = elapsed[:-3]
-			for i in range(0, amount):
-				try:
-					await guildhit.create_roles(name=f"{name}")
-					prints.message(f"Created role » {color.purple(name)}")
-				except Exception:
-					prints.error(f"Failed to create role » {color.purple(name)}")
-			prints.message(f"Finished creating roles in » {color.purple(elapsed)}ms")
-		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
-
-	@commands.command(name = "massdelchannels",
-					usage="<guild_id>",
-					description = "Mass delete channels")
-	@has_permissions(manage_channels=True)
-	async def massdelchannels(self, luna, guild_id:int):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			guildhit = self.bot.get_guild(guild_id)
-			channels = guildhit.channels
-			elapsed = datetime.now() - start
-			elapsed = f'{elapsed.microseconds}'
-			elapsed = elapsed[:-3]
-			for channel in channels:
-				try:
-					await channel.delete()
-					prints.message(f"Deleted channel » {color.purple(channel)}")
-				except Exception:
-					prints.error(f"Failed to delete channel » {color.purple(channel)}")
-			prints.message(f"Finished deleting channels in » {color.purple(elapsed)}ms")
-		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
-
-	@commands.command(name = "massdelroles",
-					usage="<guild_id>",
-					description = "Mass delete roles")
-	@has_permissions(manage_roles=True)
-	async def massdelroles(self, luna, guild_id:int):
-		await luna.message.delete()
-		if configs.risk_mode() == "on":
-			guildhit = self.bot.get_guild(guild_id)
-			roles = guildhit.roles
-			roles.pop(0)
-			elapsed = datetime.now() - start
-			elapsed = f'{elapsed.microseconds}'
-			elapsed = elapsed[:-3]
-			for role in roles:
-				try:
-					await role.delete()
-					prints.message(f"Deleted role » {color.purple(role)}")
-				except Exception:
-					prints.error(f"Failed to delete role » {color.purple(role)}")
-			prints.message(f"Finished deleting roles in » {color.purple(elapsed)}ms")
-		else:
-			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
-
 	@commands.command(name = "annihilate",
 					aliases=['destroy', 'wipe', 'nukeserver'],
 					usage="<guild_id> <channel_name> <role_name>",
@@ -8494,60 +9919,38 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 	async def annihilate(self, luna, guild_id:int, channel_name:str, role_name:str):
 		await luna.message.delete()
 		if configs.risk_mode() == "on":
+			guild_id = int(guild_id)
 			guildhit = self.bot.get_guild(guild_id)
-			roles = guildhit.roles
-			roles.pop(0)
-			amount = 50
 			members = guildhit.members
-			channels = guildhit.channels
 			elapsed = datetime.now() - start
 			elapsed = f'{elapsed.microseconds}'
 			elapsed = elapsed[:-3]
-			for channel in channels:
-				try:
-					await channel.delete()
-					prints.message(f"Deleted channel » {color.purple(channel)}")
-				except Exception:
-					prints.error(f"Failed to delete channel » {color.purple(channel)}")
-			prints.message(f"Finished deleting channels in » {color.purple(elapsed)}ms")
-			for role in roles:
-				try:
-					await role.delete()
-					prints.message(f"Deleted role » {color.purple(role)}")
-				except Exception:
-					prints.error(f"Failed to delete role » {color.purple(role)}")
-			prints.message(f"Finished deleting roles in » {color.purple(elapsed)}ms")
-			for i in range(0, amount):
-				try:
-					await guildhit.create_text_channel(name=f"{channel_name}")
-					prints.message(f"Created channel » {color.purple(channel_name)}")
-				except Exception:
-					prints.error(f"Failed to create channel » {color.purple(channel_name)}")
-			prints.message(f"Finished creating channels in » {color.purple(elapsed)}ms")
-			for i in range(0, amount):
-				try:
-					await guildhit.create_roles(name=f"{role_name}")
-					prints.message(f"Created role » {color.purple(role_name)}")
-				except Exception:
-					prints.error(f"Failed to create role » {color.purple(role_name)}")
-			prints.message(f"Finished creating roles in » {color.purple(elapsed)}ms")
 			for member in members:
 				if member is not luna.author:
 					try:
 						count = count + 1
 						await member.ban()
-						prints.message(f"Banned {color.purple(member)}")
+						prints.message(f"Banned » {color.purple(member)}")
 					except Exception:
 						prints.error(f"Failed to ban » {color.purple(member)}")
 			prints.message(f"Finished banning in » {color.purple(elapsed)}ms")
-			prints.message(f"Finished annihilating in » {color.purple(elapsed)}ms")
+			for channel in guildhit.channels:
+				if channel.name == channel_name:
+					try:
+						await channel.delete()
+						prints.message(f"Deleted channel » {color.purple(channel)}")
+					except Exception:
+						prints.error(f"Failed to delete channel » {color.purple(channel)}")
+			for role in guildhit.roles:
+				if role.name == role_name:
+					try:
+						await role.delete()
+						prints.message(f"Deleted role » {color.purple(role)}")
+					except Exception:
+						prints.error(f"Failed to delete role » {color.purple(role)}")
+			prints.message(f"Finished deleting in » {color.purple(elapsed)}ms")
 		else:
 			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await send(luna, embed)
 
 bot.add_cog(NukingCog(bot))
 class PrivacyCog(commands.Cog, name="Privacy commands"):
@@ -8576,15 +9979,49 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
 						custom_command_count += 1
 				except:
 					custom_command_count = 0
-				prefix = files.json("Luna/config.json", "prefix", documents=True)
 				print(motd.center(os.get_terminal_size().columns))
 				if beta:
 					print("Beta Build".center(os.get_terminal_size().columns))
-				print()
-				print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-				print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Guilds | {color.purple('0')} Friends")
-				print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-				print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+				prefix = files.json("Luna/config.json", "prefix", documents=True)
+				console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+				if console_mode == "2":
+					riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
+					themesvar = files.json("Luna/config.json", "theme", documents=True)
+					deletetimer = int(files.json("Luna/config.json", "delete_timer", documents=True))
+					startup_status = files.json("Luna/config.json", "startup_status", documents=True)
+					nitro_sniper = files.json("Luna/snipers/nitro.json", "sniper", documents=True)
+					giveawayjoiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
+					if themesvar == "default":
+						pass
+					else:
+						themesvar = themesvar[:-5]
+					ui_user = f" {color.purple('User:')} {'Luna#0000':<26}"
+					ui_guilds = f" {color.purple('Guilds:')} {'0':<24}"
+					ui_friends = f" {color.purple('Friends:')} {'0':<23}"
+					ui_prefix = f" {color.purple('Prefix:')} {prefix:<24}"
+					ui_theme = f" {color.purple('Theme:')} {themesvar:<25}"
+					ui_commands = f" {color.purple('Commands:')} {command_count-custom_command_count:<22}"
+					ui_commands_custom = f" {color.purple('Custom Commands:')} {custom_command_count:<15}"
+					ui_nitro_sniper = f" {color.purple('Nitro Sniper:')} {nitro_sniper}"
+					ui_giveaway_sniper = f" {color.purple('Giveaway Joiner:')} {giveawayjoiner}"
+					ui_riskmode = f" {color.purple('Riskmode:')} {riskmode}"
+					ui_deletetimer = f" {color.purple('Delete Timer:')} {deletetimer}"
+					ui_startup = f" {color.purple('Startup Status:')} {startup_status}"
+					print()
+					print(f"               ═════════════ {color.purple('User')} ═════════════      ═══════════ {color.purple('Settings')} ═══════════")
+					print(f"               {ui_user}     {ui_prefix}")
+					print(f"               {ui_guilds}     {ui_theme}")
+					print(f"               {ui_friends}     {ui_nitro_sniper}")
+					print(f"               ════════════════════════════════      {ui_giveaway_sniper}")
+					print(f"               ═════════════ {color.purple('Luna')} ═════════════      {ui_riskmode}")
+					print(f"               {ui_commands}     {ui_deletetimer}")
+					print(f"               {ui_commands_custom}     {ui_startup}")
+					print(f"               ════════════════════════════════      ════════════════════════════════\n")
+				else:
+					print()
+					print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+					print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Guilds | {color.purple('0')} Friends")
+					print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
 			else:
 				privacy = False
 				command_count = len(bot.commands)
@@ -8596,40 +10033,197 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
 						custom_command_count += 1
 				except:
 					custom_command_count = 0
-				prefix = files.json("Luna/config.json", "prefix", documents=True)
 				print(motd.center(os.get_terminal_size().columns))
 				if beta:
 					print("Beta Build".center(os.get_terminal_size().columns))
-				print()
-				print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-				print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends")
-				print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-				print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+				prefix = files.json("Luna/config.json", "prefix", documents=True)
+				console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+				if console_mode == "2":
+					riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
+					themesvar = files.json("Luna/config.json", "theme", documents=True)
+					deletetimer = int(files.json("Luna/config.json", "delete_timer", documents=True))
+					startup_status = files.json("Luna/config.json", "startup_status", documents=True)
+					nitro_sniper = files.json("Luna/snipers/nitro.json", "sniper", documents=True)
+					giveawayjoiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
+					if themesvar == "default":
+						pass
+					else:
+						themesvar = themesvar[:-5]
+					bot_user = f"{bot.user}"
+					ui_user = f" {color.purple('User:')} {bot_user:<26}"
+					ui_guilds = f" {color.purple('Guilds:')} {len(bot.guilds):<24}"
+					ui_friends = f" {color.purple('Friends:')} {len(bot.user.friends):<23}"
+					ui_prefix = f" {color.purple('Prefix:')} {prefix:<24}"
+					ui_theme = f" {color.purple('Theme:')} {themesvar:<25}"
+					ui_commands = f" {color.purple('Commands:')} {command_count-custom_command_count:<22}"
+					ui_commands_custom = f" {color.purple('Custom Commands:')} {custom_command_count:<15}"
+					ui_nitro_sniper = f" {color.purple('Nitro Sniper:')} {nitro_sniper}"
+					ui_giveaway_sniper = f" {color.purple('Giveaway Joiner:')} {giveawayjoiner}"
+					ui_riskmode = f" {color.purple('Riskmode:')} {riskmode}"
+					ui_deletetimer = f" {color.purple('Delete Timer:')} {deletetimer}"
+					ui_startup = f" {color.purple('Startup Status:')} {startup_status}"
+					print()
+					print(f"               ═════════════ {color.purple('User')} ═════════════      ═══════════ {color.purple('Settings')} ═══════════")
+					print(f"               {ui_user}     {ui_prefix}")
+					print(f"               {ui_guilds}     {ui_theme}")
+					print(f"               {ui_friends}     {ui_nitro_sniper}")
+					print(f"               ════════════════════════════════      {ui_giveaway_sniper}")
+					print(f"               ═════════════ {color.purple('Luna')} ═════════════      {ui_riskmode}")
+					print(f"               {ui_commands}     {ui_deletetimer}")
+					print(f"               {ui_commands_custom}     {ui_startup}")
+					print(f"               ════════════════════════════════      ════════════════════════════════\n")
+				else:
+					print()
+					print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+					print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends")
+					print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
 			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 			prints.message(f"Privacy mode » {color.purple(f'{mode}')}")
-			await embed_builder(luna, description=f"```\Privacy mode » {mode}```")
+			await embed_builder(ctx, description=f"```\Privacy mode » {mode}```")
 		else:
-			await mode_error(luna, "on or off")
+			await mode_error(ctx, "on or off")
 
 bot.add_cog(PrivacyCog(bot))
+class ProtectionGuildCog(commands.Cog, name="Protection Guild commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
 
+	@commands.command(name = "pguilds",
+					aliases=['pguild', 'protectguild'],
+					usage="<guild_id>",
+					description = "Protect a guild")
+	async def pguilds(self, luna, guild_id:int):
+		await luna.message.delete()
+		try:
+			self.bot.get_guild(guild_id)
+		except:
+			await error_builder(luna, description="Invalid guild")
+			return
+		config._global("Luna/protections/config.json", "guilds", guild_id, add=True)
+		prints.message(f"Added » {color.purple(f'{guild_id}')} to the list of protected guilds")
+		await embed_builder(luna, description=f"```\nAdded » {guild_id} to the list of protected guilds```")
+	
+	@commands.command(name = "rguilds",
+					aliases=['rguild', 'removeguild'],
+					usage="<guild_id>",
+					description = "Remove a protected guild")
+	async def rguilds(self, luna, guild_id:int):
+		await luna.message.delete()
+		try:
+			self.bot.get_guild(guild_id)
+		except:
+			await error_builder(luna, description="Invalid guild")
+			return
+		config._global("Luna/protections/config.json", "guilds", guild_id, delete=True)
+		prints.message(f"Removed » {color.purple(f'{guild_id}')} from the list of protected guilds")
+		await embed_builder(luna, description=f"```\nRemoved » {guild_id} from the list of protected guilds```")
+
+bot.add_cog(ProtectionGuildCog(bot))
 class ProtectionCog(commands.Cog, name="Protection commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
+
+	@commands.command(name = "pfooter",
+					usage="<on/off>",
+					description = "Protections footer info")
+	async def pfooter(self, luna, mode:str):
+		await luna.message.delete()
+		if mode == "on" or mode == "off":
+			prints.message(f"Protections footer info » {color.purple(f'{mode}')}")
+			if mode == "on":
+				config._global("Luna/protections/config.json", "footer", True)
+			else:
+				config._global("Luna/protections/config.json", "footer", False)
+			await embed_builder(luna, description=f"```\nProtections footer info » {mode}```")
+		else:
+			await mode_error(luna, "on or off")
 		
 	@commands.command(name = "antiraid",
-					usage="",
+					usage="<on/off>",
 					description = "Protects against raids")
 	async def antiraid(self, luna, mode:str):
 		await luna.message.delete()
 		global antiraid
+		global active_protections
+		global active_list
 		if mode == "on" or mode == "off":
 			prints.message(f"Antiraid » {color.purple(f'{mode}')}")
 			if mode == "on":
 				antiraid = True
+				active_protections += 1
+				active_list.append("antiraid")
 			else:
 				antiraid = False
+				active_protections -= 1
+				active_list.remove("antiraid")
 			await embed_builder(luna, description=f"```\nAntiraid » {mode}```")
+		else:
+			await mode_error(luna, "on or off")
+
+	@commands.command(name = "antiinvite",
+					usage="<on/off>",
+					description = "Protects against invites")
+	async def antiinvite(self, luna, mode:str):
+		await luna.message.delete()
+		global antiinvite
+		global active_protections
+		global active_list
+		if mode == "on" or mode == "off":
+			prints.message(f"Antiinvite » {color.purple(f'{mode}')}")
+			if mode == "on":
+				antiinvite = True
+				active_protections += 1
+				active_list.append("antiinvite")
+			else:
+				antiinvite = False
+				active_protections -= 1
+				active_list.remove("antiinvite")
+			await embed_builder(luna, description=f"```\nAntiinvite » {mode}```")
+		else:
+			await mode_error(luna, "on or off")
+
+	@commands.command(name = "antiupper",
+					usage="<on/off>",
+					description = "Protects against uppercase")
+	async def antiupper(self, luna, mode:str):
+		await luna.message.delete()
+		global antiupper
+		global active_protections
+		global active_list
+		if mode == "on" or mode == "off":
+			prints.message(f"Antiupper » {color.purple(f'{mode}')}")
+			if mode == "on":
+				antiupper = True
+				active_protections += 1
+				active_list.append("antiupper")
+			else:
+				antiupper = False
+				active_protections -= 1
+				active_list.remove("antiupper")
+			await embed_builder(luna, description=f"```\nAntiupper » {mode}```")
+		else:
+			await mode_error(luna, "on or off")
+
+	@commands.command(name = "antiphishing",
+					usage="<on/off>",
+					description = "Protects against phishing")
+	async def antiphishing(self, luna, mode:str):
+		await luna.message.delete()
+		global antiphishing
+		global active_protections
+		global active_list
+		if mode == "on" or mode == "off":
+			prints.message(f"Anti phishing links » {color.purple(f'{mode}')}")
+			if mode == "on":
+				antiphishing = True
+				active_protections += 1
+				active_list.append("Anti Phishing Links")
+			else:
+				antiphishing = False
+				active_protections -= 1
+				active_list.remove("Anti Phishing Links")
+			await embed_builder(luna, description=f"```\nAnti phishing links » {mode}```")
 		else:
 			await mode_error(luna, "on or off")
 
@@ -8654,7 +10248,7 @@ class BackupsCog(commands.Cog, name="Backup commands"):
 		serverName = luna.guild.name
 
 		newGuild = await self.bot.create_guild(serverName)
-		prints.info(f"Created new guild.")
+		prints.info(f"Created new guild")
 		newGuildDefaultChannels = await newGuild.fetch_channels()
 		for channel in newGuildDefaultChannels:
 			await channel.delete()
@@ -8709,7 +10303,7 @@ class BackupsCog(commands.Cog, name="Backup commands"):
 				except:
 					pass
 
-		await embed_builder(luna, f"```\nCloned {luna.guild.name}```")
+		await embed_builder(luna, description=f"```\nCloned {luna.guild.name}```")
 
 	@commands.command(name = "friendsbackup",
 					usage="",
@@ -8723,17 +10317,18 @@ class BackupsCog(commands.Cog, name="Backup commands"):
 		blockedlist = ""
 		for friend in self.bot.user.friends:
 			friendslist += f"{friend.name}#{friend.discriminator}\n"
-			friendsamount += 1
-		file = open("data/backup/friends.txt", "w", encoding='utf-8') 
+			friendsamount += 1 
+		file = open(os.path.join(files.documents(), "Luna/backup/friends.txt"), "w", encoding='utf-8')
 		file.write(friendslist)
 		file.close()
 		for block in self.bot.user.blocked:
 			blockedlist += f"{block.name}#{block.discriminator}\n"
 			blockedamount += 1
-		file = open("data/backup/blocked.txt", "w", encoding='utf-8') 
+		file = open(os.path.join(files.documents(), "Luna/backup/blocked.txt"), "w", encoding='utf-8')
 		file.write(blockedlist)
 		file.close()
-		await embed_builder(luna, f"```\nBacked up {friendsamount} friends in data/backup/friends.txt\nBacked up {blockedamount} blocked users in data/backup/blocked.txt```")
+		prints.message(f"Friendslist backed up. Friends » {friendsamount} Blocked » {blockedamount}")
+		await embed_builder(luna, description=f"```\nBacked up {friendsamount} friends in Documents/Luna/backup/friends.txt\nBacked up {blockedamount} blocked users in Documents/Luna/backup/blocked.txt```")
 
 bot.add_cog(BackupsCog(bot))
 class WhitelistCog(commands.Cog, name="Whitelist commands"):
@@ -8751,10 +10346,10 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
 			if luna.guild.id not in whitelisted_users.keys():
 				whitelisted_users[luna.guild.id] = {}
 			if user.id in whitelisted_users[luna.guild.id]:
-				await embed_builder(luna, f"```\n{user.name}#{user.discriminator} is already whitelisted```")
+				await embed_builder(luna, description=f"```\n{user.name}#{user.discriminator} is already whitelisted```")
 			else:
 				whitelisted_users[luna.guild.id][user.id] = 0
-				await embed_builder(luna, f"```\nWhitelisted " + user.name.replace("*", "\*").replace("`", "\`").replace("_", "\_") + "#" + user.discriminator + "```")
+				await embed_builder(luna, description=f"```\nWhitelisted " + user.name.replace("*", "\*").replace("`", "\`").replace("_", "\_") + "#" + user.discriminator + "```")
 
 	@commands.command(name = "unwhitelist",
 					usage="",
@@ -8770,7 +10365,7 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
 			if user.id in whitelisted_users[luna.guild.id]:
 				whitelisted_users[luna.guild.id].pop(user.id, 0)
 				user2 = self.bot.get_user(user.id)
-				await embed_builder(luna, f"```\nUnwhitelisted " + user.name.replace("*", "\*").replace("`", "\`").replace("_", "\_") + "#" + user.discriminator + "```")
+				await embed_builder(luna, description=f"```\nUnwhitelisted " + user.name.replace("*", "\*").replace("`", "\`").replace("_", "\_") + "#" + user.discriminator + "```")
 
 	@commands.command(name = "whitelisted",
 					usage="",
@@ -8783,7 +10378,7 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
 				for key2 in whitelisted_users[key]:
 					user = self.bot.get_user(key2)
 					whitelist += '+ ' + user.name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + "#" + user.discriminator + " - " + self.bot.get_guild(key).name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + "" + "\n"
-			await embed_builder(luna, f"```\n{whitelist}```")
+			await embed_builder(luna, description=f"```\n{whitelist}```")
 		else:
 			whitelist = "`" + luna.guild.name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + '\'s Whitelisted Users:`\n'
 			for key in self.bot.whitelisted_users:
@@ -8791,7 +10386,7 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
 					for key2 in self.bot.whitelisted_users[luna.guild.id]:
 						user = self.bot.get_user(key2)
 						whitelist += '+ ' + user.name.replace('*', "\*").replace('`', "\`").replace('_', "\_") + "#" + user.discriminator + " (" + str(user.id) + ")" + "\n"
-			await embed_builder(luna, f"```\n{whitelist}```")
+			await embed_builder(luna, description=f"```\n{whitelist}```")
 
 	@commands.command(name = "clearwhitelist",
 					usage="",
@@ -8799,7 +10394,7 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
 	async def clearwhitelist(self, luna):
 		await luna.message.delete()
 		whitelisted_users.clear()
-		await embed_builder(luna, f"```\nCleared the whitelist```")
+		await embed_builder(luna, description=f"```\nCleared the whitelist```")
 
 bot.add_cog(WhitelistCog(bot))
 class SettingsCog(commands.Cog, name="Settings commands"):
@@ -8826,12 +10421,45 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 			print(motd.center(os.get_terminal_size().columns))
 			if beta:
 				print("Beta Build".center(os.get_terminal_size().columns))
-			print()
-			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-			print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Guilds | {color.purple('0')} Friends")
-			print(f"                           {color.purple('[')}+{color.purple(']')} {newprefix}\n")
-			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+			console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+			if console_mode == "2":
+				riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
+				themesvar = files.json("Luna/config.json", "theme", documents=True)
+				deletetimer = int(files.json("Luna/config.json", "delete_timer", documents=True))
+				startup_status = files.json("Luna/config.json", "startup_status", documents=True)
+				nitro_sniper = files.json("Luna/snipers/nitro.json", "sniper", documents=True)
+				giveawayjoiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
+				if themesvar == "default":
+					pass
+				else:
+					themesvar = themesvar[:-5]
+				ui_user = f" {color.purple('User:')} {'Luna#0000':<26}"
+				ui_guilds = f" {color.purple('Guilds:')} {'0':<24}"
+				ui_friends = f" {color.purple('Friends:')} {'0':<23}"
+				ui_prefix = f" {color.purple('Prefix:')} {newprefix:<24}"
+				ui_theme = f" {color.purple('Theme:')} {themesvar:<25}"
+				ui_commands = f" {color.purple('Commands:')} {command_count-custom_command_count:<22}"
+				ui_commands_custom = f" {color.purple('Custom Commands:')} {custom_command_count:<15}"
+				ui_nitro_sniper = f" {color.purple('Nitro Sniper:')} {nitro_sniper}"
+				ui_giveaway_sniper = f" {color.purple('Giveaway Joiner:')} {giveawayjoiner}"
+				ui_riskmode = f" {color.purple('Riskmode:')} {riskmode}"
+				ui_deletetimer = f" {color.purple('Delete Timer:')} {deletetimer}"
+				ui_startup = f" {color.purple('Startup Status:')} {startup_status}"
+				print()
+				print(f"               ═════════════ {color.purple('User')} ═════════════      ═══════════ {color.purple('Settings')} ═══════════")
+				print(f"               {ui_user}     {ui_prefix}")
+				print(f"               {ui_guilds}     {ui_theme}")
+				print(f"               {ui_friends}     {ui_nitro_sniper}")
+				print(f"               ════════════════════════════════      {ui_giveaway_sniper}")
+				print(f"               ═════════════ {color.purple('Luna')} ═════════════      {ui_riskmode}")
+				print(f"               {ui_commands}     {ui_deletetimer}")
+				print(f"               {ui_commands_custom}     {ui_startup}")
+				print(f"               ════════════════════════════════      ════════════════════════════════\n")
+			else:
+				print()
+				print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+				print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Guilds | {color.purple('0')} Friends")
+				print(f"                           {color.purple('[')}+{color.purple(']')} {newprefix}\n")
 		else:
 			command_count = len(bot.commands)
 			cog = bot.get_cog('Custom commands')
@@ -8845,12 +10473,48 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 			print(motd.center(os.get_terminal_size().columns))
 			if beta:
 				print("Beta Build".center(os.get_terminal_size().columns))
-			print()
-			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-			print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends")
-			print(f"                           {color.purple('[')}+{color.purple(']')} {newprefix}\n")
-			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+			console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+			if console_mode == "2":
+				riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
+				themesvar = files.json("Luna/config.json", "theme", documents=True)
+				deletetimer = int(files.json("Luna/config.json", "delete_timer", documents=True))
+				startup_status = files.json("Luna/config.json", "startup_status", documents=True)
+				nitro_sniper = files.json("Luna/snipers/nitro.json", "sniper", documents=True)
+				giveawayjoiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
+				if themesvar == "default":
+					pass
+				else:
+					themesvar = themesvar[:-5]
+				bot_user = f"{bot.user}"
+				ui_user = f" {color.purple('User:')} {bot_user:<26}"
+				ui_guilds = f" {color.purple('Guilds:')} {len(bot.guilds):<24}"
+				ui_friends = f" {color.purple('Friends:')} {len(bot.user.friends):<23}"
+				ui_prefix = f" {color.purple('Prefix:')} {newprefix:<24}"
+				ui_theme = f" {color.purple('Theme:')} {themesvar:<25}"
+				ui_commands = f" {color.purple('Commands:')} {command_count-custom_command_count:<22}"
+				ui_commands_custom = f" {color.purple('Custom Commands:')} {custom_command_count:<15}"
+				ui_nitro_sniper = f" {color.purple('Nitro Sniper:')} {nitro_sniper}"
+				ui_giveaway_sniper = f" {color.purple('Giveaway Joiner:')} {giveawayjoiner}"
+				ui_riskmode = f" {color.purple('Riskmode:')} {riskmode}"
+				ui_deletetimer = f" {color.purple('Delete Timer:')} {deletetimer}"
+				ui_startup = f" {color.purple('Startup Status:')} {startup_status}"
+				print()
+				print(f"               ═════════════ {color.purple('User')} ═════════════      ═══════════ {color.purple('Settings')} ═══════════")
+				print(f"               {ui_user}     {ui_prefix}")
+				print(f"               {ui_guilds}     {ui_theme}")
+				print(f"               {ui_friends}     {ui_nitro_sniper}")
+				print(f"               ════════════════════════════════      {ui_giveaway_sniper}")
+				print(f"               ═════════════ {color.purple('Luna')} ═════════════      {ui_riskmode}")
+				print(f"               {ui_commands}     {ui_deletetimer}")
+				print(f"               {ui_commands_custom}     {ui_startup}")
+				print(f"               ════════════════════════════════      ════════════════════════════════\n")
+			else:
+				print()
+				print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+				print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends")
+				print(f"                           {color.purple('[')}+{color.purple(']')} {newprefix}\n")
+		print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+		prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 		prints.message(f"Prefix changed to {color.purple(f'{newprefix}')}")
 		await embed_builder(ctx, description=f"```\nPrefix changed to {newprefix}```")
 
@@ -9043,7 +10707,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 
 	@commands.command(name = "selfbotdetection",
 					usage="<on/off>",
-					description = "Selfbot detection")
+					description = "Sb detection")
 	async def selfbotdetection(self, luna, mode:str):
 		await luna.message.delete()
 		if mode == "on" or mode == "off":
@@ -9067,41 +10731,190 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 
 	@commands.command(name = "password",
 					usage="<new_password>",
-					description = "Change password config")
+					description = "Change password")
 	async def password(self, luna, password:str):
 		await luna.message.delete()
 		await embed_builder(luna, description=f"```\nChanged password to » {password}```")
 		prints.message(f"Changed password to » {color.purple(f'{password}')}")
 		config.password(f"{password}")
 
-	@commands.command(name = "startup",
-					usage="<online/idle/dnd/offline>",
-					description = "Startup")
-	async def startup(self, luna, mode:str):
-		await luna.message.delete()
-		if mode == "online" or mode == "idle" or mode == "dnd" or mode == "offline":
-			prints.message(f"Startup status » {color.purple(f'{mode}')}")
-			config.startup_status(mode)
-			await embed_builder(luna, description=f"```\nStartup status » {mode}```")
+	@commands.command(name = "console",
+					usage="<1/2>",
+					description = "Change console mode")
+	async def console(self, ctx, mode:str):
+		await ctx.message.delete()
+		if mode == "1" or mode == "2":
+			config._global("Luna/console/console.json", "mode", mode)
+			prints.message(f"Console mode » {color.purple(f'{mode}')}")
+			await embed_builder(ctx, description=f"```\nConsole mode » {mode}```")
+			luna.console(clear=True)
+			if privacy:
+				command_count = len(bot.commands)
+				cog = bot.get_cog('Custom commands')
+				try:
+					custom = cog.get_commands()
+					custom_command_count = 0
+					for command in custom:
+						custom_command_count += 1
+				except:
+					custom_command_count = 0
+				prefix = files.json("Luna/config.json", "prefix", documents=True)
+				print(motd.center(os.get_terminal_size().columns))
+				if beta:
+					print("Beta Build".center(os.get_terminal_size().columns))
+				prefix = files.json("Luna/config.json", "prefix", documents=True)
+				console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+				if console_mode == "2":
+					riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
+					themesvar = files.json("Luna/config.json", "theme", documents=True)
+					deletetimer = int(files.json("Luna/config.json", "delete_timer", documents=True))
+					startup_status = files.json("Luna/config.json", "startup_status", documents=True)
+					nitro_sniper = files.json("Luna/snipers/nitro.json", "sniper", documents=True)
+					giveawayjoiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
+					if themesvar == "default":
+						pass
+					else:
+						themesvar = themesvar[:-5]
+					ui_user = f" {color.purple('User:')} {'Luna#0000':<26}"
+					ui_guilds = f" {color.purple('Guilds:')} {'0':<24}"
+					ui_friends = f" {color.purple('Friends:')} {'0':<23}"
+					ui_prefix = f" {color.purple('Prefix:')} {prefix:<24}"
+					ui_theme = f" {color.purple('Theme:')} {themesvar:<25}"
+					ui_commands = f" {color.purple('Commands:')} {command_count-custom_command_count:<22}"
+					ui_commands_custom = f" {color.purple('Custom Commands:')} {custom_command_count:<15}"
+					ui_nitro_sniper = f" {color.purple('Nitro Sniper:')} {nitro_sniper}"
+					ui_giveaway_sniper = f" {color.purple('Giveaway Joiner:')} {giveawayjoiner}"
+					ui_riskmode = f" {color.purple('Riskmode:')} {riskmode}"
+					ui_deletetimer = f" {color.purple('Delete Timer:')} {deletetimer}"
+					ui_startup = f" {color.purple('Startup Status:')} {startup_status}"
+					print()
+					print(f"               ═════════════ {color.purple('User')} ═════════════      ═══════════ {color.purple('Settings')} ═══════════")
+					print(f"               {ui_user}     {ui_prefix}")
+					print(f"               {ui_guilds}     {ui_theme}")
+					print(f"               {ui_friends}     {ui_nitro_sniper}")
+					print(f"               ════════════════════════════════      {ui_giveaway_sniper}")
+					print(f"               ═════════════ {color.purple('Luna')} ═════════════      {ui_riskmode}")
+					print(f"               {ui_commands}     {ui_deletetimer}")
+					print(f"               {ui_commands_custom}     {ui_startup}")
+					print(f"               ════════════════════════════════      ════════════════════════════════\n")
+				else:
+					print()
+					print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+					print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Guilds | {color.purple('0')} Friends")
+					print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+			else:
+				command_count = len(bot.commands)
+				cog = bot.get_cog('Custom commands')
+				try:
+					custom = cog.get_commands()
+					custom_command_count = 0
+					for command in custom:
+						custom_command_count += 1
+				except:
+					custom_command_count = 0
+				prefix = files.json("Luna/config.json", "prefix", documents=True)
+				print(motd.center(os.get_terminal_size().columns))
+				if beta:
+					print("Beta Build".center(os.get_terminal_size().columns))
+				prefix = files.json("Luna/config.json", "prefix", documents=True)
+				console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+				if console_mode == "2":
+					riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
+					themesvar = files.json("Luna/config.json", "theme", documents=True)
+					deletetimer = int(files.json("Luna/config.json", "delete_timer", documents=True))
+					startup_status = files.json("Luna/config.json", "startup_status", documents=True)
+					nitro_sniper = files.json("Luna/snipers/nitro.json", "sniper", documents=True)
+					giveawayjoiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
+					if themesvar == "default":
+						pass
+					else:
+						themesvar = themesvar[:-5]
+					bot_user = f"{bot.user}"
+					ui_user = f" {color.purple('User:')} {bot_user:<26}"
+					ui_guilds = f" {color.purple('Guilds:')} {len(bot.guilds):<24}"
+					ui_friends = f" {color.purple('Friends:')} {len(bot.user.friends):<23}"
+					ui_prefix = f" {color.purple('Prefix:')} {prefix:<24}"
+					ui_theme = f" {color.purple('Theme:')} {themesvar:<25}"
+					ui_commands = f" {color.purple('Commands:')} {command_count-custom_command_count:<22}"
+					ui_commands_custom = f" {color.purple('Custom Commands:')} {custom_command_count:<15}"
+					ui_nitro_sniper = f" {color.purple('Nitro Sniper:')} {nitro_sniper}"
+					ui_giveaway_sniper = f" {color.purple('Giveaway Joiner:')} {giveawayjoiner}"
+					ui_riskmode = f" {color.purple('Riskmode:')} {riskmode}"
+					ui_deletetimer = f" {color.purple('Delete Timer:')} {deletetimer}"
+					ui_startup = f" {color.purple('Startup Status:')} {startup_status}"
+					print()
+					print(f"               ═════════════ {color.purple('User')} ═════════════      ═══════════ {color.purple('Settings')} ═══════════")
+					print(f"               {ui_user}     {ui_prefix}")
+					print(f"               {ui_guilds}     {ui_theme}")
+					print(f"               {ui_friends}     {ui_nitro_sniper}")
+					print(f"               ════════════════════════════════      {ui_giveaway_sniper}")
+					print(f"               ═════════════ {color.purple('Luna')} ═════════════      {ui_riskmode}")
+					print(f"               {ui_commands}     {ui_deletetimer}")
+					print(f"               {ui_commands_custom}     {ui_startup}")
+					print(f"               ════════════════════════════════      ════════════════════════════════\n")
+				else:
+					print()
+					print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+					print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends")
+					print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 		else:
-			await mode_error(luna, "online, idle, dnd or offline")
+			await mode_error(ctx, "1 or 2")
 
 	@commands.command(name = "reload",
 					usage="",
 					description = "Reload custom commands")
 	async def reload(self, ctx):
 		await ctx.message.delete()
-		path = getattr(sys, '_MEIPASS', os.getcwd())
-		cogs_path = path + "\\cogs"
-		luna.loader_check()
-		for filename in os.listdir(cogs_path):
-			if filename.endswith(".py"):
-				bot.reload_extension(f"cogs.{filename[:-3]}")
-		prints.message(f"Reloaded custom commands")
-		await embed_builder(ctx, description=f"```\nReloaded custom commands```")
+		prefix = files.json("Luna/config.json", "prefix", documents=True)
+		# path = getattr(sys, '_MEIPASS', os.getcwd())
+		# cogs_path = path + "\\cogs"
+		# luna.loader_check()
+		# for filename in os.listdir(cogs_path):
+		# 	if filename.endswith(".py"):
+		# 		bot.reload_extension(f"cogs.{filename[:-3]}")
+		# prints.message(f"Reloaded custom commands")
+		# await embed_builder(ctx, description=f"```\nReloaded custom commands```")
+		await embed_builder(ctx, description=f"```\nReload has been disabled until further notice, use {prefix}restart instead```")
 
 bot.add_cog(SettingsCog(bot))
+class CustomCog(commands.Cog, name="Custom commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+	try:
+		file = open(os.path.join(files.documents(), "Luna/custom/custom.py"), "r")
+		file_data = file.read()
+		if "sys.modules" in str(file_data):
+			prints.error("Using sys.modules is not allowed.")
+			time.sleep(5)
+			os._exit(0)
+		if "inspect" and "import" in str(file_data):
+			prints.error("Importing inspect is not allowed.")
+			time.sleep(5)
+			os._exit(0)
+		if "dill" and "import" in str(file_data):
+			prints.error("Importing dill is not allowed.")
+			time.sleep(5)
+			os._exit(0)
+		if "exec" in str(file_data):
+			prints.error("Using exec is not allowed.")
+			time.sleep(5)
+			os._exit(0)
+		if "auth_luna" in str(file_data):
+			prints.error("\"auth_luna\" not allowed.")
+			time.sleep(5)
+			os._exit(0)
+		if "atlas" in str(file_data):
+			prints.error("\"atlas\" not allowed.")
+			time.sleep(5)
+			os._exit(0)
+		exec(file_data)
+	except Exception as e:
+		prints.error(e)
+		os.system('pause')
 
+bot.add_cog(CustomCog(bot))
 class ShareCog(commands.Cog, name="Share commands"):
     def __init__(self, bot:commands.bot):
         self.bot = bot
@@ -9150,7 +10963,7 @@ class EncodeCog(commands.Cog, name="Encode commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
 
-	@commands.command(name = "encode_cea256", usage = "<key> <text>", description = "cea256")  # Encryption made by Exodus <3 
+	@commands.command(name = "encode_cea256", usage = "<key> <text>", description = "cea256")
 	async def encode_cea256(self, luna, key, *, text):
 		await luna.message.delete()
 		if len(key) != 32:
@@ -9237,7 +11050,7 @@ class DecodeCog(commands.Cog, name="Decode commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
 
-	@commands.command(name = "decode_cea256", usage = "<key> <text>", description = "cea256")  # Encryption made by Exodus <3 
+	@commands.command(name = "decode_cea256", usage = "<key> <text>", description = "cea256")
 	async def decode_cea256(self, luna, key, *, text):
 		await luna.message.delete()
 		if len(key) != 32:
@@ -9881,33 +11694,37 @@ class OnMember(commands.Cog, name="on member events"):
         
 	@commands.Cog.listener()
 	async def on_member_join(self, member):
-		if antiraid is True and member.bot:
-			try:
-				guild = member.guild
-				async for i in guild.audit_logs(limit=1, action=discord.AuditLogAction.bot_add):
-					if member.guild.id in whitelisted_users.keys() and i.user.id in whitelisted_users[
-							member.guild.id].keys():
-						return
-					else:
-						await guild.ban(member, reason="Luna Anti-Raid")
-						await guild.ban(i.user, reason="Luna Anti-Raid")
-			except Exception as e:
-				print(e)
+		if antiraid is True:
+			guilds = files.json("Luna/protections/config.json", "guilds", documents=True)
+			if member.guild.id in guilds:
+				try:
+					guild = member.guild
+					async for i in guild.audit_logs(limit=1, action=discord.AuditLogAction.bot_add):
+						if member.guild.id in whitelisted_users.keys() and i.user.id in whitelisted_users[
+								member.guild.id].keys():
+							return
+						else:
+							prints.message(f"{member.name}#{member.discriminator} banned by Anti-Raid")
+							await guild.ban(member, reason="Luna Anti-Raid")
+				except Exception as e:
+					print(e)
 
 	@commands.Cog.listener()
 	async def on_member_remove(self, member):
 		if antiraid is True:
-			try:
-				guild = member.guild
-				async for i in guild.audit_logs(limit=1, action=discord.AuditLogAction.kick):
-					if guild.id in whitelisted_users.keys() and i.user.id in whitelisted_users[
-							guild.id].keys() and i.user.id is not self.bot.user.id:
-						print('not banned')
-					else:
-						print('banned')
-						await guild.ban(i.user, reason="Luna Anti-Raid")
-			except Exception as e:
-				print(e)
+			guilds = files.json("Luna/protections/config.json", "guilds", documents=True)
+			if member.guild.id in guilds:
+				try:
+					guild = member.guild
+					async for i in guild.audit_logs(limit=1, action=discord.AuditLogAction.kick):
+						if guild.id in whitelisted_users.keys() and i.user.id in whitelisted_users[
+								guild.id].keys() and i.user.id is not self.bot.user.id:
+							prints.message(f"{i.user.name}#{i.user.discriminator} not banned")
+						else:
+							prints.message(f"{i.user.name}#{i.user.discriminator} banned by Anti-Raid")
+							await guild.ban(i.user, reason="Luna Anti-Raid")
+				except Exception as e:
+					print(e)
 
 bot.add_cog(OnMember(bot))
 
@@ -10049,6 +11866,34 @@ class ThemesCog(commands.Cog, name="Theme commands"):
 		await luna.message.delete()
 		themesvar = files.json("Luna/config.json", "theme", documents=True)
 		await luna.send(file=discord.File(os.path.join(files.documents(), f"Luna/themes/{themesvar}")))
+
+	@commands.command(name="stealtheme", 
+					usage="<id>",
+					aliases=["themesteal"],
+					description="Steal a theme")
+	async def stealtheme(self, luna, message_id:int):
+		await luna.message.delete()
+		prefix = files.json("Luna/config.json", "prefix", documents=True)
+		message = await luna.fetch_message(message_id)
+		embed = message.embeds[0]
+		path = os.path.expanduser('~\Documents\Luna')
+		file = open(path + "\\themes\\" + embed.title.lower().replace(" ", "").replace("_", "").replace("*", "").replace("`", "") + ".json", "w+", encoding="utf-8")
+		data = """{
+	"title": "%s",
+	"title_url": "%s",
+	"footer": "%s",
+	"footer_icon_url": "%s",
+	"image_url": "%s",
+	"large_image_url": "%s",
+	"hex_color": "%s",
+	"author": "%s",
+	"author_icon_url": "%s",
+	"author_url": "%s",
+	"description": true	
+}"""%(embed.title, embed.url, embed.footer.text, embed.footer.icon_url, embed.thumbnail.url, embed.image.url, embed.color, embed.author.name, embed.author.icon_url, embed.author.url)
+		file.write(data.replace("Embed.Empty", ""))
+		file.close()
+		await embed_builder(luna, description=f"""```\nSaved the embed theme as » {embed.title.lower().replace(" ", "").replace("_", "").replace("*", "").replace("`", "")}\n``````\nNote\n\nUse \"{prefix}theme {embed.title.lower().replace(" ", "").replace("_", "").replace("*", "").replace("`", "")}\" to use the theme.```""")
 
 	@commands.command(name = "communitythemes",
 					aliases=['cthemes'],
@@ -11099,7 +12944,24 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 					description = "Uptime")
 	async def uptime(self, luna):
 		await luna.message.delete()
-		await embed_builder(luna, description=f"```\nUptime » {hour:02d}:{minute:02d}:{second:02d}```")
+		await embed_builder(luna, title="Uptime",description=f"```\n{hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds```")
+
+
+	@commands.command(name = "logout",
+					usage="",
+					description = "Logout of the bot")
+	async def logout(self, luna):
+		await luna.message.delete()
+		prints.message(f"Logging out of the bot")
+		await embed_builder(luna, description=f"```\nLogging out of the bot```")
+		await bot.logout()
+
+	@commands.command(name = "shutdown",
+					usage="",
+					description = "Shutdown the bot")
+	async def shutdown(self, luna):
+		await luna.message.delete()
+		os._exit(0)
 
 	# @commands.command(name = "thelp",
 	# 				usage="",
@@ -11279,6 +13141,8 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 					description = "Updates Luna")
 	async def update(self, luna):
 		await luna.message.delete()
+		r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
+		version_url = r["version"]
 		if developer_mode:
 			await embed_builder(luna, title="Update", description=f"```\nDeveloper mode active! No updates will be downloaded.```")
 		elif version == version_url:
@@ -11297,23 +13161,23 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 					description = "Restart Luna")
 	async def restart(self, luna):
 		await luna.message.delete()
-		if configs.mode() == 2:
-			sent = await luna.send(f"```ini\n[ Restarting ]\n\nAllow up to 5 seconds\n\n[ {theme.footer()} ]```")
-			await asyncio.sleep(3)
-			await sent.delete()
-		if configs.mode() == 3:
-			sent = await luna.send(f"> **Restarting**\n> \n> Allow up to 5 seconds\n> \n> {theme.footer()}")
-			await asyncio.sleep(3)
-			await sent.delete()
-		else:
-			embed = discord.Embed(title="Restarting", url=theme.title_url(), description=f"```\nAllow up to 5 seconds```", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			sent = await luna.send(embed=embed)
-			await asyncio.sleep(3)
-			await sent.delete()
+		# if configs.mode() == 2:
+		# 	sent = await luna.send(f"```ini\n[ Restarting ]\n\nAllow up to 5 seconds\n\n[ {theme.footer()} ]```")
+		# 	await asyncio.sleep(3)
+		# 	await sent.delete()
+		# if configs.mode() == 3:
+		# 	sent = await luna.send(f"> **Restarting**\n> \n> Allow up to 5 seconds\n> \n> {theme.footer()}")
+		# 	await asyncio.sleep(3)
+		# 	await sent.delete()
+		# else:
+		# 	embed = discord.Embed(title="Restarting", url=theme.title_url(), description=f"```\nAllow up to 5 seconds```", color=theme.hex_color())
+		# 	embed.set_thumbnail(url=theme.image_url())
+		# 	embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+		# 	embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+		# 	embed.set_image(url=theme.large_image_url())
+		# 	sent = await luna.send(embed=embed)
+		# 	await asyncio.sleep(3)
+		# 	await sent.delete()
 		restart_program()
 
 	@commands.command(name = "shutdown",
@@ -11347,9 +13211,8 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 					description = "Clear the console")
 	async def clear(self, ctx):
 		await ctx.message.delete()
-
+		luna.console(clear=True)
 		if privacy:
-			luna.console(clear=True)
 			command_count = len(bot.commands)
 			cog = bot.get_cog('Custom commands')
 			try:
@@ -11363,14 +13226,47 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 			print(motd.center(os.get_terminal_size().columns))
 			if beta:
 				print("Beta Build".center(os.get_terminal_size().columns))
-			print()
-			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-			print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Guilds | {color.purple('0')} Friends")
-			print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+			prefix = files.json("Luna/config.json", "prefix", documents=True)
+			console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+			if console_mode == "2":
+				riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
+				themesvar = files.json("Luna/config.json", "theme", documents=True)
+				deletetimer = int(files.json("Luna/config.json", "delete_timer", documents=True))
+				startup_status = files.json("Luna/config.json", "startup_status", documents=True)
+				nitro_sniper = files.json("Luna/snipers/nitro.json", "sniper", documents=True)
+				giveawayjoiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
+				if themesvar == "default":
+					pass
+				else:
+					themesvar = themesvar[:-5]
+				ui_user = f" {color.purple('User:')} {'Luna#0000':<26}"
+				ui_guilds = f" {color.purple('Guilds:')} {'0':<24}"
+				ui_friends = f" {color.purple('Friends:')} {'0':<23}"
+				ui_prefix = f" {color.purple('Prefix:')} {prefix:<24}"
+				ui_theme = f" {color.purple('Theme:')} {themesvar:<25}"
+				ui_commands = f" {color.purple('Commands:')} {command_count-custom_command_count:<22}"
+				ui_commands_custom = f" {color.purple('Custom Commands:')} {custom_command_count:<15}"
+				ui_nitro_sniper = f" {color.purple('Nitro Sniper:')} {nitro_sniper}"
+				ui_giveaway_sniper = f" {color.purple('Giveaway Joiner:')} {giveawayjoiner}"
+				ui_riskmode = f" {color.purple('Riskmode:')} {riskmode}"
+				ui_deletetimer = f" {color.purple('Delete Timer:')} {deletetimer}"
+				ui_startup = f" {color.purple('Startup Status:')} {startup_status}"
+				print()
+				print(f"               ═════════════ {color.purple('User')} ═════════════      ═══════════ {color.purple('Settings')} ═══════════")
+				print(f"               {ui_user}     {ui_prefix}")
+				print(f"               {ui_guilds}     {ui_theme}")
+				print(f"               {ui_friends}     {ui_nitro_sniper}")
+				print(f"               ════════════════════════════════      {ui_giveaway_sniper}")
+				print(f"               ═════════════ {color.purple('Luna')} ═════════════      {ui_riskmode}")
+				print(f"               {ui_commands}     {ui_deletetimer}")
+				print(f"               {ui_commands_custom}     {ui_startup}")
+				print(f"               ════════════════════════════════      ════════════════════════════════\n")
+			else:
+				print()
+				print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+				print(f"                           {color.purple('[')}+{color.purple(']')} Luna#0000 | {color.purple('0')} Guilds | {color.purple('0')} Friends")
+				print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
 		else:
-			luna.console(clear=True)
 			command_count = len(bot.commands)
 			cog = bot.get_cog('Custom commands')
 			try:
@@ -11384,12 +13280,49 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 			print(motd.center(os.get_terminal_size().columns))
 			if beta:
 				print("Beta Build".center(os.get_terminal_size().columns))
-			print()
-			print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
-			print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends")
-			print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
-			print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-			prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+			prefix = files.json("Luna/config.json", "prefix", documents=True)
+			console_mode = files.json("Luna/console/console.json", "mode", documents=True)
+			if console_mode == "2":
+				riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
+				themesvar = files.json("Luna/config.json", "theme", documents=True)
+				deletetimer = int(files.json("Luna/config.json", "delete_timer", documents=True))
+				startup_status = files.json("Luna/config.json", "startup_status", documents=True)
+				nitro_sniper = files.json("Luna/snipers/nitro.json", "sniper", documents=True)
+				giveawayjoiner = files.json("Luna/snipers/giveaway.json", "joiner", documents=True)
+				if themesvar == "default":
+					pass
+				else:
+					themesvar = themesvar[:-5]
+				bot_user = f"{bot.user}"
+				ui_user = f" {color.purple('User:')} {bot_user:<26}"
+				ui_guilds = f" {color.purple('Guilds:')} {len(bot.guilds):<24}"
+				ui_friends = f" {color.purple('Friends:')} {len(bot.user.friends):<23}"
+				ui_prefix = f" {color.purple('Prefix:')} {prefix:<24}"
+				ui_theme = f" {color.purple('Theme:')} {themesvar:<25}"
+				ui_commands = f" {color.purple('Commands:')} {command_count-custom_command_count:<22}"
+				ui_commands_custom = f" {color.purple('Custom Commands:')} {custom_command_count:<15}"
+				ui_nitro_sniper = f" {color.purple('Nitro Sniper:')} {nitro_sniper}"
+				ui_giveaway_sniper = f" {color.purple('Giveaway Joiner:')} {giveawayjoiner}"
+				ui_riskmode = f" {color.purple('Riskmode:')} {riskmode}"
+				ui_deletetimer = f" {color.purple('Delete Timer:')} {deletetimer}"
+				ui_startup = f" {color.purple('Startup Status:')} {startup_status}"
+				print()
+				print(f"               ═════════════ {color.purple('User')} ═════════════      ═══════════ {color.purple('Settings')} ═══════════")
+				print(f"               {ui_user}     {ui_prefix}")
+				print(f"               {ui_guilds}     {ui_theme}")
+				print(f"               {ui_friends}     {ui_nitro_sniper}")
+				print(f"               ════════════════════════════════      {ui_giveaway_sniper}")
+				print(f"               ═════════════ {color.purple('Luna')} ═════════════      {ui_riskmode}")
+				print(f"               {ui_commands}     {ui_deletetimer}")
+				print(f"               {ui_commands_custom}     {ui_startup}")
+				print(f"               ════════════════════════════════      ════════════════════════════════\n")
+			else:
+				print()
+				print(f"                           {color.purple('[')}+{color.purple('] CONNECTED')}")
+				print(f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends")
+				print(f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
+		print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+		prints.message(f"{color.purple(f'{command_count-custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
 
 	@commands.command(name = "covid",
 					aliases=['corona'],
@@ -11430,6 +13363,14 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 		else:
 			await mode_error(luna, "on or off")
 
+	@commands.command(name = "hwid",
+					usage="",
+					description = "Prints your hwid")
+	async def hwid(self, luna):
+		await luna.message.delete()
+		hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\r\n')[1].strip('\r').strip()
+		prints.message(f"Your HWID » {hwid}")
+
 bot.add_cog(MiscCog(bot))
 class GamesCog(commands.Cog, name="Game commands"):
 	def __init__(self, bot:commands.bot):
@@ -11463,19 +13404,18 @@ def convert_to_text(embed: discord.Embed):
 	largeimagevar = theme.large_image_url()
 	if embed.image.url == "":
 		if embed.description.endswith("\n"):
-			text_mode_builder = f"```ini\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('```', '')}\n[ {embed.footer.text} ]\n```"
+			text_mode_builder = f"```css\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('```', '')}\n[ {embed.footer.text} ]\n```"
 		else:
-			text_mode_builder = f"```ini\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('```', '')}\n\n[ {embed.footer.text} ]\n```"
+			text_mode_builder = f"```css\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('```', '')}\n\n[ {embed.footer.text} ]\n```"
 		return text_mode_builder
 	elif embed.image.url == largeimagevar:
 		if embed.description.endswith("\n"):
-			text_mode_builder = f"```ini\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('```', '')}\n[ {embed.footer.text} ]\n```"
+			text_mode_builder = f"```css\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('```', '')}\n[ {embed.footer.text} ]\n```"
 		else:
-			text_mode_builder = f"```ini\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('```', '')}\n\n[ {embed.footer.text} ]\n```"
+			text_mode_builder = f"```css\n[ {embed.title.replace('**', '')} ]\n\n{embed.description.replace('```', '')}\n\n[ {embed.footer.text} ]\n```"
 		return text_mode_builder
 	else:
 		return embed.image.url
-
 
 def convert_to_indent(embed: discord.Embed):
 	largeimagevar = theme.large_image_url()
@@ -11532,7 +13472,7 @@ async def mode_error(luna, modes:str):
         embed.set_image(url=theme.large_image_url())
         await send(luna, embed)
 
-async def embed_builder(luna, title=None, description="", color=None, large_image=None, thumbnail=None, delete_after=None):
+async def embed_builder(luna, title=None, description="", color=None, large_image=None, thumbnail=None, delete_after=None, footer_extra=None, footer=None):
 	"""
 	Luna's main function for creating embeds with the theme applied.\n
 	Parse `luna = ctx` as first argument. (Important)\n
@@ -11553,9 +13493,22 @@ async def embed_builder(luna, title=None, description="", color=None, large_imag
 		thumbnail = ""
 	if title == None:
 		title = theme.title()
+	if not footer == "None":
+		if footer_extra == None:
+			if files.json("Luna/protections/config.json", "footer", documents=True) == True:
+				footer_extra = f"Enabled Protections » {active_protections} | {theme.footer()}"
+			else:
+				footer_extra = theme.footer()
+		else:
+			if files.json("Luna/protections/config.json", "footer", documents=True) == True:
+				footer_extra = f"{footer_extra} | Enabled Protections » {active_protections} | {theme.footer()}"
+			else:
+				footer_extra = f"{footer_extra} | {theme.footer()}"
+	else:
+		footer_extra = ""
 	embed = discord.Embed(title=title, url=theme.title_url(), description=description, color=color)
 	embed.set_thumbnail(url=thumbnail)
-	embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+	embed.set_footer(text=footer_extra, icon_url=theme.footer_icon_url())
 	embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
 	embed.set_image(url=large_image)
 	await send(luna, embed, delete_after)
@@ -11604,10 +13557,16 @@ async def error_builder(luna, description=""):
 
 # notify.webhook(url="https://discord.com/api/webhooks/909150388681310218/UTUTPihWbPzaOeXoxe7zyfHJJBBf4s_krKys-LB0uSmQZvB42QnQRVndygIc8ehq13cf", description="This is a test")
 
+# ///////////////////////////////////////////////////////////////
 # Main Thread, Don't Touch
 
-check_debuggers_thread()
+if not developer_mode:
+	check_debuggers_thread()
+
+if os.path.splitext(__file__)[1] == ".pyc":
+	os._exit(0)
+
 luna.title("Luna")
-luna.file_check()
+luna.file_check(console=True)
 luna.authentication()
 luna.wizard()
