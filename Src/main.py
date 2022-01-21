@@ -9871,9 +9871,11 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 						count = count + 1
 						await member.ban()
 						prints.message(f"Banned » {color.purple(member)}")
+						await asyncio.sleep(2)
 					except Exception:
 						prints.error(f"Failed to ban » {color.purple(member)}")
-			prints.message(f"Finished banning in » {color.purple(elapsed)}ms")
+						await asyncio.sleep(2)
+			prints.message(f"Finished banning in » {color.purple(elapsed)}s")
 		else:
 			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=theme.image_url())
@@ -9901,9 +9903,11 @@ class NukingCog(commands.Cog, name="Nuking commands"):
 						count = count + 1
 						await member.kick()
 						prints.message(f"Kicked » {color.purple(member)}")
+						await asyncio.sleep(2)
 					except Exception:
 						prints.error(f"Failed to kick » {color.purple(member)}")
-			prints.message(f"Finished kicking in » {color.purple(elapsed)}ms")
+						await asyncio.sleep(2)
+			prints.message(f"Finished kicking in » {color.purple(elapsed)}s")
 		else:
 			embed = discord.Embed(title="Error", url=theme.title_url(), description=f"```\nRiskmode is disabled```", color=0xff0000)
 			embed.set_thumbnail(url=theme.image_url())
