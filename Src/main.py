@@ -7791,6 +7791,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 					usage="<application>",
 					description = "Open an application")
 	async def open(self, luna, *, application:str):
+		await luna.message.delete()
 		os.startfile(application)
 
 	@commands.command(name = "calc",
