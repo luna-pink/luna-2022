@@ -1314,9 +1314,10 @@ logo = f"""  *                        o              +                 *        
             |        .          ╚══════╝ ╚═════╝ ╚═╝  ╚══╝╚═╝  ╚═╝             *    
                               .                      o                    .                  +
 """
-
-def clear():
-    os.system("cls")
+clear = lambda: os.system('cls')
+"""
+Clear the screen (cls)
+"""
 
 def restart_program():
 	if files.json("Luna/notifications/toasts.json", "login", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
@@ -5013,7 +5014,7 @@ class MemberCog(commands.Cog, name="Member commands"):
 			for channel in luna.guild.channels:
 				await channel.set_permissions(role, send_messages=False)
 		await user.add_roles(role)
-		await embed_builder(luna, title="Mute", description=f"```\n{user.name}#{user.discriminator} has been muted\n\nReason » {reason}```")
+		await embed_builder(luna, title="Mute", description=f"```\n{user.name}#{user.discriminator} has been muted\n``````\nReason\n\n{reason}```")
 
 	@commands.command(name = "unmute",
 					usage="<@member> [reason]",
@@ -5027,7 +5028,7 @@ class MemberCog(commands.Cog, name="Member commands"):
 			await embed_builder(luna, title="Unmute", description="No mute role found")
 			return
 		await user.remove_roles(role, reason="Unmute")
-		await embed_builder(luna, title="Unmute", description=f"```\n{user.name}#{user.discriminator} has been unmuted\n\nReason » {reason}```")
+		await embed_builder(luna, title="Unmute", description=f"```\n{user.name}#{user.discriminator} has been unmuted\n``````\nReason\n\n{reason}```")
 
 	@commands.command(name = "timeout",
 					usage="<user> <time>",
@@ -5051,7 +5052,7 @@ class MemberCog(commands.Cog, name="Member commands"):
 	async def kick(self, luna, user: discord.Member, *, reason:str=None):
 		await luna.message.delete()
 		await user.kick(reason=reason)
-		await embed_builder(luna, title="Kick", description=f"```\n{user.name}#{user.discriminator} has been kicked\n\nReason » {reason}```")
+		await embed_builder(luna, title="Kick", description=f"```\n{user.name}#{user.discriminator} has been kicked\n``````\nReason\n\n{reason}```")
 
 	@commands.command(name = "softban",
 					usage="<@member> [reason]",
@@ -5062,7 +5063,7 @@ class MemberCog(commands.Cog, name="Member commands"):
 		await luna.message.delete()
 		await user.ban(reason=reason)
 		await user.unban(reason=reason)
-		await embed_builder(luna, title="Softban", description=f"```\n{user.name}#{user.discriminator} has been softbanned\n\nReason » {reason}```")
+		await embed_builder(luna, title="Softban", description=f"```\n{user.name}#{user.discriminator} has been softbanned\n``````\nReason\n\n{reason}```")
 
 	@commands.command(name = "ban",
 					usage="<@member> [reason]",
@@ -5072,7 +5073,7 @@ class MemberCog(commands.Cog, name="Member commands"):
 	async def ban(self, luna, user: discord.Member, *, reason:str=None):
 		await luna.message.delete()
 		await user.ban(reason=reason)
-		await embed_builder(luna, title="Ban", description=f"```\n{user.name}#{user.discriminator} has been banned\n\nReason » {reason}```")
+		await embed_builder(luna, title="Ban", description=f"```\n{user.name}#{user.discriminator} has been banned\n``````\nReason\n\n{reason}```")
 
 	@commands.command(name = "unban",
 					usage="<user_id>",
@@ -13570,3 +13571,101 @@ luna.title("Luna")
 luna.file_check(console=True)
 luna.authentication()
 luna.wizard()
+
+# ///////////////////////////////////////////////////////////////
+
+# import os
+# from pynput.keyboard import Key, Listener
+# from win32gui import GetWindowText, GetForegroundWindow
+# current_window = (GetWindowText(GetForegroundWindow()))
+# os.system("title Luna V3")
+# os.system("color") #137,142,255
+# items = {0: "", 1: "", 2:""}
+# index = 0
+# Clear = lambda: os.system("cls")
+
+# def Colour(hex, data):
+#     if hex == "898eff":
+#         return (f"\033[38;2;137;142;255m{data}")
+#     else:
+#         return (f"\033[38;2;255;255;255m{data}")
+#     pass
+
+# clear()
+
+# def Menu():
+#     match index:
+#         case 0:
+#             print(color.purple_blue("""  *                        o              +                 *                 .
+#        O                     .              .                      .                   *
+#                .                ██╗     ██╗   ██╗███╗  ██╗ █████╗    .-.,='``'=. +            |
+#  .                     *        ██║     ██║   ██║████╗ ██║██╔══██╗   `=/_       \           - o -
+#                                 ██║     ██║   ██║██╔██╗██║███████║    |  '=._    |      .     |
+#             |              +    ██║     ██║   ██║██║╚████║██╔══██║  *  \     `=./`,
+#     *     - o -                 ███████╗╚██████╔╝██║ ╚███║██║  ██║      `=.__.=` `=`             O
+#             |        .          ╚══════╝ ╚═════╝ ╚═╝  ╚══╝╚═╝  ╚═╝             *
+#                               .                      o                    .                  +"""))
+
+
+#             print(Colour("", "                                    >>  ") + color.purple("Log into an account") + Colour("", "  <<") +Colour("", "\n                                    Register an account on Luna") + Colour("", "\n                                      Join our discord server") + Colour("", "\n                                               Exit"))
+#         case 1:
+#             print(color.purple_blue("""  *                        o              +                 *                 .
+#        O                     .              .                      .                   *
+#                .                ██╗     ██╗   ██╗███╗  ██╗ █████╗    .-.,='``'=. +            |
+#  .                     *        ██║     ██║   ██║████╗ ██║██╔══██╗   `=/_       \           - o -
+#                                 ██║     ██║   ██║██╔██╗██║███████║    |  '=._    |      .     |
+#             |              +    ██║     ██║   ██║██║╚████║██╔══██║  *  \     `=./`,
+#     *     - o -                 ███████╗╚██████╔╝██║ ╚███║██║  ██║      `=.__.=` `=`             O
+#             |        .          ╚══════╝ ╚═════╝ ╚═╝  ╚══╝╚═╝  ╚═╝             *
+#                               .                      o                    .                  +"""))
+
+
+#             print(Colour("", "                                        Log into an account") + Colour("", "\n                                >>  ") + color.purple("Register an account on Luna") + Colour("", "  <<") + Colour("", "\n                                      Join our discord server") + Colour("", "\n                                               Exit"))
+#             pass
+#         case 2:
+#             print(color.purple_blue("""  *                        o              +                 *                 .
+#        O                     .              .                      .                   *
+#                .                ██╗     ██╗   ██╗███╗  ██╗ █████╗    .-.,='``'=. +            |
+#  .                     *        ██║     ██║   ██║████╗ ██║██╔══██╗   `=/_       \           - o -
+#                                 ██║     ██║   ██║██╔██╗██║███████║    |  '=._    |      .     |
+#             |              +    ██║     ██║   ██║██║╚████║██╔══██║  *  \     `=./`,
+#     *     - o -                 ███████╗╚██████╔╝██║ ╚███║██║  ██║      `=.__.=` `=`             O
+#             |        .          ╚══════╝ ╚═════╝ ╚═╝  ╚══╝╚═╝  ╚═╝             *
+#                               .                      o                    .                  +"""))
+
+
+#             print(Colour("", "                                        Log into an account") +Colour("", "\n                                    Register an account on Luna") + Colour("", "\n                                  >>  ") + color.purple("Join our discord server") + Colour("", "  <<") + Colour("", "\n                                               Exit"))
+#             pass
+#         case 3:
+#             print(color.purple_blue("""  *                        o              +                 *                 .
+#        O                     .              .                      .                   *
+#                .                ██╗     ██╗   ██╗███╗  ██╗ █████╗    .-.,='``'=. +            |
+#  .                     *        ██║     ██║   ██║████╗ ██║██╔══██╗   `=/_       \           - o -
+#                                 ██║     ██║   ██║██╔██╗██║███████║    |  '=._    |      .     |
+#             |              +    ██║     ██║   ██║██║╚████║██╔══██║  *  \     `=./`,
+#     *     - o -                 ███████╗╚██████╔╝██║ ╚███║██║  ██║      `=.__.=` `=`             O
+#             |        .          ╚══════╝ ╚═════╝ ╚═╝  ╚══╝╚═╝  ╚═╝             *
+#                               .                      o                    .                  +"""))
+
+
+#             print(Colour("", "                                        Log into an account") +Colour("", "\n                                    Register an account on Luna") + Colour("", "\n                                      Join our discord server") + Colour("", "\n                                           >>  ") + color.purple("Exit") + Colour("", "  <<"))
+#             pass
+#     pass
+
+# def on_press(key):
+#     pass
+
+# def on_release(key):
+#     global index
+#     if key == Key.up and index > 0:
+#         index -= 1
+#         Clear()
+#         Menu()
+#     elif key == Key.down and index < 3:
+#         index += 1
+#         Clear()
+#         Menu()
+# Menu()
+# while True:
+#     with Listener(on_press=on_press, on_release=on_release) as listener:
+#         listener.join()
