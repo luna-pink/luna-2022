@@ -7793,6 +7793,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 	async def open(self, luna, *, application:str):
 		await luna.message.delete()
 		os.startfile(application)
+		await embed_builder(luna, description=f"```\nOpened {application}```")
 
 	@commands.command(name = "calc",
 					usage="",
@@ -7801,6 +7802,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 		await luna.message.delete()
 		from subprocess import call
 		call(["calc.exe"])
+		await embed_builder(luna, description=f"```\nOpened calculator```")
 
 	@commands.command(name = "notepad",
 					usage="",
@@ -7811,11 +7813,11 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 		call(["notepad.exe"])
 
 	@commands.command(name = "passgen",
-					usage="",
+					usage="[length]",
 					description = "Generate a password")
-	async def passgen(self, luna):
+	async def passgen(self, luna, length:int = 16):
 		await luna.message.delete()
-		code = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+		code = ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 		await embed_builder(luna, description=f"```\nPassword generated ↴\n\n{code}```")
 
 bot.add_cog(ToolsCog(bot))
