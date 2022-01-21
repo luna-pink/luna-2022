@@ -3607,12 +3607,9 @@ class OnMessage(commands.Cog, name="on message"):
 		global afk_reset
 
 		if afkstatus == 1 and afk_user_id == 0:
-
-			with open("config.json", "r") as f:
-				config = json.load(f)
-				afkmessage = config.get('afkmessage')
-				if afkmessage == "":
-					afkmessage = "This is an autoresponse message! User is now AFK.."
+			afkmessage = files.json("Luna/config.json", "afk_message", documents=True)
+			if afkmessage == "":
+				afkmessage = "This is an autoresponse message! User is now AFK.."
 			if message.guild is None and not isinstance(message.channel, discord.GroupChannel):
 				if message.author == self.bot.user:
 					return
@@ -7773,10 +7770,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 					description = "Create a QR code")
 	async def qrcode(self, luna, *, text:str):
 		await luna.message.delete()
-
-		with open('./config.json') as f:
-			config = json.load(f)
-		deletetimer = int(config.get('deletetimer'))
+		deletetimer = int(files.json("Luna/config.json", "delete_timer", documents=True))
 
 		qr = qrcode.QRCode(
 			version=1,
