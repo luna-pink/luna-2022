@@ -3044,7 +3044,7 @@ class theme:
 			if not descriptionvar == "true":
 				descriptionvar = ""
 			else:
-				descriptionvar = "```<> is required | [] is optional\n\n```"
+				descriptionvar = "```<> is required | [] is optional\n```"
 		else:
 			descriptionvar = files.json(f"Luna/themes/{theme}", "description", documents=True)
 			if descriptionvar == None:
@@ -3052,7 +3052,7 @@ class theme:
 			if not descriptionvar:
 				descriptionvar = ""
 			else:
-				descriptionvar = "```<> is required | [] is optional\n\n```"
+				descriptionvar = "```<> is required | [] is optional\n```"
 		return str(descriptionvar)
 
 class webhook:
@@ -13278,6 +13278,14 @@ class GamesCog(commands.Cog, name="Game commands"):
 bot.add_cog(GamesCog(bot))
 
 def convert_to_text(embed: discord.Embed):
+	"""[summary]
+
+	Args:
+		embed (discord.Embed): [description]
+
+	Returns:
+		[type]: [description]
+	"""
 	largeimagevar = theme.large_image_url()
 	if embed.image.url == "":
 		if not embed.description.endswith("\n"):
@@ -13298,6 +13306,14 @@ def convert_to_text(embed: discord.Embed):
 		return embed.image.url
 
 def convert_to_indent(embed: discord.Embed):
+	"""[summary]
+
+	Args:
+		embed (discord.Embed): [description]
+
+	Returns:
+		[type]: [description]
+	"""
 	largeimagevar = theme.large_image_url()
 	if embed.image.url == "":
 		text = ""
@@ -13330,14 +13346,21 @@ def convert_to_indent(embed: discord.Embed):
 
 
 async def send(luna, embed, delete_after=None):
+	"""[summary]
+
+	Args:
+		luna ([type]): [description]
+		embed ([type]): [description]
+		delete_after ([type], optional): [description]. Defaults to None.
+	"""
 	deletetimer = configs.delete_timer()
 	if delete_after is not None:
 		deletetimer = delete_after
 	mode = configs.mode()
-	if mode == 3:
-		await luna.send(convert_to_indent(embed), delete_after=deletetimer)
-	else:
+	if mode == 2:
 		await luna.send(convert_to_text(embed), delete_after=deletetimer)
+	else:
+		await luna.send(convert_to_indent(embed), delete_after=deletetimer)
 
 async def mode_error(luna, modes:str):
     if configs.error_log() == "console":
