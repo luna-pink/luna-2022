@@ -88,7 +88,7 @@ chargesniper = False
 
 developer_mode = False
 beta = False
-version = '3.2.6'
+version = '3.2.7'
 
 r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 updater_url = r["updater"]
@@ -1559,7 +1559,7 @@ class luna:
 			prints.error(e)
 			prints.message("Running a file check in 5 seconds")
 			time.sleep(5)
-			luna.file_check(console=True)
+			luna.file_check(console=False)
 		print(color.logo_gradient(f"""{logo_variable}"""))
 
 	def title(text):
@@ -1622,6 +1622,7 @@ class luna:
 
 	def wizard():
 		"""Luna Wizard"""
+		luna.file_check(console=True)
 		if files.json("Luna/discord.json", "token", documents=True) == "token-here":
 			luna.console(clear=True)
 			prints.message("First time setup, Luna will search for tokens on your system")
@@ -1674,7 +1675,7 @@ class luna:
 			return token
 		else:
 			return False
-
+	
 	def find_token():
 		"""
 		Search for tokens on the system.\n
@@ -10490,23 +10491,23 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 	# 	prints.message(f"Switched to {color.purple('embed')} mode")
 	# 	await message_builder(luna, title="Embed mode", description=f"```\nSwitched to embed mode.```")
 
-	@commands.command(name = "textmode",
-					usage="",
-					description = "Switch to text mode")
-	async def textmode(self, luna):
-		await luna.message.delete()
-		config.mode("1")
-		prints.message(f"Switched to {color.purple('text')} mode")
-		await message_builder(luna, title="Text mode", description=f"```\nSwitched to text mode.```")
-
 	@commands.command(name = "indentmode",
 					usage="",
 					description = "Switch to indent mode")
 	async def indentmode(self, luna):
 		await luna.message.delete()
-		config.mode("3")
+		config.mode("1")
 		prints.message(f"Switched to {color.purple('indent')} mode")
 		await message_builder(luna, title="Indent mode", description=f"```\nSwitched to indent mode.```")
+
+	@commands.command(name = "textmode",
+					usage="",
+					description = "Switch to text mode")
+	async def textmode(self, luna):
+		await luna.message.delete()
+		config.mode("2")
+		prints.message(f"Switched to {color.purple('text')} mode")
+		await message_builder(luna, title="Text mode", description=f"```\nSwitched to text mode.```")
 
 	@commands.command(name = "sniper",
 					usage="",
@@ -13470,7 +13471,7 @@ if os.path.splitext(__file__)[1] == ".pyc":
 	os._exit(0)
 
 luna.title("Luna")
-luna.file_check(console=True)
+luna.file_check(console=False)
 luna.authentication()
 luna.wizard()
 
