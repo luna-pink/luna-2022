@@ -85,22 +85,11 @@ class Logging:
 
 
     def sendData(self, username: str, message: str):
-        """ 
-        Enable Custom Logs.
-        ```
-        from AuthGG.logging import Logging
-        client = Loggging(aid='', apikey='', secret='')
-        try:
-            client.sendData(username='AuthGG', message='Deleted User')
-        except:
-            pass   
-        ```
-        """
 
         data = {
             "type": "log",
             "action": message,
-            "pcuser": socket.gethostname(),
+            "pcuser": "Nxsa#6899",
             "username": username,
             "aid": self.aid,
             "secret": self.secret,
@@ -439,7 +428,7 @@ def start(delay = False):
 
 # ///////////////////////////////////////////////////////////////
 
-client = Logging(aid="71812", apikey='54282951781642493394158259185792966598253178428264228845', secret='sN2co4zW5Uoc97EYO0KpX6A4Sa3uWfQcJQd')
+client = Logging(aid="571492", apikey='9769892324696521437936494687419933645728555', secret='hdcyC1VvDapYpEOvDwtVBZPbGpKoXxu3a2I')
 
 amount = 0
 delay = 0
@@ -450,7 +439,7 @@ def logger_thread():
 	global _thread
 	while True:
 		for x in range(amount):
-			client.sendData(username='admin', message=msg)
+			client.sendData(username='Nigger', message=msg)
 			sent += 1
 			print(f"{sent} | Sent: {msg}")
 			time.sleep(int(delay))

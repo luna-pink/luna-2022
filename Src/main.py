@@ -33,12 +33,10 @@ import ctypes.wintypes as wintypes
 from gtts import gTTS
 from ctypes import windll
 from notifypy import Notify
-from os import error, name, remove, system
+from os import error, system
 from datetime import datetime
 from pypresence import Presence
 from discord.ext import commands
-from urllib.request import urlopen
-from urllib.parse import non_hierarchical, quote_plus
 from time import localtime, strftime
 
 import discord
@@ -52,6 +50,8 @@ antiraid = False
 antiinvite = False
 antiupper = False
 antiphishing = False
+
+farming = False
 
 active_protections = 0
 active_list = []
@@ -908,7 +908,7 @@ class color:
 			return color.purple(f"{text}")
 
 	def black(text):
-		system(""); faded = ""
+		os.system(""); faded = ""
 		for line in text.splitlines():
 			red = 0; green = 0; blue = 0
 			for character in line:
@@ -919,7 +919,7 @@ class color:
 		return faded
 
 	def green(text):
-		system(""); faded = ""
+		os.system(""); faded = ""
 		for line in text.splitlines():
 			blue = 100
 			for character in line:
@@ -930,7 +930,7 @@ class color:
 		return faded
 
 	def blue(text):
-		system(""); faded = ""
+		os.system(""); faded = ""
 		for line in text.splitlines():
 			green = 0
 			for character in line:
@@ -941,7 +941,7 @@ class color:
 		return faded
 
 	def yellow(text):
-		system(""); faded = ""
+		os.system(""); faded = ""
 		for line in text.splitlines():
 			red = 0
 			for character in line:
@@ -951,7 +951,7 @@ class color:
 		return faded
 
 	def red(text):
-		system(""); faded = ""
+		os.system(""); faded = ""
 		for line in text.splitlines():
 			green = 250
 			for character in line:
@@ -964,21 +964,10 @@ class color:
 	def purple(text):
 		os.system(""); faded = ""; down = False
 		for line in text.splitlines():
-			# red = 40
 			red = 137
 			green = 142
 			blue = 255
 			for character in line:
-				# if down:
-				# 	red -= 3
-				# else:
-				# 	red += 3
-				# if red > 254:
-				# 	red = 255
-				# 	down = True
-				# elif red < 1:
-				# 	red = 30
-				# 	down = False
 
 				if down:
 					red -= 3
@@ -1002,43 +991,16 @@ class color:
 					green = 30
 					down = False
 
-				# if not green == 0:
-				# 	green -= 5
-				# 	if green < 0:
-				# 		green = 0
-				# if not red == 255:
-				# 	red += 5
-				# 	if red > 255:
-				# 		red = 255
-
-				# faded += (f"\033[38;2;{red};0;220m{character}\033[0m")
 				faded += (f"\033[38;2;{red};{green};{blue}m{character}\033[0m")
 		return faded
 
 	def purple_blue(text):
 		os.system(""); faded = ""
-		# V3.0.5
-		# red = 220
-		# green = 0
-		# blue = 255
-
-		# V3.0.6
 		red = 137
 		green = 142
 		blue = 255
 		for line in text.splitlines():
 			faded += (f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n")
-			# V3.0.5
-			# if not red == 0:
-            #     red -= 25
-            #     if red < 0:
-            #         red = 0
-            # if not green == 0:
-            #     green -= 40
-            #     if green < 0:
-            #         green = 0
-
-			# V3.0.6
 			if not green == 0:
 				green -= 5
 				if green < 0:
@@ -1067,7 +1029,7 @@ class color:
 		return faded
 
 	def pink_red(text):
-		system(""); faded = ""
+		os.system(""); faded = ""
 		blue = 255
 		for line in text.splitlines():
 			faded += (f"\033[38;2;255;0;{blue}m{line}\033[0m\n")
@@ -1078,7 +1040,7 @@ class color:
 		return faded
 
 	def black_white(text):
-		system(""); faded = ""
+		os.system(""); faded = ""
 		red = 0; green = 0; blue = 0
 		for line in text.splitlines():
 			faded += (f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n")
@@ -1089,7 +1051,7 @@ class color:
 		return faded
 
 	def blue_cyan(text):
-		system(""); faded = ""
+		os.system(""); faded = ""
 		green = 10
 		for line in text.splitlines():
 			faded += (f"\033[38;2;0;{green};255m{line}\033[0m\n")
@@ -1100,7 +1062,7 @@ class color:
 		return faded
 
 	def green_blue(text):
-		system(""); faded = ""
+		os.system(""); faded = ""
 		blue = 100
 		for line in text.splitlines():
 			faded += (f"\033[38;2;0;255;{blue}m{line}\033[0m\n")
@@ -1111,7 +1073,7 @@ class color:
 		return faded
 
 	def orange_red(text):
-		system(""); faded = ""
+		os.system(""); faded = ""
 		green = 250
 		for line in text.splitlines():
 			faded += (f"\033[38;2;255;{green};0m{line}\033[0m\n")
@@ -1286,9 +1248,12 @@ def check_debuggers():
 # Threading
 
 def check_debuggers_thread():
-    debugger_thread = threading.Thread(target=check_debuggers)
-    debugger_thread.daemon = True
-    debugger_thread.start()
+	"""
+		Threading for check_debuggers()
+	"""
+	debugger_thread = threading.Thread(target=check_debuggers)
+	debugger_thread.daemon = True
+	debugger_thread.start()
 
 # ///////////////////////////////////////////////////////////////
 # Print Functions
@@ -1314,12 +1279,17 @@ logo = f"""  *                        o              +                 *        
             |        .          ╚══════╝ ╚═════╝ ╚═╝  ╚══╝╚═╝  ╚═╝             *    
                               .                      o                    .                  +
 """
-clear = lambda: os.system('cls')
-"""
-Clear the screen (cls)
-"""
+
+def clear():
+	"""
+	Clears the screen.
+	"""
+	os.system('cls')
 
 def restart_program():
+	"""
+	Restarts the program.
+	"""
 	if files.json("Luna/notifications/toasts.json", "login", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
 		notify.toast(message=f"Restarting Luna...")
 	if files.json("Luna/webhooks/webhooks.json", "login", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
@@ -1328,9 +1298,12 @@ def restart_program():
 	os.execl(python, python, *sys.argv)
 
 def Randprntsc():
-    letterprn = ''.join(random.choices(string.ascii_lowercase, k=4))
-    numberprn = random.randint(10, 99)
-    return f'https://prnt.sc/{numberprn}{letterprn}'
+	"""
+	Random print screen.
+	"""
+	letterprn = ''.join(random.choices(string.ascii_lowercase, k=4))
+	numberprn = random.randint(10, 99)
+	return f'https://prnt.sc/{numberprn}{letterprn}'
 
 # ///////////////////////////////////////////////////////////////
 # Class AUTH
@@ -1761,9 +1734,9 @@ class luna:
 
 	def file_check(console=False):
 		"""Run a check for the files, create if needed."""
-		luna.console(clear=True)
 
 		if console:
+			luna.console(clear=True)
 			now = datetime.now()
 			hour = now.hour
 
@@ -3045,7 +3018,8 @@ class theme:
 			if not descriptionvar == "true":
 				descriptionvar = ""
 			else:
-				descriptionvar = "```<> is required | [] is optional\n```"
+				# descriptionvar = "```ansi\n[35m<>[0m is required | [34m[][0m is optional\n```"
+				descriptionvar = "```\n<> is required | [] is optional\n```"
 		else:
 			descriptionvar = files.json(f"Luna/themes/{theme}", "description", documents=True)
 			if descriptionvar == None:
@@ -3053,7 +3027,8 @@ class theme:
 			if not descriptionvar:
 				descriptionvar = ""
 			else:
-				descriptionvar = "```<> is required | [] is optional\n```"
+				descriptionvar = "```\n<> is required | [] is optional\n```"
+				# descriptionvar = "```ansi\n[35m<>[0m is required | [34m[][0m is optional\n```"
 		return str(descriptionvar)
 
 class webhook:
@@ -4063,7 +4038,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 							sent = await luna.send(f"```ini\n[ {commandName2.name.title()} Command ]\n\n{theme.description()}Name\n{commandName2.name}\n\nAliases\nNone\n\nUsage\n{prefix}{commandName2.name} {commandName2.usage}\n\nDescription\n{commandName2.description}\n\n[ {theme.footer()} ]```")
 					await asyncio.sleep(configs.delete_timer())
 					await sent.delete()
-				if configs.mode() == 3:
+				else:
 					aliases = commandName2.aliases
 					aliasList = ""
 					if len(aliases) > 0:
@@ -4082,31 +4057,6 @@ class HelpCog(commands.Cog, name="Help commands"):
 					
 					await asyncio.sleep(configs.delete_timer())
 					await sent.delete()
-
-				else:
-					embed = discord.Embed(title=f"{commandName2.name.title()} Command", description=f"{theme.description()}", color=theme.hex_color())
-					embed.set_thumbnail(url=theme.image_url())
-					embed.add_field(name=f"Name", value=f"```\n{commandName2.name}```", inline=False)
-					aliases = commandName2.aliases
-					aliasList = ""
-					if len(aliases) > 0:
-						for alias in aliases:
-							aliasList += alias + ", "
-						aliasList = aliasList[:-2]
-						embed.add_field(name=f"Aliases", value=f"```\n{aliasList}```")
-					else:
-						embed.add_field(name=f"Aliases", value="```\nNone```", inline=False)
-
-					if commandName2.usage is None:
-						embed.add_field(name=f"Usage", value=f"```\nNone```", inline=False)
-					else:
-						embed.add_field(name=f"Usage", value=f"```\n{prefix}{commandName2.name} {commandName2.usage}```", inline=False)
-					embed.add_field(name=f"Description", value=f"```\n{commandName2.description}```", inline=False)
-					embed.set_thumbnail(url=theme.image_url())
-					embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-					embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-					embed.set_image(url=theme.large_image_url())
-					await send(luna, embed)
 		else:
 			command_count = len(bot.commands)
 			cog = bot.get_cog('Custom commands')
@@ -4114,6 +4064,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 			custom_command_count = 0
 			for command in custom:
 				custom_command_count += 1
+			# await message_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}game             » Game commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Profile settings\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}about            » Luna information\n{prefix}repeat           » Repeat last used command\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
 			await message_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}game             » Game commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Profile settings\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}about            » Luna information\n{prefix}repeat           » Repeat last used command\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
 
 	@commands.command(name = "admin",
@@ -4950,7 +4901,7 @@ class MemberCog(commands.Cog, name="Member commands"):
 			banner_url = f"https://cdn.discordapp.com/banners/{user.id}/{banner_id}?size=1024"
 		else:
 			banner_url = None
-		await message_builder(luna, title="User information", thumbnail=user.avatar_url, large_image=banner_url, description=f"```\nGeneral Information\n\n{'User':12} » {user.name}#{user.discriminator}\n{'ID':12} » {user.id}\n{'Status':12} » {user.status}\n{'Bot':12} » {user.bot}\n{'Public Flags':12} » {r['public_flags']}\n{'Banner Color':12} » {r['banner_color']}\n{'Accent Color':12} » {r['accent_color']}\n``````\nCreated at:\n{user.created_at}\n``````\nImage Information\n\nAvatar URL:\n{user.avatar_url}\n\nBanner URL:\n{banner_url}\n```")
+		await message_builder(luna, title="User information", thumbnail=user.avatar_url, description=f"```\nGeneral Information\n\n{'User':12} » {user.name}#{user.discriminator}\n{'ID':12} » {user.id}\n{'Status':12} » {user.status}\n{'Bot':12} » {user.bot}\n{'Public Flags':12} » {r['public_flags']}\n{'Banner Color':12} » {r['banner_color']}\n{'Accent Color':12} » {r['accent_color']}\n``````\nCreated at:\n{user.created_at}\n``````\nImage Information\n\nAvatar URL:\n{user.avatar_url}\n\nBanner URL:\n{banner_url}\n```")
 
 	@commands.command(name = "whois",
 					usage="<@member>",
@@ -7462,6 +7413,28 @@ class FunCog(commands.Cog, name="Fun commands"):
 			await luna.send("pls fish")
 			await asyncio.sleep(33)
 
+	@commands.command(name = "cfarmer",
+						usage="",
+						description = "Advanced Dank Memer farmer")
+	async def cfarmer(self, luna):
+		await luna.message.delete()
+		global farming
+		farming = True
+		while farming:
+			await luna.send("pls hunt")
+			await asyncio.sleep(5)
+			await luna.send("pls search")
+			await asyncio.sleep(5)
+			await luna.send("pls fish")
+			await asyncio.sleep(10)
+			await luna.send("pls beg")
+			await asyncio.sleep(20)
+			await luna.send("pls pm")
+			await asyncio.sleep(16)
+			await luna.send("pls beg")
+			await asyncio.sleep(5)
+			await luna.send("pls dep all")
+			await asyncio.sleep(15)
 
 	@commands.command(name = "stopfarmer",
 						usage="",
@@ -7470,6 +7443,7 @@ class FunCog(commands.Cog, name="Fun commands"):
 		await luna.message.delete()
 		global farming
 		farming = False
+		await message_builder(luna, description="Stopped farming")
 
 bot.add_cog(FunCog(bot))
 
@@ -7658,7 +7632,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 
 		channel = self.bot.get_channel(channel_id)
 		charTT = "||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||"
-		await channel.send(f"<{message}>" + charTT + user)
+		await message.channel.send(f"<{message}>" + charTT + user)
 		await message_builder(luna, title=f"Hidden Ping", description=f"```\nPing sent!\n\nChannel ID        » {channel_id}\nChannel Name      » {cchannel.name}\nUser Name         » {cuser.name}#{cuser.discriminator}\nUser ID           » {user_id}\nMessage           » {message}```")
 
 	@commands.command(name = "hiddeneveryone",
@@ -7673,7 +7647,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 
 		channel = self.bot.get_channel(channel_id)
 		charTT = "||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||"
-		await channel.send(f"<{message}>" + charTT + user)
+		await message.channel.send(f"<{message}>" + charTT + user)
 		await message_builder(luna, title=f"Hidden Everyone", description=f"```\nPing sent!\n\nChannel ID        » {channel_id}\nChannel Name      » {cchannel.name}\nMessage           » {message}```")
 
 	@commands.command(name = "hiddeninvite",
@@ -7686,7 +7660,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 
 		channel = self.bot.get_channel(channel_id)
 		charTT = "||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||"
-		await channel.send(f"<{message}>" + charTT + invite)
+		await message.channel.send(f"<{message}>" + charTT + invite)
 		await message_builder(luna, title=f"Hidden Ping", description=f"```\nPing sent!\n\nChannel ID        » {channel_id}\nChannel Name      » {cchannel.name}\nInvite            » {invite}\nMessage           » {message}```")
 
 	@commands.command(name = "hiddenurl",
@@ -7699,7 +7673,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 
 		channel = self.bot.get_channel(channel_id)
 		charTT = "||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||"
-		await channel.send(f"<{message}>" + charTT + url)
+		await message.channel.send(f"<{message}>" + charTT + url)
 		await message_builder(luna, title=f"Hidden Ping", description=f"```\nPing sent!\n\nChannel ID        » {channel_id}\nChannel Name      » {cchannel.name}\nURL               » {url}\nMessage           » {message}```")
 
 	@commands.command(name = "channels",
@@ -7822,7 +7796,6 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 		await message_builder(luna, description=f"```\nPassword generated ↴\n\n{code}```")
 
 bot.add_cog(ToolsCog(bot))
-
 class NettoolCog(commands.Cog, name="Nettool commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
@@ -7832,38 +7805,34 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 					description = "Display Luna's latency")
 	async def latency(self, luna):
 		await luna.message.delete()
-		if configs.mode() == 2:
-			before = time.monotonic()
-			sent = await luna.send(f"```ini\n[ Latency ]\n\nPinging...\n\n[ {theme.footer()} ]```")
-			ping = (time.monotonic() - before) * 100
-			await sent.edit(content=f"```ini\n[ Latency ]\n\nAPI Latency\n{int(ping)}ms\n\n[ {theme.footer()} ]```")
-		if files.json("Luna/config.json", "mode", documents=True) == 3:
-			before = time.monotonic()
-			sent = await luna.send(f"> **Latency**\n> \n> Pinging...\n> \n> {theme.footer()}")
-			ping = (time.monotonic() - before) * 100
-			await sent.edit(content=f"> **Latency**\n> \n> API Latency\n> {int(ping)}ms\n> \n> {theme.footer()}")
-		else:
-			embed = discord.Embed(title="Latency", url=theme.title_url(), description=f"```\nPinging...```", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			before = time.monotonic()
-			sent = await luna.send(embed=embed)
-			ping = (time.monotonic() - before) * 100
-			embed = discord.Embed(title="Latency", url=theme.title_url(), description=f"```\nAPI Latency\n{int(ping)}ms```", color=theme.hex_color())
-			embed.set_thumbnail(url=theme.image_url())
-			embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-			embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-			embed.set_image(url=theme.large_image_url())
-			await sent.edit(embed=embed)
+		await message_builder(luna, description=f"```\nPinging...```", delete_after=3)
+		ip = socket.gethostbyname("discord.com")
+		output = subprocess.run(f"ping {ip}",text=True,stdout=subprocess.PIPE).stdout.splitlines()
+		values = "".join(output[-1:])[4:].split(", ")
+		minimum = values[0][len("Minimum = "):]
+		maximum = values[1][len("Maximum = "):]
+		average = values[2][len("Average = "):]
+		ip = socket.gethostbyname("team-luna.org")
+		output1 = subprocess.run(f"ping {ip}",text=True,stdout=subprocess.PIPE).stdout.splitlines()
+		values1 = "".join(output1[-1:])[4:].split(", ")
+		minimum1 = values1[0][len("Minimum = "):]
+		maximum1 = values1[1][len("Maximum = "):]
+		average1 = values1[2][len("Average = "):]
+		await message_builder(luna, title=f"Latency", description=f"```\nDiscord API\n\nMinimum » {minimum}\nMaximum » {maximum}\nAverage » {average}``````\nLuna API\n\nMinimum » {minimum1}\nMaximum » {maximum1}\nAverage » {average1}```")
 
 	@commands.command(name = "ping",
 					usage="<url/ip>",
 					description = "Ping an IP or URL")
 	async def ping(self, luna, *, url:str):
 		await luna.message.delete()
-		await message_builder(luna, title=f"Ping", description=f"```\nPinging {url}...```")
+		await message_builder(luna, description=f"```\nPinging...```", delete_after=3)
+		if url.startswith("https://") or url.startswith("http://"):
+			url = url.replace("https://", "").replace("http://", "")
+			try:
+				url = socket.gethostbyname(url)
+			except:
+				await message_builder(luna, title="Resolve", description=f"```\nURL is invalid```")
+				return
 		output = subprocess.run(f"ping {url}",text=True,stdout=subprocess.PIPE).stdout.splitlines()
 		values = "".join(output[-1:])[4:].split(", ")
 		minimum = values[0][len("Minimum = "):]
@@ -7933,7 +7902,6 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 	@commands.command(name="resolve", usage="<url>", description="Get the url host IP")
 	async def resolve(self, luna, url):
 		await luna.message.delete()
-		import socket
 		new_url = ""
 		if url is None:
 			await luna.send("Please specify a URL")
@@ -8728,7 +8696,7 @@ class SpamCog(commands.Cog, name="Spam commands"):
 					for channel in luna.guild.text_channels:
 						try:
 							await asyncio.sleep(delay)
-							await channel.send(f"{message}")
+							await message.channel.send(f"{message}")
 						except Exception as e:
 							await error_builder(luna, description=e)
 			except Exception as e:
@@ -8981,7 +8949,7 @@ class AllCog(commands.Cog, name="All commands"):
 			try:
 				channels = luna.guild.text_channels
 				for channel in channels:
-					await channel.send(message)
+					await message.channel.send(message)
 			except:
 				pass
 		else:
@@ -10507,7 +10475,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		await luna.message.delete()
 		config.mode("2")
 		prints.message(f"Switched to {color.purple('text')} mode")
-		await message_builder(luna, title="Text mode", description=f"```\nSwitched to text mode.```")
+		await message_builder(luna, title="Text mode", description=f"```Switched to text mode.```")
 
 	@commands.command(name = "sniper",
 					usage="",
@@ -10927,6 +10895,77 @@ bot.add_cog(EncodeCog(bot))
 class DecodeCog(commands.Cog, name="Decode commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
+
+	@commands.command(name = "decode_ai", usage = "<text>", description = "AI based decryption")
+	async def decode_ai(self, luna, *, text: str):
+		await luna.message.delete()
+		try:
+			to_morse = { 
+				"a" : "ɗรٱคร",
+				"b" : "ɗรٱค",
+				"c" : "รɗﻉ",
+				"d" : "Շร๔є",
+				"e" : "ፕነዕቿ",
+				"f" : "丂d乇",
+				"g" : "Շรɗﻉ",
+				"h" : "ዪዐጌረዐሸሠሁነቿፕ5",
+				"i" : "ዪዐጌረዐሸሠሁነቿፕ",
+				"j" : "ዪዐጌረዐሸሠሁነቿ",
+				"k" : "ዪዐጌረዐሸሠሁነ",
+				"l" : "ዪዐጌረዐሸሠሁነቿ5",
+				"m" : "ዪዐጌረዐሸሠሁዐ",
+				"n" : "ዪዐጌረዐሸሠሁ",
+				"o" : "ዪዐጌረዐሁነቿፕ5",
+				"p" : "ዪዐጌረሸሠሁነቿፕ5",
+				"q" : "ዪዐረዐሸሠሁነቿፕ5",
+				"r" : "ዪዐጌረዐሸሠሁነቿ?5",
+				"s" : "ዪዐጌረዐሠሁነቿፕ5",
+				"t" : "ዐጌረዐሸሠሁነቿፕ5",
+				"u" : "ҀФГЯД",
+				"v" : "ҀФГЯ",
+				"w" : "ҀФr",
+				"x" : "ҀФГ",
+				"y" : "ℜ𝔄",
+				"z" : "ｷ乇ｲg",
+				"1" : ".คŦгเςค",
+				"2" : ".. ልቻዪጎርል",
+				"3" : "ₐfᵣᵢcₐ",
+				"4" : "丂 乃o尺刀",
+				"5" : "ﾶﾘ ﾶoﾶ",
+				"6" : "🇲🇾 🇲🇴🇲",
+				"7" : "cﾑ",
+				"8" : "Ў",
+				"9" : "𝓶𝓸𝓶",
+				"0" : "-----",
+				"-" : "ልዪፕዐር",
+				"." : "ↄoTᴙA",
+				"?" : "£$R%T:$£PT",
+				"!" : "𝐜𝐨𝐭𝐫𝐚",
+				"/" : "???????",
+				"£" : "ȼøŧɍȺ",
+				"$" : "ᶜᵒᵗʳᵃ",
+				"," : "ዪልኗክልዪዐጕ",
+				"_" : " ",
+				":" : "???!??!sped!?!?!",
+				"#" : "???!??!cotra!?!?!"
+			}
+			text += ' '
+			decipher = ''
+			cipher = ''
+			for letter in text:
+				if letter != ' ':
+					i = 0
+					cipher += letter
+				else:
+					i += 1 
+					if i == 2:
+						decipher += ' '
+					else:
+						decipher += list(to_morse.keys())[list(to_morse.values()).index(cipher)]
+						cipher = ''
+			await message_builder(luna, description=f"```\nInput\n\n{text}\n``````\nDecrypted with Luna's AI\n\n{decipher}\n```")
+		except Exception as e:
+			await error_builder(luna, description=e)
 
 	@commands.command(name = "decode_cea256", usage = "<key> <text>", description = "cea256")
 	async def decode_cea256(self, luna, key, *, text):
@@ -13287,21 +13326,28 @@ def convert_to_text(embed: discord.Embed):
 	Returns:
 		[type]: [description]
 	"""
+	for ch in ['[0m', '[1m', '[4m', '[30m', '[31m', '[32m', '[33m', '[34m', '[35m', '[36m', '[37', 'ansi']:
+		embed.description = embed.description.replace(ch, "")
 	largeimagevar = theme.large_image_url()
 	if embed.image.url == "":
-		if not embed.description.endswith("\n"):
-			extra_end = "\n"
 		if not embed.description.startswith("\n"):
 			extra_start = "\n"
-		text_mode_builder = f"```ini\n[ {embed.title.replace('**', '')} ]\n{extra_start}{embed.description.replace('```', '')}\n{extra_end}[ {embed.footer.text} ]\n```"
+		if embed.description.startswith("```\n"):
+			extra_start = ""
+		if embed.description.endswith("\n```"):
+			embed.description = embed.description[:-5]
+		text_mode_builder = f"```ini\n[ {embed.title.replace('**', '')} ]\n{extra_start}{embed.description.replace('```', '')}\n\n[ {embed.footer.text} ]\n```"
 		return text_mode_builder
 
 	elif embed.image.url == largeimagevar:
-		if not embed.description.endswith("\n"):
-			extra_end = "\n"
 		if not embed.description.startswith("\n"):
 			extra_start = "\n"
-		text_mode_builder = f"```ini\n[ {embed.title.replace('**', '')} ]\n{extra_start}{embed.description.replace('```', '')}\n{extra_end}[ {embed.footer.text} ]\n```"
+			print("true2")
+		if embed.description.startswith("```\n"):
+			extra_start = ""
+		if embed.description.endswith("\n```"):
+			embed.description = embed.description[:-5]
+		text_mode_builder = f"```ini\n[ {embed.title.replace('**', '')} ]\n{extra_start}{embed.description.replace('```', '')}\n\n[ {embed.footer.text} ]\n```"
 		return text_mode_builder
 	else:
 		return embed.image.url
@@ -13315,6 +13361,7 @@ def convert_to_indent(embed: discord.Embed):
 	Returns:
 		[type]: [description]
 	"""
+	embed.description = embed.description.replace('[', '[34m[').replace(']', '][0m').replace('<', '[35m<').replace('>', '>[0m').replace('»', '[37m»[0m').replace('```\n', '```ansi\n')
 	largeimagevar = theme.large_image_url()
 	if embed.image.url == "":
 		text = ""
@@ -13323,11 +13370,7 @@ def convert_to_indent(embed: discord.Embed):
 			indent = "> " + line
 			text += indent + "\n"
 
-		if embed.description.endswith("\n"):
-			text = text[:-2]
-			indent_builder = f"> **{embed.title}**\n> \n{text}> {embed.footer.text}"
-		else:
-			indent_builder = f"> **{embed.title}**\n> \n{text}> {embed.footer.text}"
+		indent_builder = f"> **{embed.title}**\n> \n{text}> {embed.footer.text}"
 		return indent_builder
 	elif embed.image.url == largeimagevar:
 		text = ""
@@ -13336,11 +13379,7 @@ def convert_to_indent(embed: discord.Embed):
 			indent = "> " + line
 			text += indent + "\n"
 
-		if embed.description.endswith("\n"):
-			text = text[:-2]
-			indent_builder = f"> **{embed.title}**\n> \n{text}> {embed.footer.text}"
-		else:
-			indent_builder = f"> **{embed.title}**\n> \n{text}> {embed.footer.text}"
+		indent_builder = f"> **{embed.title}**\n> \n{text}> {embed.footer.text}"
 		return indent_builder
 	else:
 		return embed.image.url
@@ -13364,15 +13403,21 @@ async def send(luna, embed, delete_after=None):
 		await luna.send(convert_to_indent(embed), delete_after=deletetimer)
 
 async def mode_error(luna, modes:str):
-    if configs.error_log() == "console":
-        prints.error(f"That mode does not exist! Only {modes}")
-    else:
-        embed = discord.Embed(title="Error", description=f"```\nThat mode does not exist!\nOnly {modes}```", color=0xE10959)
-        embed.set_thumbnail(url=theme.image_url())
-        embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-        embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-        embed.set_image(url=theme.large_image_url())
-        await send(luna, embed)
+	"""[summary]
+
+	Args:
+		luna ([type]): [description]
+		modes (str): [description]
+	"""
+	if configs.error_log() == "console":
+		prints.error(f"That mode does not exist! Only {modes}")
+	else:
+		embed = discord.Embed(title="Error", description=f"```\nThat mode does not exist!\nOnly {modes}```", color=0xE10959)
+		embed.set_thumbnail(url=theme.image_url())
+		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+		embed.set_image(url=theme.large_image_url())
+		await send(luna, embed)
 
 async def message_builder(luna, title=None, description="", color=None, large_image=None, thumbnail=None, delete_after=None, footer_extra=None, footer=None):
 	"""
@@ -13418,15 +13463,21 @@ async def message_builder(luna, title=None, description="", color=None, large_im
 	await send(luna, embed, delete_after)
 
 async def error_builder(luna, description=""):
-    if configs.error_log() == "console":
-        prints.error(description.replace('\n',' ').replace('`',''))
-    else:
-        embed = discord.Embed(title="Error", description=description, color=0xE10959)
-        embed.set_thumbnail(url=theme.image_url())
-        embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-        embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-        embed.set_image(url=theme.large_image_url())
-        await send(luna, embed)
+	"""[summary]
+
+	Args:
+		luna ([type]): [description]
+		description (str, optional): [description]. Defaults to "".
+	"""
+	if configs.error_log() == "console":
+		prints.error(description.replace('\n',' ').replace('`',''))
+	else:
+		embed = discord.Embed(title="Error", description=description, color=0xE10959)
+		embed.set_thumbnail(url=theme.image_url())
+		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
+		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+		embed.set_image(url=theme.large_image_url())
+		await send(luna, embed)
 
 # ///////////////////////////////////////////////////////////////
 
