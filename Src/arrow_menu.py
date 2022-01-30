@@ -90,8 +90,7 @@ def on_release(key):
         Menu()
 Menu()
 while True:
-    if current_window == "C:\WINDOWS\py.exe":
-        with Listener(on_press=on_press, on_release=on_release) as listener:
-            listener.join()
+    with Listener(on_press=on_press, on_release=on_release) as listener:
+        listener.join()
 
 
