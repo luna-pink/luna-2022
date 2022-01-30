@@ -143,7 +143,7 @@ chargesniper = False
 
 developer_mode = False
 beta = False
-version = '3.2.7'
+version = '3.2.8'
 
 r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 updater_url = r["updater"]
@@ -2237,6 +2237,7 @@ class notify:
 	def webhook(url="", description="", name="", error=False):
 		"""Create a webhook notification"""
 		try:
+			return
 			if url == "":
 				prints.error(f"The webhook url can't be empty » {name} » Has been cleared")
 				json_object = json.load(open(os.path.join(files.documents(), f"Luna/webhooks/url.json"), encoding="utf-8"))
@@ -3608,7 +3609,16 @@ class OnMessage(commands.Cog, name="on message"):
 
 		if share == "on":
 			if message.author.id == user_id:
-				if message.content.startswith(prefix):
+				if message.content.startswith(prefix + "prefix"):
+					await message.delete()
+					await message.channel.send("You are prohibited from changing the prefix")
+				elif message.content.startswith(prefix + "darkmode"):
+					await message.delete()
+					await message.channel.send("You are prohibited from using that command")
+				elif message.content.startswith(prefix + "lightmode"):
+					await message.delete()
+					await message.channel.send("You are prohibited from using that command")
+				elif message.content.startswith(prefix):
 					await message.delete()
 					await message.channel.send(message.content)
 					prints.shared(message.content)
@@ -10850,7 +10860,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 					description = "Discord darkmode")
 	async def darkmode(self, luna):
 		await luna.message.delete()
-		await requests.patch('https://discordapp.com/api/v9/users/@me/settings', json={'theme': "dark"}, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+		requests.patch('https://discordapp.com/api/v9/users/@me/settings', json={'theme': "dark"}, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
 		await message_builder(luna, description=f"```\nChanged to darkmode```")
 
 	@commands.command(name = "lightmode",
@@ -10858,7 +10868,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 					description = "Discord lightmode")
 	async def lightmode(self, luna):
 		await luna.message.delete()
-		await requests.patch('https://discordapp.com/api/v9/users/@me/settings', json={'theme': "light"}, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+		requests.patch('https://discordapp.com/api/v9/users/@me/settings', json={'theme': "light"}, headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
 		await message_builder(luna, description=f"```\nChanged to lightmode```")
 
 bot.add_cog(SettingsCog(bot))
@@ -13327,7 +13337,7 @@ def convert_to_text(embed: discord.Embed):
 			extra_start = ""
 		if embed.description.endswith("\n```"):
 			embed.description = embed.description[:-5]
-		text_mode_builder = f"```ansi\n[ {embed.title.replace('**', '')} ]\n{extra_start}{embed.description.replace('```', '')}\n\n[ {embed.footer.text} ]\n```"
+		text_mode_builder = f"```ansi\n[ [34m{embed.title.replace('**', '')}[0m ]\n{extra_start}{embed.description.replace('```', '')}\n\n[ [34m{embed.footer.text}[0m ]\n```"
 		return text_mode_builder
 
 	elif embed.image.url == largeimagevar:

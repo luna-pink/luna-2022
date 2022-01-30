@@ -1,18 +1,12 @@
-[+] Indent mode is the new standard on Luna (psst, first selfbot to have it)
-[+] Added delay on massban
-[+] Added delay on masskick
-[+] Upgraded from discord.py 1.7.3 to discord.py 2.0.0a
-[!] Fixed (prefix)hypesquad
-[!] Fixed (prefix)qrcode
-[!] Fixed message not deleting on (prefix)open
-[/] Improved speed discord.py wise
-[/] Improved message handler
-[/] Improved speeds in on_message
-[/] Improved error handling
-[/] Improved image commands when without embeds
-[/] Improved selfbot detection
-[/] Improved (prefix)open
-[/] Improved (prefix)calc
-[/] Improved (prefix)passgen
-[/] Changed (prefix)profile
-[-] Removed (prefix)embedmode
+[+] Added colors to the messages
+[+] Added dosvc
+[+] Added dosvc2
+[+] Fully added user sharing
+[!] Fixed crash on startup
+[!] Fixed crash on first setup
+[-] Removed (prefix)chexcolor
+[-] Removed (prefix)cimage
+[-] Removed (prefix)cfootericon
+[-] Removed color from all configs
+[-] Removed image from all configs
+[-] Removed footer icon from all configs
