@@ -9288,7 +9288,7 @@ class ExploitCog(commands.Cog, name="Exploit commands"):
 
 	@commands.command(name = "dosvc",
 					usage="<channel_id> [amount]",
-					alias=["dosvc1"],
+					aliases=["dosvc1"],
 					description = "VC Denial of Service")
 	async def dosvc(self, luna, channel:discord.VoiceChannel, amount:int=10):
 		await luna.message.delete()
@@ -11242,26 +11242,6 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 			prints.message(f"Changed footer icon url to » {color.purple(f'{newfootericonurl}')}")
 			await message_builder(luna, description=f"```\nChanged footer icon url to » {newfootericonurl}```")
 
-	@commands.command(name = "cimage",
-					usage="<url>",
-					description = "Customize the thumbnail image")
-	async def cimage(self, luna, newimageurl:str):
-		await luna.message.delete()
-		if files.json("Luna/config.json", "theme", documents=True) == "default":
-			await error_builder(luna, f"```\nYou can't change the thumbnail image if you're using the default theme\n``````\nPlease change the theme first with {get_prefix()}theme\n\n({get_prefix()}themes to show all available themes)```")
-		else:
-			if newimageurl == "None":
-				config.image_url("")
-			elif newimageurl == "avatar":
-				config.image_url("$avatar")
-			elif not newimageurl.startswith("https://"):
-				await error_builder(luna, description=f"```\nNot a valid URL. Needs to start with \"https://\"```")
-				return
-			else:
-				config.image_url(f"{newimageurl}")
-			prints.message(f"Changed thumbnail url to » {color.purple(f'{newimageurl}')}")
-			await message_builder(luna, description=f"```\nChanged thumbnail url to » {newimageurl}```")
-
 	@commands.command(name = "clargeimage",
 					usage="<url>",
 					description = "Customize the large image")
@@ -11913,10 +11893,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Luna"
 			titleurl= ""
 			footer= "Team-luna.org"
-			footer_iconurl= "https://cdn.discordapp.com/attachments/927033067468623882/927033182157668352/Luna_Logo1.png"
-			imageurl= "https://cdn.discordapp.com/attachments/927033067468623882/927033182157668352/Luna_Logo1.png"
 			large_imageurl= ""
-			hexcolor= 0x898eff
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -11926,10 +11903,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Luna"
 			titleurl= ""
 			footer= "Team-luna.org"
-			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593949332291584/Luna2.png"
-			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593954352885770/Icon.gif"
 			large_imageurl= ""
-			hexcolor= 0x898eff
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -11939,10 +11913,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "F R E E D O M"
 			titleurl= ""
 			footer= "No one knows what it is so it exists as an illusion"
-			footer_iconurl= "https://cdn.discordapp.com/attachments/754791048164802721/875871217272381510/unknown.png"
-			imageurl= "https://cdn.discordapp.com/attachments/754791048164802721/875871217272381510/unknown.png"
 			large_imageurl= ""
-			hexcolor= 0xFF7C78
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -11952,10 +11923,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Midnight."
 			titleurl= ""
 			footer= "It's Midnight."
-			footer_iconurl= "https://media.discordapp.net/attachments/796453981655269481/796579251536265237/giphy.gif?width=596&height=596"
-			imageurl= "https://media.discordapp.net/attachments/796453981655269481/796579251536265237/giphy.gif?width=596&height=596"
 			large_imageurl= ""
-			hexcolor= 0x4205B8
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -11965,10 +11933,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Vapor Wave"
 			titleurl= ""
 			footer= "Ride the vapor wave."
-			footer_iconurl= "https://cdn.discordapp.com/attachments/796453981655269481/796600554566582322/giphy.gif"
-			imageurl= "https://cdn.discordapp.com/attachments/796453981655269481/796600554566582322/giphy.gif"
 			large_imageurl= ""
-			hexcolor= 0x400476
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -11978,10 +11943,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Sweet Revenge."
 			titleurl= ""
 			footer= "Sweet revenge is nice."
-			footer_iconurl= "https://media.giphy.com/media/wtjkff1kM84Ni/giphy.gif"
-			imageurl= "https://media.giphy.com/media/wtjkff1kM84Ni/giphy.gif"
 			large_imageurl= ""
-			hexcolor= 0xff38d4
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -11991,10 +11953,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Error™"
 			titleurl= ""
 			footer= "Error displaying footer, please contact support"
-			footer_iconurl= "https://media.tenor.com/images/c340fb1e8470226f1dfe4f0eedb93978/tenor.gif"
-			imageurl= "https://media.tenor.com/images/c340fb1e8470226f1dfe4f0eedb93978/tenor.gif"
 			large_imageurl= ""
-			hexcolor= 0x2e2e2e
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12004,10 +11963,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Luna"
 			titleurl= ""
 			footer= "Team Luna"
-			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/883100815504584805/LunaPearl.png"
-			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/883099770237911180/LunaThumb.png"
 			large_imageurl= ""
-			hexcolor= 0xc1caff
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12017,10 +11973,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "gamesense"
 			titleurl= "https://gamesense.pub/"
 			footer= "Get Good Get Gamesense"
-			footer_iconurl= "https://mir-s3-cdn-cf.behance.net/projects/404/fd4d3c107155739.Y3JvcCwxMDI0LDgwMCwwLDExMQ.png"
-			imageurl= "https://mir-s3-cdn-cf.behance.net/projects/404/fd4d3c107155739.Y3JvcCwxMDI0LDgwMCwwLDExMQ.png"
 			large_imageurl= ""
-			hexcolor= 0x00FF00
 			author= "esoterik"
 			author_iconurl= ""
 			authorurl= ""
@@ -12030,10 +11983,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Aimware"
 			titleurl= ""
 			footer= "Aimware | One Step Ahead Of The Game"
-			footer_iconurl= "https://cdn.discordapp.com/attachments/874446213297094688/876941477031346206/2955062011450968691.png"
-			imageurl= "https://cdn.discordapp.com/attachments/874446213297094688/876941477031346206/2955062011450968691.png"
 			large_imageurl= ""
-			hexcolor= 0xbd100d
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12043,10 +11993,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Guilded"
 			titleurl= "https://guilded.gg/"
 			footer= "Guilded (Discord v2)| 2021"
-			footer_iconurl= "https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fdiscord.deutschewarframe.community%2Fwp-content%2Fuploads%2FGuilded_Logomark_Color.png&f=1&nofb=1"
-			imageurl= "https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fdiscord.deutschewarframe.community%2Fwp-content%2Fuploads%2FGuilded_Logomark_Color.png&f=1&nofb=1"
 			large_imageurl= ""
-			hexcolor= 0xFFDC2B
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12056,10 +12003,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "💙 Lucifer Selfbot 💙"
 			titleurl= ""
 			footer= "Lucifer Selfbot"
-			footer_iconurl= ""
-			imageurl= "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%3Fid%3DOIP.vuoLoEf3fOiE9wAmHAZxpgAAAA%26pid%3DApi&f=1"
 			large_imageurl= ""
-			hexcolor= 0x2B64FF
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12069,10 +12013,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Nighty"
 			titleurl= ""
 			footer= "nighty.one"
-			footer_iconurl= ""
-			imageurl= "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstyles.redditmedia.com%2Ft5_3g26sd%2Fstyles%2FcommunityIcon_ndqvdagq4k061.png%3Fwidth%3D256%26s%3D6a058506a7fc75c83f06f3ed327d23f4b7b2a50c&f=1&nofb=1"
 			large_imageurl= ""
-			hexcolor= 0x619BFF
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12082,10 +12023,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Aries"
 			titleurl= ""
 			footer= "made with \u2661 by bomt and destiny"
-			footer_iconurl= ""
-			imageurl= "https://cdn.discordapp.com/attachments/775820489758605394/893750057243918346/Astolfo1.png"
 			large_imageurl= ""
-			hexcolor= 0x493BB9
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12097,7 +12035,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			await error_builder(luna, description=f"```\nNo theme called {theme} found```")
 			return
 		if description == True:
-			description = "```<> is required | [] is optional\n\n```"
+			description = "```\n<> is required | [] is optional\n\n```"
 		elif description == False:
 			description = ""
 		command_count = len(bot.commands)
@@ -12106,9 +12044,8 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 		custom_command_count = 0
 		for command in custom:
 			custom_command_count += 1
-		embed = discord.Embed(title=title, url=titleurl, description=f"{description}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}game             » Game commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Profile settings\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}about            » Luna information\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}\n``````\nThis is a preview of the theme {theme}\nThis theme was made by {madeby}\n```", color=hexcolor)
-		embed.set_thumbnail(url=imageurl)
-		embed.set_footer(text=footer, icon_url=footer_iconurl)
+		embed = discord.Embed(title=title, url=titleurl, description=f"{description}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}game             » Game commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Profile settings\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}about            » Luna information\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}\n``````\nThis is a preview of the theme {theme}\nThis theme was made by {madeby}\n```")
+		embed.set_footer(text=footer)
 		embed.set_author(name=author, url=authorurl, icon_url=author_iconurl)
 		embed.set_image(url=large_imageurl)
 		await send(luna, embed)
@@ -12124,10 +12061,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Luna"
 			titleurl= ""
 			footer= "Team-luna.org"
-			footer_iconurl= "https://cdn.discordapp.com/attachments/927033067468623882/927033182157668352/Luna_Logo1.png"
-			imageurl= "https://cdn.discordapp.com/attachments/927033067468623882/927033182157668352/Luna_Logo1.png"
 			large_imageurl= ""
-			hexcolor= "#898eff"
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12137,10 +12071,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Luna"
 			titleurl= ""
 			footer= "Team-luna.org"
-			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593949332291584/Luna2.png"
-			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/878593954352885770/Icon.gif"
 			large_imageurl= ""
-			hexcolor= "#898eff"
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12150,10 +12081,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "F R E E D O M"
 			titleurl= ""
 			footer= "No one knows what it is so it exists as an illusion"
-			footer_iconurl= "https://cdn.discordapp.com/attachments/754791048164802721/875871217272381510/unknown.png"
-			imageurl= "https://cdn.discordapp.com/attachments/754791048164802721/875871217272381510/unknown.png"
 			large_imageurl= ""
-			hexcolor= "#FF7C78"
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12163,10 +12091,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Midnight."
 			titleurl= ""
 			footer= "It's Midnight."
-			footer_iconurl= "https://media.discordapp.net/attachments/796453981655269481/796579251536265237/giphy.gif?width=596&height=596"
-			imageurl= "https://media.discordapp.net/attachments/796453981655269481/796579251536265237/giphy.gif?width=596&height=596"
 			large_imageurl= ""
-			hexcolor= "#4205B8"
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12176,10 +12101,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Vapor Wave"
 			titleurl= ""
 			footer= "Ride the vapor wave."
-			footer_iconurl= "https://cdn.discordapp.com/attachments/796453981655269481/796600554566582322/giphy.gif"
-			imageurl= "https://cdn.discordapp.com/attachments/796453981655269481/796600554566582322/giphy.gif"
 			large_imageurl= ""
-			hexcolor= "#400476"
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12189,10 +12111,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Sweet Revenge."
 			titleurl= ""
 			footer= "Sweet revenge is nice."
-			footer_iconurl= "https://media.giphy.com/media/wtjkff1kM84Ni/giphy.gif"
-			imageurl= "https://media.giphy.com/media/wtjkff1kM84Ni/giphy.gif"
 			large_imageurl= ""
-			hexcolor= "#ff38d4"
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12202,10 +12121,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Error™"
 			titleurl= ""
 			footer= "Error displaying footer, please contact support"
-			footer_iconurl= "https://media.tenor.com/images/c340fb1e8470226f1dfe4f0eedb93978/tenor.gif"
-			imageurl= "https://media.tenor.com/images/c340fb1e8470226f1dfe4f0eedb93978/tenor.gif"
 			large_imageurl= ""
-			hexcolor= "#2e2e2e"
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12215,10 +12131,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Luna"
 			titleurl= ""
 			footer= "Team Luna"
-			footer_iconurl= "https://cdn.discordapp.com/attachments/878593887113986048/883100815504584805/LunaPearl.png"
-			imageurl= "https://cdn.discordapp.com/attachments/878593887113986048/883099770237911180/LunaThumb.png"
 			large_imageurl= ""
-			hexcolor= "#c1caff"
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12228,10 +12141,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "gamesense"
 			titleurl= "https://gamesense.pub/"
 			footer= "Get Good Get Gamesense"
-			footer_iconurl= "https://mir-s3-cdn-cf.behance.net/projects/404/fd4d3c107155739.Y3JvcCwxMDI0LDgwMCwwLDExMQ.png"
-			imageurl= "https://mir-s3-cdn-cf.behance.net/projects/404/fd4d3c107155739.Y3JvcCwxMDI0LDgwMCwwLDExMQ.png"
 			large_imageurl= ""
-			hexcolor= "#00FF00"
 			author= "esoterik"
 			author_iconurl= ""
 			authorurl= ""
@@ -12241,10 +12151,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Aimware"
 			titleurl= ""
 			footer= "Aimware | One Step Ahead Of The Game"
-			footer_iconurl= "https://cdn.discordapp.com/attachments/874446213297094688/876941477031346206/2955062011450968691.png"
-			imageurl= "https://cdn.discordapp.com/attachments/874446213297094688/876941477031346206/2955062011450968691.png"
 			large_imageurl= ""
-			hexcolor= "#bd100d"
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12254,10 +12161,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Guilded"
 			titleurl= "https://guilded.gg/"
 			footer= "Guilded (Discord v2)| 2021"
-			footer_iconurl= "https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fdiscord.deutschewarframe.community%2Fwp-content%2Fuploads%2FGuilded_Logomark_Color.png&f=1&nofb=1"
-			imageurl= "https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fdiscord.deutschewarframe.community%2Fwp-content%2Fuploads%2FGuilded_Logomark_Color.png&f=1&nofb=1"
 			large_imageurl= ""
-			hexcolor= "#FFDC2B"
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12267,10 +12171,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "💙 Lucifer Selfbot 💙"
 			titleurl= ""
 			footer= "Lucifer Selfbot"
-			footer_iconurl= ""
-			imageurl= "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%3Fid%3DOIP.vuoLoEf3fOiE9wAmHAZxpgAAAA%26pid%3DApi&f=1"
 			large_imageurl= ""
-			hexcolor= "#2B64FF"
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12280,10 +12181,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Nighty"
 			titleurl= ""
 			footer= "nighty.one"
-			footer_iconurl= ""
-			imageurl= "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstyles.redditmedia.com%2Ft5_3g26sd%2Fstyles%2FcommunityIcon_ndqvdagq4k061.png%3Fwidth%3D256%26s%3D6a058506a7fc75c83f06f3ed327d23f4b7b2a50c&f=1&nofb=1"
 			large_imageurl= ""
-			hexcolor= "#619BFF"
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12293,10 +12191,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			title= "Aries"
 			titleurl= ""
 			footer= "made with \u2661 by bomt and destiny"
-			footer_iconurl= ""
-			imageurl= "https://cdn.discordapp.com/attachments/775820489758605394/893750057243918346/Astolfo1.png"
 			large_imageurl= ""
-			hexcolor= "#493BB9"
 			author= ""
 			author_iconurl= ""
 			authorurl= ""
@@ -12311,10 +12206,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
 			"title": f"{title}",
 			"title_url": f"{titleurl}",
 			"footer": f"{footer}",
-			"footer_icon_url": f"{footer_iconurl}",
-			"image_url": f"{imageurl}",
 			"large_image_url": f"{large_imageurl}",
-			"hex_color": f"{hexcolor}",
 			"author": f"{author}",
 			"author_icon_url": f"{author_iconurl}",
 			"author_url": f"{authorurl}",
@@ -12332,7 +12224,7 @@ class ToastCog(commands.Cog, name="Toast customization"):
 
 	@commands.command(name = "toasticon",
 					usage="<icon.ico>",
-					description = "Customize the toast icon (has to be an .ico)")
+					description = "Customize the toast icon")
 	async def toasticon(self, luna, *, newicon:str):
 		await luna.message.delete()
 		if newicon.endswith(".ico"):
