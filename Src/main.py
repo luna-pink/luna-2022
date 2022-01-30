@@ -11222,26 +11222,6 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 				config.footer(f"{newfooter}")
 			await message_builder(luna, description=f"```\nChanged footer to » {newfooter}```")
 
-	@commands.command(name = "cfootericon",
-					usage="<url>",
-					description = "Customize the footer icon")
-	async def cfootericon(self, luna, newfootericonurl:str):
-		await luna.message.delete()
-		if files.json("Luna/config.json", "theme", documents=True) == "default":
-			await error_builder(luna, f"```\nYou can't change the footer icon if you're using the default theme\n``````\nPlease change the theme first with {get_prefix()}theme\n\n({get_prefix()}themes to show all available themes)```")
-		else:
-			if newfootericonurl == "None":
-				config.footer_icon_url("")
-			elif newfootericonurl == "avatar":
-				config.footer_icon_url("$avatar")
-			elif not newfootericonurl.startswith("https://"):
-				await error_builder(luna, description=f"```\nNot a valid URL. Needs to start with \"https://\"```")
-				return
-			else:
-				config.footer_icon_url(f"{newfootericonurl}")
-			prints.message(f"Changed footer icon url to » {color.purple(f'{newfootericonurl}')}")
-			await message_builder(luna, description=f"```\nChanged footer icon url to » {newfootericonurl}```")
-
 	@commands.command(name = "clargeimage",
 					usage="<url>",
 					description = "Customize the large image")
