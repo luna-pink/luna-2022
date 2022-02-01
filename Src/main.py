@@ -70,7 +70,8 @@ phishing_list = [
 	"crypto24cap",
 	"steamcummynutu.ru",
 	"discordgifts.one",
-	"discordgifts"
+	"discordgifts",
+	"disocrde.gift"
 ]
 
 proxy_list = {
@@ -143,7 +144,7 @@ chargesniper = False
 
 developer_mode = False
 beta = False
-version = '3.2.8'
+version = '3.2.9h1'
 
 r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 updater_url = r["updater"]
@@ -1780,9 +1781,7 @@ class luna:
 				time.sleep(5)
 				prints.event("Redirecting to the main menu in 5 seconds")
 				time.sleep(5)
-				luna.authentication()
-
-		
+				luna.authentication()	
 
 # ///////////////////////////////////////////////////////////////
 # File Check
@@ -3187,7 +3186,7 @@ class webhook:
 	
 
 # ///////////////////////////////////////////////////////////////
-# ON_READY
+# Threads
 
 def bot_prefix(bot, message):
 	"""Get the prefix in the config file"""
@@ -3253,7 +3252,42 @@ def update_thread():
 		if not update_found:
 			time.sleep(900)
 
+def anti_token_logger():
+	"""
+	Protects against token stealing.\n
+	By checking processes looking for files with the token.
+	"""
+	while True:
+		try:
+			if os.path.exists(os.path.join(files.documents(), "Luna/discord.json")):
+				json_object = json.load(open(os.path.join(files.documents(), "Luna/discord.json"), encoding="utf-8"))
+				if json_object["token"] != "":
+					token = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(json_object["token"])
+					if not token == "":
+						if not token.startswith("mfa"):
+							token = f"mfa.{token}"
+
+						for process in psutil.process_iter():
+							try:
+								for file_name in process.open_files():
+									if file_name.path.endswith('.log') or file_name.path.endswith('.ldb'):
+										for line in [x.strip() for x in open(file_name.path, errors='ignore').readlines() if x.strip()]:
+											if token in line:
+												# if not process.name().lower() == "discord.exe":
+												prints.error("Token found in a log file. Please remove the token from the log file.")
+												prints.message(f"{process.name()} » {file_name.path}")
+												os.system("pause")
+							except Exception as e:
+								prints.error(e)
+		except Exception as e:
+			prints.error(e)
+		time.sleep(10)
+
+# ///////////////////////////////////////////////////////////////
+# ON_READY
+
 bot = commands.Bot(bot_prefix, self_bot=True, case_insensitive=True, guild_subscription_options=GuildSubscriptionOptions.off(), status=statuscon())
+
 @bot.event
 async def on_ready():
 	"""Prints a ready log."""
@@ -3347,9 +3381,17 @@ async def on_ready():
 	debugger_thread = threading.Thread(target=uptime_thread)
 	debugger_thread.daemon = True
 	debugger_thread.start()
-	debugger_thread = threading.Thread(target=update_thread)
-	debugger_thread.daemon = True
-	debugger_thread.start()
+	upd_thread = threading.Thread(target=update_thread)
+	upd_thread.daemon = True
+	upd_thread.start()
+
+	# ///////////////////////////////////////////////////////////////
+
+	# anti_thread = threading.Thread(target=anti_token_logger)
+	# anti_thread.daemon = True
+	# anti_thread.start()
+
+	# ///////////////////////////////////////////////////////////////
 
 # ///////////////////////////////////////////////////////////////
 # Rest
@@ -3643,12 +3685,7 @@ class OnMessage(commands.Cog, name="on message"):
 				if configs.mode() == 2:
 					sent = await message.channel.send(f"```ini\n[ AFK ]\n\n{afkmessage}\n\n[ {theme.footer()} ]```")
 				else:
-					embed = discord.Embed(title="AFK", url=theme.title_url(), description=f"```\n{afkmessage}```", color=theme.hex_color())
-					embed.set_thumbnail(url=theme.image_url())
-					embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-					embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-					embed.set_image(url=theme.large_image_url())
-					sent = await message.channel.send(embed=embed)
+					sent = await message.channel.send(f"**AFK**\n\n```\n{afkmessage}\n```\n\n{theme.footer()}")
 
 				afk_user_id = message.author.id
 				await asyncio.sleep(60)
@@ -4118,7 +4155,7 @@ class HelpCog(commands.Cog, name="Help commands"):
 			await message_builder(luna, description=f"{theme.description()}```\nLuna\n\nCommands          » {command_count-custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}game             » Game commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Profile settings\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}about            » Luna information\n{prefix}repeat           » Repeat last used command\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
 
 	@commands.command(name = "admin",
-						usage="[2]",
+						usage="[2, 3]",
 						description = "Administrative commands")
 	async def admin(self, luna, page:str = "1"):
 		await luna.message.delete()
@@ -4158,10 +4195,12 @@ class HelpCog(commands.Cog, name="Help commands"):
 		ignoretext = ""
 		for command in commands:
 			ignoretext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-		if page == "1":
-			await message_builder(luna, title="Administrative", footer_extra=f"Page 1", description=f"{theme.description()}```\nMember Control\n\n{membertext}``````\nChannel Control\n\n{channeltext}``````\nNickname Control\n\n{nicktext}``````\nRole Control\n\n{roletext}``````\nNote\n\n{prefix}admin 2 » Page 2```")
-		elif page == "2":
-			await message_builder(luna, title="Administrative", footer_extra=f"Page 2", description=f"{theme.description()}```\nGuild Control\n\n{helptext}``````\nInvite Control\n\n{invitetext}``````\nIgnore Control\n\n{ignoretext}```")
+		if page == "2":
+			await message_builder(luna, title="Administrative", footer_extra=f"Page 2", description=f"{theme.description()}```\nMember Control\n\n{membertext}``````\nNickname Control\n\n{nicktext}``````\nGuild Control\n\n{helptext}``````\nNote\n\n{prefix}admin 3 » Page 3```")
+		elif page == "3":
+			await message_builder(luna, title="Administrative", footer_extra=f"Page 3", description=f"{theme.description()}```\nInvite Control\n\n{invitetext}``````\nIgnore Control\n\n{ignoretext}```")
+		else:
+			await message_builder(luna, title="Administrative", footer_extra=f"Page 1", description=f"{theme.description()}```\nChannel Control\n\n{channeltext}``````\nRole Control\n\n{roletext}``````\nNote\n\n{prefix}admin 2 » Page 2```")
 
 	@commands.command(name = "profile",
 					usage="",
@@ -5965,7 +6004,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
 			async for message in channel.history(limit=None):
 				if message.attachments:
 					for attachment in message.attachments:
-						if attachment.url.endswith(".png") or attachment.url.endswith(".jpg") or attachment.url.endswith(".jpeg"):
+						if attachment.url.endswith(".png") or attachment.url.endswith(".jpg") or attachment.url.endswith(".jpeg") or attachment.url.endswith(".gif"):
 							r = requests.get(attachment.url, stream=True)
 							open(os.path.join(files.documents(), f'Luna/dumping/images/{channel.guild.name}/{channel.name}/{attachment.filename}'), 'wb').write(r.content)
 			prints.message(f"Dumped images from {channel.name} ({channel.guild.name})")
@@ -8280,6 +8319,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 					usage="<number>",
 					description = "Create a countdown")
 	async def countdown(self, luna, number:int):
+		await luna.message.delete()
 		for count in range(number, 0, -1):
 			await luna.send(count)
 			await asyncio.sleep(1)
@@ -8288,6 +8328,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 					usage="<number>",
 					description = "Create a countup")
 	async def countup(self, luna, number:int):
+		await luna.message.delete()
 		for count in range(0, number):
 			await luna.send(count)
 			await asyncio.sleep(1)
@@ -11820,7 +11861,10 @@ class ThemesCog(commands.Cog, name="Theme commands"):
 				"title": "Luna",
 				"title_url": "",
 				"footer": "Team-luna.org",
+				"footer_icon_url": "https://cdn.discordapp.com/attachments/927033067468623882/927033385216520232/Luna_Logo.png",
+				"image_url": "https://cdn.discordapp.com/attachments/927033067468623882/927033385216520232/Luna_Logo.png",
 				"large_image_url": "",
+				"hex_color": "#898eff",
 				"author": "",
 				"author_icon_url": "",
 				"author_url": "",
@@ -13313,7 +13357,6 @@ class GamesCog(commands.Cog, name="Game commands"):
 		await message_builder(luna, title="Fortnite News", large_image=fortnite["data"]["image"])
 
 bot.add_cog(GamesCog(bot))
-
 def convert_to_text(embed: discord.Embed):
 	"""[summary]
 
@@ -13325,7 +13368,7 @@ def convert_to_text(embed: discord.Embed):
 	"""
 	# for ch in ['[0m', '[1m', '[4m', '[30m', '[31m', '[32m', '[33m', '[34m', '[35m', '[36m', '[37', 'ansi']:
 	# 	embed.description = embed.description.replace(ch, "")
-	embed.description = embed.description.replace('[', '[34m[').replace(']', '][0m').replace('<', '[35m<').replace('>', '>[0m').replace('»', '[37m»[0m').replace('```ansi\n', '```\n').replace(get_prefix(), f'[35m{get_prefix()}[0m')
+	embed.description = embed.description.replace('[', '[34m[').replace(']', '][0m').replace('<', '[35m<').replace('>', '>[0m').replace('»', '[37m»[0m').replace('```ansi\n', '```\n')
 	largeimagevar = theme.large_image_url()
 	if embed.image.url == "":
 		if not embed.description.startswith("\n"):
@@ -13359,7 +13402,7 @@ def convert_to_indent(embed: discord.Embed):
 	Returns:
 		[type]: [description]
 	"""
-	embed.description = embed.description.replace('[', '[34m[').replace(']', '][0m').replace('<', '[35m<').replace('>', '>[0m').replace('»', '[37m»[0m').replace('```\n', '```ansi\n').replace(get_prefix(), f'[35m{get_prefix()}[0m')
+	embed.description = embed.description.replace('[', '[34m[').replace(']', '][0m').replace('<', '[35m<').replace('>', '>[0m').replace('»', '[37m»[0m').replace('```\n', '```ansi\n')
 	largeimagevar = theme.large_image_url()
 	if embed.image.url == "":
 		text = ""
@@ -13513,8 +13556,8 @@ async def error_builder(luna, description=""):
 # ///////////////////////////////////////////////////////////////
 # Main Thread, Don't Touch
 
-if not developer_mode:
-	check_debuggers_thread()
+# if not developer_mode:
+# 	check_debuggers_thread()
 
 if os.path.splitext(__file__)[1] == ".pyc":
 	os._exit(0)

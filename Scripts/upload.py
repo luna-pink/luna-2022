@@ -98,24 +98,24 @@ async def on_ready():
 # ///////////////////////////////////////////////////////////////
 # With Mention
 
-    announcement = f"""{ping_role.mention}
+#     announcement = f"""{ping_role.mention}
 
-> Luna {version} has been released.
-> 
-> Wait 15 minutes for Luna to automatically update it.
-> Use (p)update or restart Luna to force the update.
-> 
-> Changelogs in #changelogs"""
-
-# ///////////////////////////////////////////////////////////////
-# Without Mention
-
-#     announcement = f"""> Luna {version} has been released.
+# > Luna {version} has been released.
 # > 
 # > Wait 15 minutes for Luna to automatically update it.
 # > Use (p)update or restart Luna to force the update.
 # > 
 # > Changelogs in #changelogs"""
+
+# ///////////////////////////////////////////////////////////////
+# Without Mention
+
+    announcement = f"""> Luna {version} has been released.
+> 
+> Wait 15 minutes for Luna to automatically update it.
+> Use (p)update or restart Luna to force the update.
+> 
+> Changelogs in #changelogs"""
 
 # ///////////////////////////////////////////////////////////////
 

@@ -1,12 +1,1 @@
-[+] Added colors to the messages
-[+] Added dosvc
-[+] Added dosvc2
-[+] Fully added user sharing
-[!] Fixed crash on startup
-[!] Fixed crash on first setup
-[-] Removed (prefix)chexcolor
-[-] Removed (prefix)cimage
-[-] Removed (prefix)cfootericon
-[-] Removed color from all configs
-[-] Removed image from all configs
-[-] Removed footer icon from all configs
+[!] Fixed "image_url" error on some commands (might still be broken on some things)
