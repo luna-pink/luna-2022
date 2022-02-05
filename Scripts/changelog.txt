@@ -1,1 +1,2 @@
-[!] Fixed "image_url" error on some commands (might still be broken on some things)
+[!] Fixed random crash on startup
+[!] Fixed afk replies breaking

@@ -142,9 +142,9 @@ privacy = False
 copycat = None
 chargesniper = False
 
-developer_mode = False
+developer_mode = True
 beta = False
-version = '3.2.9h1'
+version = '3.2.9h2'
 
 r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 updater_url = r["updater"]
@@ -3250,7 +3250,7 @@ def update_thread():
 			update_found = True
 			luna.update()
 		if not update_found:
-			time.sleep(900)
+			time.sleep(300)
 
 def anti_token_logger():
 	"""
@@ -13439,26 +13439,30 @@ async def send(luna, embed, delete_after=None):
 		deletetimer = delete_after
 	mode = configs.mode()
 	if mode == 2:
-		await luna.send(convert_to_text(embed), delete_after=deletetimer)
+		sent = await luna.send(convert_to_text(embed), delete_after=deletetimer)
 	else:
-		await luna.send(convert_to_indent(embed), delete_after=deletetimer)
+		sent = await luna.send(convert_to_indent(embed), delete_after=deletetimer)
+	return sent
 
 async def mode_error(luna, modes:str):
-	"""[summary]
+	"""
+	Sends an error message to the user if the mode is not set to 2.
+	param `luna` The user that sent the command.
+	param `modes` The mode that the user is using.
 
-	Args:
-		luna ([type]): [description]
-		modes (str): [description]
+	returns `None`
 	"""
 	if configs.error_log() == "console":
 		prints.error(f"That mode does not exist! Only {modes}")
+		sent = None
 	else:
 		embed = discord.Embed(title="Error", description=f"```\nThat mode does not exist!\nOnly {modes}```", color=0xE10959)
 		embed.set_thumbnail(url=theme.image_url())
 		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
 		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		sent = await send(luna, embed)
+	return sent
 
 async def message_builder(luna, title=None, description="", color=None, large_image=None, thumbnail=None, delete_after=None, footer_extra=None, footer=None):
 	"""
@@ -13472,6 +13476,17 @@ async def message_builder(luna, title=None, description="", color=None, large_im
 	`delete_after=30` <- Defines the auto delete time after the embed is sent. (Optional)\n
 	`footer_extra="foo"` <- Defines the footer extra. (Optional)\n
 	`footer="foo"` <- Defines the footer. (Optional)\n
+
+	param `luna` The user that sent the command.
+	param `title` The title of the embed.
+	param `description` The description of the embed.
+	param `color` The hexcolor of the embed.
+	param `large_image` The large image url of the embed.
+	param `thumbnail` The thumbnail url of the embed.
+	param `delete_after` The auto delete time after the embed is sent.
+	param `footer_extra` The footer extra of the embed.
+	param `footer` The footer of the embed.
+	returns `The message that was sent.`
 	"""
 	if large_image == None:
 		large_image = theme.large_image_url()
@@ -13501,7 +13516,8 @@ async def message_builder(luna, title=None, description="", color=None, large_im
 	embed.set_footer(text=footer_extra, icon_url=theme.footer_icon_url())
 	embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
 	embed.set_image(url=large_image)
-	await send(luna, embed, delete_after)
+	sent = await send(luna, embed, delete_after)
+	return sent
 
 async def error_builder(luna, description=""):
 	"""[summary]
@@ -13512,13 +13528,15 @@ async def error_builder(luna, description=""):
 	"""
 	if configs.error_log() == "console":
 		prints.error(description.replace('\n',' ').replace('`',''))
+		sent = None
 	else:
 		embed = discord.Embed(title="Error", description=description, color=0xE10959)
 		embed.set_thumbnail(url=theme.image_url())
 		embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
 		embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
 		embed.set_image(url=theme.large_image_url())
-		await send(luna, embed)
+		sent = await send(luna, embed)
+	return sent
 
 # ///////////////////////////////////////////////////////////////
 

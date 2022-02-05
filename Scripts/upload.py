@@ -26,7 +26,12 @@ class files:
         return os.path.expanduser("~/Documents")
 
     def json(file_name, value, documents=False):
-        """Reads a json file"""
+        """
+        Reads a json file
+        
+        Example:
+            files.json("Luna/discord.json", "token", documents=True)
+        """
         if documents:
             return json.load(open(os.path.join(files.documents(), file_name), encoding="utf-8"))[value]
         else:
@@ -98,24 +103,24 @@ async def on_ready():
 # ///////////////////////////////////////////////////////////////
 # With Mention
 
-#     announcement = f"""{ping_role.mention}
+    announcement = f"""{ping_role.mention}
 
-# > Luna {version} has been released.
-# > 
-# > Wait 15 minutes for Luna to automatically update it.
-# > Use (p)update or restart Luna to force the update.
-# > 
-# > Changelogs in #changelogs"""
+> Luna {version} has been released.
+> 
+> Wait 5 minutes for Luna to automatically update it.
+> Use (p)update or restart Luna to force the update.
+> 
+> Changelogs in #changelogs"""
 
 # ///////////////////////////////////////////////////////////////
 # Without Mention
 
-    announcement = f"""> Luna {version} has been released.
-> 
-> Wait 15 minutes for Luna to automatically update it.
-> Use (p)update or restart Luna to force the update.
-> 
-> Changelogs in #changelogs"""
+#     announcement = f"""> Luna {version} has been released.
+# > 
+# > Wait 5 minutes for Luna to automatically update it.
+# > Use (p)update or restart Luna to force the update.
+# > 
+# > Changelogs in #changelogs"""
 
 # ///////////////////////////////////////////////////////////////
 
