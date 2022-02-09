@@ -1,3 +1,7 @@
+import json
+import os
+
+
 """
 Create a Class that has functions for handling Json files, such as reading a value, overwriting a value and writing a new file.
 
@@ -12,9 +16,6 @@ if "Luna" is in file_path, use os.path.expanduser("~/Documents/Luna").
 Put a description on every function and the class.
 Put a description on __init__.
 """
-
-import json
-import os
 
 
 class JsonHandler:
