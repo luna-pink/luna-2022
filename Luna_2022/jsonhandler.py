@@ -1,28 +1,22 @@
 import json
 import os
 
+# /////////////////////////////////////////////////////////////////////////////
 
-"""
-Create a Class that has functions for handling Json files, such as reading a value, overwriting a value and writing a new file.
+from variables import *
 
-All have indention 4 spaces.
-
-run a check in the __init__ if the file exists, if not create it (and write "{}") before writing to it.
-
-def __init__(self, file_name:str, file_path:str = "./"):
-
-if "Luna" is in file_path, use os.path.expanduser("~/Documents/Luna").
-
-Put a description on every function and the class.
-Put a description on __init__.
-"""
+# /////////////////////////////////////////////////////////////////////////////
 
 
 class JsonHandler:
+    """
+    This class handles the json files.
+    """
     def __init__(self, file_name: str, file_path: str = "./"):
         """
         Initialize the JsonHandler class.
         Does a check if the file exists, if not creates it, before writing to it.
+        (Default: "./", if "Luna" in the file_path, the path is changed to "Documents/Luna/")
 
         Args:
             file_name: The name of the file.
@@ -36,6 +30,8 @@ class JsonHandler:
         if not os.path.exists(file_path):
             os.makedirs(file_path)
         self.file_path = file_path
+        if not file_name.endswith(".json"):
+            file_name += ".json"
         self.file_name = file_name
         self.file_path_name = os.path.join(self.file_path, self.file_name)
         if not os.path.exists(self.file_path_name):
@@ -74,7 +70,7 @@ class JsonHandler:
             data = json.load(file)
         data[key] = value
         with open(self.file_path_name, "w") as file:
-            json.dump(data, file)
+            json.dump(data, file, indent=4)
 
     def write_new_file(self, data: dict):
         """
@@ -84,4 +80,23 @@ class JsonHandler:
             data: The data to write.
         """
         with open(self.file_path_name, "w") as file:
-            json.dump(data, file)
+            json.dump(data, file, indent=4)
+
+    def delete_value(self, key: str):
+        """
+        Delete a value from a Json file.
+
+        Args:
+            key: The key of the value to delete.
+        """
+        with open(self.file_path_name, "r") as file:
+            data = json.load(file)
+        del data[key]
+        with open(self.file_path_name, "w") as file:
+            json.dump(data, file, indent=4)
+
+
+def get_prefix():
+    prefix = JsonHandler(file_name="config.json", file_path="Luna").read_value("prefix")
+    return prefix
+

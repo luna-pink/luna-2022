@@ -1,21 +1,10 @@
-import variables
 import os
-
-# def get_prefix():
-#     prefix = variables.default_prefix
-#     return prefix
-
-
-"""
-Create a Class that has functions for handling files and folders, such as reading a value, overwriting a file, creating a file or folder as well as deleting.
-
-run a check in the __init__ if the file exists, if not, create it before writing to it.
-run a check if the folder exists, if not, create it.
-"""
 
 
 class FileHandler:
-
+    """
+    This class handles the file operations.
+    """
     def __init__(self, file_name: str, file_path: str = "./"):
         """
         Initialize the FileHandler class.
