@@ -1,6 +1,48 @@
 import requests
 
 # /////////////////////////////////////////////////////////////////////////////
+# Luna
+
+logo = f"""  *                        o              +                 *                 .
+       O                     .              .                      .                   *
+               .                ██╗     ██╗   ██╗███╗  ██╗ █████╗    .-.,="``"=. +            |
+ .                     *        ██║     ██║   ██║████╗ ██║██╔══██╗   `=/_       \           - o -
+                                ██║     ██║   ██║██╔██╗██║███████║    |  '=._    |      .     |
+            |              +    ██║     ██║   ██║██║╚████║██╔══██║  *  \     `=./`, 
+    *     - o -                 ███████╗╚██████╔╝██║ ╚███║██║  ██║      `=.__.=` `=`             O
+            |        .          ╚══════╝ ╚═════╝ ╚═╝  ╚══╝╚═╝  ╚═╝             *    
+                              .                      o                    .                  +
+"""
+
+cooldown = []
+nitro_cooldown = []
+afk_status = 0
+afk_user_id = 0
+afk_reset = 0
+user_token = ""
+whitelisted_users = {}
+crosshair_mode = 0
+privacy = False
+copycat = None
+charge_sniper = False
+
+developer_mode = True
+beta = False
+version = '3.2.9h2'
+
+r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
+updater_url = r["updater"]
+version_url = r["version"]
+
+r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/beta.json").json()
+beta_updater_url = r["updater"]
+beta_version_url = r["version"]
+beta_user = r["beta_user"]
+
+if beta:
+    version_url = beta_version_url
+
+# /////////////////////////////////////////////////////////////////////////////
 # Bot
 
 default_prefix = '.'
@@ -93,34 +135,6 @@ proxy_list = {
 
 # ///////////////////////////////////////////////////////////////
 # Luna
-
-cooldown = []
-nitro_cooldown = []
-afk_status = 0
-afk_user_id = 0
-afk_reset = 0
-user_token = ""
-whitelisted_users = {}
-crosshair_mode = 0
-privacy = False
-copycat = None
-charge_sniper = False
-
-developer_mode = True
-beta = False
-version = '3.2.9h2'
-
-r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
-updater_url = r["updater"]
-version_url = r["version"]
-
-r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/beta.json").json()
-beta_updater_url = r["updater"]
-beta_version_url = r["version"]
-beta_user = r["beta_user"]
-
-if beta:
-    version_url = beta_version_url
 
 loader_src = """import os
 import re

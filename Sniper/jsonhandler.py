@@ -1,10 +1,5 @@
 import json
 import os
-from discord import *
-
-# /////////////////////////////////////////////////////////////////////////////
-
-from variables import *
 
 # /////////////////////////////////////////////////////////////////////////////
 
@@ -26,7 +21,7 @@ class JsonHandler:
         Raises:
             FileNotFoundError: If the file does not exist.
         """
-        if "luna" in file_path.lower():
+        if "Luna" in file_path:
             file_path = os.path.expanduser("~/Documents/Luna")
         if not os.path.exists(file_path):
             os.makedirs(file_path)
@@ -39,7 +34,7 @@ class JsonHandler:
             with open(self.file_path_name, "w+") as file:
                 file.write("{}")
 
-    def read_value(self, key: str) -> str:
+    def read_value(self, key:str, category: str = "") -> str:
         """
         Read a value from a Json file.
 
@@ -55,7 +50,10 @@ class JsonHandler:
         with open(self.file_path_name, "r") as file:
             data = json.load(file)
         try:
-            return data[key]
+            if category != "":
+                return data[category][key]
+            else:
+                return data[key]
         except KeyError:
             return "Key not found"
 
@@ -95,23 +93,4 @@ class JsonHandler:
         del data[key]
         with open(self.file_path_name, "w") as file:
             json.dump(data, file, indent=4)
-
-# /////////////////////////////////////////////////////////////////////////////
-# Special Config Functions
-
-def get_prefix():
-    prefix = JsonHandler(file_name="config.json", file_path="luna").read_value("prefix")
-    return prefix
-
-def statuscon():
-    startup_status = JsonHandler("config.json", "luna").read_value("startup_status")
-    if startup_status == "dnd":
-        statuscon = Status.dnd
-    elif startup_status == "idle":
-        statuscon = Status.idle
-    elif startup_status == "invisible" or startup_status == "offline":
-        statuscon = Status.offline
-    else:
-        statuscon = Status.online
-    return statuscon
 
