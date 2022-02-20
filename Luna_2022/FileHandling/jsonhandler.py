@@ -26,8 +26,8 @@ class JsonHandler:
         Raises:
             FileNotFoundError: If the file does not exist.
         """
-        if "luna" in file_path.lower():
-            file_path = os.path.expanduser("~/Documents/Luna")
+        if file_path.title().startswith("Luna"):
+            file_path = os.path.expanduser(f"~/Documents/{file_path}")
         if not os.path.exists(file_path):
             os.makedirs(file_path)
         self.file_path = file_path
@@ -100,11 +100,10 @@ class JsonHandler:
 # Special Config Functions
 
 def get_prefix():
-    prefix = JsonHandler(file_name="config.json", file_path="luna").read_value("prefix")
-    return prefix
+    return JsonHandler("config.json").read_value("prefix")
 
 def statuscon():
-    startup_status = JsonHandler("config.json", "luna").read_value("startup_status")
+    startup_status = JsonHandler("config.json").read_value("startup_status")
     if startup_status == "dnd":
         statuscon = Status.dnd
     elif startup_status == "idle":

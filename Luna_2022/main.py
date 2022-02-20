@@ -44,13 +44,17 @@ from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFou
 
 # /////////////////////////////////////////////////////////////////////////////
 
-from filehandler import *
-from jsonhandler import *
-from cea256 import *
-from authentication import *
+from FileHandling.filehandler import *
+from FileHandling.jsonhandler import *
+from Security.cea256 import *
+from Security.authentication import *
+from variables import *
+from Functions.color import *
 
 # /////////////////////////////////////////////////////////////////////////////
 
 bot = commands.Bot(command_prefix=get_prefix(), self_bot=True, case_insensitive=True, guild_subscription_options=GuildSubscriptionOptions.off(), status=statuscon())
 
 # /////////////////////////////////////////////////////////////////////////////
+
+
