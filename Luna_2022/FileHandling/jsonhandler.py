@@ -59,17 +59,24 @@ class JsonHandler:
         except KeyError:
             return "Key not found"
 
-    def write_value(self, key: str, value: str):
+    def write_value(self, key: str, value: str, type: str = ""):
         """
         Write a value to a Json file.
 
         Args:
             key: The key of the value to write.
             value: The value to write.
+            type: The type of the value. 
+            (Default: "", if "append" the value is appended to the key, if "remove" the value is removed from the key)
         """
         with open(self.file_path_name, "r", encoding="utf-8") as file:
             data = json.load(file)
-        data[key] = value
+        if type.lower() == "append":
+            data[key].append(value)
+        elif type.lower() == "remove":
+            data[key].remove(value)
+        else:
+            data[key] = value
         with open(self.file_path_name, "w", encoding="utf-8") as file:
             json.dump(data, file, indent=4)
 

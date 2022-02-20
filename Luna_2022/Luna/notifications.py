@@ -1,5 +1,4 @@
 from notifypy import Notify
-import os
 import dhooks
 from Functions.prints import *
 from FileHandling.jsonhandler import *
@@ -28,17 +27,12 @@ class notify:
         """Create a webhook notification"""
         try:
             if url == "":
-                prints.error(f"The webhook url can't be empty » {name} » Has been cleared")
-                json_object = json.load(open(os.path.join(files.documents(), f"Luna/webhooks/url.json"), encoding="utf-8"))
-                
-                json_object[f"{name}"] = "webhook-url-here"
-                files.write_json(os.path.join(files.documents(), f"Luna/webhooks/url.json"), json_object)
+                prints.error(f"The webhook url was empty » {name} » Has been cleared")
+                JsonHandler("url.json", "data/webhooks").write_value(name, "webhook-url-here")
                 return
             elif not "https://discord.com/api/webhooks/" in url:
-                prints.error(f"Invalid webhook url » {name} » Has been cleared")
-                json_object = json.load(open(os.path.join(files.documents(), f"Luna/webhooks/url.json"), encoding="utf-8"))
-                json_object[f"{name}"] = "webhook-url-here"
-                files.write_json(os.path.join(files.documents(), f"Luna/webhooks/url.json"), json_object)
+                prints.error(f"The webhook url was invalid » {name} » Has been cleared")
+                JsonHandler("url.json", "data/webhooks").write_value(name, "webhook-url-here")
                 return
             hook = dhooks.Webhook(url=url, avatar_url=webhook.image_url())
             color = 0x000000
@@ -48,8 +42,7 @@ class notify:
                 pass
             else:
                 color = webhook.hex_color()
-            embed = dhooks.Embed(title=webhook.title(
-            ), description=f"```{description}```", color=color)
+            embed = dhooks.Embed(title=webhook.title(), description=f"```{description}```", color=color)
             embed.set_thumbnail(url=webhook.image_url())
             embed.set_footer(text=webhook.footer())
             hook.send(embed=embed)

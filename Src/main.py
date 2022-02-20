@@ -3457,8 +3457,7 @@ class webhook:
 
     def title():
         """Get the title in the config file"""
-        title = files.json("Luna/webhooks/webhook.json",
-                           "title", documents=True)
+        title = files.json("Luna/webhooks/webhook.json", "title", documents=True)
         if title == None:
             title = ""
         return str(title)
