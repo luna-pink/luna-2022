@@ -45,6 +45,32 @@ def restart_program():
     python = sys.executable
     os.execl(python, python, *sys.argv)
     
+def update_thread():
+    update_found = False
+    while True:
+        r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
+        version_url = r["version"]
+
+        r = requests.get(
+            "https://raw.githubusercontent.com/Nshout/Luna/main/beta.json").json()
+        beta_version_url = r["version"]
+
+        if beta:
+            version_url = beta_version_url
+        if developer_mode:
+            pass
+        elif version == version_url:
+            pass
+        else:
+            if JsonHandler("toasts.json", "data/notifications").read_value("login") == "on" and JsonHandler("toasts.json", "data/notifications").read_value("toasts") == "on":
+                notify.toast(message=f"Starting update {version_url}")
+            if JsonHandler("webhooks.json", "data/webhooks").read_value("login") == "on" and JsonHandler("webhooks.json", "data/webhooks").read_value("webhooks") == "on" and not webhook.login_url() == "webhook-url-here":
+                notify.webhook(url=webhook.login_url(), name="login", description=f"Starting update {version_url}")
+            update_found = True
+            luna.update()
+        if not update_found:
+            time.sleep(300)
+    
 def file_check(console=False):
         """Run a check for the files, create if needed."""
 

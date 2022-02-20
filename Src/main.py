@@ -3195,8 +3195,7 @@ class configs:
 
     def delete_timer():
         """Get the delete timer in the config file"""
-        deletetimer = int(files.json(f"Luna/config.json",
-                          "delete_timer", documents=True))
+        deletetimer = int(files.json(f"Luna/config.json", "delete_timer", documents=True))
         return deletetimer
 
     def mode():
@@ -3206,33 +3205,28 @@ class configs:
 
     def error_log():
         """Get the error log in the config file"""
-        error_log = files.json(f"Luna/config.json",
-                               "error_log", documents=True)
+        error_log = files.json(f"Luna/config.json", "error_log", documents=True)
         return error_log
 
     def risk_mode():
         """Get the risk mode in the config file"""
-        risk_mode = files.json(f"Luna/config.json",
-                               "risk_mode", documents=True)
+        risk_mode = files.json(f"Luna/config.json", "risk_mode", documents=True)
         return risk_mode
 
     def stream_url():
         """Get the stream url in the config file"""
-        stream_url = files.json(f"Luna/config.json",
-                                "stream_url", documents=True)
+        stream_url = files.json(f"Luna/config.json", "stream_url", documents=True)
         return stream_url
 
     def startup_status():
         """Get the startup status in the config file"""
-        startup_status = files.json(
-            f"Luna/config.json", "startup_status", documents=True)
+        startup_status = files.json(f"Luna/config.json", "startup_status", documents=True)
         return startup_status
 
     def password():
         """Get the password in the config file"""
         password = files.json(f"Luna/discord.json", "password", documents=True)
-        password = Decryption(
-            '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+        password = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
         return password
 
     def share():
@@ -3651,8 +3645,7 @@ def anti_token_logger():
 # ///////////////////////////////////////////////////////////////
 # ON_READY
 
-bot = commands.Bot(bot_prefix, self_bot=True, case_insensitive=True,
-                   guild_subscription_options=GuildSubscriptionOptions.off(), status=statuscon())
+bot = commands.Bot(bot_prefix, self_bot=True, case_insensitive=True, guild_subscription_options=GuildSubscriptionOptions.off(), status=statuscon())
 
 
 @bot.event
