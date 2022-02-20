@@ -19,7 +19,6 @@ class Atlas:
         return f"0.3.1 - vNext"
 
     def connect(self):
-        # Check if correct CEAShim is installed, will also validated by the server in vNext.
         if CEAMisc.GetShimVersion() != self.expectedCEAShim:
             raise CustomError(f"Invalid CEA SHIM version! Expected version: {self.expectedCEAShim}")
         socket = self.socket
@@ -80,8 +79,7 @@ class Atlas:
                     case "AuthenticationFailed":
                         raise CustomError("Username/Password is invalid")
             else:
-                raise CustomError(
-                    "An unknown issue occured while attempting to authenticate")
+                raise CustomError("An unknown issue occured while attempting to authenticate")
         except Exception as e:
             self.disconnect()
             raise CustomError("{}".format(e))
@@ -89,8 +87,7 @@ class Atlas:
     def Register(self, username: str, password: str):
         socket = self.socket
         try:
-            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(
-                f"OpCode=4;AuthOpCode=2;UserFullname={username};UserHandle={username};UserPass={password};UserEmail={username}@nomail.com;")))
+            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=4;AuthOpCode=2;UserFullname={username};UserHandle={username};UserPass={password};UserEmail={username}@nomail.com;")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -102,8 +99,7 @@ class Atlas:
                     case "AccountRegistrationFailed":
                         raise CustomError("Registration failed")
             else:
-                raise CustomError(
-                    "An unknown issue occured while registering the specified user")
+                raise CustomError("An unknown issue occured while registering the specified user")
         except Exception as e:
             self.disconnect()
             raise CustomError("{}".format(e))
@@ -119,11 +115,9 @@ class Atlas:
                     case "AppUserRegistrationSuccessful":
                         return True
                     case "AppUserRegistrationFailed":
-                        raise CustomError(
-                            "Unable to register as application user")
+                        raise CustomError("Unable to register as application user")
                     case "AppUserHWIDRegistrationFailed":
-                        raise CustomError(
-                            "Unable to register as application user HWID not accepted by server")
+                        raise CustomError("Unable to register as application user HWID not accepted by server")
             else:
                 raise CustomError(
                     "An unknown issue occured while enrolling application user")
@@ -142,11 +136,9 @@ class Atlas:
                     case "AppUserDeRegistrationSuccessful":
                         return True
                     case "AppUserDeRegistrationFailed":
-                        raise CustomError(
-                            "Unable to deallocate the specified application user")
+                        raise CustomError("Unable to deallocate the specified application user")
             else:
-                raise CustomError(
-                    "An unknown issue occured while removing the application user")
+                raise CustomError("An unknown issue occured while removing the application user")
         except Exception as e:
             self.disconnect()
             raise CustomError("{}".format(e))
@@ -163,11 +155,9 @@ class Atlas:
                     case "SLActivated":
                         return True
                     case "SLActivationFailed":
-                        raise CustomError(
-                            "An issue occured while activating the specified license key")
+                        raise CustomError("An issue occured while activating the specified license key")
             else:
-                raise CustomError(
-                    "An unknown issue occured while redeeming the specified entitlement")
+                raise CustomError("An unknown issue occured while redeeming the specified entitlement")
         except Exception as e:
             self.disconnect()
             raise CustomError("{}".format(e))
@@ -184,14 +174,11 @@ class Atlas:
                     case "UserEntitlementValid":
                         return True
                     case "SKUValidationFailed":  # SKU should be embedded as constant, has tampering/use of incorrect version been detected?
-                        raise CustomError(
-                            "An issue occured while validating the specified application")
+                        raise CustomError("An issue occured while validating the specified application")
                     case "SKUInvalid":
-                        raise CustomError(
-                            "The specified user is not licensed to use the specified application")
+                        raise CustomError("The specified user is not licensed to use the specified application")
                     case "UserEntitlementInvalid":
-                        raise CustomError(
-                            "The specified user is not licensed to use the specified application")
+                        raise CustomError("The specified user is not licensed to use the specified application")
             else:
                 raise CustomError(
                     "An unknown issue occured while validating the application")
@@ -210,8 +197,7 @@ class Atlas:
                     case "HWIDUpdated":
                         return True
                     case "HWIDUpdateFailed":
-                        raise CustomError(
-                            "An issue occured while attempting to update the specified user's HWID")
+                        raise CustomError("An issue occured while attempting to update the specified user's HWID")
             else:
                 raise CustomError(
                     "An unknown issue occured while attempting to update the specified user's HWID")
@@ -230,11 +216,9 @@ class Atlas:
                     case "HardwareIDValid":
                         return True
                     case "HardwareIDInvalid":
-                        raise CustomError(
-                            "The submitted hardware ID is invalid")
+                        raise CustomError("The submitted hardware ID is invalid")
                     case "HardwareIDNotSet":
-                        raise CustomError(
-                            "No hardware ID has been set for the specified user")
+                        raise CustomError("No hardware ID has been set for the specified user")
             else:
                 raise CustomError(
                     "An unknown issue occured while attempting to validate the specified user's HWID")
@@ -251,8 +235,7 @@ class Atlas:
             if responseCode == "8":
                 return responseResult
             else:
-                raise CustomError(
-                    "An unknown issue occured while attempting to obtain the specified user's AppUserRole")
+                raise CustomError("An unknown issue occured while attempting to obtain the specified user's AppUserRole")
         except Exception as e:
             self.disconnect()
             raise CustomError("{}".format(e))
@@ -272,8 +255,7 @@ class Atlas:
                         raise CustomError(
                             "The specified license key is invalid")
                     case "SLKValidationFailed":
-                        raise CustomError(
-                            "An issue occured while attempting to validate the specified license key")
+                        raise CustomError("An issue occured while attempting to validate the specified license key")
             else:
                 raise CustomError(
                     "An unknown issue occured while attempting to validate the specified user's HWID")

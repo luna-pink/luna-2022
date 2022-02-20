@@ -1488,14 +1488,10 @@ class luna:
             luna.console(clear=True)
             if not developer_mode:
                 try:
-                    username = files.json(
-                        "Luna/auth.json", "username", documents=True)
-                    password = files.json(
-                        "Luna/auth.json", "password", documents=True)
-                    username = Decryption(
-                        '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-                    password = Decryption(
-                        '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+                    username = files.json("Luna/auth.json", "username", documents=True)
+                    password = files.json("Luna/auth.json", "password", documents=True)
+                    username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+                    password = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
                 except:
                     files.remove('Luna/auth.json', documents=True)
                     prints.error("There has been an issue with your login")
@@ -1925,8 +1921,7 @@ class luna:
                 greeting = "Good evening"
 
             username = files.json("Luna/auth.json", "username", documents=True)
-            username = Decryption(
-                '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+            username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
             prints.message(f"{greeting}, {color.purple(username)}.")
             time.sleep(3)
             prints.message("We are getting Luna ready for you.")
