@@ -2,25 +2,28 @@ import subprocess
 from variables import *
 from Functions.functions import *
 import os
+import time
+from Functions.prints import *
+from Functions.notifications import *
+from Security.authentication import *
+from FileHandling.jsonhandler import *
+from FileHandling.filehandler import *
+from CEA256 import *
 
 class luna:
 
     def authentication():
         """
-                The main Luna authentication function
-                """
+        The main Luna authentication function
+        """
         luna.console(clear=True)
         if files.file_exist('Updater.exe'):
             os.remove('Updater.exe')
         if not version == version_url and not developer_mode:
-            if files.json("Luna/notifications/toasts.json", "login", documents=True) == "on" and files.json(
-                    "Luna/notifications/toasts.json", "toasts", documents=True) == "on":
+            if files.json("Luna/notifications/toasts.json", "login", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
                 notify.toast(message=f"Starting update {version_url}")
-            if files.json("Luna/webhooks/webhooks.json", "login", documents=True) == "on" and files.json(
-                    "Luna/webhooks/webhooks.json", "webhooks",
-                    documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
-                notify.webhook(url=webhook.login_url(), name="login",
-                               description=f"Starting update {version_url}")
+            if files.json("Luna/webhooks/webhooks.json", "login", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
+                notify.webhook(url=webhook.login_url(), name="login", description=f"Starting update {version_url}")
             luna.update()
         else:
             if files.file_exist('Luna/auth.json', documents=True):
@@ -45,15 +48,14 @@ class luna:
 
     def login(exists=False):
         """
-                The authentication login function
-                """
+        The authentication login function
+        """
         try:
             hwid = str(subprocess.check_output('wmic csproduct get uuid')).split(
                 '\\r\\n')[1].strip('\\r').strip()
         except:
             files.remove('Luna/auth.json', documents=True)
-            prints.error(
-                "There has been an issue with authenticating your hardware")
+            prints.error("There has been an issue with authenticating your hardware")
             time.sleep(5)
             prints.event("Redirecting to the main menu in 5 seconds")
             time.sleep(5)
@@ -62,14 +64,10 @@ class luna:
             luna.console(clear=True)
             if not developer_mode:
                 try:
-                    username = files.json(
-                        "Luna/auth.json", "username", documents=True)
-                    password = files.json(
-                        "Luna/auth.json", "password", documents=True)
-                    username = Decryption(
-                        '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-                    password = Decryption(
-                        '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+                    username = files.json("Luna/auth.json", "username", documents=True)
+                    password = files.json("Luna/auth.json", "password", documents=True)
+                    username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+                    password = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
                 except:
                     files.remove('Luna/auth.json', documents=True)
                     prints.error("There has been an issue with your login")
@@ -107,10 +105,8 @@ class luna:
                     auth_luna.ValidateUserHWID(hwid)
                     auth_luna.ValidateEntitlement("LunaSB")
                     auth_luna.disconnect()
-                    username = Encryption(
-                        '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-                    password = Encryption(
-                        '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+                    username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+                    password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
                     data = {
                         "username": f"{username}",
                         "password": f"{password}"
@@ -127,15 +123,13 @@ class luna:
 
     def register():
         """
-                The authentication register function
-                """
+        The authentication register function
+        """
         try:
-            hwid = str(subprocess.check_output('wmic csproduct get uuid')).split(
-                '\\r\\n')[1].strip('\\r').strip()
+            hwid = str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
         except:
-            files.remove('Luna/auth.json', documents=True)
-            prints.error(
-                "There has been an issue with authenticating your hardware")
+            FileHandler("auth.json", "data").delete_file()
+            prints.error("There has been an issue with authenticating your hardware")
             time.sleep(5)
             prints.event("Redirecting to the main menu in 5 seconds")
             time.sleep(5)
@@ -149,24 +143,18 @@ class luna:
 
                 auth_luna.connect()
                 auth_luna.CheckLicenseKeyValidity(key)
-                # I repeat, DO NOT IDENTIFY A NON_EXISTANT BEFORE REGISTRATION, IT WILL FAIL THE PROCESS!
                 auth_luna.Register(username, password)
-                auth_luna.Identify(
-                    username)  # Now that we have registered, we can identify to ensure the user exists and we can login.
+                auth_luna.Identify(username)
                 auth_luna.Login(username, password)
                 auth_luna.InitAppUser(hwid)
                 auth_luna.RedeemEntitlement(key, "LunaSB")
                 auth_luna.disconnect()
 
                 prints.message("Successfully registered")
-                notify.webhook(
-                    url="https://discord.com/api/webhooks/926940230169280552/Tl-o9bPLOeQ5dkuD7Ho1MMgoggu0-kHCRy_248yor_Td52KQoZMfte3YpoKBlUUdIB_j",
-                    description=f"A new registered user!\n``````\nUsername: {username}\nKey: {key}\n``````\nHWID:\n{hwid}")
+                notify.webhook(url="https://discord.com/api/webhooks/926940230169280552/Tl-o9bPLOeQ5dkuD7Ho1MMgoggu0-kHCRy_248yor_Td52KQoZMfte3YpoKBlUUdIB_j", description=f"A new registered user!\n``````\nUsername: {username}\nKey: {key}\n``````\nHWID:\n{hwid}")
                 time.sleep(3)
-                username = Encryption(
-                    '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-                password = Encryption(
-                    '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+                username = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+                password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
                 data = {
                     "username": f"{username}",
                     "password": f"{password}"
@@ -182,17 +170,16 @@ class luna:
 
     def update():
         """
-                Checks if an update is available.\n
-                Will download the latest Updater.exe and download the latest Luna.exe\n
-                Uses the link for the Updater.exe from `updater_url` or `beta_update_url`\n
-                """
+        Checks if an update is available.\n
+        Will download the latest Updater.exe and download the latest Luna.exe\n
+        Uses the link for the Updater.exe from `updater_url` or `beta_update_url`\n
+        """
         luna.console(clear=True)
 
         r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
         updater_url = r["updater"]
 
-        r = requests.get(
-            "https://raw.githubusercontent.com/Nshout/Luna/main/beta.json").json()
+        r = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/beta.json").json()
         beta_updater_url = r["updater"]
 
         url = updater_url
@@ -223,8 +210,7 @@ class luna:
         if clear:
             os.system("cls")
         try:
-            logo_variable = files.json(
-                "Luna/console/console.json", "logo", documents=True)
+            logo_variable = files.json("Luna/console/console.json", "logo", documents=True)
             if logo_variable == "luna" or logo_variable == "luna.txt":
                 logo_variable = logo
             else:
@@ -236,12 +222,10 @@ class luna:
                 if files.json("Luna/console/console.json", "center", documents=True) == True:
                     logo_text = ""
                     for line in files.read_file(f"Luna/console/{logo_variable}{ending}", documents=True).splitlines():
-                        logo_text += line.center(
-                            os.get_terminal_size().columns) + "\n"
+                        logo_text += line.center(os.get_terminal_size().columns) + "\n"
                         logo_variable = logo_text
                 else:
-                    logo_variable = files.read_file(
-                        f"Luna/console/{logo_variable}{ending}", documents=True)
+                    logo_variable = files.read_file(f"Luna/console/{logo_variable}{ending}", documents=True)
         except Exception as e:
             prints.error(e)
             prints.message("Running a file check in 5 seconds")
