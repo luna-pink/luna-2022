@@ -4,7 +4,6 @@ from cea256 import *
 class CustomError(Exception):
     pass
 
-
 class Atlas:
     def __init__(self, host: str, port: int, app_id: str, app_token: str):
         self.app_id = app_id

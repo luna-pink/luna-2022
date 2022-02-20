@@ -1608,10 +1608,10 @@ class luna:
 
     def update():
         """
-                Checks if an update is available.\n
-                Will download the latest Updater.exe and download the latest Luna.exe\n
-                Uses the link for the Updater.exe from `updater_url` or `beta_update_url`\n
-                """
+        Checks if an update is available.\n
+        Will download the latest Updater.exe and download the latest Luna.exe\n
+        Uses the link for the Updater.exe from `updater_url` or `beta_update_url`\n
+        """
         luna.console(clear=True)
 
         r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
@@ -3254,28 +3254,17 @@ class configs:
 # ///////////////////////////////////////////////////////////////
 # Theme Functions
 
-title_request = requests.get(
-    "https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["title"]
-title_url_request = requests.get(
-    "https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["title_url"]
-footer_request = requests.get(
-    "https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["footer"]
-footer_icon_url_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()[
-    "footer_icon_url"]
-image_url_request = requests.get(
-    "https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["image_url"]
-large_image_url_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()[
-    "large_image_url"]
-hexcolorvar_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()[
-    "hex_color"]
-author_request = requests.get(
-    "https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["author"]
-author_icon_url_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()[
-    "author_icon_url"]
-author_url_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()[
-    "author_url"]
-descriptionvar_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()[
-    "description"]
+title_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["title"]
+title_url_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["title_url"]
+footer_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["footer"]
+footer_icon_url_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["footer_icon_url"]
+image_url_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["image_url"]
+large_image_url_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["large_image_url"]
+hexcolorvar_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["hex_color"]
+author_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["author"]
+author_icon_url_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["author_icon_url"]
+author_url_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["author_url"]
+descriptionvar_request = requests.get("https://raw.githubusercontent.com/Nshout/Luna/main/default.json").json()["description"]
 
 
 class theme:

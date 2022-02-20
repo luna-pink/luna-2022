@@ -31,14 +31,10 @@ class CEAMisc:
 
     def CipherEncode(plaintext):
         normal_numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-        normal_low = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s",
-                      "u", "v", "x", "y", "z"]
-        normal_caps = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
-                       "U", "V", "X", "Y", "Z"]
-        ciphered_low = ["c", "e", "a", "b", "i", "f", "d", "h", "g", "n", "l", "k", "q", "j", "r", "p", "o", "m", "u",
-                        "s", "y", "x", "v", "z"]
-        ciphered_caps = ["C", "E", "A", "B", "I", "F", "D", "H", "G", "N", "L", "K", "Q", "J", "R", "P", "O", "M", "U",
-                         "S", "Y", "X", "V", "Z"]
+        normal_low = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "u", "v", "x", "y", "z"]
+        normal_caps = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "U", "V", "X", "Y", "Z"]
+        ciphered_low = ["c", "e", "a", "b", "i", "f", "d", "h", "g", "n", "l", "k", "q", "j", "r", "p", "o", "m", "u", "s", "y", "x", "v", "z"]
+        ciphered_caps = ["C", "E", "A", "B", "I", "F", "D", "H", "G", "N", "L", "K", "Q", "J", "R", "P", "O", "M", "U", "S", "Y", "X", "V", "Z"]
         ciphered_numbers = ["0", "5", "3", "2", "8", "1", "9", "7", "4", "6"]
         text_length = len(plaintext)
         encoded_text = []
@@ -63,14 +59,10 @@ class CEAMisc:
 
     def CipherDecode(encodedtext):
         normal_numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-        normal_low = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s",
-                      "u", "v", "x", "y", "z"]
-        normal_caps = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
-                       "U", "V", "X", "Y", "Z"]
-        ciphered_low = ["c", "e", "a", "b", "i", "f", "d", "h", "g", "n", "l", "k", "q", "j", "r", "p", "o", "m", "u",
-                        "s", "y", "x", "v", "z"]
-        ciphered_caps = ["C", "E", "A", "B", "I", "F", "D", "H", "G", "N", "L", "K", "Q", "J", "R", "P", "O", "M", "U",
-                         "S", "Y", "X", "V", "Z"]
+        normal_low = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "u", "v", "x", "y", "z"]
+        normal_caps = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "U", "V", "X", "Y", "Z"]
+        ciphered_low = ["c", "e", "a", "b", "i", "f", "d", "h", "g", "n", "l", "k", "q", "j", "r", "p", "o", "m", "u", "s", "y", "x", "v", "z"]
+        ciphered_caps = ["C", "E", "A", "B", "I", "F", "D", "H", "G", "N", "L", "K", "Q", "J", "R", "P", "O", "M", "U", "S", "Y", "X", "V", "Z"]
         ciphered_numbers = ["0", "5", "3", "2", "8", "1", "9", "7", "4", "6"]
         text_length = len(encodedtext)
         plain_text = []
@@ -174,8 +166,7 @@ class CEADecrypt:
         splits += 1
 
         for x in range(splits):
-            split_data.append(
-                int(f"{CEAMisc.XOR(cipher_encoded.split(':')[x], self.key)}"))
+            split_data.append(int(f"{CEAMisc.XOR(cipher_encoded.split(':')[x], self.key)}"))
 
         for x in range(len(self.key)):
             key_decimals.append(ord(self.key[x]))

@@ -18,6 +18,12 @@ class JsonHandler:
         Initialize the JsonHandler class.
         Does a check if the file exists, if not creates it, before writing to it.
         (Default: "./", if "Luna" in the file_path, the path is changed to "Documents/Luna/")
+        
+        Initialize:
+            >>> JsonHandler("foo.json", "data/foo")
+            
+        Example:
+            >>> JsonHandler("foo.json", "data/foo").read_value("foo")
 
         Args:
             file_name: The name of the file.
@@ -42,6 +48,7 @@ class JsonHandler:
     def read_value(self, key: str) -> str:
         """
         Read a value from a Json file.
+        >>> JsonHandler("test.json", "data/test").read_value("test")
 
         Args:
             key: The key of the value to read.
@@ -62,6 +69,7 @@ class JsonHandler:
     def write_value(self, key: str, value: str, type: str = ""):
         """
         Write a value to a Json file.
+        >>> JsonHandler("test.json", "data/test").write_value("test", "test")
 
         Args:
             key: The key of the value to write.
@@ -83,6 +91,7 @@ class JsonHandler:
     def write_file(self, data: dict):
         """
         Write a new Json file.
+        >>> JsonHandler("test.json", "data/test").write_file({"test": "test"})
 
         Args:
             data: The data to write.
@@ -93,6 +102,7 @@ class JsonHandler:
     def delete_value(self, key: str):
         """
         Delete a value from a Json file.
+        >>> JsonHandler("test.json", "data/test").delete_value("test")
 
         Args:
             key: The key of the value to delete.
