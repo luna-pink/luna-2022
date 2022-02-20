@@ -22,8 +22,7 @@ class Atlas:
     def connect(self):
         # Check if correct CEAShim is installed, will also validated by the server in vNext.
         if CEAMisc.GetShimVersion() != self.expectedCEAShim:
-            raise CustomError(
-                f"Invalid CEA SHIM version! Expected version: {self.expectedCEAShim}")
+            raise CustomError(f"Invalid CEA SHIM version! Expected version: {self.expectedCEAShim}")
         socket = self.socket
         try:
             socket.connect((self.host, self.port))
@@ -54,8 +53,7 @@ class Atlas:
     def Identify(self, userHandle: str):
         socket = self.socket
         try:
-            payload_id = CEADecrypt(self.app_token).CEA256(
-                self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=10;UserHandle={userHandle};")))
+            payload_id = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=10;UserHandle={userHandle};")))
             response_code = payload_id.split(";")[0].split("=")[1]
             response_result = payload_id.split(";")[1].split("=")[1]
             if response_code == "8" and response_result == "Identified!":
@@ -114,8 +112,7 @@ class Atlas:
     def InitAppUser(self, hwid: str):  # Must be authenticated (See docs)
         socket = self.socket
         try:
-            RegisterPayload = CEADecrypt(self.app_token).CEA256(
-                self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=1;HWID={hwid};")))
+            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=1;HWID={hwid};")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -138,8 +135,7 @@ class Atlas:
     def DropAppUser(self):  # Must be authenticated (See docs)
         socket = self.socket
         try:
-            RegisterPayload = CEADecrypt(self.app_token).CEA256(
-                self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=2;")))
+            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=2;")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -160,8 +156,7 @@ class Atlas:
     def RedeemEntitlement(self, LicenseKey: str, applicationSKU: str):
         socket = self.socket
         try:
-            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(
-                f"OpCode=5;AppOpCode=3;SLK={LicenseKey};SKU={applicationSKU};")))
+            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=3;SLK={LicenseKey};SKU={applicationSKU};")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -182,8 +177,7 @@ class Atlas:
     def ValidateEntitlement(self, applicationSKU: str):
         socket = self.socket
         try:
-            RegisterPayload = CEADecrypt(self.app_token).CEA256(
-                self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=4;SKU={applicationSKU};")))
+            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=4;SKU={applicationSKU};")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -209,8 +203,7 @@ class Atlas:
     def SetUserHWID(self, hwid: str):  # Must be authenticated (See docs)
         socket = self.socket
         try:
-            RegisterPayload = CEADecrypt(self.app_token).CEA256(
-                self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=5;HWID={hwid};")))
+            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=5;HWID={hwid};")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -230,8 +223,7 @@ class Atlas:
     def ValidateUserHWID(self, hwid: str):  # Must be authenticated (See docs)
         socket = self.socket
         try:
-            RegisterPayload = CEADecrypt(self.app_token).CEA256(
-                self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=6;HWID={hwid};")))
+            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=6;HWID={hwid};")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -254,8 +246,7 @@ class Atlas:
     def GetAppUserRole(self):  # Must be authenticated (See docs)
         socket = self.socket
         try:
-            RegisterPayload = CEADecrypt(self.app_token).CEA256(
-                self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=7;")))
+            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=7;")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":
@@ -271,8 +262,7 @@ class Atlas:
     def CheckLicenseKeyValidity(self, LicenseKey: str):
         socket = self.socket
         try:
-            RegisterPayload = CEADecrypt(self.app_token).CEA256(
-                self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=8;SLK={LicenseKey};")))
+            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=8;SLK={LicenseKey};")))
             responseCode = RegisterPayload.split(";")[0].split("=")[1]
             responseResult = RegisterPayload.split(";")[1].split("=")[1]
             if responseCode == "8":

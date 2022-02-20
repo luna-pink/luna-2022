@@ -20,9 +20,9 @@ class luna:
         if FileHandler("Updater.exe").check_file_exists():
             os.remove('Updater.exe')
         if not version == version_url and not developer_mode:
-            if files.json("Luna/notifications/toasts.json", "login", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
+            if JsonHandler("toasts.json", "data/notifications").read_value("login") == "on" and JsonHandler("toasts.json", "data/notifications").read_value("toasts") == "on":
                 notify.toast(message=f"Starting update {version_url}")
-            if files.json("Luna/webhooks/webhooks.json", "login", documents=True) == "on" and files.json("Luna/webhooks/webhooks.json", "webhooks", documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
+            if JsonHandler("webhooks.json", "data/webhooks").read_value("login") == "on" and JsonHandler("webhooks.json", "data/webhooks").read_value("webhooks") == "on" and not webhook.login_url() == "webhook-url-here":
                 notify.webhook(url=webhook.login_url(), name="login", description=f"Starting update {version_url}")
             luna.update()
         else:
@@ -135,6 +135,13 @@ class luna:
             luna.authentication()
         username = prints.input("Username")
         password = prints.password("Password")
+        cpassword = prints.password("Confirm Password")
+        if not password == cpassword:
+            prints.error("Passwords do not match!")
+            time.sleep(5)
+            prints.event("Redirecting to the main menu in 5 seconds")
+            time.sleep(5)
+            luna.authentication()
         key = prints.input("Key")
         try:
             if not developer_mode:
