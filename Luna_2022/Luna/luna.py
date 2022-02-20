@@ -1,8 +1,5 @@
-import subprocess
 from variables import *
 from Functions.functions import *
-import os
-import time
 from Functions.prints import *
 from Functions.notifications import *
 from Security.authentication import *
