@@ -17,7 +17,7 @@ class luna:
         The main Luna authentication function
         """
         luna.console(clear=True)
-        if files.file_exist('Updater.exe'):
+        if FileHandler("Updater.exe").check_file_exists():
             os.remove('Updater.exe')
         if not version == version_url and not developer_mode:
             if files.json("Luna/notifications/toasts.json", "login", documents=True) == "on" and files.json("Luna/notifications/toasts.json", "toasts", documents=True) == "on":
@@ -26,7 +26,7 @@ class luna:
                 notify.webhook(url=webhook.login_url(), name="login", description=f"Starting update {version_url}")
             luna.update()
         else:
-            if files.file_exist('Luna/auth.json', documents=True):
+            if FileHandler("auth.json", "data").check_file_exists():
                 luna.login(exists=True)
             elif developer_mode:
                 luna.login(exists=True)
@@ -34,8 +34,7 @@ class luna:
                 prints.message("1 = Log into an existing Luna account")
                 prints.message("2 = Register a new Luna account")
                 prints.message("If you forgot your password, open a ticket\n")
-                print(
-                    f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+                print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
                 choice = prints.input("Choice")
                 if choice == "1":
                     luna.login()
@@ -54,7 +53,7 @@ class luna:
             hwid = str(subprocess.check_output('wmic csproduct get uuid')).split(
                 '\\r\\n')[1].strip('\\r').strip()
         except:
-            files.remove('Luna/auth.json', documents=True)
+            FileHandler("auth.json", "data").remove_file()
             prints.error("There has been an issue with authenticating your hardware")
             time.sleep(5)
             prints.event("Redirecting to the main menu in 5 seconds")
@@ -64,12 +63,12 @@ class luna:
             luna.console(clear=True)
             if not developer_mode:
                 try:
-                    username = files.json("Luna/auth.json", "username", documents=True)
-                    password = files.json("Luna/auth.json", "password", documents=True)
+                    username = JsonHandler("auth.json", "data").read_value("username")
+                    password = JsonHandler("auth.json", "data").read_value("password")
                     username = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
                     password = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
                 except:
-                    files.remove('Luna/auth.json', documents=True)
+                    FileHandler("auth.json", "data").remove_file()
                     prints.error("There has been an issue with your login")
                     time.sleep(5)
                     prints.event("Redirecting to the main menu in 5 seconds")
@@ -87,7 +86,7 @@ class luna:
                 luna.wizard()
             except Exception as e:
                 prints.error(e)
-                files.remove('Luna/auth.json', documents=True)
+                FileHandler("auth.json", "data").remove_file()
                 time.sleep(5)
                 prints.event("Redirecting to the main menu in 5 seconds")
                 time.sleep(5)
@@ -111,10 +110,10 @@ class luna:
                         "username": f"{username}",
                         "password": f"{password}"
                     }
-                    files.write_json("Luna/auth.json", data, documents=True)
+                    JsonHandler("auth.json", "data").write_file(data)
                 except Exception as e:
                     prints.error(e)
-                    files.remove('Luna/auth.json', documents=True)
+                    FileHandler("auth.json", "data").remove_file()
                     time.sleep(5)
                     prints.event("Redirecting to the main menu in 5 seconds")
                     time.sleep(5)
@@ -159,7 +158,7 @@ class luna:
                     "username": f"{username}",
                     "password": f"{password}"
                 }
-                files.write_json("Luna/auth.json", data, documents=True)
+                JsonHandler("auth.json", "data").write_file(data)
             luna.login(exists=True)
         except Exception as e:
             prints.error(e)
@@ -210,22 +209,22 @@ class luna:
         if clear:
             os.system("cls")
         try:
-            logo_variable = files.json("Luna/console/console.json", "logo", documents=True)
+            logo_variable = JsonHandler("console.json", "data/console").read_value("logo")
             if logo_variable == "luna" or logo_variable == "luna.txt":
                 logo_variable = logo
             else:
                 ending = ".txt"
                 if ".txt" in logo_variable:
                     ending = ""
-                if not files.file_exist(f"Luna/console/{logo_variable}{ending}", documents=True):
+                if not FileHandler(logo_variable + ending, "data/console").check_file_exists():
                     logo_variable = logo
-                if files.json("Luna/console/console.json", "center", documents=True) == True:
+                if JsonHandler("console.json", "data/console").read_value("center") == True:
                     logo_text = ""
-                    for line in files.read_file(f"Luna/console/{logo_variable}{ending}", documents=True).splitlines():
+                    for line in FileHandler(logo_variable + ending, "data/console").read_file().splitlines():
                         logo_text += line.center(os.get_terminal_size().columns) + "\n"
                         logo_variable = logo_text
                 else:
-                    logo_variable = files.read_file(f"Luna/console/{logo_variable}{ending}", documents=True)
+                    logo_variable = FileHandler(logo_variable + ending, "data/console")
         except Exception as e:
             prints.error(e)
             prints.message("Running a file check in 5 seconds")

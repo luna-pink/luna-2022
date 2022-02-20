@@ -80,14 +80,14 @@ class JsonHandler:
         with open(self.file_path_name, "w", encoding="utf-8") as file:
             json.dump(data, file, indent=4)
 
-    def write_new_file(self, data: dict):
+    def write_file(self, data: dict):
         """
         Write a new Json file.
 
         Args:
             data: The data to write.
         """
-        with open(self.file_path_name, "w") as file:
+        with open(self.file_path_name, "w", encoding="utf-8") as file:
             json.dump(data, file, indent=4)
 
     def delete_value(self, key: str):

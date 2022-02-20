@@ -1406,8 +1406,7 @@ def restart_program():
     if files.json("Luna/webhooks/webhooks.json", "login", documents=True) == "on" and files.json(
             "Luna/webhooks/webhooks.json", "webhooks",
             documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
-        notify.webhook(url=webhook.login_url(), name="login",
-                       description=f"Restarting Luna...")
+        notify.webhook(url=webhook.login_url(), name="login", description=f"Restarting Luna...")
     python = sys.executable
     os.execl(python, python, *sys.argv)
 
@@ -3340,8 +3339,7 @@ class theme:
             if image_url == "$avatar":
                 image_url = bot.user.avatar_url
         else:
-            image_url = files.json(
-                f"Luna/themes/{theme}", "image_url", documents=True)
+            image_url = files.json(f"Luna/themes/{theme}", "image_url", documents=True)
             if image_url == None:
                 image_url = ""
             elif image_url == "$avatar":
@@ -3396,8 +3394,7 @@ class theme:
         if theme == "default":
             author = author_request
         else:
-            author = files.json(
-                f"Luna/themes/{theme}", "author", documents=True)
+            author = files.json(f"Luna/themes/{theme}", "author", documents=True)
             if author == None:
                 author = ""
         return str(author)
@@ -3464,16 +3461,14 @@ class webhook:
 
     def footer():
         """Get the title in the config file"""
-        footer = files.json("Luna/webhooks/webhook.json",
-                            "footer", documents=True)
+        footer = files.json("Luna/webhooks/webhook.json", "footer", documents=True)
         if footer == None:
             footer = ""
         return str(footer)
 
     def image_url():
         """Get the image url in the config file"""
-        image_url = files.json("Luna/webhooks/webhook.json",
-                               "image_url", documents=True)
+        image_url = files.json("Luna/webhooks/webhook.json", "image_url", documents=True)
         if image_url == None:
             image_url = ""
         elif image_url == "$avatar":
@@ -3496,74 +3491,62 @@ class webhook:
 
     def login_url():
         """Get the login webhook url in the config file"""
-        login_url = files.json("Luna/webhooks/url.json",
-                               "login", documents=True)
+        login_url = files.json("Luna/webhooks/url.json", "login", documents=True)
         return str(login_url)
 
     def nitro_url():
         """Get the nitro webhook url in the config file"""
-        nitro_url = files.json("Luna/webhooks/url.json",
-                               "nitro", documents=True)
+        nitro_url = files.json("Luna/webhooks/url.json", "nitro", documents=True)
         return str(nitro_url)
 
     def giveaway_url():
         """Get the giveaway webhook url in the config file"""
-        giveaway_url = files.json(
-            "Luna/webhooks/url.json", "giveaway", documents=True)
+        giveaway_url = files.json("Luna/webhooks/url.json", "giveaway", documents=True)
         return str(giveaway_url)
 
     def privnote_url():
         """Get the privnote webhook url in the config file"""
-        privnote_url = files.json(
-            "Luna/webhooks/url.json", "privnote", documents=True)
+        privnote_url = files.json("Luna/webhooks/url.json", "privnote", documents=True)
         return str(privnote_url)
 
     def selfbot_url():
         """Get the selfbot webhook url in the config file"""
-        selfbot_url = files.json(
-            "Luna/webhooks/url.json", "selfbot", documents=True)
+        selfbot_url = files.json("Luna/webhooks/url.json", "selfbot", documents=True)
         return str(selfbot_url)
 
     def pings_url():
         """Get the pings webhook url in the config file"""
-        pings_url = files.json("Luna/webhooks/url.json",
-                               "pings", documents=True)
+        pings_url = files.json("Luna/webhooks/url.json", "pings", documents=True)
         return str(pings_url)
 
     def ghostpings_url():
         """Get the ghostpings webhook url in the config file"""
-        ghostpings_url = files.json(
-            "Luna/webhooks/url.json", "ghostpings", documents=True)
+        ghostpings_url = files.json("Luna/webhooks/url.json", "ghostpings", documents=True)
         return str(ghostpings_url)
 
     def friendevents_url():
         """Get the friendevents webhook url in the config file"""
-        friendevents_url = files.json(
-            "Luna/webhooks/url.json", "friendevents", documents=True)
+        friendevents_url = files.json("Luna/webhooks/url.json", "friendevents", documents=True)
         return str(friendevents_url)
 
     def guildevents_url():
         """Get the guildevents webhook url in the config file"""
-        guildevents_url = files.json(
-            "Luna/webhooks/url.json", "guildevents", documents=True)
+        guildevents_url = files.json("Luna/webhooks/url.json", "guildevents", documents=True)
         return str(guildevents_url)
 
     def roleupdates_url():
         """Get the roleupdates webhook url in the config file"""
-        roleupdates_url = files.json(
-            "Luna/webhooks/url.json", "roleupdates", documents=True)
+        roleupdates_url = files.json("Luna/webhooks/url.json", "roleupdates", documents=True)
         return str(roleupdates_url)
 
     def nickupdates_url():
         """Get the nickupdates webhook url in the config file"""
-        nickupdates_url = files.json(
-            "Luna/webhooks/url.json", "nickupdates", documents=True)
+        nickupdates_url = files.json("Luna/webhooks/url.json", "nickupdates", documents=True)
         return str(nickupdates_url)
 
     def protections_url():
         """Get the protections webhook url in the config file"""
-        protections_url = files.json(
-            "Luna/webhooks/url.json", "protections", documents=True)
+        protections_url = files.json("Luna/webhooks/url.json", "protections", documents=True)
         return str(protections_url)
 
 
