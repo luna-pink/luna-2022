@@ -1391,8 +1391,8 @@ logo = f"""  *                        o              +                 *        
 
 def clear():
     """
-        Clears the screen.
-        """
+    Clears the screen.
+    """
     os.system('cls')
 
 

@@ -294,3 +294,6 @@ class Atlas:
 
 
 auth_luna = Atlas("auth.project-atlas.xyz", 6969,  "02621487807712432558", "Pde67VDTmJXGCpKZLPHijiPFhZUTHcMF")
+
+class Auth:
+    

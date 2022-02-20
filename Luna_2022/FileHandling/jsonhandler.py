@@ -36,7 +36,7 @@ class JsonHandler:
         self.file_name = file_name
         self.file_path_name = os.path.join(self.file_path, self.file_name)
         if not os.path.exists(self.file_path_name):
-            with open(self.file_path_name, "w+") as file:
+            with open(self.file_path_name, "w+", encoding="utf-8") as file:
                 file.write("{}")
 
     def read_value(self, key: str) -> str:
@@ -52,7 +52,7 @@ class JsonHandler:
         Raises:
             KeyError: If the key is not in the Json file.
         """
-        with open(self.file_path_name, "r") as file:
+        with open(self.file_path_name, "r", encoding="utf-8") as file:
             data = json.load(file)
         try:
             return data[key]
@@ -67,10 +67,10 @@ class JsonHandler:
             key: The key of the value to write.
             value: The value to write.
         """
-        with open(self.file_path_name, "r") as file:
+        with open(self.file_path_name, "r", encoding="utf-8") as file:
             data = json.load(file)
         data[key] = value
-        with open(self.file_path_name, "w") as file:
+        with open(self.file_path_name, "w", encoding="utf-8") as file:
             json.dump(data, file, indent=4)
 
     def write_new_file(self, data: dict):
@@ -90,10 +90,10 @@ class JsonHandler:
         Args:
             key: The key of the value to delete.
         """
-        with open(self.file_path_name, "r") as file:
+        with open(self.file_path_name, "r", encoding="utf-8") as file:
             data = json.load(file)
         del data[key]
-        with open(self.file_path_name, "w") as file:
+        with open(self.file_path_name, "w", encoding="utf-8") as file:
             json.dump(data, file, indent=4)
 
 # /////////////////////////////////////////////////////////////////////////////
