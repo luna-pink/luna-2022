@@ -6,6 +6,8 @@ from Security.authentication import *
 from FileHandling.jsonhandler import *
 from FileHandling.filehandler import *
 from CEA256 import *
+import subprocess
+import time
 
 class luna:
 
