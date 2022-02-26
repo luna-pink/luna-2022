@@ -1,5 +1,5 @@
 import socket
-from cea256 import *
+from Security.cea256 import *
 
 class CustomError(Exception):
     pass

@@ -1965,7 +1965,7 @@ class luna:
         if not files.file_exist("Luna/notes", documents=True):
             files.create_folder("Luna/notes", documents=True)
 
-        if not files.file_exist("Luna/emojis", documents=True):1
+        if not files.file_exist("Luna/emojis", documents=True):
             files.create_folder("Luna/emojis", documents=True)
 
         if not files.file_exist("Luna/privnote", documents=True):

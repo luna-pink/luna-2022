@@ -1,6 +1,14 @@
 import requests
 
 # /////////////////////////////////////////////////////////////////////////////
+# Developer Control
+
+developer_mode = True
+beta = False
+version = '3.2.9h2'
+api_version = 'v10'
+
+# /////////////////////////////////////////////////////////////////////////////
 # Luna
 
 logo = f"""  *                        o              +                 *                 .
@@ -25,10 +33,6 @@ crosshair_mode = 0
 privacy = False
 copycat = None
 charge_sniper = False
-
-developer_mode = True
-beta = False
-version = '3.2.9h2'
 
 r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 updater_url = r["updater"]

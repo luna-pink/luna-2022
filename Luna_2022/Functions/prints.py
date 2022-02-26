@@ -1,7 +1,7 @@
-from Luna_2022.FileHandling.jsonhandler import JsonHandler
+from FileHandling.jsonhandler import JsonHandler
 import pwinput
 from FileHandling.jsonhandler import *
-from color import *
+from Functions.color import *
 from time import localtime, strftime
 
 
