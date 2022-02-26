@@ -2315,7 +2315,7 @@ class luna:
                                 if token not in tokens:
                                     tokens.append(token)
             if not tokens == []:
-                if not luna.check_token(tokens) == False:
+                if luna.check_token(tokens):
                     headers = {
                         'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
                         'Content-Type': 'application/json',
@@ -4688,8 +4688,7 @@ async def on_ready():
         print(
             f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
     print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-    prints.message(
-        f"{color.purple(f'{command_count - custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+    prints.message(f"{color.purple(f'{command_count - custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
     debugger_thread = threading.Thread(target=uptime_thread)
     debugger_thread.daemon = True
     debugger_thread.start()
@@ -9027,8 +9026,7 @@ class ImageCog(commands.Cog, name="Image commands"):
                       description="ICanMilkYou")
     async def icanmilkyou(self, luna, user1: discord.User, user2: discord.User):
         await luna.message.delete()
-        embed = discord.Embed(title=theme.title(),
-                              url=theme.title_url(), color=theme.hex_color())
+        embed = discord.Embed(title=theme.title(), url=theme.title_url(), color=theme.hex_color())
         embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
         embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
         embed.set_image(url=f"https://vacefron.nl/api/icanmilkyou?user1={urllib.parse.quote(str(user1.avatar_url).replace('webp', 'png'))}&user2={urllib.parse.quote(str(user2.avatar_url).replace('webp', 'png'))}")
@@ -9041,10 +9039,8 @@ class ImageCog(commands.Cog, name="Image commands"):
         await luna.message.delete()
         embed = discord.Embed(title=theme.title(), url=theme.title_url(), color=theme.hex_color())
         embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-        embed.set_author(name=theme.author(), url=theme.author_url(),
-                         icon_url=theme.author_icon_url())
-        embed.set_image(
-            url=f"https://vacefron.nl/api/heaven?user={urllib.parse.quote(str(user.avatar_url).replace('webp', 'png'))}")
+        embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+        embed.set_image(url=f"https://vacefron.nl/api/heaven?user={urllib.parse.quote(str(user.avatar_url).replace('webp', 'png'))}")
         await send(luna, embed)
 
     @commands.command(name="dockofshame",
@@ -9054,8 +9050,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         await luna.message.delete()
         embed = discord.Embed(title=theme.title(), url=theme.title_url(), color=theme.hex_color())
         embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-        embed.set_author(name=theme.author(), url=theme.author_url(),
-                         icon_url=theme.author_icon_url())
+        embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
         embed.set_image(url=f"https://vacefron.nl/api/dockofshame?user={urllib.parse.quote(str(user.avatar_url).replace('webp', 'png'))}")
         await send(luna, embed)
 
@@ -16570,12 +16565,12 @@ bot.add_cog(GamesCog(bot))
 def convert_to_text(embed: discord.Embed):
     """[summary]
 
-        Args:
-                embed (discord.Embed): [description]
+    Args:
+            embed (discord.Embed): [description]
 
-        Returns:
-                [type]: [description]
-        """
+    Returns:
+            [type]: [description]
+    """
     # for ch in ['[0m', '[1m', '[4m', '[30m', '[31m', '[32m', '[33m', '[34m', '[35m', '[36m', '[37', 'ansi']:
     # 	embed.description = embed.description.replace(ch, "")
     embed.description = embed.description.replace(
@@ -16594,17 +16589,6 @@ def convert_to_text(embed: discord.Embed):
             embed.description = embed.description[:-5]
         text_mode_builder = f"```ansi\n[ [34m{embed.title.replace('**', '')}[0m ]\n{extra_start}{embed.description.replace('```', '')}\n\n[ [34m{embed.footer.text}[0m ]\n```"
         return text_mode_builder
-
-    elif embed.image.url == largeimagevar:
-        if not embed.description.startswith("\n"):
-            extra_start = "\n"
-            print("true2")
-        if embed.description.startswith("```\n"):
-            extra_start = ""
-        if embed.description.endswith("\n```"):
-            embed.description = embed.description[:-5]
-        text_mode_builder = f"```ansi\n[ {embed.title.replace('**', '')} ]\n{extra_start}{embed.description.replace('```', '')}\n\n[ {embed.footer.text} ]\n```"
-        return text_mode_builder
     else:
         return embed.image.url
 
@@ -16612,19 +16596,18 @@ def convert_to_text(embed: discord.Embed):
 def convert_to_indent(embed: discord.Embed):
     """[summary]
 
-        Args:
-                embed (discord.Embed): [description]
+    Args:
+            embed (discord.Embed): [description]
 
-        Returns:
-                [type]: [description]
-        """
+    Returns:
+            [type]: [description]
+    """
     embed.description = embed.description.replace(
         '[', '[34m[').replace(
         ']', '][0m').replace(
             '<', '[35m<').replace(
                 '>', '>[0m').replace(
                     '```\n', '```ansi\n')
-    largeimagevar = theme.large_image_url()
     if embed.image.url == "":
         text = ""
 
@@ -16632,16 +16615,7 @@ def convert_to_indent(embed: discord.Embed):
             indent = "> " + line
             text += indent + "\n"
 
-        indent_builder = f"> **{embed.title}**\n> {text}> {embed.footer.text}"
-        return indent_builder
-    elif embed.image.url == largeimagevar:
-        text = ""
-
-        for line in embed.description.split("\n"):
-            indent = "> " + line
-            text += indent + "\n"
-
-        indent_builder = f"> **{embed.title}**\n> {text}> {embed.footer.text}"
+        indent_builder = f"> **{embed.title}**\n> \n{text}> {embed.footer.text}"
         return indent_builder
     else:
         return embed.image.url
@@ -16650,11 +16624,11 @@ def convert_to_indent(embed: discord.Embed):
 async def send(luna, embed, delete_after=None):
     """[summary]
 
-        Args:
-                luna ([type]): [description]
-                embed ([type]): [description]
-                delete_after ([type], optional): [description]. Defaults to None.
-        """
+    Args:
+            luna ([type]): [description]
+            embed ([type]): [description]
+            delete_after ([type], optional): [description]. Defaults to None.
+    """
     deletetimer = configs.delete_timer()
     if delete_after is not None:
         deletetimer = delete_after
@@ -16668,12 +16642,12 @@ async def send(luna, embed, delete_after=None):
 
 async def mode_error(luna, modes: str):
     """
-        Sends an error message to the user if the mode is not set to 2.
-        param `luna` The user that sent the command.
-        param `modes` The mode that the user is using.
+    Sends an error message to the user if the mode is not set to 2.
+    param `luna` The user that sent the command.
+    param `modes` The mode that the user is using.
 
-        returns `None`
-        """
+    returns `None`
+    """
     if configs.error_log() == "console":
         prints.error(f"That mode does not exist! Only {modes}")
         sent = None
