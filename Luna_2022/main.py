@@ -16668,28 +16668,28 @@ async def mode_error(luna, modes: str):
 async def message_builder(luna, title=None, description="", color=None, large_image=None, thumbnail=None,
                           delete_after=None, footer_extra=None, footer=None):
     """
-        Luna's main function for creating messages with the theme applied.\n
-        Parse `luna/ctx` as first argument. (Important)\n
-        `title="foo"` <- Defines the title. (Optional)\n
-        `description="foo"` <- Defines the description. (Optional)\n
-        `color=0xffffff` <- Defines the hexcolor. (Optional)\n
-        `large_image="url"` <- Defines the large image url. (Optional)\n
-        `thumbnail="url"` <- Defines the thumbnail url. (Optional)\n
-        `delete_after=30` <- Defines the auto delete time after the embed is sent. (Optional)\n
-        `footer_extra="foo"` <- Defines the footer extra. (Optional)\n
-        `footer="foo"` <- Defines the footer. (Optional)\n
+    Luna's main function for creating messages with the theme applied.\n
+    Parse `luna/ctx` as first argument. (Important)\n
+    `title="foo"` <- Defines the title. (Optional)\n
+    `description="foo"` <- Defines the description. (Optional)\n
+    `color=0xffffff` <- Defines the hexcolor. (Optional)\n
+    `large_image="url"` <- Defines the large image url. (Optional)\n
+    `thumbnail="url"` <- Defines the thumbnail url. (Optional)\n
+    `delete_after=30` <- Defines the auto delete time after the embed is sent. (Optional)\n
+    `footer_extra="foo"` <- Defines the footer extra. (Optional)\n
+    `footer="foo"` <- Defines the footer. (Optional)\n
 
-        param `luna` The user that sent the command.
-        param `title` The title of the embed.
-        param `description` The description of the embed.
-        param `color` The hexcolor of the embed.
-        param `large_image` The large image url of the embed.
-        param `thumbnail` The thumbnail url of the embed.
-        param `delete_after` The auto delete time after the embed is sent.
-        param `footer_extra` The footer extra of the embed.
-        param `footer` The footer of the embed.
-        returns `The message that was sent.`
-        """
+    param `luna` The user that sent the command.
+    param `title` The title of the embed.
+    param `description` The description of the embed.
+    param `color` The hexcolor of the embed.
+    param `large_image` The large image url of the embed.
+    param `thumbnail` The thumbnail url of the embed.
+    param `delete_after` The auto delete time after the embed is sent.
+    param `footer_extra` The footer extra of the embed.
+    param `footer` The footer of the embed.
+    returns `The message that was sent.`
+    """
     if large_image is None:
         large_image = theme.large_image_url()
     if color is None:
@@ -16719,12 +16719,10 @@ async def message_builder(luna, title=None, description="", color=None, large_im
                 footer_extra = f"{footer_extra} | {theme.footer()}"
     else:
         footer_extra = ""
-    embed = discord.Embed(title=title, url=theme.title_url(),
-                          description=description, color=color)
+    embed = discord.Embed(title=title, url=theme.title_url(), description=description, color=color)
     embed.set_thumbnail(url=thumbnail)
     embed.set_footer(text=footer_extra, icon_url=theme.footer_icon_url())
-    embed.set_author(name=theme.author(), url=theme.author_url(),
-                     icon_url=theme.author_icon_url())
+    embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
     embed.set_image(url=large_image)
     sent = await send(luna, embed, delete_after)
     return sent
@@ -16733,10 +16731,10 @@ async def message_builder(luna, title=None, description="", color=None, large_im
 async def error_builder(luna, description=""):
     """[summary]
 
-        Args:
-                luna ([type]): [description]
-                description (str, optional): [description]. Defaults to "".
-        """
+    Args:
+            luna ([type]): [description]
+            description (str, optional): [description]. Defaults to "".
+    """
     if configs.error_log() == "console":
         prints.error(description.replace('\n', ' ').replace('`', ''))
         sent = None
@@ -16801,99 +16799,3 @@ luna.authentication()
 luna.wizard()
 
 # ///////////////////////////////////////////////////////////////
-
-# import os
-# from pynput.keyboard import Key, Listener
-# from win32gui import GetWindowText, GetForegroundWindow
-# current_window = (GetWindowText(GetForegroundWindow()))
-# os.system("title Luna V3")
-# os.system("color") #137,142,255
-# items = {0: "", 1: "", 2:""}
-# index = 0
-# Clear = lambda: os.system("cls")
-
-# def Colour(hex, data):
-#     if hex == "898eff":
-#         return (f"\033[38;2;137;142;255m{data}")
-#     else:
-#         return (f"\033[38;2;255;255;255m{data}")
-#     pass
-
-# clear()
-
-# def Menu():
-#     match index:
-#         case 0:
-#             print(color.purple_blue("""  *                        o              +                 *                 .
-#        O                     .              .                      .                   *
-#                .                ██╗     ██╗   ██╗███╗  ██╗ █████╗    .-.,='``'=. +            |
-#  .                     *        ██║     ██║   ██║████╗ ██║██╔══██╗   `=/_                 - o -
-#                                 ██║     ██║   ██║██╔██╗██║███████║    |  '=._    |      .     |
-#             |              +    ██║     ██║   ██║██║╚████║██╔══██║  *      `=./`,
-#     *     - o -                 ███████╗╚██████╔╝██║ ╚███║██║  ██║      `=.__.=` `=`             O
-#             |        .          ╚══════╝ ╚═════╝ ╚═╝  ╚══╝╚═╝  ╚═╝             *
-#                               .                      o                    .                  +"""))
-
-
-#             print(Colour("", "                                    >>  ") + color.purple("Log into an account") + Colour("", "  <<") +Colour("", "\n                                    Register an account on Luna") + Colour("", "\n                                      Join our discord server") + Colour("", "\n                                               Exit"))
-#         case 1:
-#             print(color.purple_blue("""  *                        o              +                 *                 .
-#        O                     .              .                      .                   *
-#                .                ██╗     ██╗   ██╗███╗  ██╗ █████╗    .-.,='``'=. +            |
-#  .                     *        ██║     ██║   ██║████╗ ██║██╔══██╗   `=/_                 - o -
-#                                 ██║     ██║   ██║██╔██╗██║███████║    |  '=._    |      .     |
-#             |              +    ██║     ██║   ██║██║╚████║██╔══██║  *      `=./`,
-#     *     - o -                 ███████╗╚██████╔╝██║ ╚███║██║  ██║      `=.__.=` `=`             O
-#             |        .          ╚══════╝ ╚═════╝ ╚═╝  ╚══╝╚═╝  ╚═╝             *
-#                               .                      o                    .                  +"""))
-
-
-#             print(Colour("", "                                        Log into an account") + Colour("", "\n                                >>  ") + color.purple("Register an account on Luna") + Colour("", "  <<") + Colour("", "\n                                      Join our discord server") + Colour("", "\n                                               Exit"))
-#             pass
-#         case 2:
-#             print(color.purple_blue("""  *                        o              +                 *                 .
-#        O                     .              .                      .                   *
-#                .                ██╗     ██╗   ██╗███╗  ██╗ █████╗    .-.,='``'=. +            |
-#  .                     *        ██║     ██║   ██║████╗ ██║██╔══██╗   `=/_                 - o -
-#                                 ██║     ██║   ██║██╔██╗██║███████║    |  '=._    |      .     |
-#             |              +    ██║     ██║   ██║██║╚████║██╔══██║  *      `=./`,
-#     *     - o -                 ███████╗╚██████╔╝██║ ╚███║██║  ██║      `=.__.=` `=`             O
-#             |        .          ╚══════╝ ╚═════╝ ╚═╝  ╚══╝╚═╝  ╚═╝             *
-#                               .                      o                    .                  +"""))
-
-
-#             print(Colour("", "                                        Log into an account") +Colour("", "\n                                    Register an account on Luna") + Colour("", "\n                                  >>  ") + color.purple("Join our discord server") + Colour("", "  <<") + Colour("", "\n                                               Exit"))
-#             pass
-#         case 3:
-#             print(color.purple_blue("""  *                        o              +                 *                 .
-#        O                     .              .                      .                   *
-#                .                ██╗     ██╗   ██╗███╗  ██╗ █████╗    .-.,='``'=. +            |
-#  .                     *        ██║     ██║   ██║████╗ ██║██╔══██╗   `=/_                 - o -
-#                                 ██║     ██║   ██║██╔██╗██║███████║    |  '=._    |      .     |
-#             |              +    ██║     ██║   ██║██║╚████║██╔══██║  *      `=./`,
-#     *     - o -                 ███████╗╚██████╔╝██║ ╚███║██║  ██║      `=.__.=` `=`             O
-#             |        .          ╚══════╝ ╚═════╝ ╚═╝  ╚══╝╚═╝  ╚═╝             *
-#                               .                      o                    .                  +"""))
-
-
-#             print(Colour("", "                                        Log into an account") +Colour("", "\n                                    Register an account on Luna") + Colour("", "\n                                      Join our discord server") + Colour("", "\n                                           >>  ") + color.purple("Exit") + Colour("", "  <<"))
-#             pass
-#     pass
-
-# def on_press(key):
-#     pass
-
-# def on_release(key):
-#     global index
-#     if key == Key.up and index > 0:
-#         index -= 1
-#         Clear()
-#         Menu()
-#     elif key == Key.down and index < 3:
-#         index += 1
-#         Clear()
-#         Menu()
-# Menu()
-# while True:
-#     with Listener(on_press=on_press, on_release=on_release) as listener:
-#         listener.join()
