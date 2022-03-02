@@ -1,0 +1,13 @@
+playsound
+requests
+pyPrivnote
+httpx
+dhooks
+gtts
+tqdm
+win10toast
+pypresence
+pwinput
+psutil
+notify-py
+clint
