@@ -1140,7 +1140,7 @@ class Atlas:
             raise CustomError("{}".format(e))
 
 
-auth_luna = Atlas("auth.project-atlas.xyz", 6969,
+auth_luna = Atlas("nshout.ddns.net", 9696,
                   "02621487807712432558", "Pde67VDTmJXGCpKZLPHijiPFhZUTHcMF")
 
 
