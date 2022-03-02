@@ -48,199 +48,7 @@ from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFou
 # ///////////////////////////////////////////////////////////////
 # Special Imports
 
-from FileHandling.filehandler import *
-from FileHandling.jsonhandler import *
-from Security.cea256 import *
-from Security.authentication import *
 from variables import *
-from Functions.color import *
-from Functions.threads import *
-from Luna.luna import *
-
-# ///////////////////////////////////////////////////////////////
-# Luna Variables
-
-anti_raid = False
-anti_invite = False
-anti_upper = False
-anti_phishing = False
-
-farming = False
-
-active_protections = 0
-active_list = []
-
-phishing_list = [
-    "discordgg.",
-    "withereum.com",
-    "amazon.com/exec/obidos",
-    "csgo500.org",
-    "steamconmunity",
-    "steamcommunuty",
-    "steamconmunuty",
-    "steamcommunity.ru",
-    "crypto24cap",
-    "steamcummynutu.ru",
-    "discordgifts.one",
-    "discordgifts",
-    "disocrde.gift"
-]
-
-# ///////////////////////////////////////////////////////////////
-# Luna Protections
-
-cooldown = []
-nitro_cooldown = []
-afk_status = 0
-afk_user_id = 0
-afk_reset = 0
-user_token = ""
-whitelisted_users = {}
-crosshair_mode = 0
-privacy = False
-copycat = None
-charge_sniper = False
-
-developer_mode = True
-beta = False
-version = '3.2.9h2'
-
-r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
-updater_url = r["updater"]
-version_url = r["version"]
-
-r = requests.get(
-    "https://raw.githubusercontent.com/Nshout/Luna/main/beta.json").json()
-beta_updater_url = r["updater"]
-beta_version_url = r["version"]
-beta_user = r["beta_user"]
-
-if beta:
-    version_url = beta_version_url
-
-loader_src = """import os
-import re
-import sys
-import json
-import time
-import httpx
-import base64
-import qrcode
-import dhooks
-import string
-import socket
-import urllib
-import ctypes
-import random
-import psutil
-import typing
-import aiohttp
-import asyncio
-import discord
-import hashlib
-import pwinput
-import requests
-import threading
-import pyPrivnote
-import subprocess
-import pypresence
-import ctypes.wintypes as wintypes
-from gtts import gTTS
-from discord import *
-from ctypes import windll
-from notifypy import Notify
-from os import error, name, system
-from datetime import datetime
-from pypresence import Presence
-from discord.ext import commands
-from urllib.request import urlopen
-from urllib.parse import quote_plus
-from time import localtime, strftime
-from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFound, has_permissions
-class files:
-	def documents():
-		return os.path.expanduser("~/Documents")
-	def file_exist(file_name, documents=False):
-		if documents:
-			return os.path.exists(os.path.join(files.documents(), file_name))
-		else:
-			return os.path.exists(file_name)
-	def write_file(path, content, documents=False):
-		if documents:
-			with open(os.path.join(files.documents(), path), 'w') as f:
-				f.write(content)
-		else:
-			with open(path, 'w') as f:
-				f.write(content)
-	def write_json(path, content, documents=False):
-		if documents:
-			with open(os.path.join(files.documents(), path), "w", encoding="utf-8") as f:
-				f.write(json.dumps(content, indent=4))
-		else:
-			with open(path, "w", encoding="utf-8") as f:
-				f.write(json.dumps(content, indent=4))
-	def read_file(path, documents=False):
-		if documents:
-			with open(os.path.join(files.documents(), path), 'r', encoding="utf-8") as f:
-				return f.read()
-		else:
-			with open(path, 'r', encoding="utf-8") as f:
-				return f.read()
-	def append_file(path, content):
-		with open(path, 'a') as f:
-			f.write(content)
-	def delete_file(path, documents=False):
-		if documents:
-			os.remove(os.path.join(files.documents(), path))
-		else:
-			os.remove(path)
-	def create_folder(path, documents=False):
-		if documents:
-			if not os.path.exists(os.path.join(files.documents(), path)):
-				os.makedirs(os.path.join(files.documents(), path))
-		else:
-			if not os.path.exists(path):
-				os.makedirs(path)
-	def json(file_name, value, documents=False):
-		if documents:
-			return json.load(open(os.path.join(files.documents(), file_name), encoding="utf-8"))[value]
-		else:
-			return json.load(open(file_name, encoding="utf-8"))[value]
-	def remove(path, documents=False):
-		if documents:
-			if os.path.exists(os.path.join(files.documents(), path)):
-				os.remove(os.path.join(files.documents(), path))
-		else:
-			if os.path.exists(path):
-				os.remove(path)
-class CustomCog(commands.Cog, name="Custom commands"):
-	def __init__(self, bot:commands.bot):
-		self.bot = bot
-	try:
-		file = open(os.path.join(files.documents(), "Luna/custom/custom.py"), "r")
-		file_data = file.read()
-		if "sys.modules" in str(file_data):
-			print("Using sys.modules is not allowed.")
-			time.sleep(5)
-			exit()
-		if "inspect" and "import" in str(file_data):
-			print("Importing inspect is not allowed.")
-			time.sleep(5)
-			exit()
-		if "dill" and "import" in str(file_data):
-			print("Importing dill is not allowed.")
-			time.sleep(5)
-			exit()
-		if "exec" in str(file_data):
-			print("Using exec is not allowed.")
-			time.sleep(5)
-			exit()
-		exec(file_data)
-	except Exception as e:
-		print(e)
-		os.system('pause')
-def setup(bot:commands.Bot):
-	bot.add_cog(CustomCog(bot))"""
 
 # ///////////////////////////////////////////////////////////////
 # Window Size & Scroller
@@ -2182,13 +1990,12 @@ class luna:
                 'Content-Type': 'application/json',
                 'authorization': Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)}
             r = requests.get(
-                "https://discordapp.com/api/v9/users/@me",
+                f"https://discordapp.com/api/{api_version}/users/@me",
                 headers=headers).json()
             prints.event(
                 f"Logging into {color.purple(r['username'])}#{color.purple(r['discriminator'])}...")
             global user_token
-            user_token = Decryption(
-                '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)
+            user_token = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)
             bot.run(Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token))
         except Exception as e:
             files.remove('Luna/discord.json', documents=True)
@@ -2226,7 +2033,7 @@ class luna:
                 'Content-Type': 'application/json',
                 'authorization': token}
             r = requests.get(
-                "https://discordapp.com/api/v9/users/@me",
+                f"https://discordapp.com/api/{api_version}/users/@me",
                 headers=headers).json()
             if token.startswith("mfa"):
                 _2fa = " » 2FA Active"
@@ -2266,7 +2073,7 @@ class luna:
                     'Content-Type': 'application/json',
                     'authorization': i}
                 r = requests.get(
-                    "https://discordapp.com/api/v9/users/@me/library",
+                    f"https://discordapp.com/api/{api_version}/users/@me/library",
                     headers=headers)
                 if r.status_code == 200:
                     valid_tokens.append(i)
@@ -2277,7 +2084,7 @@ class luna:
             'Content-Type': 'application/json',
             'authorization': token}
         r = requests.get(
-            "https://discordapp.com/api/v9/users/@me/library", headers=headers)
+            f"https://discordapp.com/api/{api_version}/users/@me/library", headers=headers)
         if r.status_code == 200:
             return token
         else:
@@ -2321,7 +2128,7 @@ class luna:
                         'Content-Type': 'application/json',
                         'authorization': valid_tokens[0]}
                     r = requests.get(
-                        "https://discordapp.com/api/v9/users/@me",
+                        f"https://discordapp.com/api/{api_version}/users/@me",
                         headers=headers).json()
                     if token.startswith("mfa"):
                         _2fa = " » 2FA Active"
@@ -4564,7 +4371,7 @@ def anti_token_logger():
 # ON_READY
 
 bot = commands.Bot(
-    bot_prefix,
+    command_prefix=bot_prefix,
     self_bot=True,
     case_insensitive=True,
     guild_subscription_options=GuildSubscriptionOptions.off(),
@@ -4733,7 +4540,7 @@ class OnMessage(commands.Cog, name="on message"):
                     async with httpx.AsyncClient() as client:
                         start_time = time.time()
                         result = await client.post(
-                            f'https://discordapp.com/api/v9/entitlements/gift-codes/{code}/redeem',
+                            f'https://discordapp.com/api/{api_version}/entitlements/gift-codes/{code}/redeem',
                             json={'channel_id': message.channel.id},
                             headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
                         elapsed = '%.3fs' % (time.time() - start_time)
@@ -4793,7 +4600,7 @@ class OnMessage(commands.Cog, name="on message"):
                     async with httpx.AsyncClient() as client:
                         start_time = time.time()
                         result = await client.post(
-                            f'https://discordapp.com/api/v9/entitlements/gift-codes/{code}/redeem',
+                            f'https://discordapp.com/api/{api_version}/entitlements/gift-codes/{code}/redeem',
                             json={'channel_id': message.channel.id},
                             headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
                         elapsed = '%.3fs' % (time.time() - start_time)
@@ -4989,7 +4796,7 @@ class OnMessage(commands.Cog, name="on message"):
                                             ")", "").replace(
                                             "https://discord.gg/", "")
                                         async with httpx.AsyncClient() as client:
-                                            await client.post(f'https://discord.com/api/v9/invites/{code}', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+                                            await client.post(f'https://discord.com/api/{api_version}/invites/{code}', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
                                             joined_server = f'discord.gg/{code}'
                                             await asyncio.sleep(5)
                                 except Exception:
@@ -5120,7 +4927,7 @@ class OnMessage(commands.Cog, name="on message"):
                                     ")", "").replace(
                                     "https://discord.gg/", ""))
                             async with httpx.AsyncClient() as client:
-                                await client.post(f'https://canary.discord.com/api/v9/invites/{code}',
+                                await client.post(f'https://canary.discord.com/api/{api_version}/invites/{code}',
                                                   headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
                                 joined_server = f'discord.gg/{code}'
                                 if files.json(
@@ -6492,7 +6299,7 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         await luna.message.delete()
         payload = {'status': "online"}
         requests.patch(
-            'https://discordapp.com/api/v9/users/@me/settings',
+            'https://discordapp.com/api/{api_version}/users/@me/settings',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -6506,7 +6313,7 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         await luna.message.delete()
         payload = {'status': "idle"}
         requests.patch(
-            'https://discordapp.com/api/v9/users/@me/settings',
+            'https://discordapp.com/api/{api_version}/users/@me/settings',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -6520,7 +6327,7 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         await luna.message.delete()
         payload = {'status': "dnd"}
         requests.patch(
-            'https://discordapp.com/api/v9/users/@me/settings',
+            'https://discordapp.com/api/{api_version}/users/@me/settings',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -6534,7 +6341,7 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         await luna.message.delete()
         payload = {'status': "invisible"}
         requests.patch(
-            'https://discordapp.com/api/v9/users/@me/settings',
+            'https://discordapp.com/api/{api_version}/users/@me/settings',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -6568,7 +6375,7 @@ class StatusCog(commands.Cog, name="Animated statuses"):
         await luna.message.delete()
         payload = {'custom_status': {"text": f"{text}"}}
         requests.patch(
-            'https://discordapp.com/api/v9/users/@me/settings',
+            'https://discordapp.com/api/{api_version}/users/@me/settings',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -6582,7 +6389,7 @@ class StatusCog(commands.Cog, name="Animated statuses"):
         await luna.message.delete()
         payload = {'custom_status': {"text": ""}}
         requests.patch(
-            'https://discordapp.com/api/v9/users/@me/settings',
+            'https://discordapp.com/api/{api_version}/users/@me/settings',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -6637,7 +6444,7 @@ class ChannelCog(commands.Cog, name="Channel commands"):
             'type': 13
         }
         this = requests.post(
-            f'https://discordapp.com/api/v9/guilds/{luna.guild.id}/channels',
+            f'https://discordapp.com/api/{api_version}/guilds/{luna.guild.id}/channels',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -6656,7 +6463,7 @@ class ChannelCog(commands.Cog, name="Channel commands"):
             'type': 5
         }
         requests.post(
-            f'https://discordapp.com/api/v9/guilds/{luna.guild.id}/channels',
+            f'https://discordapp.com/api/{api_version}/guilds/{luna.guild.id}/channels',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -6793,7 +6600,7 @@ class MemberCog(commands.Cog, name="Member commands"):
         if user is None:
             user = luna.author
         r = requests.get(
-            f'https://discordapp.com/api/v9/users/{user.id}',
+            f'https://discordapp.com/api/{api_version}/users/{user.id}',
             headers={
                 'authorization': user_token,
                 'user-agent': 'Mozilla/5.0'}).json()
@@ -6844,7 +6651,7 @@ class MemberCog(commands.Cog, name="Member commands"):
             'reason': reason
         }
         requests.post(
-            'https://discordapp.com/api/v9/report',
+            'https://discordapp.com/api/{api_version}/report',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -6892,7 +6699,7 @@ class MemberCog(commands.Cog, name="Member commands"):
             'duration': time
         }
         requests.post(
-            f'https://discordapp.com/api/v9/guilds/{luna.guild.id}/bans',
+            f'https://discordapp.com/api/{api_version}/guilds/{luna.guild.id}/bans',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -10684,7 +10491,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                             '')
                         try:
                             async with httpx.AsyncClient() as client:
-                                await client.post(f'https://discord.com/api/v9/invites/{invite}',
+                                await client.post(f'https://discord.com/api/{api_version}/invites/{invite}',
                                                   headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
                                 prints.event(f"Joined {invite}")
                                 await asyncio.sleep(0.5)
@@ -10733,7 +10540,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                             '')
                         try:
                             async with httpx.AsyncClient() as client:
-                                await client.post(f'https://discord.com/api/v9/invites/{invite}',
+                                await client.post(f'https://discord.com/api/{api_version}/invites/{invite}',
                                                   headers={
                                                       'authorization': user_token, 'user-agent': 'Mozilla/5.0'},
                                                   proxies={'http://': f'http://{proxylist[p]}'})
@@ -11188,7 +10995,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
             payload = {'house_id': 3}
 
         try:
-            request.post('https://discordapp.com/api/v9/hypesquad/online',
+            request.post('https://discordapp.com/api/{api_version}/hypesquad/online',
                          headers=headers, json=payload)
             prints.message(f"Successfully set your hypesquad house to {house}")
             embed = discord.Embed(
@@ -11262,14 +11069,14 @@ class UtilsCog(commands.Cog, name="Util commands"):
         await luna.message.delete()
         try:
             guilds = requests.get(
-                'https://discordapp.com/api/v9/users/@me/guilds',
+                'https://discordapp.com/api/{api_version}/users/@me/guilds',
                 headers={
                     'authorization': user_token,
                     'user-agent': 'Mozilla/5.0'}).json()
             for guild in range(0, len(guilds)):
                 guild_id = guilds[guild]['id']
                 requests.delete(
-                    f'https://discordapp.com/api/v9/users/@me/guilds/{guild_id}',
+                    f'https://discordapp.com/api/{api_version}/users/@me/guilds/{guild_id}',
                     headers={
                         'authorization': user_token,
                         'user-agent': 'Mozilla/5.0'})
@@ -11371,7 +11178,7 @@ class SpamCog(commands.Cog, name="Spam commands"):
                         'reason': reason
                     }
                     requests.post(
-                        'https://discordapp.com/api/v9/report',
+                        'https://discordapp.com/api/{api_version}/report',
                         json=payload,
                         headers={
                             'authorization': user_token,
@@ -11919,7 +11726,7 @@ class ExploitCog(commands.Cog, name="Exploit commands"):
                 "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"}
 
             requests.patch(
-                url=f"https://discord.com/api/v9/channels/{str(channel.id)}/call",
+                url=f"https://discord.com/api/{api_version}/channels/{str(channel.id)}/call",
                 headers=headers,
                 json={
                     'region': random.choice(region)})
@@ -11952,7 +11759,7 @@ class ExploitCog(commands.Cog, name="Exploit commands"):
 
         for x in range(amount):
             requests.patch(
-                f'https://discord.com/api/v9/guilds/{str(luna.guild.id)}',
+                f'https://discord.com/api/{api_version}/guilds/{str(luna.guild.id)}',
                 headers={
                     'Authorization': user_token},
                 json={
@@ -11969,7 +11776,7 @@ class ExploitCog(commands.Cog, name="Exploit commands"):
 # 	await luna.message.delete()
 
 # 	await message_builder(luna, title="Token Disabler", description=f"```\nAttempting to disable the token...```", delete_after=3)
-# 	res = requests.patch('https://discordapp.com/api/v9/guilds', headers={'Authorization': token}, json={'name': 'Luna Disabler'})
+# 	res = requests.patch('https://discordapp.com/api/{api_version}/guilds', headers={'Authorization': token}, json={'name': 'Luna Disabler'})
 # await message_builder(luna, title="Token Disabler",
 # description=f"```\n{res}``````json\nJSON\n\n{res.json()}```")
 
@@ -11985,7 +11792,7 @@ class ExploitCog(commands.Cog, name="Exploit commands"):
 
 # 	DISABLED_MESSAGE = "You need to be 13 or older in order to use Discord."
 # 	IMMUNE_MESSAGE = "You cannot update your date of birth."
-# 	res = requests.patch('https://discordapp.com/api/v9/users/@me', headers={'Authorization': token}, json={'date_of_birth': '2017-2-11'})
+# 	res = requests.patch('https://discordapp.com/api/{api_version}/users/@me', headers={'Authorization': token}, json={'date_of_birth': '2017-2-11'})
 
 # 	if res.status_code == 400:
 # 		res_message = res.json().get('date_of_birth', ['no response message'])[0]
@@ -12124,7 +11931,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 token = line.strip("\n")
                 headers = {'Content-Type': 'application/json',
                            'authorization': token}
-                url = "https://discordapp.com/api/v6/users/@me/library"
+                url = f"https://discordapp.com/api/v6/users/@me/library"
                 request = requests.get(url, headers=headers)
                 if request.status_code == 200:
                     valid_tokens.append(token)
@@ -12176,7 +11983,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 _token = _token[0]
                 try:
                     async with httpx.AsyncClient() as client:
-                        await client.post(f'https://discord.com/api/v9/invites/{invitelink}',
+                        await client.post(f'https://discord.com/api/{api_version}/invites/{invitelink}',
                                           headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'})
                         prints.event(f"{_token} joined {invitelink}")
                 except Exception:
@@ -12208,7 +12015,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 _token = _token[0]
                 try:
                     async with httpx.AsyncClient() as client:
-                        await client.post(f'https://discord.com/api/v9/invites/{invitelink}',
+                        await client.post(f'https://discord.com/api/{api_version}/invites/{invitelink}',
                                           headers={'authorization': _token,
                                                    'user-agent': 'Mozilla/5.0'},
                                           proxies={'http://': f'http://{proxylist[p]}'})
@@ -12235,7 +12042,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 try:
                     async with httpx.AsyncClient() as client:
                         for i in range(0, amount):
-                            await client.post(f'https://discord.com/api/v9/channels/{channel_id}/messages',
+                            await client.post(f'https://discord.com/api/{api_version}/channels/{channel_id}/messages',
                                               json={
                                                   'content': f'{message}', 'tts': 'false'},
                                               headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'})
@@ -12272,7 +12079,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 try:
                     async with httpx.AsyncClient() as client:
                         for i in range(0, amount):
-                            await client.post(f'https://discord.com/api/v9/channels/{channel_id}/messages',
+                            await client.post(f'https://discord.com/api/{api_version}/channels/{channel_id}/messages',
                                               json={
                                                   'content': f'{message}', 'tts': 'false'},
                                               headers={
@@ -12315,7 +12122,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                         try:
                             async with httpx.AsyncClient() as client:
                                 for i in range(0, amount):
-                                    await client.post(f'https://discord.com/api/v9/channels/{channel_id}/messages',
+                                    await client.post(f'https://discord.com/api/{api_version}/channels/{channel_id}/messages',
                                                       json={
                                                           'content': f'{pingtext}', 'tts': 'false'},
                                                       headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'})
@@ -12368,7 +12175,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                         try:
                             async with httpx.AsyncClient() as client:
                                 for i in range(0, amount):
-                                    await client.post(f'https://discord.com/api/v9/channels/{channel_id}/messages',
+                                    await client.post(f'https://discord.com/api/{api_version}/channels/{channel_id}/messages',
                                                       json={
                                                           'content': f'{pingtext}', 'tts': 'false'},
                                                       headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'})
@@ -12405,7 +12212,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 _token = _token[0]
                 try:
                     async with httpx.AsyncClient() as client:
-                        await client.delete(f'https://discord.com/api/v9/users/@me/guilds/{server_id}',
+                        await client.delete(f'https://discord.com/api/{api_version}/users/@me/guilds/{server_id}',
                                             headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'})
                         prints.event(f"{_token} left {server_id}")
                 except Exception:
@@ -12437,7 +12244,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 _token = _token[0]
                 try:
                     async with httpx.AsyncClient() as client:
-                        await client.delete(f'https://discord.com/api/v9/users/@me/guilds/{server_id}',
+                        await client.delete(f'https://discord.com/api/{api_version}/users/@me/guilds/{server_id}',
                                             headers={'authorization': _token,
                                                      'user-agent': 'Mozilla/5.0'},
                                             proxies={'http://': f'http://{proxylist[p]}'})
@@ -12463,7 +12270,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 try:
                     async with httpx.AsyncClient() as client:
                         await client.put(
-                            f'https://discord.com/api/v9/channels/{channel_id}/messages/{message_id}/reactions/{urllib.parse.quote(emoji)}/%40me',
+                            f'https://discord.com/api/{api_version}/channels/{channel_id}/messages/{message_id}/reactions/{urllib.parse.quote(emoji)}/%40me',
                             headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'})
                         prints.event(f"{_token} reacted on {message_id}")
                 except Exception:
@@ -12495,7 +12302,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 try:
                     async with httpx.AsyncClient() as client:
                         await client.put(
-                            f'https://discord.com/api/v9/channels/{channel_id}/messages/{message_id}/reactions/{urllib.parse.quote(emoji)}/%40me',
+                            f'https://discord.com/api/{api_version}/channels/{channel_id}/messages/{message_id}/reactions/{urllib.parse.quote(emoji)}/%40me',
                             headers={'authorization': _token,
                                      'user-agent': 'Mozilla/5.0'},
                             proxies={'http://': f'http://{proxylist[p]}'})
@@ -12524,33 +12331,33 @@ class NukingCog(commands.Cog, name="Nuking commands"):
         if configs.risk_mode() == "on":
             try:
                 guilds = requests.get(
-                    'https://discordapp.com/api/v9/users/@me/guilds',
+                    'https://discordapp.com/api/{api_version}/users/@me/guilds',
                     headers={
                         'authorization': token,
                         'user-agent': 'Mozilla/5.0'}).json()
                 for guild in range(0, len(guilds)):
                     guild_id = guilds[guild]['id']
                     requests.delete(
-                        f'https://discordapp.com/api/v9/users/@me/guilds/{guild_id}',
+                        f'https://discordapp.com/api/{api_version}/users/@me/guilds/{guild_id}',
                         headers={
                             'authorization': token,
                             'user-agent': 'Mozilla/5.0'})
                 friends = requests.get(
-                    'https://discordapp.com/api/v9/users/@me/relationships',
+                    'https://discordapp.com/api/{api_version}/users/@me/relationships',
                     headers={
                         'authorization': token,
                         'user-agent': 'Mozilla/5.0'}).json()
                 for friend in range(0, len(friends)):
                     friend_id = friends[friend]['id']
                     requests.put(
-                        f'https://discordapp.com/api/v9/users/@me/relationships/{friend_id}',
+                        f'https://discordapp.com/api/{api_version}/users/@me/relationships/{friend_id}',
                         json={
                             'type': 2},
                         headers={
                             'authorization': token,
                             'user-agent': 'Mozilla/5.0'})
                     requests.delete(
-                        f'https://discordapp.com/api/v9/channels/{friend_id}',
+                        f'https://discordapp.com/api/{api_version}/channels/{friend_id}',
                         headers={
                             'authorization': token,
                             'user-agent': 'Mozilla/5.0'})
@@ -12582,7 +12389,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
             }
 
             requests.patch(
-                'https://discordapp.com/api/v9/users/@me/settings',
+                'https://discordapp.com/api/{api_version}/users/@me/settings',
                 json=payload,
                 headers={
                     'authorization': token,
@@ -12590,9 +12397,9 @@ class NukingCog(commands.Cog, name="Nuking commands"):
             try:
                 while True:
                     async with httpx.AsyncClient() as client:
-                        await client.patch('https://discordapp.com/api/v9/users/@me/settings', json={'theme': "light"},
+                        await client.patch('https://discordapp.com/api/{api_version}/users/@me/settings', json={'theme': "light"},
                                            headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
-                        await client.patch('https://discordapp.com/api/v9/users/@me/settings', json={'theme': "dark"},
+                        await client.patch('https://discordapp.com/api/{api_version}/users/@me/settings', json={'theme': "dark"},
                                            headers={'authorization': token, 'user-agent': 'Mozilla/5.0'})
             except Exception:
                 return
@@ -13794,7 +13601,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
     async def darkmode(self, luna):
         await luna.message.delete()
         requests.patch(
-            'https://discordapp.com/api/v9/users/@me/settings',
+            'https://discordapp.com/api/{api_version}/users/@me/settings',
             json={
                 'theme': "dark"},
             headers={
@@ -13808,7 +13615,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
     async def lightmode(self, luna):
         await luna.message.delete()
         requests.patch(
-            'https://discordapp.com/api/v9/users/@me/settings',
+            'https://discordapp.com/api/{api_version}/users/@me/settings',
             json={
                 'theme': "light"},
             headers={
