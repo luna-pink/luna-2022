@@ -1,6 +1,71 @@
-# -*- coding: utf-8 -*-
+import requests
 
-import os
+# ///////////////////////////////////////////////////////////////
+# Developer Variables
+
+developer_mode = False
+beta = False
+version = '3.2.9h2'
+api_version = 'v9'
+
+# ///////////////////////////////////////////////////////////////
+# Luna Variables
+
+anti_raid = False
+anti_invite = False
+anti_upper = False
+anti_phishing = False
+
+farming = False
+
+active_protections = 0
+active_list = []
+
+phishing_list = [
+    "discordgg.",
+    "withereum.com",
+    "amazon.com/exec/obidos",
+    "csgo500.org",
+    "steamconmunity",
+    "steamcommunuty",
+    "steamconmunuty",
+    "steamcommunity.ru",
+    "crypto24cap",
+    "steamcummynutu.ru",
+    "discordgifts.one",
+    "discordgifts",
+    "disocrde.gift"
+]
+
+# ///////////////////////////////////////////////////////////////
+# Luna Protections
+
+cooldown = []
+nitro_cooldown = []
+afk_status = 0
+afk_user_id = 0
+afk_reset = 0
+user_token = ""
+whitelisted_users = {}
+crosshair_mode = 0
+privacy = False
+copycat = None
+charge_sniper = False
+
+r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
+updater_url = r["updater"]
+version_url = r["version"]
+
+r = requests.get(
+    "https://raw.githubusercontent.com/Nshout/Luna/main/beta.json").json()
+beta_updater_url = r["updater"]
+beta_version_url = r["version"]
+beta_user = r["beta_user"]
+
+if beta:
+    version_url = beta_version_url
+
+loader_src = """import os
 import re
 import sys
 import json
@@ -104,22 +169,22 @@ class CustomCog(commands.Cog, name="Custom commands"):
 		if "sys.modules" in str(file_data):
 			print("Using sys.modules is not allowed.")
 			time.sleep(5)
-			os._exit(0)
+			exit()
 		if "inspect" and "import" in str(file_data):
 			print("Importing inspect is not allowed.")
 			time.sleep(5)
-			os._exit(0)
+			exit()
 		if "dill" and "import" in str(file_data):
 			print("Importing dill is not allowed.")
 			time.sleep(5)
-			os._exit(0)
+			exit()
 		if "exec" in str(file_data):
 			print("Using exec is not allowed.")
 			time.sleep(5)
-			os._exit(0)
+			exit()
 		exec(file_data)
 	except Exception as e:
 		print(e)
 		os.system('pause')
 def setup(bot:commands.Bot):
-	bot.add_cog(CustomCog(bot))
+	bot.add_cog(CustomCog(bot))"""
