@@ -1676,8 +1676,8 @@ class luna:
 
     def authentication():
         """
-                The main Luna authentication function
-                """
+        The main Luna authentication function
+        """
         luna.console(clear=True)
         if files.file_exist('Updater.exe'):
             os.remove('Updater.exe')
@@ -1719,7 +1719,7 @@ class luna:
                 else:
                     prints.error("That choice does not exist!")
                     time.sleep(5)
-                    restart_program()
+                    return luna.authentication()
 
     def login(exists=False):
         """
