@@ -1723,8 +1723,9 @@ class luna:
 
     def login(exists=False):
         """
-                The authentication login function
-                """
+        The authentication login function
+        """
+        luna.console(clear=True)
         try:
             hwid = str(subprocess.check_output('wmic csproduct get uuid')).split(
                 '\\r\\n')[1].strip('\\r').strip()
@@ -1807,6 +1808,7 @@ class luna:
         """
         The authentication register function
         """
+        luna.console(clear=True)
         try:
             hwid = str(subprocess.check_output('wmic csproduct get uuid')).split(
                 '\\r\\n')[1].strip('\\r').strip()
@@ -1820,6 +1822,12 @@ class luna:
             luna.authentication()
         username = prints.input("Username")
         password = prints.password("Password")
+        confirm_password = prints.password("Confirm Password")
+        if not password == confirm_password:
+            prints.error(
+                "Passwords do not match, please try again")
+            time.sleep(5)
+            return luna.register()
         key = prints.input("Key")
         try:
             if not developer_mode:
