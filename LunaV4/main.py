@@ -4474,6 +4474,10 @@ async def on_ready():
         print(
             f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
     print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
+    global command_names_list
+    command_names_list = ""
+    for command in bot.commands:
+        command_names_list += command.name + ", "
     prints.message(f"Loaded {color.purple(f'{command_count - custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
     debugger_thread = threading.Thread(target=uptime_thread)
     debugger_thread.daemon = True
@@ -5028,83 +5032,6 @@ class OnMessage(commands.Cog, name="on message"):
                 print()
 
         # ///////////////////////////////////////////////////////////////
-        # Selfbot Detection - Embed
-
-        if not message.author.bot:
-            if message.author == self.bot.user:
-                pass
-            else:
-                embeds = message.embeds
-                for embed in embeds:
-                    global cooldown
-                    if embed is not None and cooldown.count(message.author.id) == 0 and not (
-                            "https://" or "http://" or "cdn.discordapp.com" or ".png" or ".gif" or "www.") in message.content.lower():
-                        cooldown.append(message.author.id)
-                        if files.json(
-                            "Luna/snipers/selfbot.json",
-                            "sniper",
-                                documents=True) == "on":
-                            if files.json(
-                                    "Luna/notifications/toasts.json",
-                                    "selfbot",
-                                    documents=True) == "on" and files.json(
-                                    "Luna/notifications/toasts.json",
-                                    "toasts",
-                                    documents=True) == "on":
-                                notify.toast(
-                                    message=f"Selfbot Detected\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
-                            if files.json(
-                                    "Luna/webhooks/webhooks.json",
-                                    "selfbot",
-                                    documents=True) == "on" and files.json(
-                                    "Luna/webhooks/webhooks.json",
-                                    "webhooks",
-                                    documents=True) == "on" and not webhook.selfbot_url() == "webhook-url-here":
-                                notify.webhook(
-                                    url=webhook.selfbot_url(),
-                                    name="selfbot",
-                                    description=f"Selfbot Detected\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
-                            print()
-                            prints.sniper(
-                                f"{color.purple('Selfbot Detected')}")
-                            prints.sniper(
-                                f"Server  | {color.purple(f'{message.guild}')}")
-                            prints.sniper(
-                                f"Channel | {color.purple(f'{message.channel}')}")
-                            prints.sniper(
-                                f"Author  | {color.purple(f'{message.author}')}")
-                            try:
-                                title = embed.to_dict()['title']
-                                title = title.lower()
-                                if "nighty" in title:
-                                    prints.sniper(
-                                        f"Selfbot | Prediction » {color.purple('Nighty')}")
-                                elif "aries" in title:
-                                    prints.sniper(
-                                        f"Selfbot | Prediction » {color.purple('Aries')}")
-                                elif "solus" in title:
-                                    prints.sniper(
-                                        f"Selfbot | Prediction » {color.purple('Solus')}")
-                                elif "ghost" in title:
-                                    prints.sniper(
-                                        f"Selfbot | Prediction » {color.purple('Ghost')}")
-                                elif "okuru" in title:
-                                    prints.sniper(
-                                        f"Selfbot | Prediction » {color.purple('Okuru')}")
-                                elif "lucifer" in title:
-                                    prints.sniper(
-                                        f"Selfbot | Prediction » {color.purple('Lucifer')}")
-                            except BaseException:
-                                pass
-                            print()
-                            await asyncio.sleep(3600)
-                            cooldown.remove(message.author.id)
-                        else:
-                            pass
-                    else:
-                        pass
-
-        # ///////////////////////////////////////////////////////////////
         # Privnote Sniper
 
         if 'privnote.com' in message.content.lower():
@@ -5258,7 +5185,6 @@ class OnMessage(commands.Cog, name="on message"):
 
 bot.add_cog(OnMessage(bot))
 
-
 # ///////////////////////////////////////////////////////////////
 # On Message Delete Event
 
@@ -5269,37 +5195,89 @@ class OnDelete(commands.Cog, name="on delete"):
     @commands.Cog.listener()
     async def on_message_delete(self, message):
         if message.author == self.bot.user:
-            pass
-        else:
-            mention = f'<@!{self.bot.user.id}>'
-            if mention in message.content:
-                if files.json(
-                        "Luna/notifications/toasts.json",
-                        "ghostpings",
-                        documents=True) == "on" and files.json(
-                        "Luna/notifications/toasts.json",
-                        "toasts",
-                        documents=True) == "on":
-                    notify.toast(
-                        message=f"You have been ghostpinged\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
-                if files.json(
-                        "Luna/webhooks/webhooks.json",
-                        "ghostpings",
-                        documents=True) == "on" and files.json(
-                        "Luna/webhooks/webhooks.json",
-                        "webhooks",
-                        documents=True) == "on" and not webhook.ghostpings_url() == "webhook-url-here":
-                    notify.webhook(
-                        url=webhook.ghostpings_url(),
-                        name="ghostpings",
-                        description=f"You have been ghostpinged\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
-                print()
-                prints.sniper(f"{color.purple('You have been ghostpinged')}")
-                prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
-                prints.sniper(
-                    f"Channel | {color.purple(f'{message.channel}')}")
-                prints.sniper(f"Author  | {color.purple(f'{message.author}')}")
-                print()
+            return
+        
+        if f'<@!{self.bot.user.id}>' in message.content:
+            if files.json(
+                    "Luna/notifications/toasts.json",
+                    "ghostpings",
+                    documents=True) == "on" and files.json(
+                    "Luna/notifications/toasts.json",
+                    "toasts",
+                    documents=True) == "on":
+                notify.toast(
+                    message=f"You have been ghostpinged\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
+            if files.json(
+                    "Luna/webhooks/webhooks.json",
+                    "ghostpings",
+                    documents=True) == "on" and files.json(
+                    "Luna/webhooks/webhooks.json",
+                    "webhooks",
+                    documents=True) == "on" and not webhook.ghostpings_url() == "webhook-url-here":
+                notify.webhook(
+                    url=webhook.ghostpings_url(),
+                    name="ghostpings",
+                    description=f"You have been ghostpinged\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
+            print()
+            prints.sniper(f"{color.purple('You have been ghostpinged')}")
+            prints.sniper(f"Server  | {color.purple(f'{message.guild}')}")
+            prints.sniper(
+                f"Channel | {color.purple(f'{message.channel}')}")
+            prints.sniper(f"Author  | {color.purple(f'{message.author}')}")
+            print()
+                
+        # ///////////////////////////////////////////////////////////////
+        # Selfbot Detection - BETA
+        
+        # else:
+        #     global cooldown
+        #     prefixes = ['.', ',', '-', '_', '!', '?', '>', '+', '*', '#', '$', '%', '^', '&', '@', '~', '`', '<', ';', ':', '\\', '/', '|', '=', '{', '}', '[', ']', '"', "'"]
+        #     for pref in prefixes:
+        #         if message.content.startswith(pref) and message.content in command_names_list:
+        #             if cooldown.count(message.author.id) == 0:
+        #                 cooldown.append(message.author.id)
+        #                 if files.json(
+        #                     "Luna/snipers/selfbot.json",
+        #                     "sniper",
+        #                         documents=True) == "on":
+        #                     if files.json(
+        #                             "Luna/notifications/toasts.json",
+        #                             "selfbot",
+        #                             documents=True) == "on" and files.json(
+        #                             "Luna/notifications/toasts.json",
+        #                             "toasts",
+        #                             documents=True) == "on":
+        #                         notify.toast(
+        #                             message=f"Selfbot Detected\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
+        #                     if files.json(
+        #                             "Luna/webhooks/webhooks.json",
+        #                             "selfbot",
+        #                             documents=True) == "on" and files.json(
+        #                             "Luna/webhooks/webhooks.json",
+        #                             "webhooks",
+        #                             documents=True) == "on" and not webhook.selfbot_url() == "webhook-url-here":
+        #                         notify.webhook(
+        #                             url=webhook.selfbot_url(),
+        #                             name="selfbot",
+        #                             description=f"Selfbot Detected\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
+        #                     print()
+        #                     prints.sniper(
+        #                         f"{color.purple('Selfbot Detected')}")
+        #                     prints.sniper(
+        #                         f"Server  | {color.purple(f'{message.guild}')}")
+        #                     prints.sniper(
+        #                         f"Channel | {color.purple(f'{message.channel}')}")
+        #                     prints.sniper(
+        #                         f"Author  | {color.purple(f'{message.author}')}")
+        #                     print()
+        #                     await asyncio.sleep(3600)
+        #                     cooldown.remove(message.author.id)
+        #                 else:
+        #                     pass
+        #             else:
+        #                 pass
+        #         else:
+        #             pass
 
 
 bot.add_cog(OnDelete(bot))
@@ -5603,41 +5581,39 @@ class HelpCog(commands.Cog, name="Help commands"):
             for command in custom:
                 custom_command_count += 1
             await message_builder(luna,
-                                  description=f"{theme.description()}```\n \
-                                  Luna\n\nCommands          » {command_count - custom_command_count}\n \
-                                  Custom Commands   » {custom_command_count}\n``````\n \
-                                  Categories\n\n \
-                                  {prefix}help [command]   » Display all commands\n \
-                                  {prefix}admin            » Administrative commands\n \
-                                  {prefix}abusive          » Abusive commands\n \
-                                  {prefix}animated         » Animated commands\n \
-                                  {prefix}dump             » Dumping\n \
-                                  {prefix}fun              » Funny commands\n \
-                                  {prefix}game             » Game commands\n \
-                                  {prefix}image            » Image commands\n \
-                                  {prefix}hentai           » Hentai explorer\n \
-                                  {prefix}profile          » Profile settings\n \
-                                  {prefix}protection       » Protections\n \
-                                  {prefix}raiding          » Raiding tools\n \
-                                  {prefix}text             » Text commands\n \
-                                  {prefix}trolling         » Troll commands\n \
-                                  {prefix}tools            » Tools\n \
-                                  {prefix}networking       » Networking\n \
-                                  {prefix}nuking           » Account nuking\n \
-                                  {prefix}utility          » Utilities\n \
-                                  {prefix}settings         » Settings\n \
-                                  {prefix}webhook          » Webhook settings\n \
-                                  {prefix}notifications    » Toast notifications\n \
-                                  {prefix}sharing          » Share with somebody\n \
-                                  {prefix}themes           » Themes\n \
-                                  {prefix}communitythemes  » Community made themes\n \
-                                  {prefix}communitycmds    » Community made commands\n \
-                                  {prefix}customhelp       » Show custom commands\n \
-                                  {prefix}misc             » Miscellaneous\n \
-                                  {prefix}about            » Luna information\n \
-                                  {prefix}repeat           » Repeat last used command\n \
-                                  {prefix}search <command> » Search for a command\n``````\n \
-                                  Version\n\n{version}```")
+                                  description=f"{theme.description()}```\n\
+Luna\n\nCommands          » {command_count - custom_command_count}\n\
+Custom Commands   » {custom_command_count}\n``````\n\
+Categories\n\n\
+{prefix}help [command]   » Display all commands\n\
+{prefix}chelp            » Display custom commands\n\
+{prefix}admin            » Administrative commands\n\
+{prefix}abusive          » Abusive commands\n\
+{prefix}animated         » Animated commands\n\
+{prefix}dump             » Dumping\n\
+{prefix}fun              » Funny commands\n\
+{prefix}game             » Game commands\n\
+{prefix}image            » Image commands\n\
+{prefix}hentai           » Hentai explorer\n\
+{prefix}profile          » Profile settings\n\
+{prefix}protection       » Protections\n \
+{prefix}raiding          » Raiding tools\n\
+{prefix}text             » Text commands\n\
+{prefix}trolling         » Troll commands\n\
+{prefix}tools            » Tools\n\
+{prefix}networking       » Networking\n\
+{prefix}nuking           » Account nuking\n\
+{prefix}utility          » Utilities\n\
+{prefix}settings         » Settings\n\
+{prefix}webhook          » Webhook settings\n\
+{prefix}notifications    » Toast notifications\n\
+{prefix}sharing          » Share with somebody\n\
+{prefix}themes           » Themes\n\
+{prefix}misc             » Miscellaneous\n\
+{prefix}about            » Luna information\n\
+{prefix}repeat           » Repeat last used command\n\
+{prefix}search <command> » Search for a command\n``````\n\
+Version\n\n{version}```")
 
     @commands.command(name="admin",
                       usage="[2, 3]",
@@ -6184,11 +6160,11 @@ class HelpCog(commands.Cog, name="Help commands"):
         await message_builder(luna, title="Webhooks",
                               description=f"{theme.description()}```\nWebhook configuration\n\nWebhooks          » {webhooks}\nLogin webhooks    » {login}\nNitro webhooks    » {nitro}\nGiveaway webhooks » {giveaway}\nPrivnote webhooks » {privnote}\nSelfbot webhooks  » {selfbot}\nPing webhooks     » {pings}\nGhostping webhooks » {ghostpings}\nFriendevent webhooks » {friendevents}\nGuildevent webhooks » {guildevents}\nRoleupdate webhooks » {roleupdates}\nNickname webhooks » {nickupdates}\nProtection webhooks » {protection}\n``````\nWebhook setup\n\n{setuptext}\n``````\nWebhook control\n\n{helptext}\n``````\nWebhook url's\n\n{urltext}```")
 
-    @commands.command(name="customhelp",
-                      aliases=['chelp'],
+    @commands.command(name="chelp",
+                      aliases=['customhelp'],
                       usage="",
                       description="Show custom commands")
-    async def customhelp(self, luna):
+    async def chelp(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
         cog = self.bot.get_cog('Custom commands')
@@ -6201,16 +6177,6 @@ class HelpCog(commands.Cog, name="Help commands"):
                 helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
         await message_builder(luna, title="Your custom commands",
                               description=f"{theme.description()}```\n{helptext}``````\nNote\n\n{prefix}reload           » Reload custom commands```")
-
-    @commands.command(name="communitycmds",
-                      aliases=['ccommands', 'communitycommands', 'community'],
-                      usage="",
-                      description="Community made commands")
-    async def communitycmds(self, luna):
-        await luna.message.delete()
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
-        await message_builder(luna, title="Community commands",
-                              description=f"{theme.description()}```\n{prefix}command luna     » Luna```")
 
     @commands.command(name="about",
                       usage="",
@@ -14833,11 +14799,11 @@ class ThemesCog(commands.Cog, name="Theme commands"):
         await message_builder(luna,
                               description=f"""```\nSaved the embed theme as » {embed.title.lower().replace(" ", "").replace("_", "").replace("*", "").replace("`", "")}\n``````\nNote\n\nUse"{prefix}theme {embed.title.lower().replace(" ", "").replace("_", "").replace("*", "").replace("`", "")}\" to use the theme.```""")
 
-    @commands.command(name="communitythemes",
-                      aliases=['cthemes'],
+    @commands.command(name="cthemes",
+                      aliases=['communitythemes'],
                       usage="",
                       description="Community made themes")
-    async def communitythemes(self, luna):
+    async def cthemes(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
         await message_builder(luna, title="Community Themes",
