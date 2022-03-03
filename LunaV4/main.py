@@ -4228,12 +4228,21 @@ def uptime_thread():
     global hour
     global minute
     global second
+    global day
     hour = 0
     minute = 0
     second = 0
+    day = 0
+    username = files.json("Luna/auth.json", "username", documents=True)
+    username = Decryption(
+        '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
     while True:
-        luna.title(
-            f"Luna {version_url} | {hour:02d}:{minute:02d}:{second:02d}")
+        if day == 0:
+            luna.title(
+                f"Luna {version_url} | {username} | {hour:02d}:{minute:02d}:{second:02d}")
+        else:
+            luna.title(
+                f"Luna {version_url} | {username} | {day:02d} Days, {hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds")
         time.sleep(1)
         second += 1
         if second == 60:
@@ -4246,6 +4255,7 @@ def uptime_thread():
             hour = 0
             minute = 0
             second = 0
+            day += 1
 
 
 def update_thread():
@@ -15824,8 +15834,12 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
                       description="Uptime")
     async def uptime(self, luna):
         await luna.message.delete()
-        await message_builder(luna, title="Uptime",
-                              description=f"```\n{hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds```")
+        if day == 0:
+            await message_builder(luna, title="Uptime",
+                                description=f"```\n{hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds```")
+        else:
+            await message_builder(luna, title="Uptime",
+                                description=f"```\n{day:02d} Days, {hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds```")
 
     @commands.command(name="logout",
                       usage="",
