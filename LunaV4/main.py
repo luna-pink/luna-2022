@@ -4239,10 +4239,10 @@ def uptime_thread():
     while True:
         if day == 0:
             luna.title(
-                f"Luna {version_url} | {username} | {hour:02d}:{minute:02d}:{second:02d}")
+                f"Luna - {username} | {hour:02d}:{minute:02d}:{second:02d}")
         else:
             luna.title(
-                f"Luna {version_url} | {username} | {day:02d} Days, {hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds")
+                f"Luna - {username} | {day:02d} Days, {hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds")
         time.sleep(1)
         second += 1
         if second == 60:
