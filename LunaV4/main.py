@@ -4474,7 +4474,7 @@ async def on_ready():
         print(
             f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n")
     print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-    prints.message(f"{color.purple(f'{command_count - custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+    prints.message(f"Loaded {color.purple(f'{command_count - custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
     debugger_thread = threading.Thread(target=uptime_thread)
     debugger_thread.daemon = True
     debugger_thread.start()
@@ -5602,37 +5602,42 @@ class HelpCog(commands.Cog, name="Help commands"):
             custom_command_count = 0
             for command in custom:
                 custom_command_count += 1
-            # await message_builder(luna,
-            # description=f"{theme.description()}```\nLuna\n\nCommands
-            # » {command_count-custom_command_count}\nCustom Commands   »
-            # {custom_command_count}\n``````\nCategories\n\n{prefix}help
-            # [command]   » Display all commands\n{prefix}admin            »
-            # Administrative commands\n{prefix}abusive          » Abusive
-            # commands\n{prefix}animated         » Animated
-            # commands\n{prefix}dump             » Dumping\n{prefix}fun
-            # » Funny commands\n{prefix}game             » Game
-            # commands\n{prefix}image            » Image
-            # commands\n{prefix}hentai           » Hentai
-            # explorer\n{prefix}profile          » Profile
-            # settings\n{prefix}protection       » Protections\n{prefix}raiding
-            # » Raiding tools\n{prefix}text             » Text
-            # commands\n{prefix}trolling         » Troll
-            # commands\n{prefix}tools            » Tools\n{prefix}networking
-            # » Networking\n{prefix}nuking           » Account
-            # nuking\n{prefix}utility          » Utilities\n{prefix}settings
-            # » Settings\n{prefix}webhook          » Webhook
-            # settings\n{prefix}notifications    » Toast
-            # notifications\n{prefix}sharing          » Share with
-            # somebody\n{prefix}themes           »
-            # Themes\n{prefix}communitythemes  » Community made
-            # themes\n{prefix}communitycmds    » Community made
-            # commands\n{prefix}customhelp       » Show custom
-            # commands\n{prefix}misc             » Miscellaneous\n{prefix}about
-            # » Luna information\n{prefix}repeat           » Repeat last used
-            # command\n{prefix}search <command> » Search for a
-            # command\n``````\nVersion\n\n{version}```")
             await message_builder(luna,
-                                  description=f"{theme.description()}```\nLuna\n\nCommands          » {command_count - custom_command_count}\nCustom Commands   » {custom_command_count}\n``````\nCategories\n\n{prefix}help [command]   » Display all commands\n{prefix}admin            » Administrative commands\n{prefix}abusive          » Abusive commands\n{prefix}animated         » Animated commands\n{prefix}dump             » Dumping\n{prefix}fun              » Funny commands\n{prefix}game             » Game commands\n{prefix}image            » Image commands\n{prefix}hentai           » Hentai explorer\n{prefix}profile          » Profile settings\n{prefix}protection       » Protections\n{prefix}raiding          » Raiding tools\n{prefix}text             » Text commands\n{prefix}trolling         » Troll commands\n{prefix}tools            » Tools\n{prefix}networking       » Networking\n{prefix}nuking           » Account nuking\n{prefix}utility          » Utilities\n{prefix}settings         » Settings\n{prefix}webhook          » Webhook settings\n{prefix}notifications    » Toast notifications\n{prefix}sharing          » Share with somebody\n{prefix}themes           » Themes\n{prefix}communitythemes  » Community made themes\n{prefix}communitycmds    » Community made commands\n{prefix}customhelp       » Show custom commands\n{prefix}misc             » Miscellaneous\n{prefix}about            » Luna information\n{prefix}repeat           » Repeat last used command\n{prefix}search <command> » Search for a command\n``````\nVersion\n\n{version}```")
+                                  description=f"{theme.description()}```\n \
+                                  Luna\n\nCommands          » {command_count - custom_command_count}\n \
+                                  Custom Commands   » {custom_command_count}\n``````\n \
+                                  Categories\n\n \
+                                  {prefix}help [command]   » Display all commands\n \
+                                  {prefix}admin            » Administrative commands\n \
+                                  {prefix}abusive          » Abusive commands\n \
+                                  {prefix}animated         » Animated commands\n \
+                                  {prefix}dump             » Dumping\n \
+                                  {prefix}fun              » Funny commands\n \
+                                  {prefix}game             » Game commands\n \
+                                  {prefix}image            » Image commands\n \
+                                  {prefix}hentai           » Hentai explorer\n \
+                                  {prefix}profile          » Profile settings\n \
+                                  {prefix}protection       » Protections\n \
+                                  {prefix}raiding          » Raiding tools\n \
+                                  {prefix}text             » Text commands\n \
+                                  {prefix}trolling         » Troll commands\n \
+                                  {prefix}tools            » Tools\n \
+                                  {prefix}networking       » Networking\n \
+                                  {prefix}nuking           » Account nuking\n \
+                                  {prefix}utility          » Utilities\n \
+                                  {prefix}settings         » Settings\n \
+                                  {prefix}webhook          » Webhook settings\n \
+                                  {prefix}notifications    » Toast notifications\n \
+                                  {prefix}sharing          » Share with somebody\n \
+                                  {prefix}themes           » Themes\n \
+                                  {prefix}communitythemes  » Community made themes\n \
+                                  {prefix}communitycmds    » Community made commands\n \
+                                  {prefix}customhelp       » Show custom commands\n \
+                                  {prefix}misc             » Miscellaneous\n \
+                                  {prefix}about            » Luna information\n \
+                                  {prefix}repeat           » Repeat last used command\n \
+                                  {prefix}search <command> » Search for a command\n``````\n \
+                                  Version\n\n{version}```")
 
     @commands.command(name="admin",
                       usage="[2, 3]",
