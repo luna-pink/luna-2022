@@ -1805,8 +1805,8 @@ class luna:
 
     def register():
         """
-                The authentication register function
-                """
+        The authentication register function
+        """
         try:
             hwid = str(subprocess.check_output('wmic csproduct get uuid')).split(
                 '\\r\\n')[1].strip('\\r').strip()
