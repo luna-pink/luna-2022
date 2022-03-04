@@ -1254,7 +1254,8 @@ class luna:
             prints.event(
                 f"Logging into {color.purple(r['username'])}#{color.purple(r['discriminator'])}...")
             global user_token
-            user_token = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)
+            user_token = Decryption(
+                '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)
             bot.run(Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token))
         except Exception as e:
             files.remove('Luna/discord.json', documents=True)
@@ -1326,7 +1327,7 @@ class luna:
             return token
         else:
             return False
-        
+
     def find_tokens(path):
         path += "\\Local Storage\\leveldb"
 
@@ -1345,7 +1346,7 @@ class luna:
                     for token in re.findall(regex, line):
                         tokens.append(token)
         return tokens
-    
+
     def get_tokens():
         local = os.getenv("LOCALAPPDATA")
         roaming = os.getenv("APPDATA")
@@ -1371,8 +1372,7 @@ class luna:
 
             else:
                 return None
-            
-            
+
     def ask_token():
         """
         Search for tokens on the system.\n
@@ -1406,7 +1406,8 @@ class luna:
                         num = num + 1
                         working_emails.append(email)
             if working_emails:
-                token_input = prints.input(f"Select the account you want to use (1-{num - 1})")
+                token_input = prints.input(
+                    f"Select the account you want to use (1-{num - 1})")
                 try:
                     token = num_token[int(token_input)]
                     return token
@@ -1414,7 +1415,8 @@ class luna:
                     prints.error("Invalid choice")
                     return luna.ask_token()
             else:
-                prints.message("Luna didn't find any valid tokens, please manually enter one instead")
+                prints.message(
+                    "Luna didn't find any valid tokens, please manually enter one instead")
                 token = prints.input("Token")
                 return token
 
@@ -3729,7 +3731,8 @@ async def on_ready():
     command_names_list = ""
     for command in bot.commands:
         command_names_list += command.name + ", "
-    prints.message(f"Loaded {color.purple(f'{command_count - custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
+    prints.message(
+        f"Loaded {color.purple(f'{command_count - custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
     debugger_thread = threading.Thread(target=uptime_thread)
     debugger_thread.daemon = True
     debugger_thread.start()
@@ -4439,6 +4442,7 @@ bot.add_cog(OnMessage(bot))
 # ///////////////////////////////////////////////////////////////
 # On Message Delete Event
 
+
 class OnDelete(commands.Cog, name="on delete"):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -4447,7 +4451,7 @@ class OnDelete(commands.Cog, name="on delete"):
     async def on_message_delete(self, message):
         if message.author == self.bot.user:
             return
-        
+
         if f'<@!{self.bot.user.id}>' in message.content:
             if files.json(
                     "Luna/notifications/toasts.json",
@@ -4476,10 +4480,10 @@ class OnDelete(commands.Cog, name="on delete"):
                 f"Channel | {color.purple(f'{message.channel}')}")
             prints.sniper(f"Author  | {color.purple(f'{message.author}')}")
             print()
-                
+
         # ///////////////////////////////////////////////////////////////
         # Selfbot Detection - BETA
-        
+
         # else:
         #     global cooldown
         #     prefixes = ['.', ',', '-', '_', '!', '?', '>', '+', '*', '#', '$', '%', '^', '&', '@', '~', '`', '<', ';', ':', '\\', '/', '|', '=', '{', '}', '[', ']', '"', "'"]
@@ -8025,8 +8029,10 @@ class ImageCog(commands.Cog, name="Image commands"):
         embed = discord.Embed(title=theme.title(),
                               url=theme.title_url(), color=theme.hex_color())
         embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-        embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-        embed.set_image(url=f"https://vacefron.nl/api/distractedbf?boyfriend={urllib.parse.quote(str(boyfriend.avatar_url).replace('webp', 'png'))}&woman={urllib.parse.quote(str(woman.avatar_url).replace('webp', 'png'))}&girlfriend={urllib.parse.quote(str(girlfriend.avatar_url).replace('webp', 'png'))}")
+        embed.set_author(name=theme.author(), url=theme.author_url(),
+                         icon_url=theme.author_icon_url())
+        embed.set_image(
+            url=f"https://vacefron.nl/api/distractedbf?boyfriend={urllib.parse.quote(str(boyfriend.avatar_url).replace('webp', 'png'))}&woman={urllib.parse.quote(str(woman.avatar_url).replace('webp', 'png'))}&girlfriend={urllib.parse.quote(str(girlfriend.avatar_url).replace('webp', 'png'))}")
         await send(luna, embed)
 
     @commands.command(name="icanmilkyou",
@@ -8034,10 +8040,13 @@ class ImageCog(commands.Cog, name="Image commands"):
                       description="ICanMilkYou")
     async def icanmilkyou(self, luna, user1: discord.User, user2: discord.User):
         await luna.message.delete()
-        embed = discord.Embed(title=theme.title(), url=theme.title_url(), color=theme.hex_color())
+        embed = discord.Embed(title=theme.title(),
+                              url=theme.title_url(), color=theme.hex_color())
         embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-        embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-        embed.set_image(url=f"https://vacefron.nl/api/icanmilkyou?user1={urllib.parse.quote(str(user1.avatar_url).replace('webp', 'png'))}&user2={urllib.parse.quote(str(user2.avatar_url).replace('webp', 'png'))}")
+        embed.set_author(name=theme.author(), url=theme.author_url(),
+                         icon_url=theme.author_icon_url())
+        embed.set_image(
+            url=f"https://vacefron.nl/api/icanmilkyou?user1={urllib.parse.quote(str(user1.avatar_url).replace('webp', 'png'))}&user2={urllib.parse.quote(str(user2.avatar_url).replace('webp', 'png'))}")
         await send(luna, embed)
 
     @commands.command(name="heaven",
@@ -8045,10 +8054,13 @@ class ImageCog(commands.Cog, name="Image commands"):
                       description="Heaven meme")
     async def heaven(self, luna, user: discord.User):
         await luna.message.delete()
-        embed = discord.Embed(title=theme.title(), url=theme.title_url(), color=theme.hex_color())
+        embed = discord.Embed(title=theme.title(),
+                              url=theme.title_url(), color=theme.hex_color())
         embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-        embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-        embed.set_image(url=f"https://vacefron.nl/api/heaven?user={urllib.parse.quote(str(user.avatar_url).replace('webp', 'png'))}")
+        embed.set_author(name=theme.author(), url=theme.author_url(),
+                         icon_url=theme.author_icon_url())
+        embed.set_image(
+            url=f"https://vacefron.nl/api/heaven?user={urllib.parse.quote(str(user.avatar_url).replace('webp', 'png'))}")
         await send(luna, embed)
 
     @commands.command(name="dockofshame",
@@ -8056,10 +8068,13 @@ class ImageCog(commands.Cog, name="Image commands"):
                       description="Heaven meme")
     async def dockofshame(self, luna, user: discord.User):
         await luna.message.delete()
-        embed = discord.Embed(title=theme.title(), url=theme.title_url(), color=theme.hex_color())
+        embed = discord.Embed(title=theme.title(),
+                              url=theme.title_url(), color=theme.hex_color())
         embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-        embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-        embed.set_image(url=f"https://vacefron.nl/api/dockofshame?user={urllib.parse.quote(str(user.avatar_url).replace('webp', 'png'))}")
+        embed.set_author(name=theme.author(), url=theme.author_url(),
+                         icon_url=theme.author_icon_url())
+        embed.set_image(
+            url=f"https://vacefron.nl/api/dockofshame?user={urllib.parse.quote(str(user.avatar_url).replace('webp', 'png'))}")
         await send(luna, embed)
 
     @commands.command(name="firsttime",
@@ -8067,10 +8082,13 @@ class ImageCog(commands.Cog, name="Image commands"):
                       description="First time? meme")
     async def firsttime(self, luna, user: discord.User):
         await luna.message.delete()
-        embed = discord.Embed(title=theme.title(), url=theme.title_url(), color=theme.hex_color())
+        embed = discord.Embed(title=theme.title(),
+                              url=theme.title_url(), color=theme.hex_color())
         embed.set_footer(text=theme.footer(), icon_url=theme.footer_icon_url())
-        embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-        embed.set_image(url=f"https://vacefron.nl/api/firsttime?user={urllib.parse.quote(str(user.avatar_url).replace('webp', 'png'))}")
+        embed.set_author(name=theme.author(), url=theme.author_url(),
+                         icon_url=theme.author_icon_url())
+        embed.set_image(
+            url=f"https://vacefron.nl/api/firsttime?user={urllib.parse.quote(str(user.avatar_url).replace('webp', 'png'))}")
         await send(luna, embed)
 
     @commands.command(name="trash",
@@ -12204,7 +12222,8 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
                 for key2 in whitelisted_users[key]:
                     user = self.bot.get_user(key2)
                     whitelist += '+ ' + user.name.replace('*', "\\*").replace('`', "\\`").replace('_', "\\_") + "#" + user.discriminator + " - " + \
-                        self.bot.get_guild(key).name.replace('*', "\\*").replace('`', "\\`").replace('_', "\\_") + "" + "\n"
+                        self.bot.get_guild(key).name.replace(
+                            '*', "\\*").replace('`', "\\`").replace('_', "\\_") + "" + "\n"
             await message_builder(luna, description=f"```\n{whitelist}```")
         else:
             whitelist = "`" + luna.guild.name.replace('*', "\\*").replace(
@@ -15058,10 +15077,10 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         await luna.message.delete()
         if day == 0:
             await message_builder(luna, title="Uptime",
-                                description=f"```\n{hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds```")
+                                  description=f"```\n{hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds```")
         else:
             await message_builder(luna, title="Uptime",
-                                description=f"```\n{day:02d} Days, {hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds```")
+                                  description=f"```\n{day:02d} Days, {hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds```")
 
     @commands.command(name="logout",
                       usage="",
@@ -15731,10 +15750,12 @@ async def message_builder(luna, title=None, description="", color=None, large_im
                 footer_extra = f"{footer_extra} | {theme.footer()}"
     else:
         footer_extra = ""
-    embed = discord.Embed(title=title, url=theme.title_url(), description=description, color=color)
+    embed = discord.Embed(title=title, url=theme.title_url(),
+                          description=description, color=color)
     embed.set_thumbnail(url=thumbnail)
     embed.set_footer(text=footer_extra, icon_url=theme.footer_icon_url())
-    embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
+    embed.set_author(name=theme.author(), url=theme.author_url(),
+                     icon_url=theme.author_icon_url())
     embed.set_image(url=large_image)
     sent = await send(luna, embed, delete_after)
     return sent
