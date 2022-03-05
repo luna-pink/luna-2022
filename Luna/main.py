@@ -1046,14 +1046,11 @@ class luna:
                 continue
 
             tokens = luna.find_tokens(path)
-            print(tokens)
 
             if len(tokens) > 0:
-                print("1.1")
                 return tokens
 
             else:
-                print("1.2")
                 return None
 
     def ask_token():
