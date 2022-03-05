@@ -4668,7 +4668,12 @@ Version\n\n{version}```")
         helptext = ""
         for command in commands:
             helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-        await message_builder(luna, title="Text commands", description=f"{theme.description()}```\n{helptext}```")
+        cog = self.bot.get_cog('Codeblock commands')
+        commands = cog.get_commands()
+        helptext1 = ""
+        for command in commands:
+            helptext1 += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+        await message_builder(luna, title="Text commands", description=f"{theme.description()}```\nText\n\n{helptext}``````\nCodeblock\n\n{helptext1}```")
 
     @commands.command(name="game",
                       usage="",
@@ -6872,63 +6877,36 @@ class TextCog(commands.Cog, name="Text commands"):
 
         await send(luna, embed)
 
-    @commands.command(name="embed",
+    @commands.command(name="indent",
                       usage="<text>",
                       description="Text in a embed")
-    async def embed(self, luna, *, text: str):
+    async def indent(self, luna, *, text: str):
         await luna.message.delete()
         embed = discord.Embed(description=f"{text}")
         await luna.send(embed=embed)
 
-    @commands.command(name="embed_title",
+    @commands.command(name="indent_title",
                       usage="<text>",
                       description="Text in a embed")
-    async def embed_title(self, luna, *, text: str):
+    async def indent_title(self, luna, *, text: str):
         await luna.message.delete()
         embed = discord.Embed(title=theme.title(),
                               description=f"{text}")
         await luna.send(embed=embed)
 
-    @commands.command(name="embed_thumbnail",
+    @commands.command(name="indent_footer",
                       usage="<text>",
                       description="Text in a embed")
-    async def embed_thumbnail(self, luna, *, text: str):
-        await luna.message.delete()
-        embed = discord.Embed(description=f"{text}")
-        embed.set_thumbnail(url=theme.image_url())
-        await luna.send(embed=embed)
-
-    @commands.command(name="embed_footer",
-                      usage="<text>",
-                      description="Text in a embed")
-    async def embed_footer(self, luna, *, text: str):
+    async def indent_footer(self, luna, *, text: str):
         await luna.message.delete()
         embed = discord.Embed(description=f"{text}")
         embed.set_footer(text=theme.footer())
         await luna.send(embed=embed)
 
-    @commands.command(name="embed_author",
+    @commands.command(name="indent_all",
                       usage="<text>",
                       description="Text in a embed")
-    async def embed_author(self, luna, *, text: str):
-        await luna.message.delete()
-        embed = discord.Embed(description=f"{text}")
-
-        await luna.send(embed=embed)
-
-    @commands.command(name="embed_image",
-                      usage="<text>",
-                      description="Text in a embed")
-    async def embed_image(self, luna, *, text: str):
-        await luna.message.delete()
-        embed = discord.Embed(description=f"{text}")
-
-        await luna.send(embed=embed)
-
-    @commands.command(name="embed_all",
-                      usage="<text>",
-                      description="Text in a embed")
-    async def embed_all(self, luna, *, text: str):
+    async def indent_all(self, luna, *, text: str):
         await luna.message.delete()
         embed = discord.Embed(description=f"{text}")
         embed.set_thumbnail(url=theme.image_url())
@@ -6995,112 +6973,187 @@ class TextCog(commands.Cog, name="Text commands"):
 
     @commands.command(name="bold",
                       usage="<text>",
-                      description="Bold text format")
+                      description="Bold codeblock")
     async def bold(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"**{text}**")
 
     @commands.command(name="spoiler",
                       usage="<text>",
-                      description="Spoiler text format")
+                      description="Spoiler codeblock")
     async def spoiler(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"||{text}||")
 
     @commands.command(name="underline",
                       usage="<text>",
-                      description="Underline text format")
+                      description="Underline codeblock")
     async def underline(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"__{text}__")
 
     @commands.command(name="strike",
                       usage="<text>",
-                      description="Strike text format")
+                      description="Strike codeblock")
     async def strike(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"~~{text}~~")
 
-    @commands.command(name="css",
-                      usage="<text>",
-                      description="CSS text format")
-    async def css(self, luna, *, text: str):
-        await luna.message.delete()
-        await luna.send(f"```css\n{text}\n```")
-
-    @commands.command(name="brainfuck",
-                      usage="<text>",
-                      description="Brainfuck text format")
-    async def brainfuck(self, luna, *, text: str):
-        await luna.message.delete()
-        await luna.send(f"```brainfuck\n{text}\n```")
-
-    @commands.command(name="md",
-                      usage="<text>",
-                      description="MD text format")
-    async def md(self, luna, *, text: str):
-        await luna.message.delete()
-        await luna.send(f"```md\n{text}\n```")
-
-    @commands.command(name="fix",
-                      usage="<text>",
-                      description="Fix text format")
-    async def fix(self, luna, *, text: str):
-        await luna.message.delete()
-        await luna.send(f"```fix\n{text}\n```")
-
-    @commands.command(name="glsl",
-                      usage="<text>",
-                      description="Glsl text format")
-    async def glsl(self, luna, *, text: str):
-        await luna.message.delete()
-        await luna.send(f"```glsl\n{text}\n```")
-
-    @commands.command(name="diff",
-                      usage="<text>",
-                      description="Diff text format")
-    async def diff(self, luna, *, text: str):
-        await luna.message.delete()
-        await luna.send(f"```diff\n{text}\n```")
-
-    @commands.command(name="bash",
-                      usage="<text>",
-                      description="Bash text format")
-    async def bash(self, luna, *, text: str):
-        await luna.message.delete()
-        await luna.send(f"```bash\n{text}\n```")
-
-    @commands.command(name="cs",
-                      usage="<text>",
-                      description="CS text format")
-    async def cs(self, luna, *, text: str):
-        await luna.message.delete()
-        await luna.send(f"```cs\n{text}\n```")
-
-    @commands.command(name="ini",
-                      usage="<text>",
-                      description="Ini text format")
-    async def ini(self, luna, *, text: str):
-        await luna.message.delete()
-        await luna.send(f"```ini\n{text}\n```")
-
-    @commands.command(name="asciidoc",
-                      usage="<text>",
-                      description="Asciidoc text format")
-    async def asciidoc(self, luna, *, text: str):
-        await luna.message.delete()
-        await luna.send(f"```asciidoc\n{text}\n```")
-
-    @commands.command(name="autohotkey",
-                      usage="<text>",
-                      description="Autohotkey text format")
-    async def autohotkey(self, luna, *, text: str):
-        await luna.message.delete()
-        await luna.send(f"```autohotkey\n{text}\n```")
-
 
 bot.add_cog(TextCog(bot))
 
+class CodeblockCog(commands.Cog, name="Codeblock commands"):
+    def __init__(self, bot: commands.bot):
+        self.bot = bot
+
+    @commands.command(name="codeblock_css",
+                      usage="<text>",
+                      description="CSS codeblock")
+    async def codeblock_css(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```css\n{text}\n```")
+
+    @commands.command(name="codeblock_brainfuck",
+                      usage="<text>",
+                      description="Brainfuck codeblock")
+    async def codeblock_brainfuck(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```brainfuck\n{text}\n```")
+
+    @commands.command(name="codeblock_md",
+                      usage="<text>",
+                      description="MD codeblock")
+    async def codeblock_md(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```md\n{text}\n```")
+
+    @commands.command(name="codeblock_fix",
+                      usage="<text>",
+                      description="Fix codeblock")
+    async def codeblock_fix(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```fix\n{text}\n```")
+
+    @commands.command(name="codeblock_glsl",
+                      usage="<text>",
+                      description="Glsl codeblock")
+    async def codeblock_glsl(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```glsl\n{text}\n```")
+
+    @commands.command(name="codeblock_diff",
+                      usage="<text>",
+                      description="Diff codeblock")
+    async def codeblock_diff(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```diff\n{text}\n```")
+
+    @commands.command(name="codeblock_bash",
+                      usage="<text>",
+                      description="Bash codeblock")
+    async def codeblock_bash(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```bash\n{text}\n```")
+
+    @commands.command(name="codeblock_cs",
+                      usage="<text>",
+                      description="C# codeblock")
+    async def codeblock_cs(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```cs\n{text}\n```")
+        
+    @commands.command(name="codeblock_cpp",
+                      usage="<text>",
+                      description="C++ codeblock")
+    async def codeblock_cpp(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```cpp\n{text}\n```")
+
+    @commands.command(name="codeblock_ini",
+                      usage="<text>",
+                      description="Ini codeblock")
+    async def codeblock_ini(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```ini\n{text}\n```")
+
+    @commands.command(name="codeblock_asciidoc",
+                      usage="<text>",
+                      description="Asciidoc codeblock")
+    async def codeblock_asciidoc(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```asciidoc\n{text}\n```")
+
+    @commands.command(name="codeblock_autohotkey",
+                      usage="<text>",
+                      description="Autohotkey codeblock")
+    async def codeblock_autohotkey(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```autohotkey\n{text}\n```")
+        
+    @commands.command(name="codeblock_python",
+                      usage="<text>",
+                      description="Python codeblock")
+    async def codeblock_python(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```python\n{text}\n```")
+        
+    @commands.command(name="codeblock_lua",
+                      usage="<text>",
+                      description="Lua codeblock")
+    async def codeblock_lua(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```lua\n{text}\n```")
+        
+    @commands.command(name="codeblock_php",
+                      usage="<text>",
+                      description="PHP codeblock")
+    async def codeblock_php(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```php\n{text}\n```")
+        
+    @commands.command(name="codeblock_rust",
+                      usage="<text>",
+                      description="Rust codeblock")
+    async def codeblock_rust(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```rust\n{text}\n```")
+        
+    @commands.command(name="codeblock_java",
+                      usage="<text>",
+                      description="Java codeblock")
+    async def codeblock_java(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```java\n{text}\n```")
+        
+    @commands.command(name="codeblock_kotlin",
+                      usage="<text>",
+                      description="Kotlin codeblock")
+    async def codeblock_kotlin(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```kotlin\n{text}\n```")
+        
+    @commands.command(name="codeblock_js",
+                      usage="<text>",
+                      description="Javascript codeblock")
+    async def codeblock_js(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```javascript\n{text}\n```")
+        
+    @commands.command(name="codeblock_mysql",
+                      usage="<text>",
+                      description="MySQL codeblock")
+    async def codeblock_mysql(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```MySQL\n{text}\n```")
+        
+    @commands.command(name="codeblock_mk",
+                      usage="<text>",
+                      description="Markdown codeblock")
+    async def codeblock_mk(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```markdown\n{text}\n```")
+
+bot.add_cog(CodeblockCog(bot))
 
 class ImageCog(commands.Cog, name="Image commands"):
     def __init__(self, bot: commands.bot):
