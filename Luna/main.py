@@ -18,7 +18,6 @@ import socket
 import urllib
 import ctypes
 import random
-import discum
 import psutil
 import typing
 import aiohttp
@@ -38,7 +37,7 @@ from ctypes import windll
 from notifypy import Notify
 from os import error, system
 from datetime import datetime
-from pypresence import Presence
+# from pypresence import Presence
 from discord.ext import commands
 from time import localtime, strftime
 
@@ -10336,6 +10335,7 @@ class MassCog(commands.Cog, name="Mass commands"):
                       usage="<name>",
                       description="Mass change nicknames")
     async def massnick(self, luna, name: str):
+        import discum
         if configs.risk_mode() == "on":
             bot = discum.Client(token=user_token, log=False,
                                 user_agent="Mozilla/5.0")

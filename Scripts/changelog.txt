@@ -55,6 +55,7 @@
 [!] Fixed webhooks not sending
 [!] Fixed notifications not sending
 [!] Fixed messages not sending because indentation messed it up
+[!] Fixed an issue with the console colors
 [-] Removed {prefix}embed
 [-] Removed {prefix}embed_title
 [-] Removed {prefix}embed_thumbnail

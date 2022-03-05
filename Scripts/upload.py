@@ -102,7 +102,7 @@ async def on_ready():
     announcement_channel = upload_guild.get_channel(announcement_channel_id)
     ping_role = upload_guild.get_role(luna_role)
     upload_guild_sbstore = bot.get_guild(guild_id_sbstore)
-    changelog_channel_sbstore = upload_guild.get_channel(changelog_channel_id_sbstore)
+    changelog_channel_sbstore = upload_guild_sbstore.get_channel(changelog_channel_id_sbstore)
 
 # ///////////////////////////////////////////////////////////////
 # With Mention
@@ -139,11 +139,11 @@ async def on_ready():
     file = open("changelog.txt", "r")
     file_data = file.read()
     file.close()
-    await changelog_channel.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
-    await changelog_channel_sbstore.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
     await announcement_channel.send(announcement)
+    await changelog_channel.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
     config.version(version)
     config.update(exe_link)
+    await changelog_channel_sbstore.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
     os._exit(0)
 
 # ///////////////////////////////////////////////////////////////
