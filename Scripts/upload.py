@@ -74,6 +74,8 @@ guild_id = 893540274561765426
 upload_channel_id = 893540849852489758
 changelog_channel_id = 893639765855969345
 announcement_channel_id = 896068189262331914
+guild_id_sbstore = 923317142701617193
+changelog_channel_id_sbstore = 923355464249528360
 luna_role = 893541525575839785
 
 # ///////////////////////////////////////////////////////////////
@@ -99,6 +101,8 @@ async def on_ready():
     changelog_channel = upload_guild.get_channel(changelog_channel_id)
     announcement_channel = upload_guild.get_channel(announcement_channel_id)
     ping_role = upload_guild.get_role(luna_role)
+    upload_guild_sbstore = bot.get_guild(guild_id_sbstore)
+    changelog_channel_sbstore = upload_guild.get_channel(changelog_channel_id_sbstore)
 
 # ///////////////////////////////////////////////////////////////
 # With Mention
@@ -136,6 +140,7 @@ async def on_ready():
     file_data = file.read()
     file.close()
     await changelog_channel.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
+    await changelog_channel_sbstore.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
     await announcement_channel.send(announcement)
     config.version(version)
     config.update(exe_link)

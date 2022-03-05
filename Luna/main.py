@@ -7152,6 +7152,13 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
     async def codeblock_mk(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```markdown\n{text}\n```")
+        
+    @commands.command(name="codeblock_ansi",
+                      usage="<text>",
+                      description="Ansi codeblock")
+    async def codeblock_ansi(self, luna, *, text: str):
+        await luna.message.delete()
+        await luna.send(f"```ansi\n{text}\n```")
 
 bot.add_cog(CodeblockCog(bot))
 
