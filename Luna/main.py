@@ -4929,46 +4929,6 @@ Version\n\n{version}```")
             helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
         await message_builder(luna, title="Miscellaneous", description=f"{theme.description()}```\n{helptext}```")
 
-    @commands.command(name="notifications",
-                      usage="",
-                      description="Toast notifications")
-    async def notifications(self, luna):
-        await luna.message.delete()
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
-        toasts = files.json("Luna/notifications/toasts.json",
-                            "toasts", documents=True)
-        login = files.json("Luna/notifications/toasts.json",
-                           "login", documents=True)
-        nitro = files.json("Luna/notifications/toasts.json",
-                           "nitro", documents=True)
-        giveaway = files.json(
-            "Luna/notifications/toasts.json", "giveaway", documents=True)
-        privnote = files.json(
-            "Luna/notifications/toasts.json", "privnote", documents=True)
-        selfbot = files.json(
-            "Luna/notifications/toasts.json", "selfbot", documents=True)
-        pings = files.json("Luna/notifications/toasts.json",
-                           "pings", documents=True)
-        ghostpings = files.json(
-            "Luna/notifications/toasts.json", "ghostpings", documents=True)
-        friendevents = files.json(
-            "Luna/notifications/toasts.json", "friendevents", documents=True)
-        guildevents = files.json(
-            "Luna/notifications/toasts.json", "guildevents", documents=True)
-        roleupdates = files.json(
-            "Luna/notifications/toasts.json", "roleupdates", documents=True)
-        nickupdates = files.json(
-            "Luna/notifications/toasts.json", "nickupdates", documents=True)
-        protection = files.json(
-            "Luna/notifications/toasts.json", "protection", documents=True)
-        cog = self.bot.get_cog('Toast commands')
-        commands = cog.get_commands()
-        helptext = ""
-        for command in commands:
-            helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-        await message_builder(luna, title="Toast notifications",
-                              description=f"{theme.description()}```\nToast configuration\n\nToasts            » {toasts}\nLogin toasts      » {login}\nNitro toasts      » {nitro}\nGiveaway toasts   » {giveaway}\nPrivnote toasts   » {privnote}\nSelfbot toasts    » {selfbot}\nPing toasts       » {pings}\nGhostping toasts  » {ghostpings}\nFriendevent toast » {friendevents}\nGuildevent toasts » {guildevents}\nRoleupdate toasts » {roleupdates}\nNickname toasts   » {nickupdates}\nProtection toasts » {protection}\n``````\nToast control\n\n{helptext}```")
-
     @commands.command(name="settings",
                       usage="",
                       description="Settings")
@@ -5019,8 +4979,6 @@ Version\n\n{version}```")
             title = "None"
         if footer == "":
             footer = "None"
-        if author == "":
-            author = "None"
         cog = self.bot.get_cog('Settings commands')
         commands = cog.get_commands()
         helptext = ""
@@ -5033,7 +4991,7 @@ Version\n\n{version}```")
         else:
             sharinguser = await self.bot.fetch_user(user_id)
         await message_builder(luna, title="Settings",
-                              description=f"{theme.description()}```\nYour current settings\n\nError logging     » {errorlog}\nAuto delete timer » {deletetimer}\nStartup status    » {startup_status}\nTheme             » {themesvar}\nConsole Mode      » {console_mode}\nRiskmode          » {riskmode}\nDescription       » {theme_description}\nSelfbot detection » {selfbotdetection}\nMention notify    » {pings}\n``````\nYour current theme settings\n\nTheme             » {themesvar}\nTitle             » {title}\nFooter            » {footer}\n``````\nShare Settings\n\nShare             » {share}\nUser              » {sharinguser}``````\nSettings\n\n{helptext}```")
+                              description=f"{theme.description()}```\nYour current settings\n\nError logging     » {errorlog}\nAuto delete timer » {deletetimer}\nStartup status    » {startup_status}\nTheme             » {themesvar}\nConsole Mode      » {console_mode}\nRiskmode          » {riskmode}\nDescription       » {theme_description}\nSelfbot detection » {selfbotdetection}\nMention notify    » {pings}\n``````\nYour current theme settings\n\nTheme             » {themesvar}\nTitle             » {title}\nFooter            » {footer}\nDescription       » {theme_description}\n``````\nShare Settings\n\nShare             » {share}\nUser              » {sharinguser}``````\nSettings\n\n{helptext}```")
 
     @commands.command(name="sharing",
                       usage="",
@@ -5054,56 +5012,6 @@ Version\n\n{version}```")
             helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
         await message_builder(luna, title="Sharing",
                               description=f"{theme.description()}```\nYour current settings\n\nShare             » {share}\nUser              » {sharinguser}\n``````\n{helptext}```")
-
-    @commands.command(name="webhook",
-                      usage="",
-                      description="Webhook settings")
-    async def webhook(self, luna):
-        await luna.message.delete()
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
-        webhooks = files.json("Luna/webhooks/webhooks.json",
-                              "webhooks", documents=True)
-        login = files.json("Luna/webhooks/webhooks.json",
-                           "login", documents=True)
-        nitro = files.json("Luna/webhooks/webhooks.json",
-                           "nitro", documents=True)
-        giveaway = files.json("Luna/webhooks/webhooks.json",
-                              "giveaway", documents=True)
-        privnote = files.json("Luna/webhooks/webhooks.json",
-                              "privnote", documents=True)
-        selfbot = files.json("Luna/webhooks/webhooks.json",
-                             "selfbot", documents=True)
-        pings = files.json("Luna/webhooks/webhooks.json",
-                           "pings", documents=True)
-        ghostpings = files.json(
-            "Luna/webhooks/webhooks.json", "ghostpings", documents=True)
-        friendevents = files.json(
-            "Luna/webhooks/webhooks.json", "friendevents", documents=True)
-        guildevents = files.json(
-            "Luna/webhooks/webhooks.json", "guildevents", documents=True)
-        roleupdates = files.json(
-            "Luna/webhooks/webhooks.json", "roleupdates", documents=True)
-        nickupdates = files.json(
-            "Luna/webhooks/webhooks.json", "nickupdates", documents=True)
-        protection = files.json(
-            "Luna/webhooks/webhooks.json", "protection", documents=True)
-        cog = self.bot.get_cog('Webhook setup')
-        commands = cog.get_commands()
-        setuptext = ""
-        for command in commands:
-            setuptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-        cog = self.bot.get_cog('Webhook commands')
-        commands = cog.get_commands()
-        helptext = ""
-        for command in commands:
-            helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-        cog = self.bot.get_cog('Webhook urls')
-        commands = cog.get_commands()
-        urltext = ""
-        for command in commands:
-            urltext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-        await message_builder(luna, title="Webhooks",
-                              description=f"{theme.description()}```\nWebhook configuration\n\nWebhooks          » {webhooks}\nLogin webhooks    » {login}\nNitro webhooks    » {nitro}\nGiveaway webhooks » {giveaway}\nPrivnote webhooks » {privnote}\nSelfbot webhooks  » {selfbot}\nPing webhooks     » {pings}\nGhostping webhooks » {ghostpings}\nFriendevent webhooks » {friendevents}\nGuildevent webhooks » {guildevents}\nRoleupdate webhooks » {roleupdates}\nNickname webhooks » {nickupdates}\nProtection webhooks » {protection}\n``````\nWebhook setup\n\n{setuptext}\n``````\nWebhook control\n\n{helptext}\n``````\nWebhook url's\n\n{urltext}```")
 
     @commands.command(name="chelp",
                       aliases=['customhelp'],
@@ -12117,6 +12025,96 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         for command in commands:
             helptext3 += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
         await message_builder(luna, title="Customization", description=f"{theme.description()}```\nYour current theme settings\n\nTheme             » {themevar}\nTitle             » {title}\nFooter            » {footer}\nDescription       » {theme_description}\n``````\nSelfbot theme settings\n\n{helptext1}\n``````\nWebhook theme settings\n\n{helptext2}\n``````\nToast theme settings\n\n{helptext3}\n``````\nNote\n\nIf you want to remove a customization,\nYou can use \"None\" to remove it.\n```")
+
+    @commands.command(name="webhook",
+                      usage="",
+                      description="Webhook settings")
+    async def webhook(self, luna):
+        await luna.message.delete()
+        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        webhooks = files.json("Luna/webhooks/webhooks.json",
+                              "webhooks", documents=True)
+        login = files.json("Luna/webhooks/webhooks.json",
+                           "login", documents=True)
+        nitro = files.json("Luna/webhooks/webhooks.json",
+                           "nitro", documents=True)
+        giveaway = files.json("Luna/webhooks/webhooks.json",
+                              "giveaway", documents=True)
+        privnote = files.json("Luna/webhooks/webhooks.json",
+                              "privnote", documents=True)
+        selfbot = files.json("Luna/webhooks/webhooks.json",
+                             "selfbot", documents=True)
+        pings = files.json("Luna/webhooks/webhooks.json",
+                           "pings", documents=True)
+        ghostpings = files.json(
+            "Luna/webhooks/webhooks.json", "ghostpings", documents=True)
+        friendevents = files.json(
+            "Luna/webhooks/webhooks.json", "friendevents", documents=True)
+        guildevents = files.json(
+            "Luna/webhooks/webhooks.json", "guildevents", documents=True)
+        roleupdates = files.json(
+            "Luna/webhooks/webhooks.json", "roleupdates", documents=True)
+        nickupdates = files.json(
+            "Luna/webhooks/webhooks.json", "nickupdates", documents=True)
+        protection = files.json(
+            "Luna/webhooks/webhooks.json", "protection", documents=True)
+        cog = self.bot.get_cog('Webhook setup')
+        commands = cog.get_commands()
+        setuptext = ""
+        for command in commands:
+            setuptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+        cog = self.bot.get_cog('Webhook commands')
+        commands = cog.get_commands()
+        helptext = ""
+        for command in commands:
+            helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+        cog = self.bot.get_cog('Webhook urls')
+        commands = cog.get_commands()
+        urltext = ""
+        for command in commands:
+            urltext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+        await message_builder(luna, title="Webhooks",
+                              description=f"{theme.description()}```\nWebhook configuration\n\nWebhooks          » {webhooks}\nLogin webhooks    » {login}\nNitro webhooks    » {nitro}\nGiveaway webhooks » {giveaway}\nPrivnote webhooks » {privnote}\nSelfbot webhooks  » {selfbot}\nPing webhooks     » {pings}\nGhostping webhooks » {ghostpings}\nFriendevent webhooks » {friendevents}\nGuildevent webhooks » {guildevents}\nRoleupdate webhooks » {roleupdates}\nNickname webhooks » {nickupdates}\nProtection webhooks » {protection}\n``````\nWebhook setup\n\n{setuptext}\n``````\nWebhook control\n\n{helptext}\n``````\nWebhook url's\n\n{urltext}```")
+
+    @commands.command(name="notifications",
+                      usage="",
+                      description="Toast notifications")
+    async def notifications(self, luna):
+        await luna.message.delete()
+        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        toasts = files.json("Luna/notifications/toasts.json",
+                            "toasts", documents=True)
+        login = files.json("Luna/notifications/toasts.json",
+                           "login", documents=True)
+        nitro = files.json("Luna/notifications/toasts.json",
+                           "nitro", documents=True)
+        giveaway = files.json(
+            "Luna/notifications/toasts.json", "giveaway", documents=True)
+        privnote = files.json(
+            "Luna/notifications/toasts.json", "privnote", documents=True)
+        selfbot = files.json(
+            "Luna/notifications/toasts.json", "selfbot", documents=True)
+        pings = files.json("Luna/notifications/toasts.json",
+                           "pings", documents=True)
+        ghostpings = files.json(
+            "Luna/notifications/toasts.json", "ghostpings", documents=True)
+        friendevents = files.json(
+            "Luna/notifications/toasts.json", "friendevents", documents=True)
+        guildevents = files.json(
+            "Luna/notifications/toasts.json", "guildevents", documents=True)
+        roleupdates = files.json(
+            "Luna/notifications/toasts.json", "roleupdates", documents=True)
+        nickupdates = files.json(
+            "Luna/notifications/toasts.json", "nickupdates", documents=True)
+        protection = files.json(
+            "Luna/notifications/toasts.json", "protection", documents=True)
+        cog = self.bot.get_cog('Toast commands')
+        commands = cog.get_commands()
+        helptext = ""
+        for command in commands:
+            helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+        await message_builder(luna, title="Toast notifications",
+                              description=f"{theme.description()}```\nToast configuration\n\nToasts            » {toasts}\nLogin toasts      » {login}\nNitro toasts      » {nitro}\nGiveaway toasts   » {giveaway}\nPrivnote toasts   » {privnote}\nSelfbot toasts    » {selfbot}\nPing toasts       » {pings}\nGhostping toasts  » {ghostpings}\nFriendevent toast » {friendevents}\nGuildevent toasts » {guildevents}\nRoleupdate toasts » {roleupdates}\nNickname toasts   » {nickupdates}\nProtection toasts » {protection}\n``````\nToast control\n\n{helptext}```")
 
     # @commands.command(name = "embedmode",
     # 				usage="",
