@@ -1,7 +1,9 @@
 # Luna-SelfBot
 Team Luna's flagship selfbot!
 
-![Luna Logo](https://github.com/Team-Luna-Development/Luna-SelfBot/blob/master/Images/Luna_Logo.png)
+[![built with: Python3](https://camo.githubusercontent.com/0d9fbff04202da688cc79c5ffe984bd171edf453b2e41e5e56e55202dd5bdbb2/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6275696c74253230776974682d507974686f6e332d7265642e737667)](https://www.python.org/)
+
+![Luna Logo](https://github.com/Team-Luna-Development/Luna-SelfBot/blob/dev/Images/Luna_Logo.png)
 
 ---------------------------
 

