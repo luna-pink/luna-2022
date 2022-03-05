@@ -4365,7 +4365,10 @@ class OnCommandErrorCog(commands.Cog, name="on command error"):
                 found = f"```\n\nDid you mean?\n\n{commandlistfind}```"
             else:
                 found = ""
-            await error_builder(luna, f"```\nNot Found\n\n{error}```{found}```\nNote\n\nYou can use \"search\" to search for a command.\n{prefix}search <command> » Search for a command```")
+            if configs.error_log() == "message":
+                await error_builder(luna, f"```\nNot Found\n\n{error}```{found}```\nNote\n\nYou can use \"search\" to search for a command.\n{prefix}search <command> » Search for a command```")
+            else:
+                await error_builder(luna, f"```\nNot Found\n\n{error}```")
         elif isinstance(error, CheckFailure):
             try:
                 await luna.message.delete()
@@ -4541,8 +4544,6 @@ Categories\n\n\
 {prefix}nuking           » Account nuking\n\
 {prefix}utility          » Utilities\n\
 {prefix}settings         » Settings\n\
-{prefix}webhook          » Webhook settings\n\
-{prefix}notifications    » Toast notifications\n\
 {prefix}sharing          » Share with somebody\n\
 {prefix}themes           » Themes\n\
 {prefix}misc             » Miscellaneous\n\
@@ -12190,7 +12191,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         await luna.message.delete()
         if mode == "message" or mode == "console":
             prints.message(f"Error logging » {color.purple(f'{mode}')}")
-            configs.error_log()(mode)
+            config.error_log(mode)
             await message_builder(luna, description=f"```\nError logging » {mode}```")
         else:
             await mode_error(luna, "message or console")
