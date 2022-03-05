@@ -7,6 +7,7 @@ developer_mode = False
 beta = False
 version = '3.2.9h2'
 api_version = 'v9'
+beta_version = 'v10'
 
 # ///////////////////////////////////////////////////////////////
 # Luna Variables
