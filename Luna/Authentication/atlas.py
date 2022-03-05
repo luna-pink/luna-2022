@@ -328,3 +328,17 @@ class Atlas:
         except Exception as e:
             self.disconnect()
             raise CustomError("{}".format(e))
+        
+    def GetAppVersion(self):
+        socket = self.socket
+        try:
+            RegisterPayload = CEADecrypt(self.app_token).CEA256(self._send(socket, CEAEncrypt(self.app_token).CEA256(f"OpCode=5;AppOpCode=9;")))
+            responseCode = RegisterPayload.split(";")[0].split("=")[1]
+            responseResult = RegisterPayload.split(";")[1].split("=")[1]
+            if responseCode == "8":
+                return responseResult
+            else:
+                raise CustomError("An unknown issue occured while attempting to obtain the specified user's AppUserRole")
+        except Exception as e:
+            self.disconnect()
+            raise CustomError("Error: {}".format(e))
