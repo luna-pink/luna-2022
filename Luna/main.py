@@ -912,15 +912,15 @@ class luna:
         """Logs in the bot."""
         luna.console(clear=True)
 
-        # try:
-        # 	path = getattr(sys, '_MEIPASS', os.getcwd())
-        # 	cogs_path = path + "\\cogs"
-        # 	luna.loader_check()
-        # 	for filename in os.listdir(cogs_path):
-        # 		if filename.endswith(".py"):
-        # 			bot.load_extension(f"cogs.{filename[:-3]}")
-        # except:
-        # 	pass
+        try:
+            path = getattr(sys, '_MEIPASS', os.getcwd())
+            cogs_path = path + "\\cogs"
+            luna.loader_check()
+            for filename in os.listdir(cogs_path):
+                if filename.endswith(".py"):
+                    bot.load_extension(f"cogs.{filename[:-3]}")
+        except BaseException:
+            pass
 
         try:
             token = files.json("Luna/discord.json", "token", documents=True)
@@ -12426,17 +12426,18 @@ class SettingsCog(commands.Cog, name="Settings commands"):
     async def reload(self, ctx):
         await ctx.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
-        # path = getattr(sys, '_MEIPASS', os.getcwd())
-        # cogs_path = path + "\\cogs"
-        # luna.loader_check()
-        # for filename in os.listdir(cogs_path):
-        # 	if filename.endswith(".py"):
-        # 		bot.reload_extension(f"cogs.{filename[:-3]}")
-        # prints.message(f"Reloaded custom commands")
-        # await message_builder(ctx, description=f"```\nReloaded custom
-        # commands```")
-        await message_builder(ctx,
-                              description=f"```\nReload has been disabled until further notice, use {prefix}restart instead```")
+        path = getattr(sys, '_MEIPASS', os.getcwd())
+        cogs_path = path + "\\cogs"
+        luna.loader_check()
+        for filename in os.listdir(cogs_path):
+            if filename.endswith(".py"):
+                try:
+                    bot.reload_extension(f"cogs.{filename[:-3]}")
+                except BaseException:
+                    bot.load_extension(f"cogs.{filename[:-3]}")
+        prints.message(f"Reloaded custom commands")
+        await message_builder(ctx, description=f"```\nReloaded custom commands```")
+        # await message_builder(ctx, description=f"```\nReload has been disabled until further notice, use {prefix}restart instead```")
 
     @commands.command(name="darkmode",
                       usage="",
@@ -12470,45 +12471,45 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 bot.add_cog(SettingsCog(bot))
 
 
-class CustomCog(commands.Cog, name="Custom commands"):
-    def __init__(self, bot: commands.bot):
-        self.bot = bot
+# class CustomCog(commands.Cog, name="Custom commands"):
+#     def __init__(self, bot: commands.bot):
+#         self.bot = bot
 
-    try:
-        file = open(os.path.join(files.documents(),
-                    "Luna/custom/custom.py"), "r")
-        file_data = file.read()
-        if "sys.modules" in str(file_data):
-            prints.error("Using sys.modules is not allowed.")
-            time.sleep(5)
-            exit()
-        if "import inspect" in str(file_data):
-            prints.error("Importing inspect is not allowed.")
-            time.sleep(5)
-            exit()
-        if "import dill" in str(file_data):
-            prints.error("Importing dill is not allowed.")
-            time.sleep(5)
-            exit()
-        if "exec" in str(file_data):
-            prints.error("Using exec is not allowed.")
-            time.sleep(5)
-            exit()
-        if "auth_luna" in str(file_data):
-            prints.error("\"auth_luna\" not allowed.")
-            time.sleep(5)
-            exit()
-        if "atlas" in str(file_data):
-            prints.error("\"atlas\" not allowed.")
-            time.sleep(5)
-            exit()
-        exec(file_data)
-    except Exception as e:
-        prints.error(e)
-        os.system('pause')
+#     try:
+#         file = open(os.path.join(files.documents(),
+#                     "Luna/custom/custom.py"), "r")
+#         file_data = file.read()
+#         if "sys.modules" in str(file_data):
+#             prints.error("Using sys.modules is not allowed.")
+#             time.sleep(5)
+#             exit()
+#         if "import inspect" in str(file_data):
+#             prints.error("Importing inspect is not allowed.")
+#             time.sleep(5)
+#             exit()
+#         if "import dill" in str(file_data):
+#             prints.error("Importing dill is not allowed.")
+#             time.sleep(5)
+#             exit()
+#         if "exec" in str(file_data):
+#             prints.error("Using exec is not allowed.")
+#             time.sleep(5)
+#             exit()
+#         if "auth_luna" in str(file_data):
+#             prints.error("\"auth_luna\" not allowed.")
+#             time.sleep(5)
+#             exit()
+#         if "atlas" in str(file_data):
+#             prints.error("\"atlas\" not allowed.")
+#             time.sleep(5)
+#             exit()
+#         exec(file_data)
+#     except Exception as e:
+#         prints.error(e)
+#         os.system('pause')
 
 
-bot.add_cog(CustomCog(bot))
+# bot.add_cog(CustomCog(bot))
 
 
 class ShareCog(commands.Cog, name="Share commands"):

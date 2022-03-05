@@ -170,19 +170,19 @@ class CustomCog(commands.Cog, name="Custom commands"):
 		if "sys.modules" in str(file_data):
 			print("Using sys.modules is not allowed.")
 			time.sleep(5)
-			exit()
+			os._exit(0)
 		if "inspect" and "import" in str(file_data):
 			print("Importing inspect is not allowed.")
 			time.sleep(5)
-			exit()
+			os._exit(0)
 		if "dill" and "import" in str(file_data):
 			print("Importing dill is not allowed.")
 			time.sleep(5)
-			exit()
+			os._exit(0)
 		if "exec" in str(file_data):
 			print("Using exec is not allowed.")
 			time.sleep(5)
-			exit()
+			os._exit(0)
 		exec(file_data)
 	except Exception as e:
 		print(e)
