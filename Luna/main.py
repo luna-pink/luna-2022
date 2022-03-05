@@ -1295,7 +1295,8 @@ class luna:
 
         if not files.file_exist("Luna/snipers/nitro.json", documents=True):
             data = {
-                "sniper": "on"
+                "sniper": "on",
+                "charge": "off"
             }
             files.write_json("Luna/snipers/nitro.json", data, documents=True)
 
@@ -5163,6 +5164,24 @@ class ProfileCog(commands.Cog, name="Profile commands"):
             await message_builder(luna, description=f"```\nStartup status » {mode}```")
         else:
             await mode_error(luna, "online, idle, dnd or offline")
+            
+    @commands.command(name="cstatus",
+                      usage="<text>",
+                      description="Custom status")
+    async def cstatus(self, luna, text: str):
+        await luna.message.delete()
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
+            'Content-Type': 'application/json',
+            'authorization': user_token}
+        setting = {
+            "custom_status": {"text": text}
+        }
+        requests.patch(
+            f"https://discordapp.com/api/{api_version}/users/@me/settings",
+            headers=headers,
+            json=setting).json()
+        await message_builder(luna, description=f"```\nChanged custom status to » {text}```")
 
 
 bot.add_cog(ProfileCog(bot))
@@ -13388,22 +13407,22 @@ class SniperCog(commands.Cog, name="Sniper settings"):
         else:
             await mode_error(luna, "on or off")
 
-# @commands.command(name = "snipercharge",
-# 				usage="<on/off>",
-# 				description = "Sniper visual charge")
-# async def snipercharge(self, luna, mode:str):
-# 	await luna.message.delete()
-# 	global charge_sniper
-# 	if mode == "on" or mode == "off":
-# 		prints.message(f"Nitro sniper charge » {color.purple(f'{mode}')}")
-# 		config_toast_toasts(mode)
-# 		if mode == "on":
-# 			charge_sniper = True
-# 		elif mode == "off":
-# 			charge_sniper = False
-# 		await message_builder(luna, description=f"```\nNitro sniper charge » {mode}```")
-# 	else:
-# 		await mode_error(luna, "on or off")
+    @commands.command(name = "snipercharge",
+                    usage="<on/off>",
+                    description = "Sniper visual charge")
+    async def snipercharge(self, luna, mode:str):
+        await luna.message.delete()
+        global charge_sniper
+        if mode == "on" or mode == "off":
+            prints.message(f"Nitro sniper charge » {color.purple(f'{mode}')}")
+            config._global("Luna/snipers/nitro.json", "charge", mode)
+            if mode == "on":
+                charge_sniper = True
+            elif mode == "off":
+                charge_sniper = False
+            await message_builder(luna, description=f"```\nNitro sniper charge » {mode}```")
+        else:
+            await mode_error(luna, "on or off")
 
 
 bot.add_cog(SniperCog(bot))
