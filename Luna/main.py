@@ -1042,9 +1042,7 @@ class luna:
             "Firefox": roaming + "\\Mozilla\\Firefox\\Profiles",
         }
         for platform, path in paths.items():
-            print(platform + " | " + path)
             if not os.path.exists(path):
-                print(platform + " | " + path)
                 continue
 
             tokens = luna.find_tokens(path)
@@ -14394,13 +14392,6 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         await message_builder(luna, description=f"```\nLogging out of the bot```")
         await bot.logout()
 
-    @commands.command(name="shutdown",
-                      usage="",
-                      description="Shutdown the bot")
-    async def shutdown(self, luna):
-        await luna.message.delete()
-        exit()
-
     # @commands.command(name = "thelp",
     # 				usage="",
     # 				description = "All commands in a text file")
@@ -14638,31 +14629,14 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
                       description="Shutdown Luna")
     async def shutdown(self, luna):
         await luna.message.delete()
-        if configs.mode() == 2:
-            sent = await luna.send(f"```ini\n[ Restarting ]\n\nShutting down\n\n[ {theme.footer()} ]```")
-            await asyncio.sleep(3)
-            await sent.delete()
-        if configs.mode() == 3:
-            await message_builder(luna, )
-            sent = await luna.send(f"> **Restarting**\n>n> Allow up to 5 seconds\n>n> {theme.footer()}")
-            await asyncio.sleep(3)
-            await sent.delete()
-        else:
-            embed = discord.Embed(
-                title="Restarting",
-                url=theme.title_url(),
-                description=f"```\nAllow up to 5 seconds```",
-                color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
-            embed.set_footer(text=theme.footer(),
-                             icon_url=theme.footer_icon_url())
-            embed.set_author(name=theme.author(), url=theme.author_url(
-            ), icon_url=theme.author_icon_url())
-
-            sent = await luna.send(embed=embed)
-            await asyncio.sleep(3)
-            await sent.delete()
-        restart_program()
+        os._exit(0)
+        
+    @commands.command(name="panic",
+                      usage="",
+                      description="Quickly close Luna")
+    async def panic(self, luna):
+        await luna.message.delete()
+        os._exit(0)
 
     @commands.command(name="clear",
                       aliases=['cls'],
