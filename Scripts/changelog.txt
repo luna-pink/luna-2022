@@ -1,0 +1,2 @@
+[!] Fixed random crash on startup
+[!] Fixed afk replies breaking
