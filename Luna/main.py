@@ -3,12 +3,12 @@
 # ///////////////////////////////////////////////////////////////
 # Imports
 
+from lib2to3.pytree import Base
 import os
 import re
 import sys
 import json
 import time
-from types import NoneType
 import httpx
 import base64
 import qrcode
@@ -38,11 +38,11 @@ from notifypy import Notify
 from os import error, system
 from datetime import datetime
 # from pypresence import Presence
-from discord.ext import commands
 from time import localtime, strftime
 
 import discord
 from discord import *
+from discord.ext import commands
 from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFound, has_permissions
 
 # ///////////////////////////////////////////////////////////////
@@ -52,6 +52,8 @@ from variables import *
 from Encryption.CEA256 import *
 from Encryption.CEAShim256 import *
 from Authentication.atlas import *
+
+from wrapper import Bot
 
 # ///////////////////////////////////////////////////////////////
 # Window Size & Scroller
@@ -400,12 +402,15 @@ class files:
 
     def remove(path: str, documents=False):
         """Removes a file"""
-        if documents:
-            if os.path.exists(os.path.join(files.documents(), path)):
-                os.remove(os.path.join(files.documents(), path))
-        else:
-            if os.path.exists(path):
-                os.remove(path)
+        try:
+            if documents:
+                if os.path.exists(os.path.join(files.documents(), path)):
+                    os.remove(os.path.join(files.documents(), path))
+            else:
+                if os.path.exists(path):
+                    os.remove(path)
+        except BaseException:
+            pass
 
 
 def is_running(process_name: str):
@@ -576,7 +581,6 @@ def restart_program():
                        description=f"Restarting Luna...")
     python = sys.executable
     os.execl(python, python, *sys.argv)
-
 
 def Randprntsc():
     """
@@ -954,6 +958,7 @@ class luna:
             "Luna/discord.json",
             "token",
                 documents=True) == "token-here":
+            print("1.3")
             luna.console(clear=True)
             prints.event(
                 "First time setup, Luna will search for tokens on your system")
@@ -1109,7 +1114,8 @@ class luna:
             luna.console(clear=True)
             now = datetime.now()
             hour = now.hour
-
+            username = f"Dev - {os.getlogin()}"
+            
             if hour < 12:
                 greeting = "Good morning"
             elif hour < 18:
@@ -1117,9 +1123,10 @@ class luna:
             else:
                 greeting = "Good evening"
 
-            username = files.json("Luna/auth.json", "username", documents=True)
-            username = Decryption(
-                '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+            if files.file_exist('Luna/auth.json', documents=True):
+                username = files.json("Luna/auth.json", "username", documents=True)
+                username = Decryption(
+                    '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
             prints.message(f"{greeting}, {color.purple(username)}.")
             time.sleep(3)
             prints.message("We are getting Luna ready for you.")
@@ -3166,9 +3173,11 @@ def uptime_thread():
     minute = 0
     second = 0
     day = 0
-    username = files.json("Luna/auth.json", "username", documents=True)
-    username = Decryption(
-        '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+    username = f"Dev - {os.getlogin()}"
+    if files.file_exist('Luna/auth.json', documents=True):
+        username = files.json("Luna/auth.json", "username", documents=True)
+        username = Decryption(
+            '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
     while True:
         if day == 0:
             luna.title(
@@ -3282,13 +3291,7 @@ def anti_token_logger():
 # ///////////////////////////////////////////////////////////////
 # ON_READY
 
-bot = commands.Bot(
-    command_prefix=bot_prefix,
-    self_bot=True,
-    case_insensitive=True,
-    guild_subscription_options=GuildSubscriptionOptions.off(),
-    status=statuscon())
-
+bot = Bot()
 
 @bot.event
 async def on_ready():

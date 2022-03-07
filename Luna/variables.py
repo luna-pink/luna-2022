@@ -3,7 +3,7 @@ import requests
 # ///////////////////////////////////////////////////////////////
 # Developer Variables
 
-developer_mode = False
+developer_mode = True
 beta = False
 version = '3.3.0'
 api_version = 'v9'
