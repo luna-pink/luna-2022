@@ -52,6 +52,7 @@ from variables import *
 from Encryption.CEA256 import *
 from Encryption.CEAShim256 import *
 from Authentication.atlas import *
+from Functions.files import *
 
 from wrapper import Bot
 
@@ -322,96 +323,8 @@ class color:
                     green = 0
         return faded
 
-
-# ///////////////////////////////////////////////////////////////
-# File Functions
-
-class files:
-    def documents():
-        return os.path.expanduser("~/Documents")
-
-    def file_exist(file_name: str, documents=False):
-        """Checks if a file exists"""
-        if documents:
-            return os.path.exists(os.path.join(files.documents(), file_name))
-        else:
-            return os.path.exists(file_name)
-
-    def write_file(path: str, content, documents=False, byte=False):
-        """Writes a file"""
-        if documents and byte:
-            with open(os.path.join(files.documents(), path), "wb") as f:
-                f.write(content)
-        elif documents:
-            with open(os.path.join(files.documents(), path), 'w') as f:
-                f.write(content)
-        else:
-            with open(path, 'w') as f:
-                f.write(content)
-
-    def write_json(path: str, content, documents=False):
-        """Writes a json file"""
-        if documents:
-            with open(os.path.join(files.documents(), path), "w") as f:
-                f.write(json.dumps(content, indent=4))
-        else:
-            with open(path, "w") as f:
-                f.write(json.dumps(content, indent=4))
-
-    def read_file(path: str, documents=False):
-        """Reads a file"""
-        if documents:
-            with open(os.path.join(files.documents(), path), 'r', encoding="utf-8") as f:
-                return f.read()
-        else:
-            with open(path, 'r', encoding="utf-8") as f:
-                return f.read()
-
-    def append_file(path: str, content):
-        """Appends to a file"""
-        with open(path, 'a') as f:
-            f.write(content)
-
-    def delete_file(path: str, documents=False):
-        """Deletes a file"""
-        if documents:
-            os.remove(os.path.join(files.documents(), path))
-        else:
-            os.remove(path)
-
-    def create_folder(path: str, documents=False):
-        """Creates a folder"""
-        if documents:
-            if not os.path.exists(os.path.join(files.documents(), path)):
-                os.makedirs(os.path.join(files.documents(), path))
-        else:
-            if not os.path.exists(path):
-                os.makedirs(path)
-
-    def json(file_name: str, value: str, documents=False):
-        """Reads a json file"""
-        if documents:
-            return json.load(
-                open(
-                    os.path.join(
-                        files.documents(),
-                        file_name),
-                    encoding="utf-8"))[value]
-        else:
-            return json.load(open(file_name, encoding="utf-8"))[value]
-
-    def remove(path: str, documents=False):
-        """Removes a file"""
-        try:
-            if documents:
-                if os.path.exists(os.path.join(files.documents(), path)):
-                    os.remove(os.path.join(files.documents(), path))
-            else:
-                if os.path.exists(path):
-                    os.remove(path)
-        except BaseException:
-            pass
-
+# /////////////////////////////////////////////////////////////////////////////
+# Functions
 
 def is_running(process_name: str):
     """Check if a process is running"""
@@ -1508,7 +1421,6 @@ class luna:
 def get_prefix():
     prefix = files.json("Luna/config.json", "prefix", documents=True)
     return prefix
-
 
 class prints:
     luna.file_check(console=False)
@@ -4294,9 +4206,8 @@ class OnCommandErrorCog(commands.Cog, name="on command error"):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_command_error(self, luna: commands.Context, error: commands.CommandError):
+    async def on_command_error(self, luna: commands.Context, error: Exception):
         error_str = str(error)
-        error = getattr(error, 'original', error)
         if isinstance(error, commands.CommandOnCooldown):
             try:
                 await luna.message.delete()
@@ -4336,7 +4247,7 @@ class OnCommandErrorCog(commands.Cog, name="on command error"):
                 else:
                     await luna.send(f'You are being ratelimited, for {error.retry_after:.2f} second(s)', delete_after=3)
 
-        if isinstance(error, CommandNotFound):
+        if isinstance(error, commands.CommandNotFound):
             try:
                 await luna.message.delete()
             except BaseException:
