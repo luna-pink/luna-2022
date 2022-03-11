@@ -3,9 +3,11 @@ import requests
 # ///////////////////////////////////////////////////////////////
 # Developer Variables
 
+free_mode = True
 developer_mode = False
+
 beta = False
-version = '3.2.9h2'
+version = '3.3.0'
 api_version = 'v9'
 beta_version = 'v10'
 
@@ -170,19 +172,19 @@ class CustomCog(commands.Cog, name="Custom commands"):
 		if "sys.modules" in str(file_data):
 			print("Using sys.modules is not allowed.")
 			time.sleep(5)
-			exit()
+			os._exit(0)
 		if "inspect" and "import" in str(file_data):
 			print("Importing inspect is not allowed.")
 			time.sleep(5)
-			exit()
+			os._exit(0)
 		if "dill" and "import" in str(file_data):
 			print("Importing dill is not allowed.")
 			time.sleep(5)
-			exit()
+			os._exit(0)
 		if "exec" in str(file_data):
 			print("Using exec is not allowed.")
 			time.sleep(5)
-			exit()
+			os._exit(0)
 		exec(file_data)
 	except Exception as e:
 		print(e)
