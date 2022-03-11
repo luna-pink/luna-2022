@@ -1021,10 +1021,13 @@ class luna:
                         num = num + 1
                         working_emails.append(email)
             if working_emails:
-                token_input = prints.input(
-                    f"Select the account you want to use (1-{num - 1})")
+                prints.message("Type \"c\" to manually enter a token")
+                token_input = prints.input(f"Select the account you want to use (1-{num - 1})")
                 try:
-                    token = num_token[int(token_input)]
+                    if token_input == "c":
+                        token = prints.input("Token")
+                    else:
+                        token = num_token[int(token_input)]
                     return token
                 except BaseException:
                     prints.error("Invalid choice")
