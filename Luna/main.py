@@ -5507,12 +5507,12 @@ class MemberCog(commands.Cog, name="Member commands"):
         await message_builder(luna, title="Unban",
                               description=f"```\nNo banned user with the id {user_id} was found```")
 
-    @commands.command(name="bans",
+    @commands.command(name="banned",
                       usage="[guild_id]",
                       description="List all bans")
     @commands.guild_only()
     @has_permissions(ban_members=True)
-    async def bans(self, luna, guild_id: int = None):
+    async def banned(self, luna, guild_id: int = None):
         await luna.message.delete()
         if guild_id is not None:
             guild = discord.utils.get(self.bot.guilds, id=guild_id)
