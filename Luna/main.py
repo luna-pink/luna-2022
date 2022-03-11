@@ -8573,7 +8573,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                       description="Poll")
     async def cpoll(self, luna, option1, option2, *, poll):
         await luna.message.delete()
-        message = await luna.send(f"> **Poll**\n> \n> {{poll}}\n> \n> 🅰️ = {option1}\n🅱️ = {option2}\n> \n> {theme.footer()}")
+        message = await luna.send(f"> **Poll**\n> \n> {poll}\n> \n> 🅰️ = {option1}\n> 🅱️ = {option2}\n> \n> {theme.footer()}")
         await message.add_reaction('🅰️')
         await message.add_reaction('🅱️')
 
