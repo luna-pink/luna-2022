@@ -24,8 +24,7 @@ class Bot(commands.Bot):
             key (str): _description_
         """
         self.ready = False
-        self.extensions = [p.stem for p in Path(
-            __file__).parent.glob('**/*.py') if p.stem != '__init__']
+        self.extensions = [p.stem for p in Path(__file__).parent.glob('**/*.py') if p.stem != '__init__']
         self.scheduler = AsyncIOScheduler()
         self.scheduler.configure(timezone=utc)
         self.key = key
