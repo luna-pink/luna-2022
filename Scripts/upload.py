@@ -83,6 +83,7 @@ luna_role = 893541525575839785
 public_guild_id = 793674589988323330
 public_upload_channel_id = 951879313341448272
 public_changelog_channel_id = 879050099563565106
+public_announcement_channel_id = 810002706214420511
 
 # ///////////////////////////////////////////////////////////////
 
@@ -113,6 +114,7 @@ async def on_ready():
     public_upload_guild = bot.get_guild(public_guild_id)
     public_upload_channel = public_upload_guild.get_channel(public_upload_channel_id)
     public_changelog_channel = public_upload_guild.get_channel(public_changelog_channel_id)
+    public_announcement_channel = upload_guild.get_channel(public_announcement_channel_id)
 
 # ///////////////////////////////////////////////////////////////
 # With Mention
@@ -151,6 +153,7 @@ async def on_ready():
     file_data = file.read()
     file.close()
     await announcement_channel.send(announcement)
+    await public_announcement_channel.send(announcement)
     await changelog_channel.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
     await public_changelog_channel.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
     config.version(version)

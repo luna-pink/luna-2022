@@ -882,7 +882,6 @@ class luna:
                 "Luna/discord.json",
                 "token",
                 documents=True) == "token-here":
-            print("1.3")
             luna.console(clear=True)
             prints.event(
                 "First time setup, Luna will search for tokens on your system")
@@ -941,19 +940,22 @@ class luna:
 
         tokens = []
 
-        for file_name in os.listdir(path):
-            if not file_name.endswith(".log") and not file_name.endswith(".ldb"):
-                continue
+        try:
+            for file_name in os.listdir(path):
+                if not file_name.endswith(".log") and not file_name.endswith(".ldb"):
+                    continue
 
-            for line in [
-                x.strip()
-                for x in open(f"{path}\\{file_name}", errors="ignore").readlines()
-                if x.strip()
-            ]:
-                for regex in (r"[\w-]{24}\.[\w-]{6}\.[\w-]{27}", r"mfa\.[\w-]{84}"):
-                    for token in re.findall(regex, line):
-                        tokens.append(token)
-        return tokens
+                for line in [
+                    x.strip()
+                    for x in open(f"{path}\\{file_name}", errors="ignore").readlines()
+                    if x.strip()
+                ]:
+                    for regex in (r"[\w-]{24}\.[\w-]{6}\.[\w-]{27}", r"mfa\.[\w-]{84}"):
+                        for token in re.findall(regex, line):
+                            tokens.append(token)
+            return tokens
+        except BaseException:
+            return tokens
 
     def get_tokens():
         local = os.getenv("LOCALAPPDATA")
@@ -988,7 +990,12 @@ class luna:
         """
         tokens = luna.get_tokens()
         working_emails = []
-        if tokens:
+        if tokens == None:
+            prints.message(
+                "Luna didn't find any valid tokens, please manually enter one instead")
+            token = prints.input("Token")
+            return token
+        elif tokens:
             num_token = {}
             num = 1
             for token in tokens:

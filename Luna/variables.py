@@ -7,7 +7,7 @@ free_mode = True
 developer_mode = False
 
 beta = False
-version = '3.3.1'
+version = '3.3.2'
 api_version = 'v9'
 beta_version = 'v10'
 
