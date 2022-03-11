@@ -3206,7 +3206,7 @@ def anti_token_logger():
 # ///////////////////////////////////////////////////////////////
 # ON_READY
 
-bot = Bot()
+bot = Bot(key="Jgy67HUXLH")
 
 
 @bot.event

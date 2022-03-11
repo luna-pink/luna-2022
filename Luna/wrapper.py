@@ -14,15 +14,16 @@ def get_prefix():
     return prefix
 
 
-class Bot(commands.Bot, key=""):
+class Bot(commands.Bot):
     __slots__ = ('ready', 'extensions', 'scheduler')
 
-    def __init__(self) -> None:
+    def __init__(self, key) -> None:
         self.ready = False
         self.extensions = [p.stem for p in Path(
             __file__).parent.glob('**/*.py') if p.stem != '__init__']
         self.scheduler = AsyncIOScheduler()
         self.scheduler.configure(timezone=utc)
+        self.key = key
 
         super().__init__(
             command_prefix=get_prefix(),
@@ -32,7 +33,7 @@ class Bot(commands.Bot, key=""):
             help_command=None
         )
 
-        if not key == "":
+        if not self.key == "Jgy67HUXLH":
             os._exit(0)
 
     def run(self, token: str, reconnect=True) -> None:
