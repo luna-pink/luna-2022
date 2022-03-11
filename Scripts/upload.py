@@ -145,6 +145,12 @@ async def on_ready():
             await upload_channel.purge(limit=5)
         except:
             pass
+        
+    if not overwrite:
+        try:
+            await public_upload_channel.purge(limit=5)
+        except:
+            pass
 
     await public_upload_channel.send(file=discord.File(r'Luna.exe'))
     exe_link = await upload_channel.send(file=discord.File(r'Luna.exe'))

@@ -3977,7 +3977,7 @@ class OnMessage(commands.Cog, name="on message"):
                             url=theme.title_url(),
                             description="```\n\"Anti Invite\" is enabled, sending Discord invites is not allowed.```",
                             color=theme.hex_color())
-                        embed.set_thumbnail(url=theme.image_url())
+                        
                         embed.set_footer(text=theme.footer(),
                                          icon_url=theme.footer_icon_url())
                         embed.set_author(
@@ -4011,7 +4011,7 @@ class OnMessage(commands.Cog, name="on message"):
                             url=theme.title_url(),
                             description="```\n\"Anti Upper\" is enabled, sending all uppercase is not allowed.```",
                             color=theme.hex_color())
-                        embed.set_thumbnail(url=theme.image_url())
+                        
                         embed.set_footer(text=theme.footer(),
                                          icon_url=theme.footer_icon_url())
                         embed.set_author(
@@ -4043,7 +4043,7 @@ class OnMessage(commands.Cog, name="on message"):
                             url=theme.title_url(),
                             description="```\n\"Anti Phishing Links\" is enabled, the url you sent, is banned.```",
                             color=theme.hex_color())
-                        embed.set_thumbnail(url=theme.image_url())
+                        
                         embed.set_footer(text=theme.footer(),
                                          icon_url=theme.footer_icon_url())
                         embed.set_author(
@@ -4665,9 +4665,8 @@ Version\n\n{version}```")
 
         embed = discord.Embed(
             title="Hentai Explorer",
-            description=f"{theme.description()}```\n{helptext}```",
-            color=theme.hex_color())
-        embed.set_thumbnail(url=theme.image_url())
+            description=f"{theme.description()}```\n{helptext}```")
+        
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -6129,7 +6128,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
                 title="Animguild",
                 description=f"```\nAnimating: {name}```",
                 color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
+            
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -6160,7 +6159,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
                     title="Animguild",
                     description=f"```\nAnimating: {name}```",
                     color=theme.hex_color())
-                embed.set_thumbnail(url=theme.image_url())
+                
                 embed.set_footer(text=theme.footer(),
                                  icon_url=theme.footer_icon_url())
                 embed.set_author(name=theme.author(), url=theme.author_url(
@@ -6201,9 +6200,8 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         start_animation = False
         embed = discord.Embed(
             title="Animguild",
-            description="```\nStopped the animation```",
-            color=theme.hex_color())
-        embed.set_thumbnail(url=theme.image_url())
+            description="```\nStopped the animation```")
+        
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -6215,9 +6213,8 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         await luna.message.delete()
         embed = discord.Embed(
             title="Cyclenick",
-            description=f"```\nAnimating: {text}```",
-            color=theme.hex_color())
-        embed.set_thumbnail(url=theme.image_url())
+            description=f"```\nAnimating: {text}```")
+        
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -6238,9 +6235,8 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         cycling = False
         embed = discord.Embed(
             title="Cyclenick",
-            description="```\nStopped the animation```",
-            color=theme.hex_color())
-        embed.set_thumbnail(url=theme.image_url())
+            description="```\nStopped the animation```")
+        
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -6252,9 +6248,8 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         await luna.message.delete()
         embed = discord.Embed(
             title="Cyclegroup",
-            description=f"```\nAnimating: {text}```",
-            color=theme.hex_color())
-        embed.set_thumbnail(url=theme.image_url())
+            description=f"```\nAnimating: {text}```")
+        
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -6275,9 +6270,8 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         cycling_group = False
         embed = discord.Embed(
             title="Cyclegroup",
-            description="```\nStopped the animation```",
-            color=theme.hex_color())
-        embed.set_thumbnail(url=theme.image_url())
+            description="```\nStopped the animation```")
+        
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -6788,9 +6782,8 @@ class TextCog(commands.Cog, name="Text commands"):
         embed = discord.Embed(
             title="Encode Text",
             url=theme.title_url(),
-            description=f"{theme.description()}```\n{helptext}```",
-            color=theme.hex_color())
-        embed.set_thumbnail(url=theme.image_url())
+            description=f"{theme.description()}```\n{helptext}```")
+        
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -6811,9 +6804,8 @@ class TextCog(commands.Cog, name="Text commands"):
         embed = discord.Embed(
             title="Decode Text",
             url=theme.title_url(),
-            description=f"{theme.description()}```\n{helptext}```",
-            color=theme.hex_color())
-        embed.set_thumbnail(url=theme.image_url())
+            description=f"{theme.description()}```\n{helptext}```")
+        
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -6824,7 +6816,7 @@ class TextCog(commands.Cog, name="Text commands"):
     async def indent(self, luna, *, text: str):
         await luna.message.delete()
         embed = discord.Embed(description=f"{text}")
-        await luna.send(embed=embed)
+        await send(luna, embed)
 
     @commands.command(name="indent_title",
                       usage="<text>",
@@ -6833,7 +6825,7 @@ class TextCog(commands.Cog, name="Text commands"):
         await luna.message.delete()
         embed = discord.Embed(title=theme.title(),
                               description=f"{text}")
-        await luna.send(embed=embed)
+        await send(luna, embed)
 
     @commands.command(name="indent_footer",
                       usage="<text>",
@@ -6842,7 +6834,7 @@ class TextCog(commands.Cog, name="Text commands"):
         await luna.message.delete()
         embed = discord.Embed(description=f"{text}")
         embed.set_footer(text=theme.footer())
-        await luna.send(embed=embed)
+        await send(luna, embed)
 
     @commands.command(name="indent_all",
                       usage="<text>",
@@ -6850,10 +6842,10 @@ class TextCog(commands.Cog, name="Text commands"):
     async def indent_all(self, luna, *, text: str):
         await luna.message.delete()
         embed = discord.Embed(description=f"{text}")
-        embed.set_thumbnail(url=theme.image_url())
+        
         embed.set_footer(text=theme.footer())
 
-        await luna.send(embed=embed)
+        await send(luna, embed)
 
     @commands.command(name="ascii",
                       usage="<text>",
@@ -7152,8 +7144,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         await luna.message.delete()
         embed = discord.Embed(
             title=f"Search link for {member}'s avatar",
-            description=f"https://images.google.com/searchbyimage?image_url={member.avatar_url}",
-            color=theme.hex_color())
+            description=f"https://images.google.com/searchbyimage?image_url={member.avatar_url}")
         embed.set_thumbnail(url=member.avatar_url)
         embed.set_footer(text=theme.footer())
 
@@ -7166,8 +7157,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         await luna.message.delete()
         embed = discord.Embed(
             title=f"Link for {member}'s avatar",
-            description=f"{member.avatar_url}",
-            color=theme.hex_color())
+            description=f"{member.avatar_url}")
         embed.set_thumbnail(url=member.avatar_url)
         embed.set_footer(text=theme.footer())
 
@@ -7195,7 +7185,7 @@ class ImageCog(commands.Cog, name="Image commands"):
             embed = discord.Embed(
                 description=f"```\nStole {member}'s avatar!```",
                 color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
+            
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -7226,7 +7216,7 @@ class ImageCog(commands.Cog, name="Image commands"):
             embed = discord.Embed(
                 description=f"```\nSet new avatar to »\n{url}```",
                 color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
+            
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -7258,7 +7248,7 @@ class ImageCog(commands.Cog, name="Image commands"):
             embed = discord.Embed(
                 description=f"```\nSet your avatar to invisible```",
                 color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
+            
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -7857,13 +7847,13 @@ class TrollCog(commands.Cog, name="Troll commands"):
                 url=theme.title_url(),
                 description=f"Now copying {copycat}",
                 color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
+            
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
             ), icon_url=theme.author_icon_url())
 
-            sent = await luna.send(embed=embed)
+            sent = await send(luna, embed)
             await asyncio.sleep(configs.delete_timer())
             await sent.delete()
 
@@ -7886,13 +7876,13 @@ class TrollCog(commands.Cog, name="Troll commands"):
                     url=theme.title_url(),
                     description=f"No one was getting copied",
                     color=theme.hex_color())
-                embed.set_thumbnail(url=theme.image_url())
+                
                 embed.set_footer(text=theme.footer(),
                                  icon_url=theme.footer_icon_url())
                 embed.set_author(name=theme.author(), url=theme.author_url(
                 ), icon_url=theme.author_icon_url())
 
-                sent = await luna.send(embed=embed)
+                sent = await send(luna, embed)
                 await asyncio.sleep(configs.delete_timer())
                 await sent.delete()
             return
@@ -7909,13 +7899,13 @@ class TrollCog(commands.Cog, name="Troll commands"):
                 url=theme.title_url(),
                 description=f"Stopped copying {copycat}",
                 color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
+            
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
             ), icon_url=theme.author_icon_url())
 
-            sent = await luna.send(embed=embed)
+            sent = await send(luna, embed)
             copycat = None
             await asyncio.sleep(configs.delete_timer())
             await sent.delete()
@@ -8160,9 +8150,8 @@ class FunCog(commands.Cog, name="Fun commands"):
         kids = random.randint(1, 100)
         embed = discord.Embed(
             title=f"{user1} ❤️ {user2}",
-            description=f"{number}% fitted!\n{kids}% chance of them having kids!\n{breakup}% chance of them breaking up!",
-            color=theme.hex_color())
-        embed.set_thumbnail(url=theme.image_url())
+            description=f"{number}% fitted!\n{kids}% chance of them having kids!\n{breakup}% chance of them breaking up!")
+        
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -8180,9 +8169,8 @@ class FunCog(commands.Cog, name="Fun commands"):
         percent = random.randint(0, 100)
         embed = discord.Embed(
             title=f"{user}'s Corona Test",
-            description=f'```\n{percent}% positive!\n``````\nResult\n\nOverall » {"Positive" if (percent > 50) else "Negative"}```',
-            color=theme.hex_color())
-        embed.set_thumbnail(url=theme.image_url())
+            description=f'```\n{percent}% positive!\n``````\nResult\n\nOverall » {"Positive" if (percent > 50) else "Negative"}```')
+        
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -8204,8 +8192,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         answer = random.choice(responses)
         embed = discord.Embed(
             title="8 Ball",
-            description=f"```\nQuestion\n\n{question}\n``````\nAnswer\n\n{answer}\n```",
-            color=theme.hex_color())
+            description=f"```\nQuestion\n\n{question}\n``````\nAnswer\n\n{answer}\n```")
         embed.set_thumbnail(
             url="https://www.horoscope.com/images-US/games/game-magic-8-ball-no-text.png")
         embed.set_footer(text=theme.footer())
@@ -8268,8 +8255,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url(),
-            description=f'```\n{joke}\n```',
-            color=theme.hex_color())
+            description=f'```\n{joke}\n```')
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -8287,8 +8273,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url(),
-            description=f'```\nSetup\n\n{setup}\n``````\nPunchline\n\n{punchline}\n```',
-            color=theme.hex_color())
+            description=f'```\nSetup\n\n{setup}\n``````\nPunchline\n\n{punchline}\n```')
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -8416,7 +8401,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                 url=theme.title_url(),
                 description=f"```\nCreated note » {name}```",
                 color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
+            
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -8451,7 +8436,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                 url=theme.title_url(),
                 description=f"```\nEdited \"note\" {name} to » {themename}```",
                 color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
+            
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -8475,7 +8460,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                 url=theme.title_url(),
                 description=f"```\nDeleted note » {name}```",
                 color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
+            
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -8531,7 +8516,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                     title="Notes",
                     description=f"```\nContent of {name}.txt ↴\n\n{str(file_data)}```",
                     color=theme.hex_color())
-                embed.set_thumbnail(url=theme.image_url())
+                
                 embed.set_footer(text=theme.footer(),
                                  icon_url=theme.footer_icon_url())
                 embed.set_author(name=theme.author(), url=theme.author_url(
@@ -8568,9 +8553,8 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 
         embed = discord.Embed(
             title="Notes",
-            description=f"{theme.description()}```\nNote control\n\n{prefix}note <name> <text> » Create a note\n{prefix}editnote <name> <name> » Edit note name\n{prefix}delnote <name>   » Delete a note\n{prefix}sendnote <name>  » Send the note\n``````\nAvailable notes\n\n{stringedit}```",
-            color=theme.hex_color())
-        embed.set_thumbnail(url=theme.image_url())
+            description=f"{theme.description()}```\nNote control\n\n{prefix}note <name> <text> » Create a note\n{prefix}editnote <name> <name> » Edit note name\n{prefix}delnote <name>   » Delete a note\n{prefix}sendnote <name>  » Send the note\n``````\nAvailable notes\n\n{stringedit}```")
+        
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -8580,12 +8564,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                       description="Create a poll")
     async def poll(self, luna, *, question):
         await luna.message.delete()
-        embed = discord.Embed(
-            title=f"Poll", description=f"{question}")
-        embed.set_thumbnail(url=theme.image_url())
-        embed.set_footer(text=theme.footer())
-
-        message = await luna.send(embed=embed)
+        message = await luna.send(f"> **Poll**\n> \n> {question}\n> \n> {theme.footer()}")
         await message.add_reaction('👍')
         await message.add_reaction('👎')
 
@@ -8594,14 +8573,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                       description="Poll")
     async def cpoll(self, luna, option1, option2, *, poll):
         await luna.message.delete()
-        embed = discord.Embed(
-            title=f"Poll",
-            description=f"{poll}\n\n🅰️ = {option1}\n🅱️ = {option2}",
-            color=theme.hex_color())
-        embed.set_thumbnail(url=theme.image_url())
-        embed.set_footer(text=theme.footer())
-
-        message = await luna.send(embed=embed)
+        message = await luna.send(f"> **Poll**\n> \n> {{poll}}\n> \n> 🅰️ = {option1}\n🅱️ = {option2}\n> \n> {theme.footer()}")
         await message.add_reaction('🅰️')
         await message.add_reaction('🅱️')
 
@@ -8619,8 +8591,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         r = requests.get(
             f"https://react.flawcra.cc/api/generation.php?type=color&color={hexcode}").json()
         await message_builder(luna, title=str(r["name"]),
-                              description=f"```\nHEX               » {r['hex']}\n``````\nRGB               » {r['rgb']}\n``````\nINT               » {r['int']}\n``````\nBrightness        » {r['brightness']}\n```",
-                              color=r["int"])
+                              description=f"```\nHEX               » {r['hex']}\n``````\nRGB               » {r['rgb']}\n``````\nINT               » {r['int']}\n``````\nBrightness        » {r['brightness']}\n```")
 
     @commands.command(name="hiddenping",
                       usage="<channel_id> <user_id> <message>",
@@ -9404,8 +9375,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         embed = discord.Embed(
             title="Emoji Added",
             url=theme.title_url(),
-            description=f"{emoji_name}",
-            color=theme.hex_color())
+            description=f"{emoji_name}")
         embed.set_thumbnail(url=image_url)
         embed.set_footer(text=theme.footer())
 
@@ -9422,8 +9392,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         embed = discord.Embed(
             title="Emoji Edited",
             url=theme.title_url(),
-            description=f"{oldname} to {new_name}",
-            color=theme.hex_color())
+            description=f"{oldname} to {new_name}")
         embed.set_thumbnail(url=emoji.url)
         embed.set_footer(text=theme.footer())
 
@@ -9441,8 +9410,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         embed = discord.Embed(
             title="Emoji Deleted",
             url=theme.title_url(),
-            description=f"{name}",
-            color=theme.hex_color())
+            description=f"{name}")
         embed.set_thumbnail(url=emojiurl)
         embed.set_footer(text=theme.footer())
 
@@ -9469,7 +9437,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                     url=theme.title_url(),
                     description=f"```\n{e}```",
                     color=theme.hex_color())
-                embed.set_thumbnail(url=theme.image_url())
+                
                 embed.set_footer(text=theme.footer(),
                                  icon_url=theme.footer_icon_url())
                 embed.set_author(name=theme.author(), url=theme.author_url(
@@ -9494,7 +9462,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                     url=theme.title_url(),
                     description=f"```\nStatus changed to » Playing {status}```",
                     color=theme.hex_color())
-                embed.set_thumbnail(url=theme.image_url())
+                
                 embed.set_footer(text=theme.footer(),
                                  icon_url=theme.footer_icon_url())
                 embed.set_author(name=theme.author(), url=theme.author_url(
@@ -9510,7 +9478,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                         url=theme.title_url(),
                         description=f"```\n{e}```",
                         color=theme.hex_color())
-                    embed.set_thumbnail(url=theme.image_url())
+                    
                     embed.set_footer(text=theme.footer(),
                                      icon_url=theme.footer_icon_url())
                     embed.set_author(name=theme.author(), url=theme.author_url(
@@ -9535,7 +9503,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                     url=theme.title_url(),
                     description=f"```\nStatus changed to » Streaming {status}```",
                     color=theme.hex_color())
-                embed.set_thumbnail(url=theme.image_url())
+                
                 embed.set_footer(text=theme.footer(),
                                  icon_url=theme.footer_icon_url())
                 embed.set_author(name=theme.author(), url=theme.author_url(
@@ -9551,7 +9519,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                         url=theme.title_url(),
                         description=f"```\n{e}```",
                         color=theme.hex_color())
-                    embed.set_thumbnail(url=theme.image_url())
+                    
                     embed.set_footer(text=theme.footer(),
                                      icon_url=theme.footer_icon_url())
                     embed.set_author(name=theme.author(), url=theme.author_url(
@@ -9575,7 +9543,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                     url=theme.title_url(),
                     description=f"```\nStatus changed to » Listening {status}```",
                     color=theme.hex_color())
-                embed.set_thumbnail(url=theme.image_url())
+                
                 embed.set_footer(text=theme.footer(),
                                  icon_url=theme.footer_icon_url())
                 embed.set_author(name=theme.author(), url=theme.author_url(
@@ -9591,7 +9559,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                         url=theme.title_url(),
                         description=f"```\n{e}```",
                         color=theme.hex_color())
-                    embed.set_thumbnail(url=theme.image_url())
+                    
                     embed.set_footer(text=theme.footer(),
                                      icon_url=theme.footer_icon_url())
                     embed.set_author(name=theme.author(), url=theme.author_url(
@@ -9615,7 +9583,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                     url=theme.title_url(),
                     description=f"```\nStatus changed to » Watching {status}```",
                     color=theme.hex_color())
-                embed.set_thumbnail(url=theme.image_url())
+                
                 embed.set_footer(text=theme.footer(),
                                  icon_url=theme.footer_icon_url())
                 embed.set_author(name=theme.author(), url=theme.author_url(
@@ -9631,7 +9599,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                         url=theme.title_url(),
                         description=f"```\n{e}```",
                         color=theme.hex_color())
-                    embed.set_thumbnail(url=theme.image_url())
+                    
                     embed.set_footer(text=theme.footer(),
                                      icon_url=theme.footer_icon_url())
                     embed.set_author(name=theme.author(), url=theme.author_url(
@@ -9650,9 +9618,8 @@ class UtilsCog(commands.Cog, name="Util commands"):
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url(),
-            description="```\nStopped activity```",
-            color=theme.hex_color())
-        embed.set_thumbnail(url=theme.image_url())
+            description="```\nStopped activity```")
+        
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -9669,7 +9636,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                     url=theme.title_url(),
                     description="```\nInvalid amount```",
                     color=theme.hex_color())
-                embed.set_thumbnail(url=theme.image_url())
+                
                 embed.set_footer(text=theme.footer(),
                                  icon_url=theme.footer_icon_url())
                 embed.set_author(name=theme.author(), url=theme.author_url(
@@ -9695,7 +9662,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                         url=theme.title_url(),
                         description=f"```\n{e}```",
                         color=theme.hex_color())
-                    embed.set_thumbnail(url=theme.image_url())
+                    
                     embed.set_footer(text=theme.footer(),
                                      icon_url=theme.footer_icon_url())
                     embed.set_author(name=theme.author(), url=theme.author_url(
@@ -9802,7 +9769,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                 url=theme.title_url(),
                 description=f"```\nSuccessfully set your hypesquad house to {house}```",
                 color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
+            
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -10697,7 +10664,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 url=theme.title_url(),
                 description=f"```\ntokens.txt is empty...```",
                 color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
+            
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -10715,13 +10682,13 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 url=theme.title_url(),
                 description=f"```\nDetected {line_count} tokens.\nChecking tokens...```",
                 color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
+            
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
             ), icon_url=theme.author_icon_url())
 
-            sent = await luna.send(embed=embed)
+            sent = await send(luna, embed)
 
         valid_tokens = []
         success = 0
@@ -10761,7 +10728,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                             str(failed) +
                             "```",
                 color=theme.hex_color())
-            embed.set_thumbnail(url=theme.image_url())
+            
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -11840,6 +11807,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
     async def prefix(self, ctx, newprefix):
         await ctx.message.delete()
         config.prefix(newprefix)
+        bot.command_prefix = newprefix
         luna.console(clear=True)
         if privacy:
             command_count = len(bot.commands)
@@ -14660,11 +14628,11 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         # 	await sent.delete()
         # else:
         # 	embed = discord.Embed(title="Restarting", description=f"```\nAllow up to 5 seconds```")
-        # 	embed.set_thumbnail(url=theme.image_url())
+        # 	
         # 	embed.set_footer(text=theme.footer())
         # 	embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
         #
-        # 	sent = await luna.send(embed=embed)
+        # 	sent = await send(luna, embed)
         # 	await asyncio.sleep(3)
         # 	await sent.delete()
         restart_program()
@@ -15099,7 +15067,7 @@ async def error_builder(luna, description=""):
 # 	embed = discord.Embed(title="Help", description=f"This is a speed test", color=0xE10959)
 # 	embed.set_thumbnail(url="https://cdn.discordapp.com/avatars/406907871998246924/70bdf0218ac762d8a7dbf8c8758ec62d.webp?size=4096")
 # 	embed.set_footer(text="Luna", icon_url="https://cdn.discordapp.com/avatars/406907871998246924/70bdf0218ac762d8a7dbf8c8758ec62d.webp?size=4096")
-# 	await luna.send(embed=embed)
+# 	await send(luna, embed)
 # await luna.send(f"It took {'%.3fs' % (time.time() - sniped_start_time)}
 # to send.")
 
