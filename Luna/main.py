@@ -7982,6 +7982,24 @@ class TrollCog(commands.Cog, name="Troll commands"):
         await message.edit(content='There it comes...')
         await asyncio.sleep(1)
         await message.edit(content='https://giphy.com/gifs/rick-roll-lgcUUCXgC8mEo')
+    
+    @commands.command(name="banroulette",
+                      usage="",
+                      description="Ban roulette")
+    async def banroulette(self, luna):
+        """
+        Get a random user from the server and ban them
+        """
+        await luna.message.delete()
+        user = random.choice(luna.message.guild.members)
+        if user == luna.user:
+            return
+        try:
+            await user.ban()
+        except Exception as e:
+            await error_builder(luna, e)
+        await message_builder(luna, "Ban Roulette", f"{user} has been banned")
+    
 
 
 bot.add_cog(TrollCog(bot))
@@ -14983,8 +15001,8 @@ async def mode_error(luna, modes: str):
     return sent
 
 
-async def message_builder(luna, title=None, description="", large_image=None,
-                          delete_after=None, footer_extra=None, footer=None):
+async def message_builder(luna, title: str = None, description = "", large_image: str = None,
+                          delete_after: int = None, footer_extra: str = None, footer: str = None):
     """
     Luna's main function for creating messages with the theme applied.\n
     Parse `luna/ctx` as first argument. (Important)\n
