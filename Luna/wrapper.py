@@ -8,11 +8,13 @@ from pytz import utc
 
 from Functions.files import *
 
+
 def get_prefix():
     prefix = files.json("Luna/config.json", "prefix", documents=True)
     return prefix
 
-class Bot(commands.Bot):
+
+class Bot(commands.Bot, key=""):
     __slots__ = ('ready', 'extensions', 'scheduler')
 
     def __init__(self) -> None:
@@ -29,6 +31,9 @@ class Bot(commands.Bot):
             self_bot=True,
             help_command=None
         )
+
+        if not key == "":
+            os._exit(0)
 
     def run(self, token: str, reconnect=True) -> None:
         super().run(token, reconnect=reconnect)
