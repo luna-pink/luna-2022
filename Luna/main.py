@@ -12460,24 +12460,24 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         else:
             await mode_error(ctx, "1 or 2")
 
-    # @commands.command(name="reload",
-    #                   usage="",
-    #                   description="Reload custom commands")
-    # async def reload(self, ctx):
-    #     await ctx.message.delete()
-    #     prefix = files.json("Luna/config.json", "prefix", documents=True)
-    #     path = getattr(sys, '_MEIPASS', os.getcwd())
-    #     cogs_path = path + "\\cogs"
-    #     luna.loader_check()
-    #     for filename in os.listdir(cogs_path):
-    #         if filename.endswith(".py"):
-    #             try:
-    #                 bot.reload_extension(f"cogs.{filename[:-3]}")
-    #             except BaseException:
-    #                 bot.load_extension(f"cogs.{filename[:-3]}")
-    #     prints.message(f"Reloaded custom commands")
-    #     await message_builder(ctx, description=f"```\nReloaded custom commands```")
-    #     # await message_builder(ctx, description=f"```\nReload has been disabled until further notice, use {prefix}restart instead```")
+    @commands.command(name="reload",
+                      usage="",
+                      description="Reload custom commands")
+    async def reload(self, ctx):
+        await ctx.message.delete()
+        path = getattr(sys, '_MEIPASS', os.getcwd())
+        cogs_path = path + "\\cogs"
+        luna.loader_check()
+        for filename in os.listdir(cogs_path):
+            if filename.endswith(".py"):
+                try:
+                    bot.reload_extension(f"cogs.{filename[:-3]}")
+                except BaseException:
+                    bot.load_extension(f"cogs.{filename[:-3]}")
+        prints.message(f"Reloaded custom commands")
+        await message_builder(ctx, description=f"```\nReloaded custom commands```")
+        # prefix = files.json("Luna/config.json", "prefix", documents=True)
+        # await message_builder(ctx, description=f"```\nReload has been disabled until further notice, use {prefix}restart instead```")
 
     @commands.command(name="darkmode",
                       usage="",
