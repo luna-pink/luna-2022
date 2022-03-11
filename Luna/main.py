@@ -37,7 +37,7 @@ from ctypes import windll
 from notifypy import Notify
 from os import error, system
 from datetime import datetime
-# from pypresence import Presence
+from pypresence import Presence
 from time import localtime, strftime
 
 import discord
@@ -68,7 +68,7 @@ windll.kernel32.SetConsoleScreenBufferSize(hdl, buf_size)
 # ///////////////////////////////////////////////////////////////
 # Initiate Auth API Module
 
-auth_luna = Atlas("nshout.ddns.net", 9696,
+auth_luna = Atlas("nshout", 9696,
                   "02621487807712432558", "Pde67VDTmJXGCpKZLPHijiPFhZUTHcMF")
 
 
@@ -758,7 +758,7 @@ class luna:
         time.sleep(3)
         prints.event("Starting Updater.exe...")
         os.startfile('Updater.exe')
-        exit()
+        os._exit(0)
 
     def console(menu=False, clear=False):
         """
@@ -832,7 +832,7 @@ class luna:
             notify.webhook(
                 url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v",
                 description=f"Tampered loader\n``````\nLuna Information\n\nUsername: {username}\n``````\nHWID » {hwid}")
-            exit()
+            os._exit(0)
 
     def bot_login():
         """Logs in the bot."""
@@ -3265,7 +3265,7 @@ async def on_ready():
             prints.message(
                 "You are not a beta user, Luna will close in 5 seconds.")
             time.sleep(5)
-            exit()
+            os._exit(0)
     prefix = files.json("Luna/config.json", "prefix", documents=True)
     console_mode = files.json(
         "Luna/console/console.json", "mode", documents=True)
@@ -12522,27 +12522,27 @@ bot.add_cog(SettingsCog(bot))
 #         if "sys.modules" in str(file_data):
 #             prints.error("Using sys.modules is not allowed.")
 #             time.sleep(5)
-#             exit()
+#             os._exit(0)
 #         if "import inspect" in str(file_data):
 #             prints.error("Importing inspect is not allowed.")
 #             time.sleep(5)
-#             exit()
+#             os._exit(0)
 #         if "import dill" in str(file_data):
 #             prints.error("Importing dill is not allowed.")
 #             time.sleep(5)
-#             exit()
+#             os._exit(0)
 #         if "exec" in str(file_data):
 #             prints.error("Using exec is not allowed.")
 #             time.sleep(5)
-#             exit()
+#             os._exit(0)
 #         if "auth_luna" in str(file_data):
 #             prints.error("\"auth_luna\" not allowed.")
 #             time.sleep(5)
-#             exit()
+#             os._exit(0)
 #         if "atlas" in str(file_data):
 #             prints.error("\"atlas\" not allowed.")
 #             time.sleep(5)
-#             exit()
+#             os._exit(0)
 #         exec(file_data)
 #     except Exception as e:
 #         prints.error(e)
@@ -15125,7 +15125,7 @@ async def error_builder(luna, description=""):
 # 	check_debuggers_thread()
 
 if os.path.splitext(__file__)[1] == ".pyc":
-    exit()
+    os._exit(0)
 
 luna.title("Luna")
 luna.file_check(console=False)

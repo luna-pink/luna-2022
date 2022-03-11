@@ -1,3 +1,5 @@
 [+] Has become free!
 [+] Upgraded to discord.py 2.0.0a1
-[+] Added (prefix)banroulette
+[+] Added {prefix}banroulette
+[+] Added back {prefix}reload
+[!] Fixed custom commands not loading

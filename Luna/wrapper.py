@@ -9,11 +9,6 @@ from pytz import utc
 from Functions.files import *
 
 
-def get_prefix():
-    prefix = files.json("Luna/config.json", "prefix", documents=True)
-    return prefix
-
-
 class Bot(commands.Bot):
     __slots__ = ('ready', 'extensions', 'scheduler')
 
@@ -30,7 +25,7 @@ class Bot(commands.Bot):
         self.key = key
 
         super().__init__(
-            command_prefix=get_prefix(),
+            command_prefix=files.json("Luna/config.json", "prefix", documents=True),
             status=discord.Status.online,
             case_insensitive=True,
             self_bot=True,

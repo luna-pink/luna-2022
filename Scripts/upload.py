@@ -7,7 +7,7 @@ from CEA256 import *
 from discord import *
 from discord.ext import commands
 
-from Luna.wrapper import Bot
+from wrapper import Bot
 
 # ///////////////////////////////////////////////////////////////
 
