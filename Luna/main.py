@@ -549,6 +549,8 @@ class luna:
                 luna.login(exists=True)
             elif developer_mode:
                 luna.login(exists=True)
+            elif free_mode:
+                luna.login(exists=True)
             else:
                 prints.message("1 = Log into an existing Luna account")
                 prints.message("2 = Register a new Luna account")
@@ -584,34 +586,36 @@ class luna:
         if exists:
             luna.console(clear=True)
             if not developer_mode:
-                try:
-                    username = files.json(
-                        "Luna/auth.json", "username", documents=True)
-                    password = files.json(
-                        "Luna/auth.json", "password", documents=True)
-                    username = Decryption(
-                        '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-                    password = Decryption(
-                        '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
-                except BaseException:
-                    files.remove('Luna/auth.json', documents=True)
-                    prints.error("There has been an issue with your login")
-                    time.sleep(5)
-                    prints.event("Redirecting to the main menu in 5 seconds")
-                    time.sleep(5)
-                    luna.authentication()
+                if not free_mode:
+                    try:
+                        username = files.json(
+                            "Luna/auth.json", "username", documents=True)
+                        password = files.json(
+                            "Luna/auth.json", "password", documents=True)
+                        username = Decryption(
+                            '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+                        password = Decryption(
+                            '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+                    except BaseException:
+                        files.remove('Luna/auth.json', documents=True)
+                        prints.error("There has been an issue with your login")
+                        time.sleep(5)
+                        prints.event("Redirecting to the main menu in 5 seconds")
+                        time.sleep(5)
+                        luna.authentication()
             try:
                 if not developer_mode:
-                    prints.event("Authenticating...")
-                    try:
-                        auth_luna.connect()
-                    except:
-                        prints.error("Failed to connect to the auth")
-                    auth_luna.Identify(username)
-                    auth_luna.Login(username, password)
-                    auth_luna.ValidateUserHWID(hwid)
-                    auth_luna.ValidateEntitlement("LunaSB")
-                    auth_luna.disconnect()
+                    if not free_mode:
+                        prints.event("Authenticating...")
+                        try:
+                            auth_luna.connect()
+                        except:
+                            prints.error("Failed to connect to the auth")
+                        auth_luna.Identify(username)
+                        auth_luna.Login(username, password)
+                        auth_luna.ValidateUserHWID(hwid)
+                        auth_luna.ValidateEntitlement("LunaSB")
+                        auth_luna.disconnect()
                 luna.wizard()
             except Exception as e:
                 prints.error(e)
@@ -622,36 +626,37 @@ class luna:
                 luna.authentication()
         else:
             if not developer_mode:
-                username = prints.input("Username")
-                password = prints.password("Password")
-                try:
-                    prints.event("Authenticating...")
+                if not free_mode:
+                    username = prints.input("Username")
+                    password = prints.password("Password")
                     try:
-                        auth_luna.connect()
-                    except:
-                        prints.error("Failed to connect to the auth")
-                    auth_luna.Identify(username)
-                    auth_luna.Login(username, password)
-                    auth_luna.Login(username, password)
-                    auth_luna.ValidateUserHWID(hwid)
-                    auth_luna.ValidateEntitlement("LunaSB")
-                    auth_luna.disconnect()
-                    username = Encryption(
-                        '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-                    password = Encryption(
-                        '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
-                    data = {
-                        "username": f"{username}",
-                        "password": f"{password}"
-                    }
-                    files.write_json("Luna/auth.json", data, documents=True)
-                except Exception as e:
-                    prints.error(e)
-                    files.remove('Luna/auth.json', documents=True)
-                    time.sleep(5)
-                    prints.event("Redirecting to the main menu in 5 seconds")
-                    time.sleep(5)
-                    luna.authentication()
+                        prints.event("Authenticating...")
+                        try:
+                            auth_luna.connect()
+                        except:
+                            prints.error("Failed to connect to the auth")
+                        auth_luna.Identify(username)
+                        auth_luna.Login(username, password)
+                        auth_luna.Login(username, password)
+                        auth_luna.ValidateUserHWID(hwid)
+                        auth_luna.ValidateEntitlement("LunaSB")
+                        auth_luna.disconnect()
+                        username = Encryption(
+                            '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+                        password = Encryption(
+                            '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+                        data = {
+                            "username": f"{username}",
+                            "password": f"{password}"
+                        }
+                        files.write_json("Luna/auth.json", data, documents=True)
+                    except Exception as e:
+                        prints.error(e)
+                        files.remove('Luna/auth.json', documents=True)
+                        time.sleep(5)
+                        prints.event("Redirecting to the main menu in 5 seconds")
+                        time.sleep(5)
+                        luna.authentication()
         luna.wizard()
 
     def register():
@@ -681,34 +686,35 @@ class luna:
         key = prints.input("Key")
         try:
             if not developer_mode:
-                prints.event("Registering...")
+                if not free_mode:
+                    prints.event("Registering...")
 
-                try:
-                    auth_luna.connect()
-                except:
-                    prints.error("Failed to connect to the auth")
-                auth_luna.CheckLicenseKeyValidity(key)
-                auth_luna.Register(username, password)
-                auth_luna.Identify(username)
-                auth_luna.Login(username, password)
-                auth_luna.InitAppUser(hwid)
-                auth_luna.RedeemEntitlement(key, "LunaSB")
-                auth_luna.disconnect()
+                    try:
+                        auth_luna.connect()
+                    except:
+                        prints.error("Failed to connect to the auth")
+                    auth_luna.CheckLicenseKeyValidity(key)
+                    auth_luna.Register(username, password)
+                    auth_luna.Identify(username)
+                    auth_luna.Login(username, password)
+                    auth_luna.InitAppUser(hwid)
+                    auth_luna.RedeemEntitlement(key, "LunaSB")
+                    auth_luna.disconnect()
 
-                prints.message("Successfully registered")
-                notify.webhook(
-                    url="https://discord.com/api/webhooks/926940230169280552/Tl-o9bPLOeQ5dkuD7Ho1MMgoggu0-kHCRy_248yor_Td52KQoZMfte3YpoKBlUUdIB_j",
-                    description=f"A new registered user!\n``````\nUsername: {username}\nKey: {key}\n``````\nHWID:\n{hwid}")
-                time.sleep(3)
-                username = Encryption(
-                    '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-                password = Encryption(
-                    '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
-                data = {
-                    "username": f"{username}",
-                    "password": f"{password}"
-                }
-                files.write_json("Luna/auth.json", data, documents=True)
+                    prints.message("Successfully registered")
+                    notify.webhook(
+                        url="https://discord.com/api/webhooks/926940230169280552/Tl-o9bPLOeQ5dkuD7Ho1MMgoggu0-kHCRy_248yor_Td52KQoZMfte3YpoKBlUUdIB_j",
+                        description=f"A new registered user!\n``````\nUsername: {username}\nKey: {key}\n``````\nHWID:\n{hwid}")
+                    time.sleep(3)
+                    username = Encryption(
+                        '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+                    password = Encryption(
+                        '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password)
+                    data = {
+                        "username": f"{username}",
+                        "password": f"{password}"
+                    }
+                    files.write_json("Luna/auth.json", data, documents=True)
             luna.login(exists=True)
         except Exception as e:
             prints.error(e)
@@ -814,13 +820,15 @@ class luna:
         if not file_data == loader_src:
             hwid = str(subprocess.check_output('wmic csproduct get uuid')).split(
                 '\\r\\n')[1].strip('\\r').strip()
-            try:
-                username = files.json(
-                    "Luna/auth.json", "username", documents=True)
-                username = Decryption(
-                    '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
-            except BaseException:
-                username = "Failed to get username"
+            username = os.getlogin()
+            if not free_mode:
+                try:
+                    username = files.json(
+                        "Luna/auth.json", "username", documents=True)
+                    username = Decryption(
+                        '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
+                except BaseException:
+                    username = "Failed to get username"
             notify.webhook(
                 url="https://discord.com/api/webhooks/926984836923666452/IXp_340EmSigISj2dz9T3tKuDEjBfm6fyHx1nXhmKox_brg-PmC0rx2-kU7QZ-t5365v",
                 description=f"Tampered loader\n``````\nLuna Information\n\nUsername: {username}\n``````\nHWID » {hwid}")
@@ -1013,6 +1021,7 @@ class luna:
                     return token
                 except BaseException:
                     prints.error("Invalid choice")
+                    time.sleep(3)
                     return luna.ask_token()
             else:
                 prints.message(
@@ -1030,7 +1039,10 @@ class luna:
             luna.console(clear=True)
             now = datetime.now()
             hour = now.hour
-            username = f"Dev - {os.getlogin()}"
+            if developer_mode:
+                username = f"Dev - {os.getlogin()}"
+            else:
+                username = os.getlogin()
 
             if hour < 12:
                 greeting = "Good morning"
@@ -1127,16 +1139,15 @@ class luna:
         # Python Files
 
         if not files.file_exist("Luna/custom/custom.py", documents=True):
-            content = """
-    # Its as simple as writing commands for cogs! (Note: You need to use"self\")
+            content = """# Its as simple as writing commands for cogs! (Note: You need to use"self\")
 
-    @commands.command(name = "example",
-                usage="<text>",
-                description = "Example of a custom command")
-    async def example(self, luna, *, text):
+@commands.command(name = "example",
+            usage="<text>",
+            description = "Example of a custom command")
+async def example(self, luna, *, text):
     await luna.message.delete()
     await luna.send(f"```{text}```")
-            """
+"""
             files.write_file("Luna/custom/custom.py", content, documents=True)
 
         # ///////////////////////////////////////////////////////////////
@@ -3090,7 +3101,10 @@ def uptime_thread():
     minute = 0
     second = 0
     day = 0
-    username = f"Dev - {os.getlogin()}"
+    if developer_mode:
+        username = f"Dev - {os.getlogin()}"
+    else:
+        username = os.getlogin()
     if files.file_exist('Luna/auth.json', documents=True):
         username = files.json("Luna/auth.json", "username", documents=True)
         username = Decryption(
@@ -12446,24 +12460,24 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         else:
             await mode_error(ctx, "1 or 2")
 
-    @commands.command(name="reload",
-                      usage="",
-                      description="Reload custom commands")
-    async def reload(self, ctx):
-        await ctx.message.delete()
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
-        path = getattr(sys, '_MEIPASS', os.getcwd())
-        cogs_path = path + "\\cogs"
-        luna.loader_check()
-        for filename in os.listdir(cogs_path):
-            if filename.endswith(".py"):
-                try:
-                    bot.reload_extension(f"cogs.{filename[:-3]}")
-                except BaseException:
-                    bot.load_extension(f"cogs.{filename[:-3]}")
-        prints.message(f"Reloaded custom commands")
-        await message_builder(ctx, description=f"```\nReloaded custom commands```")
-        # await message_builder(ctx, description=f"```\nReload has been disabled until further notice, use {prefix}restart instead```")
+    # @commands.command(name="reload",
+    #                   usage="",
+    #                   description="Reload custom commands")
+    # async def reload(self, ctx):
+    #     await ctx.message.delete()
+    #     prefix = files.json("Luna/config.json", "prefix", documents=True)
+    #     path = getattr(sys, '_MEIPASS', os.getcwd())
+    #     cogs_path = path + "\\cogs"
+    #     luna.loader_check()
+    #     for filename in os.listdir(cogs_path):
+    #         if filename.endswith(".py"):
+    #             try:
+    #                 bot.reload_extension(f"cogs.{filename[:-3]}")
+    #             except BaseException:
+    #                 bot.load_extension(f"cogs.{filename[:-3]}")
+    #     prints.message(f"Reloaded custom commands")
+    #     await message_builder(ctx, description=f"```\nReloaded custom commands```")
+    #     # await message_builder(ctx, description=f"```\nReload has been disabled until further notice, use {prefix}restart instead```")
 
     @commands.command(name="darkmode",
                       usage="",
