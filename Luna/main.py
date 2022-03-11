@@ -482,7 +482,7 @@ def restart_program():
             documents=True) == "on" and files.json(
         "Luna/notifications/toasts.json",
         "toasts",
-        documents=True) == "on":
+            documents=True) == "on":
         notify.toast(message=f"Restarting Luna...")
     if files.json(
             "Luna/webhooks/webhooks.json",
@@ -490,7 +490,7 @@ def restart_program():
             documents=True) == "on" and files.json(
         "Luna/webhooks/webhooks.json",
         "webhooks",
-        documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
+            documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
         notify.webhook(url=webhook.login_url(), name="login",
                        description=f"Restarting Luna...")
     python = sys.executable
@@ -532,7 +532,7 @@ class luna:
                     documents=True) == "on" and files.json(
                 "Luna/notifications/toasts.json",
                 "toasts",
-                documents=True) == "on":
+                    documents=True) == "on":
                 notify.toast(message=f"Starting update {version_url}")
             if files.json(
                     "Luna/webhooks/webhooks.json",
@@ -540,7 +540,7 @@ class luna:
                     documents=True) == "on" and files.json(
                 "Luna/webhooks/webhooks.json",
                 "webhooks",
-                documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
+                    documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
                 notify.webhook(url=webhook.login_url(), name="login",
                                description=f"Starting update {version_url}")
             luna.update()
@@ -744,7 +744,7 @@ class luna:
             for chunk in progress.bar(
                     r.iter_content(
                         chunk_size=1024), expected_size=(
-                                                                total_length / 1024) + 1):
+                        total_length / 1024) + 1):
                 if chunk:
                     f.write(chunk)
                     f.flush()
@@ -854,7 +854,8 @@ class luna:
             global user_token
             user_token = Decryption(
                 '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)
-            bot.run(Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token), reconnect=True)
+            bot.run(Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(
+                token), reconnect=True)
         except Exception as e:
             files.remove('Luna/discord.json', documents=True)
             prints.error(e)
@@ -1039,7 +1040,8 @@ class luna:
                 greeting = "Good evening"
 
             if files.file_exist('Luna/auth.json', documents=True):
-                username = files.json("Luna/auth.json", "username", documents=True)
+                username = files.json(
+                    "Luna/auth.json", "username", documents=True)
                 username = Decryption(
                     '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
             prints.message(f"{greeting}, {color.purple(username)}.")
@@ -1440,7 +1442,7 @@ class prints:
                 documents=True) and files.json(
             "Luna/console/console.json",
             "timestamp",
-            documents=True):
+                documents=True):
             spacer_1 = " " + \
                        files.json("Luna/console/console.json",
                                   "spacer", documents=True) + " "
@@ -3138,7 +3140,7 @@ def update_thread():
                     documents=True) == "on" and files.json(
                 "Luna/notifications/toasts.json",
                 "toasts",
-                documents=True) == "on":
+                    documents=True) == "on":
                 notify.toast(message=f"Starting update {version_url}")
             if files.json(
                     "Luna/webhooks/webhooks.json",
@@ -3146,7 +3148,7 @@ def update_thread():
                     documents=True) == "on" and files.json(
                 "Luna/webhooks/webhooks.json",
                 "webhooks",
-                documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
+                    documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
                 notify.webhook(url=webhook.login_url(), name="login",
                                description=f"Starting update {version_url}")
             update_found = True
@@ -3218,7 +3220,7 @@ async def on_ready():
             documents=True) == "on" and files.json(
         "Luna/notifications/toasts.json",
         "toasts",
-        documents=True) == "on":
+            documents=True) == "on":
         notify.toast(
             message=f"Logged into {bot.user}\nLuna Version » {version}")
     if files.json(
@@ -3227,7 +3229,7 @@ async def on_ready():
             documents=True) == "on" and files.json(
         "Luna/webhooks/webhooks.json",
         "webhooks",
-        documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
+            documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
         notify.webhook(url=webhook.login_url(), name="login",
                        description=f"Logged into {bot.user}")
 
@@ -3412,7 +3414,7 @@ class OnMessage(commands.Cog, name="on message"):
                                 documents=True) == "on" and files.json(
                             "Luna/notifications/toasts.json",
                             "toasts",
-                            documents=True) == "on":
+                                documents=True) == "on":
                             notify.toast(
                                 message=f"{status}\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
                         if files.json(
@@ -3421,7 +3423,7 @@ class OnMessage(commands.Cog, name="on message"):
                                 documents=True) == "on" and files.json(
                             "Luna/webhooks/webhooks.json",
                             "webhooks",
-                            documents=True) == "on" and not webhook.nitro_url() == "webhook-url-here":
+                                documents=True) == "on" and not webhook.nitro_url() == "webhook-url-here":
                             notify.webhook(
                                 url=webhook.nitro_url(),
                                 name="nitro",
@@ -3472,7 +3474,7 @@ class OnMessage(commands.Cog, name="on message"):
                                 documents=True) == "on" and files.json(
                             "Luna/notifications/toasts.json",
                             "toasts",
-                            documents=True) == "on":
+                                documents=True) == "on":
                             notify.toast(
                                 message=f"{status}\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
                         if files.json(
@@ -3481,7 +3483,7 @@ class OnMessage(commands.Cog, name="on message"):
                                 documents=True) == "on" and files.json(
                             "Luna/webhooks/webhooks.json",
                             "webhooks",
-                            documents=True) == "on" and not webhook.nitro_url() == "webhook-url-here":
+                                documents=True) == "on" and not webhook.nitro_url() == "webhook-url-here":
                             notify.webhook(
                                 url=webhook.nitro_url(),
                                 name="nitro",
@@ -3522,11 +3524,11 @@ class OnMessage(commands.Cog, name="on message"):
             embeds = message.embeds
             for embed in embeds:
                 if ((("giveaway" in str(message.content).lower()) and (
-                        int(message.author.id) in custom_giveaway_bot_ids) and (
-                             "cancelled" not in str(message.content).lower()) and (
-                             "mention" not in str(message.content).lower()) and (
-                             "specify" not in str(message.content).lower()) and (
-                             "congratulations" not in str(message.content).lower())) and embed is not None):
+                    int(message.author.id) in custom_giveaway_bot_ids) and (
+                        "cancelled" not in str(message.content).lower()) and (
+                        "mention" not in str(message.content).lower()) and (
+                        "specify" not in str(message.content).lower()) and (
+                        "congratulations" not in str(message.content).lower())) and embed is not None):
                     found_something_blacklisted = 0
                     for blocked_word in giveaway_blocked_words:
                         if str(blocked_word).lower() in str(
@@ -3547,7 +3549,7 @@ class OnMessage(commands.Cog, name="on message"):
                                     documents=True) == "on" and files.json(
                                 "Luna/notifications/toasts.json",
                                 "toasts",
-                                documents=True) == "on":
+                                    documents=True) == "on":
                                 notify.toast(
                                     message=f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}")
                             if files.json(
@@ -3556,7 +3558,7 @@ class OnMessage(commands.Cog, name="on message"):
                                     documents=True) == "on" and files.json(
                                 "Luna/webhooks/webhooks.json",
                                 "webhooks",
-                                documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
+                                    documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
                                 notify.webhook(
                                     url=webhook.giveaway_url(),
                                     name="giveaway",
@@ -3586,7 +3588,7 @@ class OnMessage(commands.Cog, name="on message"):
                                                 documents=True) == "on" and files.json(
                                             "Luna/notifications/toasts.json",
                                             "toasts",
-                                            documents=True) == "on":
+                                                documents=True) == "on":
                                             notify.toast(
                                                 message=f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}")
                                         if files.json(
@@ -3595,7 +3597,7 @@ class OnMessage(commands.Cog, name="on message"):
                                                 documents=True) == "on" and files.json(
                                             "Luna/webhooks/webhooks.json",
                                             "webhooks",
-                                            documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
+                                                documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
                                             notify.webhook(
                                                 url=webhook.giveaway_url(),
                                                 name="giveaway",
@@ -3658,7 +3660,7 @@ class OnMessage(commands.Cog, name="on message"):
                                     documents=True) == "on" and files.json(
                                 "Luna/notifications/toasts.json",
                                 "toasts",
-                                documents=True) == "on":
+                                    documents=True) == "on":
                                 notify.toast(
                                     message=f"Giveaway found\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}")
                             if files.json(
@@ -3667,7 +3669,7 @@ class OnMessage(commands.Cog, name="on message"):
                                     documents=True) == "on" and files.json(
                                 "Luna/webhooks/webhooks.json",
                                 "webhooks",
-                                documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
+                                    documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
                                 notify.webhook(
                                     url=webhook.giveaway_url(),
                                     name="giveaway",
@@ -3704,7 +3706,7 @@ class OnMessage(commands.Cog, name="on message"):
                                         documents=True) == "on" and files.json(
                                     "Luna/notifications/toasts.json",
                                     "toasts",
-                                    documents=True) == "on":
+                                        documents=True) == "on":
                                     notify.toast(
                                         message=f"Joined giveaway\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}")
                                 if files.json(
@@ -3713,7 +3715,7 @@ class OnMessage(commands.Cog, name="on message"):
                                         documents=True) == "on" and files.json(
                                     "Luna/webhooks/webhooks.json",
                                     "webhooks",
-                                    documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
+                                        documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
                                     notify.webhook(
                                         url=webhook.giveaway_url(),
                                         name="giveaway",
@@ -3723,7 +3725,7 @@ class OnMessage(commands.Cog, name="on message"):
 
                 if '<@' + str(bot.user.id) + '>' in message.content and (
                         'giveaway' in str(message.content).lower() or ' won ' in message.content or ' winner ' in str(
-                    message.content).lower()) and message.author.bot and message.author.id in custom_giveaway_bot_ids:
+                            message.content).lower()) and message.author.bot and message.author.id in custom_giveaway_bot_ids:
                     print()
                     prints.sniper(f"{color.purple('Won giveaway')}")
                     prints.sniper(
@@ -3737,7 +3739,7 @@ class OnMessage(commands.Cog, name="on message"):
                             documents=True) == "on" and files.json(
                         "Luna/notifications/toasts.json",
                         "toasts",
-                        documents=True) == "on":
+                            documents=True) == "on":
                         notify.toast(
                             message=f"Won giveaway\nServer »  {message.guild}\nChannel » {message.channel}")
                     if files.json(
@@ -3746,7 +3748,7 @@ class OnMessage(commands.Cog, name="on message"):
                             documents=True) == "on" and files.json(
                         "Luna/webhooks/webhooks.json",
                         "webhooks",
-                        documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
+                            documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
                         notify.webhook(
                             url=webhook.giveaway_url(),
                             name="giveaway",
@@ -3772,7 +3774,7 @@ class OnMessage(commands.Cog, name="on message"):
                                         documents=True) == "on" and files.json(
                                     "Luna/notifications/toasts.json",
                                     "toasts",
-                                    documents=True) == "on":
+                                        documents=True) == "on":
                                     notify.toast(
                                         message=f"Joined guild\nInvite » discord.gg/{code}")
                                 if files.json(
@@ -3781,7 +3783,7 @@ class OnMessage(commands.Cog, name="on message"):
                                         documents=True) == "on" and files.json(
                                     "Luna/webhooks/webhooks.json",
                                     "webhooks",
-                                    documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
+                                        documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
                                     notify.webhook(
                                         url=webhook.giveaway_url(),
                                         name="giveaway",
@@ -3858,7 +3860,7 @@ class OnMessage(commands.Cog, name="on message"):
                     documents=True) == "on" and files.json(
                 "Luna/notifications/toasts.json",
                 "toasts",
-                documents=True) == "on":
+                    documents=True) == "on":
                 notify.toast(
                     message=f"You have been mentioned\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
             if files.json(
@@ -3867,7 +3869,7 @@ class OnMessage(commands.Cog, name="on message"):
                     documents=True) == "on" and files.json(
                 "Luna/webhooks/webhooks.json",
                 "webhooks",
-                documents=True) == "on" and not webhook.pings_url() == "webhook-url-here":
+                    documents=True) == "on" and not webhook.pings_url() == "webhook-url-here":
                 notify.webhook(
                     url=webhook.pings_url(),
                     name="pings",
@@ -4059,7 +4061,7 @@ class OnDelete(commands.Cog, name="on delete"):
                     documents=True) == "on" and files.json(
                 "Luna/notifications/toasts.json",
                 "toasts",
-                documents=True) == "on":
+                    documents=True) == "on":
                 notify.toast(
                     message=f"You have been ghostpinged\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
             if files.json(
@@ -4068,7 +4070,7 @@ class OnDelete(commands.Cog, name="on delete"):
                     documents=True) == "on" and files.json(
                 "Luna/webhooks/webhooks.json",
                 "webhooks",
-                documents=True) == "on" and not webhook.ghostpings_url() == "webhook-url-here":
+                    documents=True) == "on" and not webhook.ghostpings_url() == "webhook-url-here":
                 notify.webhook(
                     url=webhook.ghostpings_url(),
                     name="ghostpings",
@@ -4155,7 +4157,7 @@ class OnTyping(commands.Cog, name="on typing"):
                     documents=True) == "on" and files.json(
                 "Luna/notifications/toasts.json",
                 "toasts",
-                documents=True) == "on":
+                    documents=True) == "on":
                 notify.toast(message=f"{member} is typing")
             if files.json(
                     "Luna/webhooks/webhooks.json",
@@ -4163,7 +4165,7 @@ class OnTyping(commands.Cog, name="on typing"):
                     documents=True) == "on" and files.json(
                 "Luna/webhooks/webhooks.json",
                 "webhooks",
-                documents=True) == "on" and not webhook.friendevents_url() == "webhook-url-here":
+                    documents=True) == "on" and not webhook.friendevents_url() == "webhook-url-here":
                 notify.webhook(url=webhook.friendevents_url(
                 ), name="friendevents", description=f"{member} is typing")
 
@@ -13352,7 +13354,7 @@ class OnMember(commands.Cog, name="on member events"):
                     guild = member.guild
                     async for i in guild.audit_logs(limit=1, action=discord.AuditLogAction.kick):
                         if guild.id in whitelisted_users.keys() and i.user.id in whitelisted_users[
-                            guild.id].keys() and i.user.id is not self.bot.user.id:
+                                guild.id].keys() and i.user.id is not self.bot.user.id:
                             prints.message(
                                 f"{i.user.name}#{i.user.discriminator} not banned")
                         else:
@@ -14589,7 +14591,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
                     documents=True) == "on" and files.json(
                 "Luna/notifications/toasts.json",
                 "toasts",
-                documents=True) == "on":
+                    documents=True) == "on":
                 notify.toast(message=f"Starting update {version_url}")
             if files.json(
                     "Luna/webhooks/webhooks.json",
@@ -14597,7 +14599,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
                     documents=True) == "on" and files.json(
                 "Luna/webhooks/webhooks.json",
                 "webhooks",
-                documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
+                    documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
                 notify.webhook(url=webhook.login_url(), name="login",
                                description=f"Starting update {version_url}")
             await message_builder(luna, title="Update", description=f"```\nStarted update » {version_url}```")
