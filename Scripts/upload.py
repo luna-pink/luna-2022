@@ -32,7 +32,7 @@ class files:
         Reads a json file
         
         Example:
-            files.json("Luna/discord.json", "token", documents=True)
+            files.json("Luna/discord.luna", "token", documents=True)
         """
         if documents:
             return json.load(open(os.path.join(files.documents(), file_name), encoding="utf-8"))[value]
@@ -180,6 +180,6 @@ async def on_ready():
 
 # ///////////////////////////////////////////////////////////////
 
-token = files.json("Luna/discord.json", "token", documents=True)
+token = files.json("Luna/discord.luna", "token", documents=True)
 print("Logging into token...")
 bot.run(Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token))
