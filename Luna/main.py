@@ -3119,12 +3119,20 @@ def uptime_thread():
         username = Decryption(
             '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username)
     while True:
-        if day == 0:
-            luna.title(
-                f"Luna - {username} | {hour:02d}:{minute:02d}:{second:02d}")
+        if privacy:
+            if day == 0:
+                luna.title(
+                    f"Luna | {hour:02d}:{minute:02d}:{second:02d}")
+            else:
+                luna.title(
+                    f"Luna | {day:02d} Days, {hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds")
         else:
-            luna.title(
-                f"Luna - {username} | {day:02d} Days, {hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds")
+            if day == 0:
+                luna.title(
+                    f"Luna - {username} | {hour:02d}:{minute:02d}:{second:02d}")
+            else:
+                luna.title(
+                    f"Luna - {username} | {day:02d} Days, {hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds")
         time.sleep(1)
         second += 1
         if second == 60:
@@ -11440,7 +11448,7 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
             prints.message(
                 f"{color.purple(f'{command_count - custom_command_count}')} commands | {color.purple(f'{custom_command_count}')} custom commands")
             prints.message(f"Privacy mode » {color.purple(f'{mode}')}")
-            await message_builder(ctx, description=f"```\\Privacy mode » {mode}```")
+            await message_builder(ctx, description=f"```\nPrivacy mode » {mode}```")
         else:
             await mode_error(ctx, "on or off")
 

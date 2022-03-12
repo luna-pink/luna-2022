@@ -1,1 +1,3 @@
 [!] Fixed webhooks not sending
+[!] Fixed typo in {prefix}privacy
+[/] Improved privacy mode (now hides name on title)
