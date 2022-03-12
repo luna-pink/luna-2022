@@ -1616,7 +1616,6 @@ class notify:
     def webhook(url="", description="", name="", error=False):
         """Create a webhook notification"""
         try:
-            return
             if url == "":
                 prints.error(
                     f"The webhook url can't be empty » {name} » Has been cleared")
@@ -7565,6 +7564,14 @@ class ImageCog(commands.Cog, name="Image commands"):
             url=f"https://api.popcatdev.repl.co/ad?image={urllib.parse.quote(str(user.avatar_url).replace('webp', 'png'))}")
         await send(luna, embed)
 
+
+bot.add_cog(ImageCog(bot))
+
+
+class ImageCog2(commands.Cog, name="Image commands 2"):
+    def __init__(self, bot: commands.bot):
+        self.bot = bot
+        
     @commands.command(name="alert",
                       usage="<text>",
                       description="Iphone alert")
@@ -7616,14 +7623,6 @@ class ImageCog(commands.Cog, name="Image commands"):
         embed.set_image(
             url=f"https://vacefron.nl/api/icanmilkyou?user1={urllib.parse.quote(str(user1.avatar_url).replace('webp', 'png'))}&user2={urllib.parse.quote(str(user2.avatar_url).replace('webp', 'png'))}")
         await send(luna, embed)
-
-
-bot.add_cog(ImageCog(bot))
-
-
-class ImageCog2(commands.Cog, name="Image commands 2"):
-    def __init__(self, bot: commands.bot):
-        self.bot = bot
 
     @commands.command(name="heaven",
                       usage="<@member>",

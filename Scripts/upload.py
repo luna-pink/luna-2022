@@ -84,6 +84,7 @@ public_guild_id = 793674589988323330
 public_upload_channel_id = 951879313341448272
 public_changelog_channel_id = 879050099563565106
 public_announcement_channel_id = 810002706214420511
+public_luna_role = 870056164107354142
 
 # ///////////////////////////////////////////////////////////////
 
@@ -107,19 +108,29 @@ async def on_ready():
     upload_channel = upload_guild.get_channel(upload_channel_id)
     changelog_channel = upload_guild.get_channel(changelog_channel_id)
     announcement_channel = upload_guild.get_channel(announcement_channel_id)
-    ping_role = upload_guild.get_role(luna_role)
+    ping_role1 = upload_guild.get_role(luna_role)
     upload_guild_sbstore = bot.get_guild(guild_id_sbstore)
     changelog_channel_sbstore = upload_guild_sbstore.get_channel(changelog_channel_id_sbstore)
     
     public_upload_guild = bot.get_guild(public_guild_id)
     public_upload_channel = public_upload_guild.get_channel(public_upload_channel_id)
     public_changelog_channel = public_upload_guild.get_channel(public_changelog_channel_id)
-    public_announcement_channel = upload_guild.get_channel(public_announcement_channel_id)
+    public_announcement_channel = public_upload_guild.get_channel(public_announcement_channel_id)
+    ping_role2 = public_upload_guild.get_role(public_luna_role)
 
 # ///////////////////////////////////////////////////////////////
 # With Mention
 
-    announcement = f"""{ping_role.mention}
+    announcement1 = f"""{ping_role1.mention}
+
+> Luna {version} has been released.
+> 
+> Wait 5 minutes for Luna to automatically update it.
+> Use (p)update or restart Luna to force the update.
+> 
+> Changelogs in #changelogs"""
+
+    announcement2 = f"""{ping_role2.mention}
 
 > Luna {version} has been released.
 > 
@@ -152,14 +163,14 @@ async def on_ready():
         except:
             pass
 
+    await public_announcement_channel.send(announcement2)
+    await announcement_channel.send(announcement1)
     await public_upload_channel.send(file=discord.File(r'Luna.exe'))
     exe_link = await upload_channel.send(file=discord.File(r'Luna.exe'))
     exe_link = exe_link.attachments[0].url
     file = open("changelog.txt", "r")
     file_data = file.read()
     file.close()
-    await announcement_channel.send(announcement)
-    await public_announcement_channel.send(announcement)
     await changelog_channel.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
     await public_changelog_channel.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
     config.version(version)
