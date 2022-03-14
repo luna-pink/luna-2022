@@ -4,7 +4,7 @@ import requests
 # Developer Variables
 
 free_mode = True
-developer_mode = False
+developer_mode = True
 
 beta = False
 version = '3.3.4'

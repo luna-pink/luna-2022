@@ -1,0 +1,1 @@
+[+] Added version encryption to prevent an "unlimited free version" crack.

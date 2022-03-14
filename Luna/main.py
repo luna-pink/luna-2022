@@ -3935,7 +3935,7 @@ def update_thread():
     update_found = False
     while True:
         r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
-        version_url = r["version"]
+        version_url = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(r["version"])
 
         r = requests.get(
             "https://raw.githubusercontent.com/Nshout/Luna/main/beta.json"

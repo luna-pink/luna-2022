@@ -20,6 +20,7 @@ print(f"Current version: {version_url}")
 version = input("What should the new version be?: ")
 print()
 
+
 # ///////////////////////////////////////////////////////////////
 
 class files:
@@ -57,17 +58,19 @@ class files:
             with open(path, "w", encoding="utf-8") as f:
                 f.write(json.dumps(content, indent=4))
 
+
 class config:
 
     def version(new_value):
         json_object = json.load(open("pastebin.json", encoding="utf-8"))
-        json_object["version"] = new_value
+        json_object["version"] = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(new_value)
         files.write_json("pastebin.json", json_object)
 
     def update(new_value):
         json_object = json.load(open("pastebin.json", encoding="utf-8"))
         json_object["update"] = new_value
         files.write_json("pastebin.json", json_object)
+
 
 # ///////////////////////////////////////////////////////////////
 
@@ -99,6 +102,7 @@ if overwrite:
     announcement_channel_id = 896794849662103563
     luna_role = 896620280909291550
 
+
 # ///////////////////////////////////////////////////////////////
 
 @bot.event
@@ -111,15 +115,15 @@ async def on_ready():
     ping_role1 = upload_guild.get_role(luna_role)
     upload_guild_sbstore = bot.get_guild(guild_id_sbstore)
     changelog_channel_sbstore = upload_guild_sbstore.get_channel(changelog_channel_id_sbstore)
-    
+
     public_upload_guild = bot.get_guild(public_guild_id)
     public_upload_channel = public_upload_guild.get_channel(public_upload_channel_id)
     public_changelog_channel = public_upload_guild.get_channel(public_changelog_channel_id)
     public_announcement_channel = public_upload_guild.get_channel(public_announcement_channel_id)
     ping_role2 = public_upload_guild.get_role(public_luna_role)
 
-# ///////////////////////////////////////////////////////////////
-# With Mention
+    # ///////////////////////////////////////////////////////////////
+    # With Mention
 
     announcement1 = f"""{ping_role1.mention}
 
@@ -139,24 +143,24 @@ async def on_ready():
 > 
 > Changelogs in #changelogs"""
 
-# ///////////////////////////////////////////////////////////////
-# Without Mention
+    # ///////////////////////////////////////////////////////////////
+    # Without Mention
 
-#     announcement = f"""> Luna {version} has been released.
-# > 
-# > Wait 5 minutes for Luna to automatically update it.
-# > Use (p)update or restart Luna to force the update.
-# > 
-# > Changelogs in #changelogs"""
+    #     announcement = f"""> Luna {version} has been released.
+    # >
+    # > Wait 5 minutes for Luna to automatically update it.
+    # > Use (p)update or restart Luna to force the update.
+    # >
+    # > Changelogs in #changelogs"""
 
-# ///////////////////////////////////////////////////////////////
+    # ///////////////////////////////////////////////////////////////
 
     if not overwrite:
         try:
             await upload_channel.purge(limit=5)
         except:
             pass
-        
+
     if not overwrite:
         try:
             await public_upload_channel.purge(limit=5)
@@ -177,6 +181,7 @@ async def on_ready():
     config.update(exe_link)
     await changelog_channel_sbstore.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
     os._exit(0)
+
 
 # ///////////////////////////////////////////////////////////////
 
