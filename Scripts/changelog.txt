@@ -1,5 +1,10 @@
-[+] Has become free!
-[+] Upgraded to discord.py 2.0.0a1
-[+] Added {prefix}banroulette
-[+] Added back {prefix}reload
-[!] Fixed custom commands not loading
+[+] Added {prefix}edited
+[+] Added {prefix}tokeninfo
+[+] Added <message> to {prefix}spamwebhook
+[+] Added {prefix}thelp
+[+] Added error codes for the dev team to identify certain errors quicker
+[!] Fixed {prefix}pikachu
+[!] Fixed "There has been an issue with authenticating your hardware"
+[!] 'NoneType' object has no attribute 'call_soon_threadsafe' is undergoing tests, though changes have been made
+[/] Improved webhooks
+[/] Improved {prefix}annihilate

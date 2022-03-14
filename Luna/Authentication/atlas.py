@@ -1,5 +1,5 @@
 import socket
-from Encryption.CEAShim256 import *
+from Encryption import *
 
 # ///////////////////////////////////////////////////////////////
 # Auth API Module

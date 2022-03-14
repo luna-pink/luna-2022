@@ -20,6 +20,7 @@ print(f"Current version: {version_url}")
 version = input("What should the new version be?: ")
 print()
 
+
 # ///////////////////////////////////////////////////////////////
 
 class files:
@@ -32,7 +33,7 @@ class files:
         Reads a json file
         
         Example:
-            files.json("Luna/discord.json", "token", documents=True)
+            files.json("Luna/discord.luna", "token", documents=True)
         """
         if documents:
             return json.load(open(os.path.join(files.documents(), file_name), encoding="utf-8"))[value]
@@ -57,6 +58,7 @@ class files:
             with open(path, "w", encoding="utf-8") as f:
                 f.write(json.dumps(content, indent=4))
 
+
 class config:
 
     def version(new_value):
@@ -68,6 +70,7 @@ class config:
         json_object = json.load(open("pastebin.json", encoding="utf-8"))
         json_object["update"] = new_value
         files.write_json("pastebin.json", json_object)
+
 
 # ///////////////////////////////////////////////////////////////
 
@@ -83,6 +86,8 @@ luna_role = 893541525575839785
 public_guild_id = 793674589988323330
 public_upload_channel_id = 951879313341448272
 public_changelog_channel_id = 879050099563565106
+public_announcement_channel_id = 810002706214420511
+public_luna_role = 870056164107354142
 
 # ///////////////////////////////////////////////////////////////
 
@@ -97,6 +102,7 @@ if overwrite:
     announcement_channel_id = 896794849662103563
     luna_role = 896620280909291550
 
+
 # ///////////////////////////////////////////////////////////////
 
 @bot.event
@@ -106,18 +112,20 @@ async def on_ready():
     upload_channel = upload_guild.get_channel(upload_channel_id)
     changelog_channel = upload_guild.get_channel(changelog_channel_id)
     announcement_channel = upload_guild.get_channel(announcement_channel_id)
-    ping_role = upload_guild.get_role(luna_role)
+    ping_role1 = upload_guild.get_role(luna_role)
     upload_guild_sbstore = bot.get_guild(guild_id_sbstore)
     changelog_channel_sbstore = upload_guild_sbstore.get_channel(changelog_channel_id_sbstore)
-    
+
     public_upload_guild = bot.get_guild(public_guild_id)
     public_upload_channel = public_upload_guild.get_channel(public_upload_channel_id)
     public_changelog_channel = public_upload_guild.get_channel(public_changelog_channel_id)
+    public_announcement_channel = public_upload_guild.get_channel(public_announcement_channel_id)
+    ping_role2 = public_upload_guild.get_role(public_luna_role)
 
-# ///////////////////////////////////////////////////////////////
-# With Mention
+    # ///////////////////////////////////////////////////////////////
+    # With Mention
 
-    announcement = f"""{ping_role.mention}
+    announcement1 = f"""{ping_role1.mention}
 
 > Luna {version} has been released.
 > 
@@ -126,17 +134,26 @@ async def on_ready():
 > 
 > Changelogs in #changelogs"""
 
-# ///////////////////////////////////////////////////////////////
-# Without Mention
+    announcement2 = f"""{ping_role2.mention}
 
-#     announcement = f"""> Luna {version} has been released.
-# > 
-# > Wait 5 minutes for Luna to automatically update it.
-# > Use (p)update or restart Luna to force the update.
-# > 
-# > Changelogs in #changelogs"""
+> Luna {version} has been released.
+> 
+> Wait 5 minutes for Luna to automatically update it.
+> Use (p)update or restart Luna to force the update.
+> 
+> Changelogs in #changelogs"""
 
-# ///////////////////////////////////////////////////////////////
+    # ///////////////////////////////////////////////////////////////
+    # Without Mention
+
+    #     announcement = f"""> Luna {version} has been released.
+    # >
+    # > Wait 5 minutes for Luna to automatically update it.
+    # > Use (p)update or restart Luna to force the update.
+    # >
+    # > Changelogs in #changelogs"""
+
+    # ///////////////////////////////////////////////////////////////
 
     if not overwrite:
         try:
@@ -144,22 +161,30 @@ async def on_ready():
         except:
             pass
 
+    if not overwrite:
+        try:
+            await public_upload_channel.purge(limit=5)
+        except:
+            pass
+
+    # await public_announcement_channel.send(announcement2)
+    # await announcement_channel.send(announcement1)
     await public_upload_channel.send(file=discord.File(r'Luna.exe'))
     exe_link = await upload_channel.send(file=discord.File(r'Luna.exe'))
     exe_link = exe_link.attachments[0].url
     file = open("changelog.txt", "r")
     file_data = file.read()
     file.close()
-    await announcement_channel.send(announcement)
-    await changelog_channel.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
-    await public_changelog_channel.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
+    # await changelog_channel.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
+    # await public_changelog_channel.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
     config.version(version)
     config.update(exe_link)
-    await changelog_channel_sbstore.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
+    # await changelog_channel_sbstore.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
     os._exit(0)
+
 
 # ///////////////////////////////////////////////////////////////
 
-token = files.json("Luna/discord.json", "token", documents=True)
+token = files.json("Luna/discord.luna", "token", documents=True)
 print("Logging into token...")
 bot.run(Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token))

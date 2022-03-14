@@ -19,13 +19,21 @@ class CEAMisc:
 
     def GenerateKey():
         """
-        Generates a random key for the CEA.
+        Generate a random string of 32 characters
+        :return: a string of 32 random characters from the string.ascii_letters and string.digits.
         """
         characters = string.ascii_letters + string.digits
         generate_string = "".join(random.sample(characters, 32))
         return generate_string
 
     def XOR(ptext, key):
+        """
+        XOR the given plaintext with the given key, character by character
+
+        :param ptext: The text to be encrypted
+        :param key: The key is the same length as the plaintext message, and it is used to encrypt the plaintext
+        :return: The XOR'd string.
+        """
         xored = []
         for x in range(len(ptext)):
             xored.append(chr(ord(ptext[x]) ^ ord(key[x % len(key)])))
@@ -33,6 +41,12 @@ class CEAMisc:
         return "".join(xored)
 
     def CipherEncode(plaintext):
+        """
+        It takes a string as input, and returns a string as output
+
+        :param plaintext: The text you want to encode
+        :return: a string of the encoded text.
+        """
         normal_numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
         normal_low = [
             "a",
@@ -283,10 +297,22 @@ class CEAMisc:
 
 class CEAEncrypt:
     def __init__(self, key=CEAMisc.GenerateKey(), encoding=1):
+        """
+        The constructor for the class
+
+        :param key: The key used to encrypt the message
+        :param encoding: 1 = ASCII, 2 = Unicode, defaults to 1 (optional)
+        """
         self.key = key
         self.encoding = encoding
 
     def CEA256(self, plain_text):
+        """
+        The function takes in a plain text and a key and encrypts the plain text using the key
+
+        :param plain_text: The text you want to encrypt
+        :return: The cipher text.
+        """
 
         # VARIABLES >>
 
@@ -334,10 +360,22 @@ class CEAEncrypt:
 
 class CEADecrypt:
     def __init__(self, key, encoding=1):
+        """
+        The __init__ function is called when an instance of the class is created.
+
+        :param key: The key is the key that will be used to encrypt and decrypt the message
+        :param encoding: 1 = ASCII, 2 = Unicode, defaults to 1 (optional)
+        """
         self.key = key
         self.encoding = encoding
 
     def CEA256(self, encoded_text):
+        """
+        The function takes in a string, splits it into a list, and then decrypts it
+
+        :param encoded_text: The text to be decrypted
+        :return: The decrypted data.
+        """
 
         # VARIABLES >>
 
