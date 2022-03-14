@@ -50,5 +50,5 @@ Webhook setup 1
 Webhook commands 1
 Webhook urls 1
 Webhook customisation 1
-Miscellaneous commands
-Game commands
+Miscellaneous commands 1
+Game commands 1

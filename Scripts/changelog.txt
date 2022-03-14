@@ -1,3 +1,6 @@
+[+] Added {prefix}edited
+[+] Added {prefix}tokeninfo
 [+] Added <message> to {prefix}spamwebhook
 [+] Added {prefix}thelp
 [/] Improved webhooks
+[/] Improved {prefix}annihilate

