@@ -4,10 +4,10 @@ import requests
 # Developer Variables
 
 free_mode = True
-developer_mode = True
+developer_mode = False
 
 beta = False
-version = '3.3.4'
+version = '2021.3.36'
 api_version = 'v9'
 beta_version = 'v10'
 

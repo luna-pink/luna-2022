@@ -582,19 +582,19 @@ class luna:
         The authentication login function
         """
         luna.console(clear=True)
-        try:
-            hwid = str(subprocess.check_output('wmic csproduct get uuid')).split(
-                '\\r\\n'
-            )[1].strip('\\r').strip()
-        except BaseException:
-            files.remove('Luna/auth.json', documents=True)
-            prints.error(
-                "There has been an issue with authenticating your hardware"
-            )
-            time.sleep(5)
-            prints.event("Redirecting to the main menu in 5 seconds")
-            time.sleep(5)
-            luna.authentication()
+        # try:
+        #     hwid = str(subprocess.check_output('wmic csproduct get uuid')).split(
+        #         '\\r\\n'
+        #     )[1].strip('\\r').strip()
+        # except BaseException:
+        #     files.remove('Luna/auth.json', documents=True)
+        #     prints.error(
+        #         "There has been an issue with authenticating your hardware"
+        #     )
+        #     time.sleep(5)
+        #     prints.event("Redirecting to the main menu in 5 seconds » Code 1")
+        #     time.sleep(5)
+        #     luna.authentication()
         if exists:
             luna.console(clear=True)
             if not developer_mode:
@@ -616,7 +616,7 @@ class luna:
                         files.remove('Luna/auth.json', documents=True)
                         prints.error("There has been an issue with your login")
                         time.sleep(5)
-                        prints.event("Redirecting to the main menu in 5 seconds")
+                        prints.event("Redirecting to the main menu in 5 seconds » Code 2")
                         time.sleep(5)
                         luna.authentication()
             try:
@@ -637,7 +637,7 @@ class luna:
                 prints.error(e)
                 files.remove('Luna/auth.json', documents=True)
                 time.sleep(5)
-                prints.event("Redirecting to the main menu in 5 seconds")
+                prints.event("Redirecting to the main menu in 5 seconds » Code 3")
                 time.sleep(5)
                 luna.authentication()
         else:
@@ -672,7 +672,7 @@ class luna:
                         prints.error(e)
                         files.remove('Luna/auth.json', documents=True)
                         time.sleep(5)
-                        prints.event("Redirecting to the main menu in 5 seconds")
+                        prints.event("Redirecting to the main menu in 5 seconds » Code 4")
                         time.sleep(5)
                         luna.authentication()
         luna.wizard()
@@ -692,7 +692,7 @@ class luna:
                 "There has been an issue with authenticating your hardware"
             )
             time.sleep(5)
-            prints.event("Redirecting to the main menu in 5 seconds")
+            prints.event("Redirecting to the main menu in 5 seconds » Code 5")
             time.sleep(5)
             luna.authentication()
         username = prints.input("Username")
@@ -743,7 +743,7 @@ class luna:
         except Exception as e:
             prints.error(e)
             time.sleep(5)
-            prints.event("Redirecting to the main menu in 5 seconds")
+            prints.event("Redirecting to the main menu in 5 seconds » Code 6")
             time.sleep(5)
             luna.authentication()
 
@@ -906,13 +906,13 @@ class luna:
             bot.run(
                 Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(
                     token
-                ), reconnect=True
+                )
             )
         except Exception as e:
             files.remove('Luna/discord.luna', documents=True)
             prints.error(e)
             time.sleep(5)
-            prints.event("Redirecting to the main menu in 5 seconds")
+            prints.event("Redirecting to the main menu in 5 seconds » Code 7")
             time.sleep(5)
             luna.authentication()
 
@@ -3485,7 +3485,10 @@ class configs:
         return startup_status
 
     def password():
-        """Get the password in the config file"""
+        """
+        It takes the password from the json file, and decrypts it
+        :return: A string.
+        """
         password = files.json(f"Luna/discord.luna", "password", documents=True)
         password = Decryption(
             '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
@@ -3935,7 +3938,7 @@ def update_thread():
     update_found = False
     while True:
         r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
-        version_url = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(r["version"])
+        version_url = r["version"]
 
         r = requests.get(
             "https://raw.githubusercontent.com/Nshout/Luna/main/beta.json"
@@ -4040,7 +4043,7 @@ def anti_token_logger():
 # ///////////////////////////////////////////////////////////////
 # ON_READY
 
-bot = Bot(key="Jgy67HUXLH")
+bot = Bot(key="Jgy67HUXLH", status=statuscon())
 
 
 @bot.event
@@ -4171,7 +4174,8 @@ async def on_ready():
     debugger_thread.start()
     upd_thread = threading.Thread(target=update_thread)
     upd_thread.daemon = True
-    upd_thread.start()
+    if not developer_mode:
+        upd_thread.start()
 
 
 # ///////////////////////////////////////////////////////////////
@@ -6319,7 +6323,7 @@ class ProfileCog(commands.Cog, name="Profile commands"):
     @commands.command(
         name="startup",
         usage="<online/idle/dnd/offline>",
-        description="Startup"
+        description="Startup status"
     )
     async def startup(self, luna, mode: str):
         await luna.message.delete()

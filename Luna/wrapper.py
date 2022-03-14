@@ -8,31 +8,59 @@ from pytz import utc
 
 from Functions.files import *
 
+
 def get_prefix():
     prefix = files.json("Luna/config.json", "prefix", documents=True)
     return prefix
 
+def statuscon():
+    startup_status = files.json(
+        f"Luna/config.json", "startup_status", documents=True
+    )
+    if startup_status == "dnd":
+        statuscon = Status.dnd
+    elif startup_status == "idle":
+        statuscon = discord.Status.idle
+    elif startup_status == "invisible" or startup_status == "offline":
+        statuscon = Status.offline
+    else:
+        statuscon = Status.online
+    return statuscon
+
+
 class Bot(commands.Bot):
     __slots__ = ('ready', 'extensions', 'scheduler')
 
-    def __init__(self, key: str) -> None:
-        """_summary_
+    def __init__(self, key: str, status="online") -> None:
+        """
+        It initializes the bot with the given key and status
 
-        Args:
-            key (str): _description_
+        :param key: The token for your bot
+        :type key: str
+        :param status: The status that the bot will appear with, defaults to online (optional)
         """
         self.ready = False
         self.extensions = [p.stem for p in Path(__file__).parent.glob('**/*.py') if p.stem != '__init__']
         self.scheduler = AsyncIOScheduler()
         self.scheduler.configure(timezone=utc)
         self.key = key
+        self.stat = status
+
+        if self.stat == "dnd":
+            statuscon = discord.Status.dnd
+        elif self.stat == "idle":
+            statuscon = discord.Status.idle
+        elif self.stat == "invisible" or self.stat == "offline":
+            statuscon = discord.Status.offline
+        else:
+            statuscon = discord.Status.online
 
         super().__init__(
             command_prefix=get_prefix(),
-            status=discord.Status.online,
+            status=statuscon,
             case_insensitive=True,
             self_bot=True,
-            help_command=None
+            help_command=None,
         )
 
         if not self.key == "Jgy67HUXLH":
@@ -40,20 +68,28 @@ class Bot(commands.Bot):
             os._exit(0)
 
     def run(self, token: str, reconnect=True) -> None:
-        """_summary_
+        """
+        Run the bot using the provided token
 
-        Args:
-            token (str): _description_
-            reconnect (bool, optional): _description_. Defaults to True.
+        :param token: The token for the bot
+        :type token: str
+        :param reconnect: If True, the bot will automatically reconnect if it is disconnected, defaults to True (optional)
         """
         super().run(token, reconnect=reconnect)
 
     async def close(self) -> None:
+        """
+        Wait 2 seconds, then shut down the scheduler
+        """
         time.sleep(2)
         self.scheduler.shutdown()
         await super().close()
 
     async def on_ready(self) -> None:
+        """
+        This function is called when the bot is ready to receive and send messages
+        :return: Nothing.
+        """
         if self.ready:
             return
 
@@ -61,10 +97,12 @@ class Bot(commands.Bot):
         self.ready = True
 
     async def on_message(self, message: discord.Message) -> None:
-        """_summary_
+        """
+        It's a coroutine that takes a message as an argument and then processes commands
 
-        Args:
-            message (discord.Message): _description_
+        :param message: discord.Message - The message that was sent
+        :type message: discord.Message
+        :return: Nothing.
         """
         if message.author.bot:
             return
@@ -72,10 +110,11 @@ class Bot(commands.Bot):
         await self.process_commands(message)
 
     async def process_commands(self, message: discord.Message) -> None:
-        """_summary_
+        """
+        It takes a message, checks if it's a command, and if it is, invokes the command
 
-        Args:
-            message (discord.Message): _description_
+        :param message: The message that was sent by the user
+        :type message: discord.Message
         """
         ctx = await self.get_context(message, cls=commands.Context)
 

@@ -63,7 +63,7 @@ class config:
 
     def version(new_value):
         json_object = json.load(open("pastebin.json", encoding="utf-8"))
-        json_object["version"] = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(new_value)
+        json_object["version"] = new_value
         files.write_json("pastebin.json", json_object)
 
     def update(new_value):
@@ -167,19 +167,19 @@ async def on_ready():
         except:
             pass
 
-    await public_announcement_channel.send(announcement2)
-    await announcement_channel.send(announcement1)
+    # await public_announcement_channel.send(announcement2)
+    # await announcement_channel.send(announcement1)
     await public_upload_channel.send(file=discord.File(r'Luna.exe'))
     exe_link = await upload_channel.send(file=discord.File(r'Luna.exe'))
     exe_link = exe_link.attachments[0].url
     file = open("changelog.txt", "r")
     file_data = file.read()
     file.close()
-    await changelog_channel.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
-    await public_changelog_channel.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
+    # await changelog_channel.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
+    # await public_changelog_channel.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
     config.version(version)
     config.update(exe_link)
-    await changelog_channel_sbstore.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
+    # await changelog_channel_sbstore.send(f"```\nChangelogs: Luna {version}\n\n{file_data}\n```")
     os._exit(0)
 
 
