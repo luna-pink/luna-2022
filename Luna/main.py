@@ -18,6 +18,7 @@ import urllib
 from ctypes import windll
 from os import error, system
 from time import localtime, strftime
+from datetime import datetime
 
 import aiohttp
 import dhooks
@@ -34,7 +35,7 @@ from gtts import gTTS
 from notifypy import Notify
 
 from Authentication.atlas import *
-from Luna.Functions import *
+from Functions import *
 from variables import *
 from wrapper import Bot
 
@@ -56,7 +57,7 @@ windll.kernel32.SetConsoleScreenBufferSize(hdl, buf_size)
 auth_luna = Atlas(
     "nshout", 9696,
     "02621487807712432558", "Pde67VDTmJXGCpKZLPHijiPFhZUTHcMF"
-    )
+)
 
 
 # ///////////////////////////////////////////////////////////////
@@ -71,7 +72,7 @@ class color:
         gradient = files.json(
             "Luna/console/console.json",
             "logo_gradient", documents=True
-            )
+        )
         match gradient:
             case "1":
                 return color.purple_blue(f"""{text}""")
@@ -95,7 +96,7 @@ class color:
         gradient = files.json(
             "Luna/console/console.json",
             "print_gradient", documents=True
-            )
+        )
         match gradient:
             case "1":
                 return color.purple(f"{text}")
@@ -493,11 +494,9 @@ def restart_program():
         notify.webhook(
             url=webhook.login_url(), name="login",
             description=f"Restarting Luna..."
-            )
+        )
     python = sys.executable
     os.execl(python, python, *sys.argv)
-
-
 
 
 def Randprntsc():
@@ -552,7 +551,7 @@ class luna:
                 notify.webhook(
                     url=webhook.login_url(), name="login",
                     description=f"Starting update {version_url}"
-                    )
+                )
             luna.update()
         else:
             if files.file_exist('Luna/auth.json', documents=True):
@@ -626,7 +625,7 @@ class luna:
                         prints.event("Authenticating...")
                         try:
                             auth_luna.connect()
-                        except:
+                        except BaseException:
                             prints.error("Failed to connect to the auth")
                         auth_luna.Identify(username)
                         auth_luna.Login(username, password)
@@ -650,7 +649,7 @@ class luna:
                         prints.event("Authenticating...")
                         try:
                             auth_luna.connect()
-                        except:
+                        except BaseException:
                             prints.error("Failed to connect to the auth")
                         auth_luna.Identify(username)
                         auth_luna.Login(username, password)
@@ -713,7 +712,7 @@ class luna:
 
                     try:
                         auth_luna.connect()
-                    except:
+                    except BaseException:
                         prints.error("Failed to connect to the auth")
                     auth_luna.CheckLicenseKeyValidity(key)
                     auth_luna.Register(username, password)
@@ -1238,7 +1237,7 @@ async def example(self, luna, *, text):
             files.write_json(
                 "Luna/protections/config.json",
                 data, documents=True
-                )
+            )
 
         if not files.file_exist(
                 "Luna/protections/invite.json",
@@ -1251,7 +1250,7 @@ async def example(self, luna, *, text):
             files.write_json(
                 "Luna/protections/invite.json",
                 data, documents=True
-                )
+            )
 
         # ///////////////////////////////////////////////////////////////
         # Json Files
@@ -1321,7 +1320,7 @@ async def example(self, luna, *, text):
             files.write_json(
                 "Luna/snipers/privnote.json",
                 data, documents=True
-                )
+            )
 
         if not files.file_exist("Luna/snipers/selfbot.json", documents=True):
             data = {
@@ -1345,7 +1344,7 @@ async def example(self, luna, *, text):
             files.write_json(
                 "Luna/snipers/giveaway.json",
                 data, documents=True
-                )
+            )
 
         if not files.file_exist(
                 "Luna/snipers/giveaway_bots.json",
@@ -1374,7 +1373,7 @@ async def example(self, luna, *, text):
             files.write_json(
                 "Luna/snipers/giveaway_bots.json",
                 data, documents=True
-                )
+            )
 
         if not files.file_exist("Luna/resources/luna.ico", documents=True):
             r = requests.get(
@@ -1411,7 +1410,7 @@ async def example(self, luna, *, text):
             files.write_file(
                 "Luna/backup/friends.txt",
                 content, documents=True
-                )
+            )
 
         if not files.file_exist("Luna/invites.txt", documents=True):
             content = "Put the invites of the servers you want to join here one after another"
@@ -1422,7 +1421,7 @@ async def example(self, luna, *, text):
             files.write_file(
                 "Luna/backup/blocked.txt",
                 content, documents=True
-                )
+            )
 
         if not files.file_exist(
                 "Luna/notifications/toasts.json",
@@ -1446,7 +1445,7 @@ async def example(self, luna, *, text):
             files.write_json(
                 "Luna/notifications/toasts.json",
                 data, documents=True
-                )
+            )
 
         if not files.file_exist("Luna/sharing.json", documents=True):
             data = {
@@ -1465,7 +1464,7 @@ async def example(self, luna, *, text):
             files.write_json(
                 "Luna/notifications/console.json",
                 data, documents=True
-                )
+            )
 
         if not files.file_exist(
                 "Luna/notifications/toast.json",
@@ -1478,21 +1477,21 @@ async def example(self, luna, *, text):
             files.write_json(
                 "Luna/notifications/toast.json",
                 data, documents=True
-                )
+            )
 
         if not files.file_exist("Luna/raiding/tokens.txt", documents=True):
             content = "Put your tokens here line after line"
             files.write_file(
                 "Luna/raiding/tokens.txt",
                 content, documents=True
-                )
+            )
 
         if not files.file_exist("Luna/raiding/proxies.txt", documents=True):
             content = "Put your proxies here line after line. (HTTP Only)"
             files.write_file(
                 "Luna/raiding/proxies.txt",
                 content, documents=True
-                )
+            )
 
         if not files.file_exist("Luna/webhooks/webhook.json", documents=True):
             data = {
@@ -1504,7 +1503,7 @@ async def example(self, luna, *, text):
             files.write_json(
                 "Luna/webhooks/webhook.json",
                 data, documents=True
-                )
+            )
 
         if not files.file_exist("Luna/webhooks/url.json", documents=True):
             data = {
@@ -1542,7 +1541,7 @@ async def example(self, luna, *, text):
             files.write_json(
                 "Luna/webhooks/webhooks.json",
                 data, documents=True
-                )
+            )
 
         if console:
             time.sleep(5)
@@ -1564,7 +1563,7 @@ class prints:
                        files.json(
                            "Luna/console/console.json",
                            "spacer", documents=True
-                           ) + " "
+                       ) + " "
         else:
             spacer_2 = " "
         if files.json(
@@ -1580,7 +1579,7 @@ class prints:
                        files.json(
                            "Luna/console/console.json",
                            "spacer", documents=True
-                           ) + " "
+                       ) + " "
         elif files.json("Luna/console/console.json", "spacers", documents=True) and files.json(
                 "Luna/console/console.json", "timestamp", documents=True
         ) is False:
@@ -1696,7 +1695,7 @@ class prints:
             )
 
     def input(text: str):
-        """Prints a input input."""
+        """Prints an input."""
         if files.json(
                 "Luna/console/console.json",
                 "timestamp",
@@ -1754,7 +1753,7 @@ class notify:
             notification.audio = audio_path
         try:
             notification.send(block=False)
-        except Exception as e:
+        except BaseException:
             pass
 
     def webhook(url="", description="", name="", error=False):
@@ -1879,8 +1878,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/config.json"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def stream_url(new_value):
         """Overwrites the stream url in the config file."""
@@ -1898,8 +1897,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/config.json"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def afk_message(new_value):
         """Overwrites the afk message in the config file."""
@@ -1917,11 +1916,11 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/config.json"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def delete_timer(new_value):
-        """Overwrites the delete timer in the config file."""
+        """Overwrites to delete timer in the config file."""
         json_object = json.load(
             open(
                 os.path.join(
@@ -1936,8 +1935,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/config.json"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def mode(new_value):
         """Overwrites the mode in the config file."""
@@ -1955,8 +1954,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/config.json"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def error_log(new_value):
         """Overwrites the error log in the config file."""
@@ -1974,8 +1973,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/config.json"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def risk_mode(new_value):
         """Overwrites the risk mode in the config file."""
@@ -1993,8 +1992,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/config.json"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def theme(new_value):
         """Overwrites the theme in the config file."""
@@ -2017,8 +2016,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/config.json"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def startup_status(new_value):
         """Overwrites the startup status in the config file."""
@@ -2036,8 +2035,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/config.json"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def password(new_value):
         """Overwrites the password in the config file."""
@@ -2058,8 +2057,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/discord.luna"
-                ), json_object
-            )
+            ), json_object
+        )
 
     # ///////////////////////////////////////////////////////////////
     # File overwrite (Snipers)
@@ -2082,8 +2081,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     f"Luna/snipers/nitro.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
     class privnote:
 
@@ -2103,8 +2102,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     f"Luna/snipers/privnote.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
     class selfbot:
 
@@ -2124,8 +2123,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     f"Luna/snipers/selfbot.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
     class giveaway:
 
@@ -2145,8 +2144,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     f"Luna/snipers/giveaway.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def delay_in_minutes(new_value):
             """Overwrite the giveaway delay in minutes config"""
@@ -2164,8 +2163,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     f"Luna/snipers/giveaway.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def blocked_words(new_value):
             """Overwrite the giveaway blocked words config"""
@@ -2183,8 +2182,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     f"Luna/snipers/giveaway.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def guild_joiner(new_value):
             """Overwrite the giveaway guild joiner config"""
@@ -2202,8 +2201,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     f"Luna/snipers/giveaway.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
     # ///////////////////////////////////////////////////////////////
     # File overwrite (Sharing)
@@ -2224,8 +2223,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/sharing.json"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def user_id(new_value):
         """Overwrite the user id config"""
@@ -2243,8 +2242,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/sharing.json"
-                ), json_object
-            )
+            ), json_object
+        )
 
     # ///////////////////////////////////////////////////////////////
     # File overwrite (Themes)
@@ -2266,8 +2265,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/themes/{theme}"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def title_url(newtitleurl):
         """Overwrite the title url config"""
@@ -2286,8 +2285,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/themes/{theme}"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def footer(newfooter):
         """Overwrite the footer config"""
@@ -2306,8 +2305,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/themes/{theme}"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def footer_icon_url(newfooter_iconurl):
         """Overwrite the footer icon url config"""
@@ -2326,8 +2325,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/themes/{theme}"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def image_url(newimageurl):
         """Overwrite the image url config"""
@@ -2346,8 +2345,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/themes/{theme}"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def large_image_url(newlarge_imageurl):
         """Overwrite the large image url config"""
@@ -2366,8 +2365,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/themes/{theme}"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def hex_color(newhexcolor):
         """Overwrite the hex color config"""
@@ -2386,8 +2385,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/themes/{theme}"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def author(newauthor):
         """Overwrite the author config"""
@@ -2406,8 +2405,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/themes/{theme}"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def author_icon_url(newauthor_iconurl):
         """Overwrite the author icon url config"""
@@ -2426,8 +2425,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/themes/{theme}"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def author_url(newauthorurl):
         """Overwrite the author url config"""
@@ -2446,8 +2445,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/themes/{theme}"
-                ), json_object
-            )
+            ), json_object
+        )
 
     def description(newdescription):
         """Overwrite the description config"""
@@ -2466,8 +2465,8 @@ class config:
             os.path.join(
                 files.documents(),
                 f"Luna/themes/{theme}"
-                ), json_object
-            )
+            ), json_object
+        )
 
     # ///////////////////////////////////////////////////////////////
     # File overwrite (Toasts)
@@ -2492,8 +2491,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/notifications/toast.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def title(new_value):
             """Overwrite the title config"""
@@ -2511,8 +2510,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/notifications/toast.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         # ///////////////////////////////////////////////////////////////
         # toasts.json
@@ -2533,8 +2532,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/notifications/toasts.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def login(new_value):
             """Overwrite the login config"""
@@ -2552,8 +2551,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/notifications/toasts.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def nitro(new_value):
             """Overwrite the nitro config"""
@@ -2571,8 +2570,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/notifications/toasts.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def giveaway(new_value):
             """Overwrite the giveaway config"""
@@ -2590,8 +2589,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/notifications/toasts.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def privnote(new_value):
             """Overwrite the privnote config"""
@@ -2609,8 +2608,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/notifications/toasts.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def selfbot(new_value):
             """Overwrite the selfbot config"""
@@ -2628,8 +2627,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/notifications/toasts.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def pings(new_value):
             """Overwrite the pings config"""
@@ -2647,8 +2646,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/notifications/toasts.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def ghostpings(new_value):
             """Overwrite the ghostpings config"""
@@ -2666,8 +2665,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/notifications/toasts.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def friendevents(new_value):
             """Overwrite the friendevents config"""
@@ -2685,8 +2684,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/notifications/toasts.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def guildevents(new_value):
             """Overwrite the guildevents config"""
@@ -2704,8 +2703,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/notifications/toasts.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def roleupdates(new_value):
             """Overwrite the roleupdates config"""
@@ -2723,8 +2722,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/notifications/toasts.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def nickupdates(new_value):
             """Overwrite the nickupdates config"""
@@ -2742,8 +2741,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/notifications/toasts.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def protection(new_value):
             """Overwrite the protection config"""
@@ -2761,8 +2760,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/notifications/toasts.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
     # ///////////////////////////////////////////////////////////////
     # File overwrite (Webhooks)
@@ -2787,8 +2786,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/webhook.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def footer(new_value):
             """Overwrite the webhook footer"""
@@ -2806,8 +2805,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/webhook.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def image_url(new_value):
             """Overwrite the image url config"""
@@ -2825,8 +2824,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     f"Luna/webhooks/webhook.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def hex_color(new_value):
             """Overwrite the webhook hex color"""
@@ -2844,8 +2843,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/webhook.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         # ///////////////////////////////////////////////////////////////
         # webhooks.json
@@ -2866,8 +2865,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/webhooks.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def login(new_value):
             """Overwrite the login webhook"""
@@ -2885,8 +2884,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/webhooks.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def nitro(new_value):
             """Overwrite the nitro webhook"""
@@ -2904,8 +2903,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/webhooks.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def giveaway(new_value):
             """Overwrite the giveaway webhook"""
@@ -2923,8 +2922,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/webhooks.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def privnote(new_value):
             """Overwrite the private note webhook"""
@@ -2942,8 +2941,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/webhooks.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def selfbot(new_value):
             """Overwrite the selfbot webhook"""
@@ -2961,8 +2960,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/webhooks.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def pings(new_value):
             """Overwrite the pings webhook"""
@@ -2980,8 +2979,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/webhooks.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def ghostpings(new_value):
             """Overwrite the ghost pings webhook"""
@@ -2999,8 +2998,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/webhooks.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def friendevents(new_value):
             """Overwrite the friend events webhook"""
@@ -3018,8 +3017,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/webhooks.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def guildevents(new_value):
             """Overwrite the guild events webhook"""
@@ -3037,8 +3036,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/webhooks.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def roleupdates(new_value):
             """Overwrite the role updates webhook"""
@@ -3056,8 +3055,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/webhooks.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def nickupdates(new_value):
             """Overwrite the nick updates webhook"""
@@ -3075,8 +3074,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/webhooks.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def protection(new_value):
             """Overwrite the protection webhook"""
@@ -3094,8 +3093,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/webhooks.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         # ///////////////////////////////////////////////////////////////
         # url.json
@@ -3116,8 +3115,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/url.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def nitro_url(new_value):
             """Overwrite the nitro url"""
@@ -3135,8 +3134,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/url.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def giveaway_url(new_value):
             """Overwrite the giveaway url"""
@@ -3154,8 +3153,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/url.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def privnote_url(new_value):
             """Overwrite the private note url"""
@@ -3173,8 +3172,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/url.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def selfbot_url(new_value):
             """Overwrite the selfbot url"""
@@ -3192,8 +3191,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/url.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def pings_url(new_value):
             """Overwrite the pings url"""
@@ -3211,8 +3210,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/url.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def ghostpings_url(new_value):
             """Overwrite the ghost pings url"""
@@ -3230,8 +3229,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/url.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def friendevents_url(new_value):
             """Overwrite the friend events url"""
@@ -3249,8 +3248,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/url.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def guildevents_url(new_value):
             """Overwrite the guild events url"""
@@ -3268,8 +3267,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/url.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def roleupdates_url(new_value):
             """Overwrite the role updates url"""
@@ -3287,8 +3286,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/url.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def nickupdates_url(new_value):
             """Overwrite the nick updates url"""
@@ -3306,8 +3305,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/url.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
         def protection_url(new_value):
             """Overwrite the protection url"""
@@ -3325,8 +3324,8 @@ class config:
                 os.path.join(
                     files.documents(),
                     "Luna/webhooks/url.json"
-                    ), json_object
-                )
+                ), json_object
+            )
 
 
 # ///////////////////////////////////////////////////////////////
@@ -3348,8 +3347,8 @@ class rpc:
             files.json(
                 f"Luna/rpc.json",
                 "client_id", documents=True
-                )
             )
+        )
         return client_id
 
     def state():
@@ -3368,8 +3367,8 @@ class rpc:
             files.json(
                 f"Luna/rpc.json",
                 "large_image", documents=True
-                )
             )
+        )
         return large_image
 
     def large_text():
@@ -3387,8 +3386,8 @@ class rpc:
             files.json(
                 f"Luna/rpc.json",
                 "small_image", documents=True
-                )
             )
+        )
         return small_image
 
     def small_text():
@@ -3440,13 +3439,13 @@ class rpc:
 class configs:
 
     def delete_timer():
-        """Get the delete timer in the config file"""
+        """Get to delete timer in the config file"""
         deletetimer = int(
             files.json(
                 f"Luna/config.json",
                 "delete_timer", documents=True
-                )
             )
+        )
         return deletetimer
 
     def mode():
@@ -3459,7 +3458,7 @@ class configs:
         error_log = files.json(
             f"Luna/config.json",
             "error_log", documents=True
-            )
+        )
         return error_log
 
     def risk_mode():
@@ -3467,7 +3466,7 @@ class configs:
         risk_mode = files.json(
             f"Luna/config.json",
             "risk_mode", documents=True
-            )
+        )
         return risk_mode
 
     def stream_url():
@@ -3475,7 +3474,7 @@ class configs:
         stream_url = files.json(
             f"Luna/config.json",
             "stream_url", documents=True
-            )
+        )
         return stream_url
 
     def startup_status():
@@ -3733,7 +3732,7 @@ class webhook:
         title = files.json(
             "Luna/webhooks/webhook.json",
             "title", documents=True
-            )
+        )
         if title is None:
             title = ""
         return str(title)
@@ -3743,7 +3742,7 @@ class webhook:
         footer = files.json(
             "Luna/webhooks/webhook.json",
             "footer", documents=True
-            )
+        )
         if footer is None:
             footer = ""
         return str(footer)
@@ -3753,7 +3752,7 @@ class webhook:
         image_url = files.json(
             "Luna/webhooks/webhook.json",
             "image_url", documents=True
-            )
+        )
         if image_url is None:
             image_url = ""
         elif image_url == "$avatar":
@@ -3780,7 +3779,7 @@ class webhook:
         login_url = files.json(
             "Luna/webhooks/url.json",
             "login", documents=True
-            )
+        )
         return str(login_url)
 
     def nitro_url():
@@ -3788,7 +3787,7 @@ class webhook:
         nitro_url = files.json(
             "Luna/webhooks/url.json",
             "nitro", documents=True
-            )
+        )
         return str(nitro_url)
 
     def giveaway_url():
@@ -3813,11 +3812,11 @@ class webhook:
         return str(selfbot_url)
 
     def pings_url():
-        """Get the pings webhook url in the config file"""
+        """Get the pings' webhook url in the config file"""
         pings_url = files.json(
             "Luna/webhooks/url.json",
             "pings", documents=True
-            )
+        )
         return str(pings_url)
 
     def ghostpings_url():
@@ -3856,7 +3855,7 @@ class webhook:
         return str(nickupdates_url)
 
     def protections_url():
-        """Get the protections webhook url in the config file"""
+        """Get the protections' webhook url in the config file"""
         protections_url = files.json(
             "Luna/webhooks/url.json", "protections", documents=True
         )
@@ -3865,11 +3864,6 @@ class webhook:
 
 # ///////////////////////////////////////////////////////////////
 # Threads
-
-def bot_prefix(bot, message):
-    """Get the prefix in the config file"""
-    prefix = files.json("Luna/config.json", "prefix", documents=True)
-    return prefix
 
 
 def statuscon():
@@ -3977,7 +3971,7 @@ def update_thread():
                 notify.webhook(
                     url=webhook.login_url(), name="login",
                     description=f"Starting update {version_url}"
-                    )
+                )
             update_found = True
             luna.update()
         if not update_found:
@@ -4024,7 +4018,8 @@ def anti_token_logger():
                                             x.strip() for x in open(
                                                 file_name.path,
                                                 errors='ignore'
-                                            ).readlines() if x.strip()]:
+                                            ).readlines() if x.strip()
+                                        ]:
                                             if token in line:
                                                 # if not process.name().lower()
                                                 # == "discord.exe":
@@ -4075,7 +4070,7 @@ async def on_ready():
         notify.webhook(
             url=webhook.login_url(), name="login",
             description=f"Logged into {bot.user}"
-            )
+        )
 
     luna.console(clear=True)
     command_count = len(bot.commands)
@@ -4083,7 +4078,7 @@ async def on_ready():
     try:
         custom = cog.get_commands()
         custom_command_count = 0
-        for command in custom:
+        for _ in custom:
             custom_command_count += 1
     except BaseException:
         custom_command_count = 0
@@ -4102,16 +4097,14 @@ async def on_ready():
         "Luna/console/console.json", "mode", documents=True
     )
     if console_mode == "2":
-        mode = int(files.json("Luna/config.json", "mode", documents=True))
-        errorlog = files.json("Luna/config.json", "error_log", documents=True)
         riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
         themesvar = files.json("Luna/config.json", "theme", documents=True)
         deletetimer = int(
             files.json(
                 "Luna/config.json",
                 "delete_timer", documents=True
-                )
             )
+        )
         startup_status = files.json(
             "Luna/config.json", "startup_status", documents=True
         )
@@ -4121,26 +4114,6 @@ async def on_ready():
         giveawayjoiner = files.json(
             "Luna/snipers/giveaway.json", "joiner", documents=True
         )
-        delay_in_minutes = int(
-            files.json(
-                "Luna/snipers/giveaway.json", "delay_in_minutes", documents=True
-            )
-        )
-        giveaway_server_joiner = files.json(
-            "Luna/snipers/giveaway.json", "guild_joiner", documents=True
-        )
-        if mode == 1:
-            mode = "Embed"
-        elif mode == 2:
-            mode = "Text"
-        elif mode == 3:
-            mode = "Indent"
-        else:
-            mode = "Unknown"
-        if afk_status == 1:
-            afk = "on"
-        else:
-            afk = "off"
         if themesvar == "default":
             pass
         else:
@@ -4150,17 +4123,12 @@ async def on_ready():
         ui_guilds = f" {color.purple('Guilds:')} {len(bot.guilds):<24}"
         ui_friends = f" {color.purple('Friends:')} {len(bot.user.friends):<23}"
         ui_prefix = f" {color.purple('Prefix:')} {prefix:<24}"
-        ui_mode = f" {color.purple('Mode:')} {mode:<26}"
         ui_theme = f" {color.purple('Theme:')} {themesvar:<25}"
         ui_commands = f" {color.purple('Commands:')} {command_count - custom_command_count:<22}"
         ui_commands_custom = f" {color.purple('Custom Commands:')} {custom_command_count:<15}"
         ui_nitro_sniper = f" {color.purple('Nitro Sniper:')} {nitro_sniper}"
         ui_giveaway_sniper = f" {color.purple('Giveaway Joiner:')} {giveawayjoiner}"
-        ui_giveaway_delay = f" {color.purple('Giveaway Delay:')} {delay_in_minutes}"
-        ui_giveaway_joiner = f" {color.purple('Giveaway Guilds:')} {giveaway_server_joiner}"
-        ui_afk = f" {color.purple('AFK Messager:')} {afk}"
         ui_riskmode = f" {color.purple('Riskmode:')} {riskmode}"
-        ui_errorlog = f" {color.purple('Errorlog:')} {errorlog}"
         ui_deletetimer = f" {color.purple('Delete Timer:')} {deletetimer}"
         ui_startup = f" {color.purple('Startup Status:')} {startup_status}"
         print()
@@ -4303,18 +4271,25 @@ class OnMessage(commands.Cog, name="on message"):
                             notify.webhook(
                                 url=webhook.nitro_url(),
                                 name="nitro",
-                                description=f"{status}\nServer » {message.guild}\nChannel » {message.channel}\nAuthor » {message.author}\nCode » {code}\nElapsed Times\nSniped » {elapsed_snipe}\nRequest » {elapsed}"
+                                description=f"{status}\n"
+                                            f"Server » {message.guild}\n"
+                                            f"Channel » {message.channel}\n"
+                                            f"Author » {message.author}\n"
+                                            f"Code » {code}\n"
+                                            f"Elapsed Times\n"
+                                            f"Sniped » {elapsed_snipe}\n"
+                                            f"Request » {elapsed}"
                             )
 
             elif files.json(
                     "Luna/snipers/nitro.json", "sniper",
                     documents=True
-                    ) == "on" and 'discord.com/gifts' in message.content.lower():
+            ) == "on" and 'discord.com/gifts' in message.content.lower():
                 elapsed_snipe = '%.4fs' % (time.time() - sniped_start_time)
                 code = re.search(
                     "discord.com/gifts/(.*)",
                     message.content
-                    ).group(1)
+                ).group(1)
                 if len(code) >= 16:
                     async with httpx.AsyncClient() as client:
                         start_time = time.time()
@@ -4379,7 +4354,14 @@ class OnMessage(commands.Cog, name="on message"):
                             notify.webhook(
                                 url=webhook.nitro_url(),
                                 name="nitro",
-                                description=f"{status}\nServer » {message.guild}\nChannel » {message.channel}\nAuthor » {message.author}\nCode » {code}\nElapsed Times\nSniped » {elapsed_snipe}\nRequest » {elapsed}"
+                                description=f"{status}\n"
+                                            f"Server » {message.guild}\n"
+                                            f"Channel » {message.channel}\n"
+                                            f"Author » {message.author}\n"
+                                            f"Code » {code}\n"
+                                            f"Elapsed Times\n"
+                                            f"Sniped » {elapsed_snipe}\n"
+                                            f"Request » {elapsed}"
                             )
         except Exception as e:
             prints.error(e)
@@ -4401,7 +4383,6 @@ class OnMessage(commands.Cog, name="on message"):
         if giveaway_joiner == "on" and message.author.bot and message.guild is not None and not isinstance(
                 message.channel, discord.GroupChannel
         ):
-            elapsed_snipe = '%.3fs' % (time.time() - sniped_start_time)
             custom_giveaway_bot_ids = []
             custom_giveaway_bot_reactions = []
             try:
@@ -4414,7 +4395,7 @@ class OnMessage(commands.Cog, name="on message"):
                     with open(
                             os.path.join(files.documents(), f"Luna/snipers/giveaway_bots.json"), "r",
                             encoding="utf-8"
-                            ) as jsonFile:
+                    ) as jsonFile:
                         data = json.load(jsonFile)
 
                     for key, value in data.items():
@@ -4480,8 +4461,8 @@ class OnMessage(commands.Cog, name="on message"):
                                 )
                             found_something_blacklisted = 1
                     try:
-                        for embed in message.embeds:
-                            embed_dict = embed.to_dict()
+                        for _embed in message.embeds:
+                            embed_dict = _embed.to_dict()
                             for blocked_word in giveaway_blocked_words:
                                 try:
                                     found = re.findall(
@@ -4544,16 +4525,16 @@ class OnMessage(commands.Cog, name="on message"):
                             joined_server = 'None'
                             giveaway_prize = None
                             try:
-                                for embed in embeds:
-                                    giveaway_prize = embed.to_dict()[
+                                for embed_1 in embeds:
+                                    giveaway_prize = embed_1.to_dict()[
                                         'author']['name']
                             except Exception:
-                                for embed in embeds:
-                                    giveaway_prize = embed.to_dict()['title']
+                                for embed_2 in embeds:
+                                    giveaway_prize = embed_2.to_dict()['title']
                             if guild_joiner == "on":
                                 try:
-                                    for embed in embeds:
-                                        embed_dict = embed.to_dict()
+                                    for embed_3 in embeds:
+                                        embed_dict = embed_3.to_dict()
                                         code = re.findall(
                                             r"\w[a-z]*\W*\w[a-z]+\.\w[g]*\W\S*", str(
                                                 embed_dict['description']
@@ -4671,15 +4652,16 @@ class OnMessage(commands.Cog, name="on message"):
                                     notify.webhook(
                                         url=webhook.giveaway_url(),
                                         name="giveaway",
-                                        description=f"Joined giveaway\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}"
+                                        description=f"Joined giveaway\n"
+                                                    f"Prize » {giveaway_prize}\n"
+                                                    f"Server »  {message.guild}\n"
+                                                    f"Channel » {message.channel}"
                                     )
                         except Exception:
                             pass
 
                 if '<@' + str(bot.user.id) + '>' in message.content and (
-                        'giveaway' in str(message.content).lower() or ' won ' in message.content or ' winner ' in str(
-                    message.content
-                ).lower()) and message.author.bot and message.author.id in custom_giveaway_bot_ids:
+                        'giveaway' in str(message.content).lower() or ' won ' in message.content or ' winner ' in str(message.content).lower()) and message.author.bot and message.author.id in custom_giveaway_bot_ids:
                     print()
                     prints.sniper(f"{color.purple('Won giveaway')}")
                     prints.sniper(
@@ -4720,8 +4702,7 @@ class OnMessage(commands.Cog, name="on message"):
                         message.content
                 ).lower() and guild_joiner == "on":
                     try:
-                        for embed in embeds:
-                            embed_dict = embed.to_dict()
+                        for _ in embeds:
                             code = re.findall(
                                 r"\w[a-z]*\W*\w[a-z]+\.\w[g]*\W\S*", str(
                                     message.content
@@ -4735,7 +4716,7 @@ class OnMessage(commands.Cog, name="on message"):
                                 await client.post(
                                     f'https://canary.discord.com/api/{api_version}/invites/{code}',
                                     headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'}
-                                    )
+                                )
                                 joined_server = f'discord.gg/{code}'
                                 if files.json(
                                         "Luna/notifications/toasts.json",
@@ -4747,7 +4728,7 @@ class OnMessage(commands.Cog, name="on message"):
                                     documents=True
                                 ) == "on":
                                     notify.toast(
-                                        message=f"Joined guild\nInvite » discord.gg/{code}"
+                                        message=f"Joined guild\nInvite » {joined_server}"
                                     )
                                 if files.json(
                                         "Luna/webhooks/webhooks.json",
@@ -4761,7 +4742,7 @@ class OnMessage(commands.Cog, name="on message"):
                                     notify.webhook(
                                         url=webhook.giveaway_url(),
                                         name="giveaway",
-                                        description=f"Joined guild\nInvite » discord.gg/{code}"
+                                        description=f"Joined guild\nInvite » {joined_server}"
                                     )
                                 await asyncio.sleep(5)
                     except Exception:
@@ -4888,36 +4869,35 @@ class OnMessage(commands.Cog, name="on message"):
                     start_time = time.time()
                     note_text = pyPrivnote.read_note(link)
                     elapsed = '%.3fs' % (time.time() - start_time)
-                    with open(os.path.join(files.documents(), f"Luna/privnote/{code}.txt"), 'a+') as f:
-                        print()
-                        prints.sniper(color.purple('Privnote sniped'))
-                        prints.sniper(
-                            f"Server  | {color.purple(f'{message.guild}')}"
-                        )
-                        prints.sniper(
-                            f"Channel | {color.purple(f'{message.channel}')}"
-                        )
-                        prints.sniper(
-                            f"Author  | {color.purple(f'{message.author}')}"
-                        )
-                        prints.sniper(f"Link    | {color.purple(f'{link}')}")
-                        prints.sniper(f"Code    | {color.purple(f'{code}')}")
-                        prints.sniper(color.purple('Elapsed Times'))
-                        prints.sniper(
-                            f"Sniped  | {color.purple(f'{elapsed_snipe}')}"
-                        )
-                        prints.sniper(
-                            f"Read    | {color.purple(f'{elapsed}')}"
-                        )
-                        print()
-                        file = open(
-                            os.path.join(
-                                files.documents(),
-                                f"Luna/privnote/{code}.txt"
-                                ), "w"
-                            )
-                        file.write(str(note_text))
-                        file.close()
+                    print()
+                    prints.sniper(color.purple('Privnote sniped'))
+                    prints.sniper(
+                        f"Server  | {color.purple(f'{message.guild}')}"
+                    )
+                    prints.sniper(
+                        f"Channel | {color.purple(f'{message.channel}')}"
+                    )
+                    prints.sniper(
+                        f"Author  | {color.purple(f'{message.author}')}"
+                    )
+                    prints.sniper(f"Link    | {color.purple(f'{link}')}")
+                    prints.sniper(f"Code    | {color.purple(f'{code}')}")
+                    prints.sniper(color.purple('Elapsed Times'))
+                    prints.sniper(
+                        f"Sniped  | {color.purple(f'{elapsed_snipe}')}"
+                    )
+                    prints.sniper(
+                        f"Read    | {color.purple(f'{elapsed}')}"
+                    )
+                    print()
+                    file = open(
+                        os.path.join(
+                            files.documents(),
+                            f"Luna/privnote/{code}.txt"
+                        ), "w"
+                    )
+                    file.write(str(note_text))
+                    file.close()
                 except Exception:
                     print()
                     prints.sniper(color.purple('Privnote already sniped'))
@@ -4963,7 +4943,7 @@ class OnMessage(commands.Cog, name="on message"):
                         embed.set_footer(
                             text=theme.footer(),
                             icon_url=theme.footer_icon_url()
-                            )
+                        )
                         embed.set_author(
                             name=theme.author(),
                             url=theme.author_url(),
@@ -5003,7 +4983,7 @@ class OnMessage(commands.Cog, name="on message"):
                         embed.set_footer(
                             text=theme.footer(),
                             icon_url=theme.footer_icon_url()
-                            )
+                        )
                         embed.set_author(
                             name=theme.author(),
                             url=theme.author_url(),
@@ -5015,6 +4995,8 @@ class OnMessage(commands.Cog, name="on message"):
                         sent = await message.channel.send(
                             f"```ini\n[ Anti Upper ]\n\n\"Anti Upper\" is enabled, sending all uppercase is not allowed.\n\n[ {theme.footer()} ]```"
                         )
+                    await asyncio.sleep(30)
+                    await sent.delete()
                 except BaseException:
                     pass
 
@@ -5041,18 +5023,20 @@ class OnMessage(commands.Cog, name="on message"):
                         embed.set_footer(
                             text=theme.footer(),
                             icon_url=theme.footer_icon_url()
-                            )
+                        )
                         embed.set_author(
                             name=theme.author(),
                             url=theme.author_url(),
                             icon_url=theme.author_icon_url()
                         )
 
-                        await message.channel.send(embed=embed)
+                        sent = await message.channel.send(embed=embed)
                     else:
-                        await message.channel.send(
+                        sent = await message.channel.send(
                             f"```ini\n[ Anti Phishing Links ]\n\n\"Anti Phishing Links\" is enabled, the url you sent, is banned.\n\n[ {theme.footer()} ]```"
                         )
+                    await asyncio.sleep(30)
+                    await sent.delete()
                 except BaseException:
                     pass
 
@@ -5229,13 +5213,13 @@ class OnCommand(commands.Cog, name="on command"):
                 files.json(
                     f"Luna/themes/{theme_json}",
                     "title", documents=True
-                    )
+                )
         except BaseException:
             config.theme("default")
             await error_builder(
                 luna,
                 description=f"```\nThe configurated theme file was missing and has been set to \"default\"```"
-                )
+            )
         return
 
 
@@ -5330,7 +5314,7 @@ class OnCommandErrorCog(commands.Cog, name="on command error"):
             if configs.error_log() == "message":
                 await error_builder(
                     luna, f"```\nNot Found\n\n{error}```{found}```\nNote\n\nYou can use \"search\" to search for a command.\n{prefix}search <command> » Search for a command```"
-                    )
+                )
             else:
                 await error_builder(luna, f"```\nNot Found\n\n{error}```")
         elif isinstance(error, CheckFailure):
@@ -5404,29 +5388,29 @@ class HelpCog(commands.Cog, name="Help commands"):
         usage="[command]",
         description="Display the help message",
         aliases=['h', '?']
-        )
+    )
     async def help(self, luna, commandName: str = None):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
 
-        commandName2 = None
+        command_name2 = None
         stop = False
 
         if commandName is not None:
             for i in self.bot.commands:
                 if i.name == commandName.lower():
-                    commandName2 = i
+                    command_name2 = i
                     break
                 else:
                     for j in i.aliases:
                         if j == commandName.lower():
-                            commandName2 = i
+                            command_name2 = i
                             stop = True
                             break
                         if stop is True:
                             break
 
-            if commandName2 is None:
+            if command_name2 is None:
                 if configs.error_log() == "console":
                     prints.error(
                         f"No command found with name or alias {color.purple(commandName)}"
@@ -5435,54 +5419,98 @@ class HelpCog(commands.Cog, name="Help commands"):
                     await error_builder(luna, f"```\nNo command found with name or alias {commandName}```")
             else:
                 if configs.mode() == 2:
-                    aliases = commandName2.aliases
-                    aliasList = ""
+                    aliases = command_name2.aliases
+                    alias_list = ""
                     if len(aliases) > 0:
                         for alias in aliases:
-                            aliasList += alias + ", "
-                        aliasList = aliasList[:-2]
-                        if commandName2.usage is None:
+                            alias_list += alias + ", "
+                        alias_list = alias_list[:-2]
+                        if command_name2.usage is None:
                             sent = await luna.send(
-                                f"```ini\n[ {commandName2.name.title()} Command ]\n\n{theme.description()}Name\n{commandName2.name}\n\nAliases\n{aliasList}\n\nUsage\nNone\n\nDescription\n{commandName2.description}\n\n[ {theme.footer()} ]```"
+                                f"```ini\n[ {command_name2.name.title()} Command ]\n\n"
+                                f"{theme.description()}"
+                                f"Name\n{command_name2.name}\n\n"
+                                f"Aliases\n{alias_list}\n\n"
+                                f"Usage\nNone\n\n"
+                                f"Description\n{command_name2.description}\n\n"
+                                f"[ {theme.footer()} ]```"
                             )
                         else:
                             sent = await luna.send(
-                                f"```ini\n[ {commandName2.name.title()} Command ]\n\n{theme.description()}Name\n{commandName2.name}\n\nAliases\n{aliasList}\n\nUsage\n{prefix}{commandName2.name} {commandName2.usage}\n\nDescription\n{commandName2.description}\n\n[ {theme.footer()} ]```"
+                                f"```ini\n[ {command_name2.name.title()} Command ]\n\n"
+                                f"{theme.description()}"
+                                f"Name\n{command_name2.name}\n\n"
+                                f"Aliases\n{alias_list}\n\n"
+                                f"Usage\n{prefix}{command_name2.name} {command_name2.usage}\n\n"
+                                f"Description\n{command_name2.description}\n\n"
+                                f"[ {theme.footer()} ]```"
                             )
                     else:
-                        if commandName2.usage is None:
+                        if command_name2.usage is None:
                             sent = await luna.send(
-                                f"```ini\n[ {commandName2.name.title()} Command ]\n\n{theme.description()}Name\n{commandName2.name}\n\nAliases\nNone\n\nUsage\nNone\n\nDescription\n{commandName2.description}\n\n[ {theme.footer()} ]```"
+                                f"```ini\n[ {command_name2.name.title()} Command ]\n\n"
+                                f"{theme.description()}"
+                                f"Name\n{command_name2.name}\n\n"
+                                f"Aliases\nNone\n\n"
+                                f"Usage\nNone\n\n"
+                                f"Description\n{command_name2.description}\n\n"
+                                f"[ {theme.footer()} ]```"
                             )
                         else:
                             sent = await luna.send(
-                                f"```ini\n[ {commandName2.name.title()} Command ]\n\n{theme.description()}Name\n{commandName2.name}\n\nAliases\nNone\n\nUsage\n{prefix}{commandName2.name} {commandName2.usage}\n\nDescription\n{commandName2.description}\n\n[ {theme.footer()} ]```"
+                                f"```ini\n[ {command_name2.name.title()} Command ]\n\n"
+                                f"{theme.description()}"
+                                f"Name\n{command_name2.name}\n\n"
+                                f"Aliases\nNone\n\n"
+                                f"Usage\n{prefix}{command_name2.name} {command_name2.usage}\n\n"
+                                f"Description\n{command_name2.description}\n\n"
+                                f"[ {theme.footer()} ]```"
                             )
                     await asyncio.sleep(configs.delete_timer())
                     await sent.delete()
                 else:
-                    aliases = commandName2.aliases
-                    aliasList = ""
+                    aliases = command_name2.aliases
+                    alias_list = ""
                     if len(aliases) > 0:
                         for alias in aliases:
-                            aliasList += alias + ", "
-                        aliasList = aliasList[:-2]
-                        if commandName2.usage is None:
+                            alias_list += alias + ", "
+                        alias_list = alias_list[:-2]
+                        if command_name2.usage is None:
                             sent = await luna.send(
-                                f"> **{commandName2.name.title()} Command**\n>n> ```\n> Name\n> {commandName2.name}``````\n> Aliases\n> {aliasList}``````\n> Usage\n> None``````\n> Description\n> {commandName2.description}```\n> {theme.footer()}"
+                                f"> **{command_name2.name.title()} Command**\n>n> "
+                                f"```\n> Name\n> {command_name2.name}```"
+                                f"```\n> Aliases\n> {alias_list}```"
+                                f"```\n> Usage\n> None```"
+                                f"```\n> Description\n> {command_name2.description}```\n"
+                                f"> {theme.footer()}"
                             )
                         else:
                             sent = await luna.send(
-                                f"> **{commandName2.name.title()} Command**\n>n> ```\n> Name\n> {commandName2.name}``````\n> Aliases\n> {aliasList}``````\n> Usage\n> {prefix}{commandName2.name} {commandName2.usage}``````\n> Description\n> {commandName2.description}```\n> {theme.footer()}"
+                                f"> **{command_name2.name.title()} Command**\n>n> "
+                                f"```\n> Name\n> {command_name2.name}```"
+                                f"```\n> Aliases\n> {alias_list}```"
+                                f"```\n> Usage\n> {prefix}{command_name2.name} {command_name2.usage}```"
+                                f"```\n> Description\n> {command_name2.description}```\n"
+                                f"> {theme.footer()}"
                             )
                     else:
-                        if commandName2.usage is None:
+                        if command_name2.usage is None:
                             sent = await luna.send(
-                                f"> **{commandName2.name.title()} Command**\n>n> ```\n> Name\n> {commandName2.name}``````\n> Aliases\n> None``````\n> Usage\n> None``````\n> Description\n> {commandName2.description}```\n> {theme.footer()}"
+                                f"> **{command_name2.name.title()} Command**\n>n> "
+                                f"```\n> Name\n> {command_name2.name}```"
+                                f"```\n> Aliases\n> None```"
+                                f"```\n> Usage\n> None```"
+                                f"```\n> Description\n> {command_name2.description}```\n"
+                                f"> {theme.footer()}"
                             )
                         else:
                             sent = await luna.send(
-                                f"> **{commandName2.name.title()} Command**\n>n> ```\n> Name\n> {commandName2.name}``````\n> Aliases\n> None``````\n> Usage\n> {prefix}{commandName2.name} {commandName2.usage}``````\n> Description\n> {commandName2.description}```\n> {theme.footer()}"
+                                f"> **{command_name2.name.title()} Command**\n>n> "
+                                f"```\n> Name\n> {command_name2.name}```"
+                                f"```\n> Aliases\n> None```"
+                                f"```\n> Usage\n> {prefix}{command_name2.name} {command_name2.usage}```"
+                                f"```\n> Description\n> {command_name2.description}```\n"
+                                f"> {theme.footer()}"
                             )
 
                     await asyncio.sleep(configs.delete_timer())
@@ -5492,7 +5520,7 @@ class HelpCog(commands.Cog, name="Help commands"):
             cog = bot.get_cog('Custom commands')
             custom = cog.get_commands()
             custom_command_count = 0
-            for command in custom:
+            for _ in custom:
                 custom_command_count += 1
             await message_builder(
                 luna,
@@ -5527,13 +5555,13 @@ Categories\n\n\
 {prefix}repeat           » Repeat last used command\n\
 {prefix}search <command> » Search for a command\n``````\n\
 Version\n\n{version}```"
-                )
+            )
 
     @commands.command(
         name="admin",
         usage="[2, 3]",
         description="Administrative commands"
-        )
+    )
     async def admin(self, luna, page: str = "1"):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -5575,24 +5603,33 @@ Version\n\n{version}```"
         if page == "2":
             await message_builder(
                 luna, title="Administrative", footer_extra=f"Page 2",
-                description=f"{theme.description()}```\nMember Control\n\n{membertext}``````\nNickname Control\n\n{nicktext}``````\nGuild Control\n\n{helptext}``````\nNote\n\n{prefix}admin 3 » Page 3```"
-                )
+                description=f"{theme.description()}"
+                            f"```\nMember Control\n\n{membertext}```"
+                            f"```\nNickname Control\n\n{nicktext}```"
+                            f"```\nGuild Control\n\n{helptext}```"
+                            f"```\nNote\n\n{prefix}admin 3 » Page 3```"
+            )
         elif page == "3":
             await message_builder(
                 luna, title="Administrative", footer_extra=f"Page 3",
-                description=f"{theme.description()}```\nInvite Control\n\n{invitetext}``````\nIgnore Control\n\n{ignoretext}```"
-                )
+                description=f"{theme.description()}"
+                            f"```\nInvite Control\n\n{invitetext}```"
+                            f"```\nIgnore Control\n\n{ignoretext}```"
+            )
         else:
             await message_builder(
                 luna, title="Administrative", footer_extra=f"Page 1",
-                description=f"{theme.description()}```\nChannel Control\n\n{channeltext}``````\nRole Control\n\n{roletext}``````\nNote\n\n{prefix}admin 2 » Page 2```"
-                )
+                description=f"{theme.description()}"
+                            f"```\nChannel Control\n\n{channeltext}```"
+                            f"```\nRole Control\n\n{roletext}```"
+                            f"```\nNote\n\n{prefix}admin 2 » Page 2```"
+            )
 
     @commands.command(
         name="profile",
         usage="",
         description="Profile settings"
-        )
+    )
     async def profile(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -5608,14 +5645,24 @@ Version\n\n{version}```"
             status_helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
         await message_builder(
             luna, title="Profile",
-            description=f"{theme.description()}```\nCurrent profile\n\nUser              » {bot.user}\nUsername          » {bot.user.name}\nDiscriminator     » {bot.user.discriminator}\n``````\nNickname Control\n\n{prefix}nick <name>      » Change your nickname\n{prefix}invisiblenick    » Make your nickname invisible\n{prefix}junknick         » Pure junk nickname\n``````\nUser Control\n\n{helptext}``````\nStatus Control\n\n{status_helptext}```"
-            )
+            description=f"{theme.description()}"
+                        f"```\nCurrent profile\n\n"
+                        f"User              » {bot.user}\n"
+                        f"Username          » {bot.user.name}\n"
+                        f"Discriminator     » {bot.user.discriminator}\n```"
+                        f"```\nNickname Control\n\n"
+                        f"{prefix}nick <name>      » Change your nickname\n"
+                        f"{prefix}invisiblenick    » Make your nickname invisible\n"
+                        f"{prefix}junknick         » Pure junk nickname\n```"
+                        f"```\nUser Control\n\n{helptext}```"
+                        f"```\nStatus Control\n\n{status_helptext}```"
+        )
 
     @commands.command(
         name="animated",
         usage="",
         description="Animated commands"
-        )
+    )
     async def animated(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -5630,7 +5677,7 @@ Version\n\n{version}```"
         name="dump",
         usage="",
         description="Dumping"
-        )
+    )
     async def dump(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -5645,7 +5692,7 @@ Version\n\n{version}```"
         name="text",
         usage="",
         description="Text commands"
-        )
+    )
     async def text(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -5665,7 +5712,7 @@ Version\n\n{version}```"
         name="game",
         usage="",
         description="Game commands"
-        )
+    )
     async def game(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -5680,7 +5727,7 @@ Version\n\n{version}```"
         name="image",
         usage="",
         description="Image commands"
-        )
+    )
     async def image(self, luna, page: str = "1"):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -5703,7 +5750,7 @@ Version\n\n{version}```"
         name="hentai",
         usage="",
         description="Hentai explorer"
-        )
+    )
     async def hentai(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -5727,7 +5774,7 @@ Version\n\n{version}```"
         name="trolling",
         usage="",
         description="Trolling"
-        )
+    )
     async def trolling(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -5742,7 +5789,7 @@ Version\n\n{version}```"
         name="fun",
         usage="",
         description="Fun commands"
-        )
+    )
     async def fun(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -5757,7 +5804,7 @@ Version\n\n{version}```"
         name="tools",
         usage="",
         description="Tools"
-        )
+    )
     async def tools(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -5772,7 +5819,7 @@ Version\n\n{version}```"
         name="networking",
         usage="",
         description="Networking"
-        )
+    )
     async def networking(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -5788,7 +5835,7 @@ Version\n\n{version}```"
         usage="",
         aliases=['utils', 'utilities'],
         description="Utilities"
-        )
+    )
     async def utility(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -5803,7 +5850,7 @@ Version\n\n{version}```"
         name="abusive",
         usage="[2]",
         description="Abusive commands"
-        )
+    )
     async def abusive(self, luna, page: str = "1"):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -5841,13 +5888,20 @@ Version\n\n{version}```"
             if page == "2":
                 await message_builder(
                     luna, title="Abusive commands", footer_extra=f"Page 2",
-                    description=f"{theme.description()}```\nGuild\n\n{guildtext}\n``````\nGeneral\n\n{helptext}\n```"
-                    )
+                    description=f"{theme.description()}"
+                                f"```\nGuild\n\n{guildtext}\n```"
+                                f"```\nGeneral\n\n{helptext}\n```"
+                )
             else:
                 await message_builder(
                     luna, title="Abusive commands", footer_extra=f"Page 1",
-                    description=f"{theme.description()}```\nExploits\n\n{exploittext}\n``````\nSpam\n\n{spamtext}\n``````\nMass\n\n{masstext}\n``````\nAll\n\n{alltext}\n``````\nNote\n\n{prefix}abusive 2 » Page 2```"
-                    )
+                    description=f"{theme.description()}"
+                                f"```\nExploits\n\n{exploittext}\n```"
+                                f"```\nSpam\n\n{spamtext}\n```"
+                                f"```\nMass\n\n{masstext}\n```"
+                                f"```\nAll\n\n{alltext}\n```"
+                                f"```\nNote\n\n{prefix}abusive 2 » Page 2```"
+                )
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -5855,7 +5909,7 @@ Version\n\n{version}```"
         name="raiding",
         usage="",
         description="Raiding servers"
-        )
+    )
     async def raiding(self, luna):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -5873,7 +5927,7 @@ Version\n\n{version}```"
         name="nuking",
         usage="",
         description="Account nuking"
-        )
+    )
     async def nuking(self, luna):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -5892,7 +5946,7 @@ Version\n\n{version}```"
         usage="",
         aliases=['protections', 'protect'],
         description="Protections"
-        )
+    )
     async def protection(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -5929,7 +5983,7 @@ Version\n\n{version}```"
         guilds = files.json(
             "Luna/protections/config.json",
             "guilds", documents=True
-            )
+        )
         activeguildtext = ""
         if not guilds == []:
             activeguildtext = f"\nProtected guilds:"
@@ -5941,14 +5995,21 @@ Version\n\n{version}```"
                     pass
         await message_builder(
             luna, title="Protections",
-            description=f"{theme.description()}```\nEnabled Protections\n\n{'Enabled':17} » {active_protections}{activetext}\n``````\nGuild Configuration\n\n{guildtext}{activeguildtext}``````\nProtections\n\n{helptext}``````\nWhitelist\n\n{whitelisttext}\n``````\nPrivacy | Streamer Mode\n\n{privacytext}\n``````\nBackups\n\n{backuptext}\n```"
-            )
+            description=f"{theme.description()}"
+                        f"```\nEnabled Protections\n\n"
+                        f"{'Enabled':17} » {active_protections}{activetext}\n```"
+                        f"```\nGuild Configuration\n\n{guildtext}{activeguildtext}```"
+                        f"```\nProtections\n\n{helptext}```"
+                        f"```\nWhitelist\n\n{whitelisttext}\n```"
+                        f"```\nPrivacy | Streamer Mode\n\n{privacytext}\n```"
+                        f"```\nBackups\n\n{backuptext}\n```"
+        )
 
     @commands.command(
         name="misc",
         usage="",
         description="Miscellaneous commands"
-        )
+    )
     async def misc(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -5963,7 +6024,7 @@ Version\n\n{version}```"
         name="settings",
         usage="",
         description="Settings"
-        )
+    )
     async def settings(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -5971,8 +6032,8 @@ Version\n\n{version}```"
             files.json(
                 "Luna/config.json",
                 "delete_timer", documents=True
-                )
             )
+        )
         errorlog = files.json("Luna/config.json", "error_log", documents=True)
         riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
         themesvar = files.json("Luna/config.json", "theme", documents=True)
@@ -6017,7 +6078,7 @@ Version\n\n{version}```"
         pings = files.json(
             "Luna/notifications/console.json",
             "pings", documents=True
-            )
+        )
         if title == "":
             title = "None"
         if footer == "":
@@ -6035,14 +6096,33 @@ Version\n\n{version}```"
             sharinguser = await self.bot.fetch_user(user_id)
         await message_builder(
             luna, title="Settings",
-            description=f"{theme.description()}```\nYour current settings\n\nError logging     » {errorlog}\nAuto delete timer » {deletetimer}\nStartup status    » {startup_status}\nTheme             » {themesvar}\nConsole Mode      » {console_mode}\nRiskmode          » {riskmode}\nDescription       » {theme_description}\nSelfbot detection » {selfbotdetection}\nMention notify    » {pings}\n``````\nYour current theme settings\n\nTheme             » {themesvar}\nTitle             » {title}\nFooter            » {footer}\nDescription       » {theme_description}\n``````\nShare Settings\n\nShare             » {share}\nUser              » {sharinguser}``````\nSettings\n\n{helptext}```"
-            )
+            description=f"{theme.description()}"
+                        f"```\nYour current settings\n\n"
+                        f"Error logging     » {errorlog}\n"
+                        f"Auto delete timer » {deletetimer}\n"
+                        f"Startup status    » {startup_status}\n"
+                        f"Theme             » {themesvar}\n"
+                        f"Console Mode      » {console_mode}\n"
+                        f"Riskmode          » {riskmode}\n"
+                        f"Description       » {theme_description}\n"
+                        f"Selfbot detection » {selfbotdetection}\n"
+                        f"Mention notify    » {pings}\n```"
+                        f"```\nYour current theme settings\n\n"
+                        f"Theme             » {themesvar}\n"
+                        f"Title             » {title}\n"
+                        f"Footer            » {footer}\n"
+                        f"Description       » {theme_description}\n```"
+                        f"```\nShare Settings\n\n"
+                        f"Share             » {share}\n"
+                        f"User              » {sharinguser}```"
+                        f"```\nSettings\n\n{helptext}```"
+        )
 
     @commands.command(
         name="sharing",
         usage="",
         description="Share commands"
-        )
+    )
     async def sharing(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -6060,21 +6140,21 @@ Version\n\n{version}```"
         await message_builder(
             luna, title="Sharing",
             description=f"{theme.description()}```\nYour current settings\n\nShare             » {share}\nUser              » {sharinguser}\n``````\n{helptext}```"
-            )
+        )
 
     @commands.command(
         name="chelp",
         aliases=['customhelp'],
         usage="",
         description="Show custom commands"
-        )
+    )
     async def chelp(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
         cog = self.bot.get_cog('Custom commands')
         commands = cog.get_commands()
         helptext = ""
-        if commands == []:
+        if not commands:
             helptext = "No custom commands found!"
         else:
             for command in commands:
@@ -6082,28 +6162,23 @@ Version\n\n{version}```"
         await message_builder(
             luna, title="Your custom commands",
             description=f"{theme.description()}```\n{helptext}``````\nNote\n\n{prefix}reload           » Reload custom commands```"
-            )
+        )
 
     @commands.command(
         name="about",
         usage="",
         description="Luna information"
-        )
+    )
     async def about(self, luna):
         await luna.message.delete()
         motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ')
         for line in motd:
             motd = line.decode().strip()
-        versionpastedec = urllib.request.urlopen(
-            'https://pastebin.com/raw/iQPkzEpg'
-        )
-        for line in versionpastedec:
-            versionpaste = line.decode().strip().replace('\'', '')
         command_count = len(bot.commands)
         cog = bot.get_cog('Custom commands')
         custom = cog.get_commands()
         custom_command_count = 0
-        for command in custom:
+        for _ in custom:
             custom_command_count += 1
         if beta:
             beta_info = f" Beta Build"
@@ -6111,14 +6186,22 @@ Version\n\n{version}```"
             beta_info = ""
         await message_builder(
             luna,
-            description=f"```\nMOTD\n\n{motd}\n``````\nVersion\n\n{version}{beta_info}\n``````\nUptime\n\n{hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds\n``````\nCommands\n\n{command_count - custom_command_count}\n``````\nCustom commands\n\n{custom_command_count}\n``````\nEnviroment\n\nDiscord.py » {discord.__version__}\n``````\nPublic server invite\n\nhttps://discord.gg/rnq876Kcd7\n``````\nCustomer only server invite\n\nhttps://discord.gg/3FGEaCnZST\n``````\nWebsite\n\nhttps://www.team-luna.org\n```"
-            )
+            description=f"```\nMOTD\n\n{motd}\n```"
+                        f"```\nVersion\n\n{version}{beta_info}\n```"
+                        f"```\nUptime\n\n{hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds\n```"
+                        f"```\nCommands\n\n{command_count - custom_command_count}\n```"
+                        f"```\nCustom commands\n\n{custom_command_count}\n```"
+                        f"```\nEnviroment\n\nDiscord.py » {discord.__version__}\n```"
+                        f"```\nPublic server invite\n\nhttps://discord.gg/rnq876Kcd7\n```"
+                        f"```\nCustomer only server invite\n\nhttps://discord.gg/3FGEaCnZST\n```"
+                        f"```\nWebsite\n\nhttps://www.team-luna.org\n```"
+        )
 
     @commands.command(
         name="repeat",
         usage="",
         description="Repeat last used command"
-        )
+    )
     async def repeat(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -6128,7 +6211,7 @@ Version\n\n{version}```"
         name="search",
         usage="<command>",
         description="Search for a command"
-        )
+    )
     async def search(self, luna, commandName: str):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -6145,12 +6228,12 @@ Version\n\n{version}```"
             await message_builder(
                 luna, title=f"Searched for » {commandName.title()}",
                 description=f"{theme.description()}```\n{commandlistfind}``````\nNote\n\n{prefix}help <command>   » To get more information```"
-                )
+            )
         else:
             await message_builder(
                 luna, title=f"Searched for » {commandName.title()}",
                 description=f"```\nNo command has been found\n``````\nNote\n\n{prefix}help <command>   » To get more information```"
-                )
+            )
 
 
 bot.remove_command("help")
@@ -6165,7 +6248,7 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         name="online",
         usage="",
         description="Online status"
-        )
+    )
     async def online(self, luna):
         await luna.message.delete()
         payload = {'status': "online"}
@@ -6183,7 +6266,7 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         name="idle",
         usage="",
         description="Idle status"
-        )
+    )
     async def idle(self, luna):
         await luna.message.delete()
         payload = {'status': "idle"}
@@ -6201,7 +6284,7 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         name="dnd",
         usage="",
         description="Do not disturb status"
-        )
+    )
     async def dnd(self, luna):
         await luna.message.delete()
         payload = {'status': "dnd"}
@@ -6219,7 +6302,7 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         name="offline",
         usage="",
         description="Offline status"
-        )
+    )
     async def offline(self, luna):
         await luna.message.delete()
         payload = {'status': "invisible"}
@@ -6237,7 +6320,7 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         name="startup",
         usage="<online/idle/dnd/offline>",
         description="Startup"
-        )
+    )
     async def startup(self, luna, mode: str):
         await luna.message.delete()
         if mode == "online" or mode == "idle" or mode == "dnd" or mode == "offline":
@@ -6251,7 +6334,7 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         name="cstatus",
         usage="<text>",
         description="Custom status"
-        )
+    )
     async def cstatus(self, luna, text: str):
         await luna.message.delete()
         headers = {
@@ -6281,7 +6364,7 @@ class StatusCog(commands.Cog, name="Animated statuses"):
         name="status",
         usage="<text>",
         description="Set a custom status"
-        )
+    )
     async def status(self, luna, text: str):
         await luna.message.delete()
         payload = {'custom_status': {"text": f"{text}"}}
@@ -6299,7 +6382,7 @@ class StatusCog(commands.Cog, name="Animated statuses"):
         name="removestatus",
         usage="",
         description="Remove custom status"
-        )
+    )
     async def removestatus(self, luna):
         await luna.message.delete()
         payload = {'custom_status': {"text": ""}}
@@ -6325,19 +6408,25 @@ class ChannelCog(commands.Cog, name="Channel commands"):
         name="channelinfo",
         usage="<#channel>",
         description="Information"
-        )
+    )
     async def channelinfo(self, luna, channel: discord.TextChannel):
         await luna.message.delete()
         await message_builder(
             luna, title="Channel Information",
-            description=f"```\n{'Name':17} » {channel.name}\n{'ID':17} » {channel.id}\n{'Created at':17} » {channel.created_at}\n{'Category':17} » {channel.category}\n{'Position':17} » {channel.position}\n{'Topic':17} » {channel.topic}\n{'Is NSFW?':17} » {channel.is_nsfw()}\n```"
-            )
+            description=f"```\n{'Name':17} » {channel.name}\n"
+                        f"{'ID':17} » {channel.id}\n"
+                        f"{'Created at':17} » {channel.created_at}\n"
+                        f"{'Category':17} » {channel.category}\n"
+                        f"{'Position':17} » {channel.position}\n"
+                        f"{'Topic':17} » {channel.topic}\n"
+                        f"{'Is NSFW?':17} » {channel.is_nsfw()}\n```"
+        )
 
     @commands.command(
         name="textchannel",
         usage="<name>",
         description="Create a text channel"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def textchannel(self, luna, name: str):
@@ -6349,7 +6438,7 @@ class ChannelCog(commands.Cog, name="Channel commands"):
         name="voicechannel",
         usage="<name>",
         description="Create a voice channel"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def voicechannel(self, luna, name: str):
@@ -6361,7 +6450,7 @@ class ChannelCog(commands.Cog, name="Channel commands"):
         name="stagechannel",
         usage="<name>",
         description="Create a stage channel"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def stagechannel(self, luna, name: str):
@@ -6370,7 +6459,7 @@ class ChannelCog(commands.Cog, name="Channel commands"):
             'name': f"{name}",
             'type': 13
         }
-        this = requests.post(
+        requests.post(
             f'https://discordapp.com/api/{api_version}/guilds/{luna.guild.id}/channels',
             json=payload,
             headers={
@@ -6384,7 +6473,7 @@ class ChannelCog(commands.Cog, name="Channel commands"):
         name="newschannel",
         usage="<name>",
         description="Create a news channel"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def newschannel(self, luna, name: str):
@@ -6407,7 +6496,7 @@ class ChannelCog(commands.Cog, name="Channel commands"):
         name="renamechannel",
         usage="<#channel> <name>",
         description="Rename channel"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def renamechannel(self, luna, channel: discord.TextChannel, name: str):
@@ -6419,7 +6508,7 @@ class ChannelCog(commands.Cog, name="Channel commands"):
         name="deletechannel",
         usage="<#channel>",
         description="Delete a channel"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def deletechannel(self, luna, channel: discord.TextChannel):
@@ -6431,7 +6520,7 @@ class ChannelCog(commands.Cog, name="Channel commands"):
         name="slowmode",
         usage="<seconds>",
         description="Set slowmode"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def slowmode(self, luna, seconds: int):
@@ -6450,7 +6539,7 @@ class ChannelCog(commands.Cog, name="Channel commands"):
         name="removeslowmode",
         usage="",
         description="Remove slowmode"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def removeslowmode(self, luna):
@@ -6462,7 +6551,7 @@ class ChannelCog(commands.Cog, name="Channel commands"):
         name="lock",
         usage="<#channel>",
         description="Lock a channel"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def lock(self, luna, channel: discord.TextChannel):
@@ -6475,7 +6564,7 @@ class ChannelCog(commands.Cog, name="Channel commands"):
         name="unlock",
         usage="<#channel>",
         description="Unlock a channel"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def unlock(self, luna, channel: discord.TextChannel):
@@ -6488,7 +6577,7 @@ class ChannelCog(commands.Cog, name="Channel commands"):
         name="category",
         usage="<name>",
         description="Create a category"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def category(self, luna, name: str):
@@ -6500,7 +6589,7 @@ class ChannelCog(commands.Cog, name="Channel commands"):
         name="deletecategory",
         usage="<category_id>",
         description="Delete a category"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def deletecategory(self, luna, category: discord.CategoryChannel):
@@ -6512,7 +6601,7 @@ class ChannelCog(commands.Cog, name="Channel commands"):
         name="purge",
         usage="<amount>",
         description="Purge the channel"
-        )
+    )
     async def purge(self, luna, amount: int):
         await luna.message.delete()
         async for message in luna.message.channel.history(limit=amount):
@@ -6525,7 +6614,7 @@ class ChannelCog(commands.Cog, name="Channel commands"):
         name="nuke",
         usage="[#channel]",
         description="Nuke the channel"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def nuke(self, luna, channel: discord.TextChannel = None):
@@ -6549,7 +6638,7 @@ class MemberCog(commands.Cog, name="Member commands"):
         name="userinfo",
         usage="[user_id]",
         description="User information"
-        )
+    )
     async def userinfo(self, luna, user: discord.Member = None):
         await luna.message.delete()
         if user is None:
@@ -6569,14 +6658,25 @@ class MemberCog(commands.Cog, name="Member commands"):
             banner_url = None
         await message_builder(
             luna, title="User information",
-            description=f"```\nGeneral Information\n\n{'User':12} » {user.name}#{user.discriminator}\n{'ID':12} » {user.id}\n{'Status':12} » {user.status}\n{'Bot':12} » {user.bot}\n{'Public Flags':12} » {r['public_flags']}\n{'Banner Color':12} » {r['banner_color']}\n{'Accent Color':12} » {r['accent_color']}\n``````\nCreated at:\n{user.created_at}\n``````\nImage Information\n\nAvatar URL:\n{user.display_avatar}\n\nBanner URL:\n{banner_url}\n```"
-            )
+            description=f"```\nGeneral Information\n\n"
+                        f"{'User':12} » {user.name}#{user.discriminator}\n"
+                        f"{'ID':12} » {user.id}\n"
+                        f"{'Status':12} » {user.status}\n"
+                        f"{'Bot':12} » {user.bot}\n"
+                        f"{'Public Flags':12} » {r['public_flags']}\n"
+                        f"{'Banner Color':12} » {r['banner_color']}\n"
+                        f"{'Accent Color':12} » {r['accent_color']}\n```"
+                        f"```\nCreated at:\n{user.created_at}\n```"
+                        f"```\nImage Information\n\n"
+                        f"Avatar URL:\n{user.display_avatar}\n\n"
+                        f"Banner URL:\n{banner_url}\n```"
+        )
 
     @commands.command(
         name="whois",
         usage="<@member>",
         description="Guild member information"
-        )
+    )
     @commands.guild_only()
     async def whois(self, luna, user: discord.Member = None):
         await luna.message.delete()
@@ -6600,17 +6700,27 @@ class MemberCog(commands.Cog, name="Member commands"):
         perm_string = ', '.join(
             [str(p[0]).replace("_", " ").title()
              for p in user.guild_permissions if p[1]]
-            )
+        )
         await message_builder(
             luna,
-            description=f"User » {user.mention}\n```User information\n\nJoined » {user.joined_at.strftime(date_format)}\nJoin position » {members.index(user) + 1}\nRegistered » {user.created_at.strftime(date_format)}\n``````\nUser server information\n\nRoles Amount » {len(user.roles) - 1}\nRoles\n\n{role_string}\n\nPermissions\n\n{perm_string}{special}```"
-            )
+            description=f"User » {user.mention}\n"
+                        f"```User information\n\n"
+                        f"Joined » {user.joined_at.strftime(date_format)}\n"
+                        f"Join position » {members.index(user) + 1}\n"
+                        f"Registered » {user.created_at.strftime(date_format)}\n```"
+                        f"```\nUser server information\n\n"
+                        f"Roles Amount » {len(user.roles) - 1}\n"
+                        f"Roles\n\n"
+                        f"{role_string}\n\n"
+                        f"Permissions\n\n"
+                        f"{perm_string}{special}```"
+        )
 
     @commands.command(
         name="report",
         usage="<message_id> <reason>",
         description="Report a user"
-        )
+    )
     async def report(self, luna, message_id: str, *, reason: str):
         await luna.message.delete()
         payload = {
@@ -6631,7 +6741,7 @@ class MemberCog(commands.Cog, name="Member commands"):
         name="mute",
         usage="<@member> [reason]",
         description="Mute a user"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_roles=True)
     async def mute(self, luna, user: discord.Member, *, reason: str = None):
@@ -6648,7 +6758,7 @@ class MemberCog(commands.Cog, name="Member commands"):
         name="unmute",
         usage="<@member> [reason]",
         description="Unmute a user"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_roles=True)
     async def unmute(self, luna, user: discord.Member, *, reason: str = None):
@@ -6664,7 +6774,7 @@ class MemberCog(commands.Cog, name="Member commands"):
         name="timeout",
         usage="<user> <time>",
         description="Time out a user"
-        )
+    )
     @commands.guild_only()
     @has_permissions(ban_members=True)
     async def timeout(self, luna, user: discord.Member, time: int):
@@ -6684,13 +6794,13 @@ class MemberCog(commands.Cog, name="Member commands"):
         await message_builder(
             luna,
             description=f"```\nTime out » {user.name}#{user.discriminator} for {time} seconds```"
-            )
+        )
 
     @commands.command(
         name="kick",
         usage="<@member> [reason]",
         description="Kick a user"
-        )
+    )
     @commands.guild_only()
     @has_permissions(kick_members=True)
     async def kick(self, luna, user: discord.Member, *, reason: str = None):
@@ -6699,13 +6809,13 @@ class MemberCog(commands.Cog, name="Member commands"):
         await message_builder(
             luna, title="Kick",
             description=f"```\n{user.name}#{user.discriminator} has been kicked\n``````\nReason\n\n{reason}```"
-            )
+        )
 
     @commands.command(
         name="softban",
         usage="<@member> [reason]",
         description="Softban a user"
-        )
+    )
     @commands.guild_only()
     @has_permissions(ban_members=True)
     async def softban(self, luna, user: discord.Member, *, reason: str = None):
@@ -6715,13 +6825,13 @@ class MemberCog(commands.Cog, name="Member commands"):
         await message_builder(
             luna, title="Softban",
             description=f"```\n{user.name}#{user.discriminator} has been softbanned\n``````\nReason\n\n{reason}```"
-            )
+        )
 
     @commands.command(
         name="ban",
         usage="<@member> [reason]",
         description="Ban a user"
-        )
+    )
     @commands.guild_only()
     @has_permissions(ban_members=True)
     async def ban(self, luna, user: discord.Member, *, reason: str = None):
@@ -6730,13 +6840,13 @@ class MemberCog(commands.Cog, name="Member commands"):
         await message_builder(
             luna, title="Ban",
             description=f"```\n{user.name}#{user.discriminator} has been banned\n``````\nReason\n\n{reason}```"
-            )
+        )
 
     @commands.command(
         name="unban",
         usage="<user_id>",
         description="Unban a user"
-        )
+    )
     @commands.guild_only()
     @has_permissions(ban_members=True)
     async def unban(self, luna, user_id: int):
@@ -6749,18 +6859,18 @@ class MemberCog(commands.Cog, name="Member commands"):
                 await message_builder(
                     luna, title="Unban",
                     description=f"```\n{user.name}#{user.discriminator} has been unbanned```"
-                    )
+                )
                 return
         await message_builder(
             luna, title="Unban",
             description=f"```\nNo banned user with the id {user_id} was found```"
-            )
+        )
 
     @commands.command(
         name="banned",
         usage="[guild_id]",
         description="List all bans"
-        )
+    )
     @commands.guild_only()
     @has_permissions(ban_members=True)
     async def banned(self, luna, guild_id: int = None):
@@ -6775,7 +6885,7 @@ class MemberCog(commands.Cog, name="Member commands"):
             await message_builder(
                 luna, title=f"Bans in {guild.name}",
                 description=f"```\nNo users are banned in {guild.name}```"
-                )
+            )
             return
         bans = [
             f"{b.user.name}#{b.user.discriminator} | {b.user.id}" for b in bans]
@@ -6786,7 +6896,7 @@ class MemberCog(commands.Cog, name="Member commands"):
         name="savebans",
         usage="[guild_id]",
         description="Save bans"
-        )
+    )
     @commands.guild_only()
     @has_permissions(ban_members=True)
     async def savebans(self, luna, guild_id: int = None):
@@ -6801,7 +6911,7 @@ class MemberCog(commands.Cog, name="Member commands"):
             await message_builder(
                 luna, title=f"Bans in {guild.name}",
                 description=f"```\nNo users are banned in {guild.name}```"
-                )
+            )
             return
         bans = [
             f"{b.user.name}#{b.user.discriminator} | {b.user.id}" for b in bans]
@@ -6813,13 +6923,13 @@ class MemberCog(commands.Cog, name="Member commands"):
         await message_builder(
             luna, title=f"Saved Bans",
             description=f"```\nSaved all bans in Luna/backup/guilds/{guild.name}/bans.txt\n``````{bans}```"
-            )
+        )
 
     @commands.command(
         name="loadbans",
         usage="[guild_id]",
         description="Load bans"
-        )
+    )
     @commands.guild_only()
     @has_permissions(ban_members=True)
     async def loadbans(self, luna, guild_id: int = None):
@@ -6835,7 +6945,7 @@ class MemberCog(commands.Cog, name="Member commands"):
             await message_builder(
                 luna, title=f"Load bans",
                 description=f"```\nNo bans were found in Luna/backup/{guild.name}/bans.txt```"
-                )
+            )
             return
         bans = files.read_file(
             f"Luna/backup/guilds/{guild.name}/bans.txt", documents=True
@@ -6850,7 +6960,7 @@ class MemberCog(commands.Cog, name="Member commands"):
         await message_builder(
             luna, title=f"Load bans",
             description=f"```\nLoaded all bans from Luna/backup/guilds/{guild.name}/bans.txt```"
-            )
+        )
 
 
 bot.add_cog(MemberCog(bot))
@@ -6864,7 +6974,7 @@ class RoleCog(commands.Cog, name="Role commands"):
         name="roleinfo",
         usage="<@role>",
         description="Information"
-        )
+    )
     async def roleinfo(self, luna, role: discord.Role):
         await luna.message.delete()
         role_amount = 0
@@ -6878,14 +6988,21 @@ class RoleCog(commands.Cog, name="Role commands"):
             role_members = "No members have this role"
         await message_builder(
             luna, title="Role Information",
-            description=f"```\n{'Name':17} » {role.name}\n{'ID':17} » {role.id}\n{'Color':17} » {role.color}\n{'Created at':17} » {role.created_at}\n{'Position':17} » {role.position}\n``````\n{'Members':17} » {role_amount}\n\nMember List:\n{role_members}\n``````\n{'Permissions':17} » {role.permissions}\n```"
-            )
+            description=f"```\n{'Name':17} » {role.name}\n"
+                        f"{'ID':17} » {role.id}\n"
+                        f"{'Color':17} » {role.color}\n"
+                        f"{'Created at':17} » {role.created_at}\n"
+                        f"{'Position':17} » {role.position}\n```"
+                        f"```\n{'Members':17} » {role_amount}\n\n"
+                        f"Member List:\n{role_members}\n```"
+                        f"```\n{'Permissions':17} » {role.permissions}\n```"
+        )
 
     @commands.command(
         name="giverole",
         usage="<@member> <role_id>",
         description="Give a role"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_roles=True)
     async def giverole(self, luna, member: discord.Member, role_id: int):
@@ -6895,19 +7012,19 @@ class RoleCog(commands.Cog, name="Role commands"):
             await message_builder(
                 luna, title="Give role",
                 description=f"```\nNo role with the id {role_id} was found```"
-                )
+            )
             return
         await member.add_roles(role)
         await message_builder(
             luna, title="Give role",
             description=f"```\nGave {member.name}#{member.discriminator} role » {role.name}```"
-            )
+        )
 
     @commands.command(
         name="giveallroles",
         usage="<@member>",
         description="Give all roles"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_roles=True)
     async def giveallroles(self, luna, member: discord.Member):
@@ -6919,13 +7036,13 @@ class RoleCog(commands.Cog, name="Role commands"):
         await message_builder(
             luna, title="Give all roles",
             description=f"```\nGave all roles to » {member.name}#{member.discriminator}```"
-            )
+        )
 
     @commands.command(
         name="allroles",
         usage="",
         description="Give all roles"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_roles=True)
     async def allroles(self, luna):
@@ -6941,7 +7058,7 @@ class RoleCog(commands.Cog, name="Role commands"):
         name="removeallroles",
         usage="<@member>",
         description="Remove all roles"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_roles=True)
     async def removeallroles(self, luna, member: discord.Member):
@@ -6953,13 +7070,13 @@ class RoleCog(commands.Cog, name="Role commands"):
         await message_builder(
             luna, title="Remove all roles",
             description=f"```\nRemoved all roles from » {member.name}#{member.discriminator}```"
-            )
+        )
 
     @commands.command(
         name="removerole",
         usage="<@member> <role_id>",
         description="Remove a role"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_roles=True)
     async def removerole(self, luna, member: discord.Member, role_id: int):
@@ -6969,19 +7086,19 @@ class RoleCog(commands.Cog, name="Role commands"):
             await message_builder(
                 luna, title="Remove role",
                 description=f"```\nNo role with the id {role_id} was found```"
-                )
+            )
             return
         await member.remove_roles(role)
         await message_builder(
             luna, title="Remove role",
             description=f"```\nRemoved role {role.name} from » {member.name}#{member.discriminator}```"
-            )
+        )
 
     @commands.command(
         name="createrole",
         usage="<role_name>",
         description="Create a role"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_roles=True)
     async def createrole(self, luna, *, role_name: str):
@@ -6993,7 +7110,7 @@ class RoleCog(commands.Cog, name="Role commands"):
         name="renamerole",
         usage="<role_id> <name>",
         description="Rename a role"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_roles=True)
     async def renamerole(self, luna, role_id: int, *, name: str):
@@ -7003,7 +7120,7 @@ class RoleCog(commands.Cog, name="Role commands"):
             await message_builder(
                 luna, title="Rename role",
                 description=f"```\nNo role with the id {role_id} was found```"
-                )
+            )
             return
         await role.edit(name=name)
         await message_builder(luna, title="Rename role", description=f"```\nRenamed role {role.name} to » {name}```")
@@ -7012,7 +7129,7 @@ class RoleCog(commands.Cog, name="Role commands"):
         name="renameroles",
         usage="<name>",
         description="Rename all roles"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_roles=True)
     async def renameroles(self, luna, *, name: str):
@@ -7027,7 +7144,7 @@ class RoleCog(commands.Cog, name="Role commands"):
         name="deleterole",
         usage="<role_id>",
         description="Delete a role"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_roles=True)
     async def deleterole(self, luna, role_id: int):
@@ -7037,7 +7154,7 @@ class RoleCog(commands.Cog, name="Role commands"):
             await message_builder(
                 luna, title="Delete role",
                 description=f"```\nNo role with the id {role_id} was found```"
-                )
+            )
             return
         await role.delete()
         await message_builder(luna, title="Delete role", description=f"```\nDeleted role » {role.name}```")
@@ -7054,7 +7171,7 @@ class NickCog(commands.Cog, name="Nickname commands"):
         name="nick",
         usage="<name>",
         description="Change nickname"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_nicknames=True)
     async def nick(self, luna, *, name: str):
@@ -7066,7 +7183,7 @@ class NickCog(commands.Cog, name="Nickname commands"):
         name="nickmember",
         usage="<@member> <name>",
         description="Change nickname"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_nicknames=True)
     async def nickmember(self, luna, member: discord.Member, *, name: str):
@@ -7075,13 +7192,13 @@ class NickCog(commands.Cog, name="Nickname commands"):
         await message_builder(
             luna, title="Nickname",
             description=f"```\nChanged nickname of {member.name}#{member.discriminator} to » {name}```"
-            )
+        )
 
     @commands.command(
         name="nickall",
         usage="<name>",
         description="Change nickname of everyone"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_nicknames=True)
     async def nickall(self, luna, *, name: str):
@@ -7094,7 +7211,7 @@ class NickCog(commands.Cog, name="Nickname commands"):
         name="clearnick",
         usage="[@member]",
         description="Clear nickname"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_nicknames=True)
     async def clearnick(self, luna, member: discord.Member = None):
@@ -7105,13 +7222,13 @@ class NickCog(commands.Cog, name="Nickname commands"):
         await message_builder(
             luna, title="Clearnick",
             description=f"```\nCleared nickname of » {member.name}#{member.discriminator}```"
-            )
+        )
 
     @commands.command(
         name="clearallnick",
         usage="",
         description="Clear all nicknames"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_nicknames=True)
     async def clearallnick(self, luna):
@@ -7132,7 +7249,7 @@ class InviteCog(commands.Cog, name="Invite commands"):
         name="inviteinfo",
         usage="<invite>",
         description="Invite information"
-        )
+    )
     @commands.guild_only()
     async def inviteinfo(self, luna, invite: str):
         await luna.message.delete()
@@ -7141,18 +7258,24 @@ class InviteCog(commands.Cog, name="Invite commands"):
             await message_builder(
                 luna, title="Invite info",
                 description=f"```\nNo invite with the id {invite} was found```"
-                )
+            )
             return
         await message_builder(
             luna, title="Invite info",
-            description=f"```\nInvite » {invite.code}\nCreated at » {invite.created_at}\nChannel » {invite.channel.mention}\nGuild » {invite.guild.name}\nCreated by » {invite.inviter.name}#{invite.inviter.discriminator}\nMax uses » {invite.max_uses}\nUses » {invite.uses}```"
-            )
+            description=f"```\nInvite » {invite.code}\n"
+                        f"Created at » {invite.created_at}\n"
+                        f"Channel » {invite.channel.mention}\n"
+                        f"Guild » {invite.guild.name}\n"
+                        f"Created by » {invite.inviter.name}#{invite.inviter.discriminator}\n"
+                        f"Max uses » {invite.max_uses}\n"
+                        f"Uses » {invite.uses}```"
+        )
 
     @commands.command(
         name="invite",
         usage="[channel_id] [age] [uses]",
         description="Invite"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def invite(self, luna, channel_id: int = None, max_age: int = 0, max_uses: int = 0):
@@ -7165,7 +7288,7 @@ class InviteCog(commands.Cog, name="Invite commands"):
             await message_builder(
                 luna, title="Invite",
                 description=f"```\nNo channel with the id » {channel_id} was found```"
-                )
+            )
             return
         invite = await channel.create_invite(max_age=max_age, max_uses=max_uses)
         await message_builder(luna, title="Invite", description=f"```\nCreated invite » {invite.url}```")
@@ -7174,7 +7297,7 @@ class InviteCog(commands.Cog, name="Invite commands"):
         name="delinvite",
         usage="<invite_id>",
         description="Delete invite"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def delinvite(self, luna, invite_id: int):
@@ -7184,7 +7307,7 @@ class InviteCog(commands.Cog, name="Invite commands"):
             await message_builder(
                 luna, title="Delete invite",
                 description=f"```\nNo invite with the id » {invite_id} was found```"
-                )
+            )
             return
         await invite.delete()
         await message_builder(luna, title="Delete invite", description=f"```\nDeleted invite » {invite.url}```")
@@ -7193,7 +7316,7 @@ class InviteCog(commands.Cog, name="Invite commands"):
         name="delallinvite",
         usage="",
         description="Delete all invites"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def delallinvite(self, luna):
@@ -7206,7 +7329,7 @@ class InviteCog(commands.Cog, name="Invite commands"):
         name="invitelist",
         usage="",
         description="List all invites"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def invitelist(self, luna):
@@ -7224,7 +7347,7 @@ class InviteCog(commands.Cog, name="Invite commands"):
         name="invitechannel",
         usage="<channel_id>",
         description="Channel invites"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def invitelistchannel(self, luna, channel_id: int):
@@ -7234,7 +7357,7 @@ class InviteCog(commands.Cog, name="Invite commands"):
             await message_builder(
                 luna, title="Invite list",
                 description=f"```\nNo channel with the id » {channel_id} was found```"
-                )
+            )
             return
         invites = channel.invites
         if len(invites) == 0:
@@ -7249,7 +7372,7 @@ class InviteCog(commands.Cog, name="Invite commands"):
         name="inviteguild",
         usage="",
         description="Invites of a guild"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def invitelistguild(self, luna):
@@ -7267,7 +7390,7 @@ class InviteCog(commands.Cog, name="Invite commands"):
         name="inviteuser",
         usage="<user_id>",
         description="Invites of a user"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_channels=True)
     async def invitelistuser(self, luna, user_id: int):
@@ -7277,7 +7400,7 @@ class InviteCog(commands.Cog, name="Invite commands"):
             await message_builder(
                 luna, title="Invite list",
                 description=f"```\nNo user with the id » {user_id} was found```"
-                )
+            )
             return
         invites = user.invites
         if len(invites) == 0:
@@ -7300,7 +7423,7 @@ class AdminCog(commands.Cog, name="Administrative commands"):
         name="guildname",
         usage="<name>",
         description="Change guild name"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_guild=True)
     async def guildname(self, luna, *, name: str):
@@ -7312,7 +7435,7 @@ class AdminCog(commands.Cog, name="Administrative commands"):
         name="guildimage",
         usage="<image_url>",
         description="Change guild image"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_guild=True)
     async def guildimage(self, luna, *, image_url: str):
@@ -7321,13 +7444,13 @@ class AdminCog(commands.Cog, name="Administrative commands"):
         await message_builder(
             luna, title="Guildimage",
             description=f"```\nChanged the image of the guild to » {image_url}```"
-            )
+        )
 
     @commands.command(
         name="guildbanner",
         usage="<image_url>",
         description="Change guild banner"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_guild=True)
     async def guildbanner(self, luna, *, image_url: str):
@@ -7336,13 +7459,13 @@ class AdminCog(commands.Cog, name="Administrative commands"):
         await message_builder(
             luna, title="Guildbanner",
             description=f"```\nChanged the banner of the guild to » {image_url}```"
-            )
+        )
 
     @commands.command(
         name="getguildimage",
         usage="[guild_id]",
         description="Get the guild image"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_guild=True)
     async def getguildimage(self, luna, guild_id: int = None):
@@ -7354,7 +7477,7 @@ class AdminCog(commands.Cog, name="Administrative commands"):
             await message_builder(
                 luna, title="Guildimage",
                 description=f"```\nNo guild with the id » {guild_id} was found```"
-                )
+            )
             return
         await message_builder(luna, title="Guildimage", description=f"```\n{guild.icon_url}```")
 
@@ -7362,7 +7485,7 @@ class AdminCog(commands.Cog, name="Administrative commands"):
         name="getguildbanner",
         usage="[guild_id]",
         description="Get the guild banner"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_guild=True)
     async def getguildbanner(self, luna, guild_id: int = None):
@@ -7374,7 +7497,7 @@ class AdminCog(commands.Cog, name="Administrative commands"):
             await message_builder(
                 luna, title="Guildbanner",
                 description=f"```\nNo guild with the id » {guild_id} was found```"
-                )
+            )
             return
         await message_builder(luna, title="Guildbanner", description=f"```\n{guild.banner_url}```")
 
@@ -7382,7 +7505,7 @@ class AdminCog(commands.Cog, name="Administrative commands"):
         name="guildinfo",
         usage="[guild_id]",
         description="Guild information"
-        )
+    )
     @commands.guild_only()
     @has_permissions(manage_guild=True)
     async def guildinfo(self, luna, guild_id: int = None):
@@ -7395,12 +7518,27 @@ class AdminCog(commands.Cog, name="Administrative commands"):
                 await message_builder(
                     luna, title="Guildinfo",
                     description=f"```\nNo guild with the id {guild_id} was found```"
-                    )
+                )
                 return
         await message_builder(
             luna, title="Guildinfo",
-            description=f"```\nGeneral Information\n\n{'Guild':<17} » {guild.name}\n{'ID':17} » {guild.id}\n{'Owner':17} » {guild.owner}\n{'Created at':17} » {guild.created_at}\n{'Boost':17} » {guild.premium_subscription_count}\n{'Boost status':17} » {guild.premium_subscription_count is not None}\n{'Region':17} » {guild.region}\n{'Verification':17} » {guild.verification_level}\n``````\nMember Information\n\n{'Member count':17} » {guild.member_count}\n``````\nChannel Information\n\n{'Text channels':17} » {len(guild.text_channels)}\n{'Voice channels':17} » {len(guild.voice_channels)}\n``````\nRole Information\n\n{'Role count':17} » {len(guild.roles)}```"
-            )
+            description=f"```\nGeneral Information\n\n"
+                        f"{'Guild':<17} » {guild.name}\n"
+                        f"{'ID':17} » {guild.id}\n"
+                        f"{'Owner':17} » {guild.owner}\n"
+                        f"{'Created at':17} » {guild.created_at}\n"
+                        f"{'Boost':17} » {guild.premium_subscription_count}\n"
+                        f"{'Boost status':17} » {guild.premium_subscription_count is not None}\n"
+                        f"{'Region':17} » {guild.region}\n"
+                        f"{'Verification':17} » {guild.verification_level}\n```"
+                        f"```\nMember Information\n\n"
+                        f"{'Member count':17} » {guild.member_count}\n```"
+                        f"```\nChannel Information\n\n"
+                        f"{'Text channels':17} » {len(guild.text_channels)}\n"
+                        f"{'Voice channels':17} » {len(guild.voice_channels)}\n```"
+                        f"```\nRole Information\n\n"
+                        f"{'Role count':17} » {len(guild.roles)}```"
+        )
 
 
 bot.add_cog(AdminCog(bot))
@@ -7416,7 +7554,7 @@ class IgnoreCog(commands.Cog, name="Ignore commands"):
         name="ignore",
         usage="<@user>",
         description="Ignore user DMs"
-        )
+    )
     async def ignore(self, luna, *, user: discord.Member):
         await luna.message.delete()
         global ignore_list
@@ -7430,7 +7568,7 @@ class IgnoreCog(commands.Cog, name="Ignore commands"):
         name="unignore",
         usage="<@user>",
         description="Unignore user DMs"
-        )
+    )
     async def unignore(self, luna, *, user: discord.Member):
         await luna.message.delete()
         global ignore_list
@@ -7444,7 +7582,7 @@ class IgnoreCog(commands.Cog, name="Ignore commands"):
         name="ignorelist",
         usage="",
         description="List ignored users"
-        )
+    )
     async def ignorelist(self, luna):
         await luna.message.delete()
         global ignore_list
@@ -7457,7 +7595,7 @@ class IgnoreCog(commands.Cog, name="Ignore commands"):
         name="ignorelistclear",
         usage="",
         description="Clear ignore list"
-        )
+    )
     async def ignorelistclear(self, luna):
         await luna.message.delete()
         global ignore_list
@@ -7479,7 +7617,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         name="animguild",
         usage="[name]",
         description="Animates the guild name"
-        )
+    )
     async def animguild(self, luna, *, name: str = None):
         await luna.message.delete()
         global cyclename
@@ -7495,11 +7633,11 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
             embed.set_footer(
                 text=theme.footer(),
                 icon_url=theme.footer_icon_url()
-                )
+            )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
                 ), icon_url=theme.author_icon_url()
-                )
+            )
 
             await send(luna, embed)
             name = luna.guild.name.lower()
@@ -7531,11 +7669,11 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
                 embed.set_footer(
                     text=theme.footer(),
                     icon_url=theme.footer_icon_url()
-                    )
+                )
                 embed.set_author(
                     name=theme.author(), url=theme.author_url(
                     ), icon_url=theme.author_icon_url()
-                    )
+                )
 
                 await send(luna, embed)
                 name = luna.guild.name.lower()
@@ -7564,14 +7702,14 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
                     await error_builder(
                         luna,
                         description=f"```\nInvalid name length, needs to be over 3 characters long```"
-                        )
+                    )
 
     @commands.command(
         name="stopanimguild",
         usage="",
         description="Stops the guild animation"
-        )
-    async def stopanimguild(self, luna, *, name: str = None):
+    )
+    async def stopanimguild(self, luna):
         await luna.message.delete()
         global start_animation
         start_animation = False
@@ -7588,7 +7726,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         name="cyclenick",
         usage="<name>",
         description="Animates the nickname"
-        )
+    )
     async def cyclenick(self, luna, *, text):
         await luna.message.delete()
         embed = discord.Embed(
@@ -7611,7 +7749,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         name="stopcyclenick",
         usage="",
         description="Stops the nickname animation"
-        )
+    )
     async def stopcyclenick(self, luna):
         await luna.message.delete()
         global cycling
@@ -7629,7 +7767,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         name="cyclegroup",
         usage="<name>",
         description="Animates the group name"
-        )
+    )
     async def cyclegroup(self, luna, *, text):
         await luna.message.delete()
         embed = discord.Embed(
@@ -7652,7 +7790,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         name="stopcyclegroup",
         usage="",
         description="Stops the group animation"
-        )
+    )
     async def stopcyclegroup(self, luna):
         await luna.message.delete()
         global cycling_group
@@ -7670,7 +7808,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         name="virus",
         usage="[@member] <virus>",
         description="Animated virus message"
-        )
+    )
     async def virus(self, luna, user: discord.Member = None, *, virus: str = "trojan"):
         user = user or luna.author
         list = (
@@ -7695,7 +7833,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         name="cathi",
         usage="[text]",
         description="Cute cat animation"
-        )
+    )
     async def cathi(self, luna, *, text: str = "Hi..."):
         list = (
             """ຸ 　　　＿＿_＿＿
@@ -7719,7 +7857,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         name="flop",
         usage="",
         description="Flop animation"
-        )
+    )
     async def flop(self, luna):
         list = (
             "(   ° - °) (' - '   )",
@@ -7736,7 +7874,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         name="poof",
         usage="",
         description="Poof animation"
-        )
+    )
     async def poof(self, luna):
         list = ("(   ' - ')", "' - ')", "- ')", "')", ")", "*poofness*")
         for i in list:
@@ -7747,7 +7885,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         name="boom",
         usage="",
         description="Boom animation"
-        )
+    )
     async def boom(self, luna):
         list = (
             "```THIS MESSAGE WILL SELFDESTRUCT IN 5```",
@@ -7767,7 +7905,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         name="tableflip",
         usage="",
         description="Tableflip/rage animation"
-        )
+    )
     async def tableflip(self, luna):
         list = (
             "`(\\°-°)\\  ┬─┬`",
@@ -7790,7 +7928,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         name="unflip",
         usage="",
         description="Unflip animation"
-        )
+    )
     async def tableflip(self, luna):
         list = (
             "`(\\°-°)\\  ┻━┻`",
@@ -7807,7 +7945,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         name="warning",
         usage="",
         description="System overload animation"
-        )
+    )
     async def warning(self, luna):
         list = (
             "`LOAD !! WARNING !! SYSTEM OVER`",
@@ -7849,7 +7987,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
         name="alldump",
         usage="<channel>",
         description="Dump all from a channel"
-        )
+    )
     async def alldump(self, luna, channel: discord.TextChannel):
         await luna.message.delete()
         if not files.file_exist(
@@ -7867,7 +8005,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
             await message_builder(
                 luna, title="Dumping",
                 description=f"```\nEvent\n\nDumping all from {channel.mention} ({channel.guild.name})...```"
-                )
+            )
             async for message in channel.history(limit=None):
                 if message.attachments:
                     for attachment in message.attachments:
@@ -7887,7 +8025,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
             await message_builder(
                 luna, title="Dumping",
                 description=f"```\nInfo\n\nDumped all from {channel.mention} ({channel.guild.name})```"
-                )
+            )
         except Exception as e:
             await error_builder(luna, e)
 
@@ -7895,7 +8033,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
         name="imgdump",
         usage="<channel>",
         description="Dump images from a channel"
-        )
+    )
     async def imgdump(self, luna, channel: discord.TextChannel):
         await luna.message.delete()
         if not files.file_exist(
@@ -7913,7 +8051,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
             await message_builder(
                 luna, title="Dumping",
                 description=f"```\nEvent\n\nDumping images from {channel.mention} ({channel.guild.name})...```"
-                )
+            )
             async for message in channel.history(limit=None):
                 if message.attachments:
                     for attachment in message.attachments:
@@ -7936,7 +8074,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
             await message_builder(
                 luna, title="Dumping",
                 description=f"```\nInfo\n\nDumped images from {channel.mention} ({channel.guild.name})```"
-                )
+            )
         except Exception as e:
             await error_builder(luna, e)
 
@@ -7944,7 +8082,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
         name="audiodump",
         usage="<channel>",
         description="Dump audio from a channel"
-        )
+    )
     async def audiodump(self, luna, channel: discord.TextChannel):
         await luna.message.delete()
         if not files.file_exist(
@@ -7962,7 +8100,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
             await message_builder(
                 luna, title="Dumping",
                 description=f"```\nEvent\n\nDumping audio from {channel.mention} ({channel.guild.name})...```"
-                )
+            )
             async for message in channel.history(limit=None):
                 if message.attachments:
                     for attachment in message.attachments:
@@ -7983,7 +8121,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
             await message_builder(
                 luna, title="Dumping",
                 description=f"```\nInfo\n\nDumped audio from {channel.mention} ({channel.guild.name})```"
-                )
+            )
         except Exception as e:
             await error_builder(luna, e)
 
@@ -7991,7 +8129,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
         name="videodump",
         usage="<channel>",
         description="Dump videos from a channel"
-        )
+    )
     async def videodump(self, luna, channel: discord.TextChannel):
         await luna.message.delete()
         if not files.file_exist(
@@ -8009,7 +8147,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
             await message_builder(
                 luna, title="Dumping",
                 description=f"```\nEvent\n\nDumping videos from {channel.mention} ({channel.guild.name})...```"
-                )
+            )
             async for message in channel.history(limit=None):
                 if message.attachments:
                     for attachment in message.attachments:
@@ -8032,7 +8170,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
             await message_builder(
                 luna, title="Dumping",
                 description=f"```\nInfo\n\nDumped videos from {channel.mention} ({channel.guild.name})```"
-                )
+            )
         except Exception as e:
             await error_builder(luna, e)
 
@@ -8040,7 +8178,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
         name="textdump",
         usage="<channel>",
         description="Dump text from a channel"
-        )
+    )
     async def textdump(self, luna, channel: discord.TextChannel):
         await luna.message.delete()
         if not files.file_exist(
@@ -8058,7 +8196,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
             await message_builder(
                 luna, title="Dumping",
                 description=f"```\nEvent\n\nDumping last 1000 messages from {channel.mention} ({channel.guild.name})...```"
-                )
+            )
             text = ""
             async for message in channel.history(limit=1000):
                 text += f"{message.author.name}#{message.author.discriminator}: {message.content}\n"
@@ -8076,7 +8214,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
             await message_builder(
                 luna, title="Dumping",
                 description=f"```\nInfo\n\nDumped last 1000 messages from {channel.mention} ({channel.guild.name})```"
-                )
+            )
         except Exception as e:
             await error_builder(luna, e)
 
@@ -8084,7 +8222,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
         name="emojidump",
         usage="<guild>",
         description="Dump all emojis from a guild"
-        )
+    )
     async def emojidump(self, luna, guild: discord.Guild):
         await luna.message.delete()
         if not files.file_exist(
@@ -8099,7 +8237,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
             await message_builder(
                 luna, title="Dumping",
                 description=f"```\nEvent\n\nDumping emojis from {guild.name}...```"
-                )
+            )
             for emoji in guild.emojis:
                 url = str(emoji.url)
                 name = str(emoji.name)
@@ -8133,7 +8271,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
         name="emojidownload",
         usage="<guild> <emoji>",
         description="Download a emoji"
-        )
+    )
     async def emojidownload(self, luna, guild: discord.Guild, emoji: discord.Emoji):
         await luna.message.delete()
         if not files.file_exist(
@@ -8148,7 +8286,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
             await message_builder(
                 luna, title="Downloading",
                 description=f"```\nEvent\n\nDownloading emoji from {guild.name}...```"
-                )
+            )
             url = str(emoji.url)
             name = str(emoji.name)
             r = requests.get(url, stream=True)
@@ -8176,7 +8314,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
             await message_builder(
                 luna, title="Downloading",
                 description=f"```\nInfo\n\nDownloaded emoji from {guild.name}```"
-                )
+            )
         except Exception as e:
             await error_builder(luna, e)
 
@@ -8184,7 +8322,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
         name="avatardump",
         usage="<guild>",
         description="Dump avatars from a guild"
-        )
+    )
     async def avatardump(self, luna, guild: discord.Guild):
         await luna.message.delete()
         if not files.file_exist(
@@ -8199,7 +8337,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
             await message_builder(
                 luna, title="Dumping",
                 description=f"```\nEvent\n\nDumping avatars from {guild.name}...```"
-                )
+            )
             for member in guild.members:
                 url = str(member.display_avatar)
                 name = str(member.name)
@@ -8228,7 +8366,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
             await message_builder(
                 luna, title="Dumping",
                 description=f"```\nInfo\n\nDumped avatars from {guild.name}```"
-                )
+            )
         except Exception as e:
             await error_builder(luna, e)
 
@@ -8236,7 +8374,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
         name="channeldump",
         usage="<guild>",
         description="Dump channels from a guild"
-        )
+    )
     async def channelnamesdump(self, luna, guild: discord.Guild):
         await luna.message.delete()
         if not files.file_exist(
@@ -8251,7 +8389,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
             await message_builder(
                 luna, title="Dumping",
                 description=f"```\nEvent\n\nDumping channel names from {guild.name}...```"
-                )
+            )
             for channel in guild.channels:
                 name = str(channel.name)
                 with open(os.path.join(files.documents(), f'Luna/dumping/channels/{guild.name}/{name}.txt'), 'w') as f:
@@ -8260,7 +8398,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
             await message_builder(
                 luna, title="Dumping",
                 description=f"```\nInfo\n\nDumped channel names from {guild.name}```"
-                )
+            )
         except Exception as e:
             await error_builder(luna, e)
 
@@ -8289,7 +8427,7 @@ class TextCog(commands.Cog, name="Text commands"):
         name="encode",
         usage="",
         description="Encoding text commands"
-        )
+    )
     async def encode(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -8314,7 +8452,7 @@ class TextCog(commands.Cog, name="Text commands"):
         name="decode",
         usage="",
         description="Decoding text commands"
-        )
+    )
     async def decode(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -8339,7 +8477,7 @@ class TextCog(commands.Cog, name="Text commands"):
         name="indent",
         usage="<text>",
         description="Text in a embed"
-        )
+    )
     async def indent(self, luna, *, text: str):
         await luna.message.delete()
         embed = discord.Embed(description=f"{text}")
@@ -8349,20 +8487,20 @@ class TextCog(commands.Cog, name="Text commands"):
         name="indent_title",
         usage="<text>",
         description="Text in a embed"
-        )
+    )
     async def indent_title(self, luna, *, text: str):
         await luna.message.delete()
         embed = discord.Embed(
             title=theme.title(),
             description=f"{text}"
-            )
+        )
         await send(luna, embed)
 
     @commands.command(
         name="indent_footer",
         usage="<text>",
         description="Text in a embed"
-        )
+    )
     async def indent_footer(self, luna, *, text: str):
         await luna.message.delete()
         embed = discord.Embed(description=f"{text}")
@@ -8373,7 +8511,7 @@ class TextCog(commands.Cog, name="Text commands"):
         name="indent_all",
         usage="<text>",
         description="Text in a embed"
-        )
+    )
     async def indent_all(self, luna, *, text: str):
         await luna.message.delete()
         embed = discord.Embed(description=f"{text}")
@@ -8386,7 +8524,7 @@ class TextCog(commands.Cog, name="Text commands"):
         name="ascii",
         usage="<text>",
         description="Ascii text"
-        )
+    )
     async def ascii(self, luna, *, text: str):
         await luna.message.delete()
         r = requests.get(
@@ -8401,7 +8539,7 @@ class TextCog(commands.Cog, name="Text commands"):
         usage="<text>",
         aliases=['vaporwave'],
         description="Vaporwave text"
-        )
+    )
     async def vape(self, luna, *, text: str):
         await luna.message.delete()
         text = text.replace('a', 'ａ').replace('A', 'Ａ').replace('b', 'ｂ') \
@@ -8433,7 +8571,7 @@ class TextCog(commands.Cog, name="Text commands"):
         name="zalgo",
         usage="<text>",
         description="Zalgo text"
-        )
+    )
     async def zarlgo(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(zalgoText(text))
@@ -8442,7 +8580,7 @@ class TextCog(commands.Cog, name="Text commands"):
         name="reverse",
         usage="<text>",
         description="Reverse given text"
-        )
+    )
     async def reverse(luna, *, text):
         await luna.message.delete()
         text = text[::-1]
@@ -8452,7 +8590,7 @@ class TextCog(commands.Cog, name="Text commands"):
         name="bold",
         usage="<text>",
         description="Bold codeblock"
-        )
+    )
     async def bold(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"**{text}**")
@@ -8461,7 +8599,7 @@ class TextCog(commands.Cog, name="Text commands"):
         name="spoiler",
         usage="<text>",
         description="Spoiler codeblock"
-        )
+    )
     async def spoiler(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"||{text}||")
@@ -8470,7 +8608,7 @@ class TextCog(commands.Cog, name="Text commands"):
         name="underline",
         usage="<text>",
         description="Underline codeblock"
-        )
+    )
     async def underline(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"__{text}__")
@@ -8479,7 +8617,7 @@ class TextCog(commands.Cog, name="Text commands"):
         name="strike",
         usage="<text>",
         description="Strike codeblock"
-        )
+    )
     async def strike(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"~~{text}~~")
@@ -8496,7 +8634,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_css",
         usage="<text>",
         description="CSS codeblock"
-        )
+    )
     async def codeblock_css(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```css\n{text}\n```")
@@ -8505,7 +8643,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_brainfuck",
         usage="<text>",
         description="Brainfuck codeblock"
-        )
+    )
     async def codeblock_brainfuck(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```brainfuck\n{text}\n```")
@@ -8514,7 +8652,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_md",
         usage="<text>",
         description="MD codeblock"
-        )
+    )
     async def codeblock_md(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```md\n{text}\n```")
@@ -8523,7 +8661,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_fix",
         usage="<text>",
         description="Fix codeblock"
-        )
+    )
     async def codeblock_fix(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```fix\n{text}\n```")
@@ -8532,7 +8670,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_glsl",
         usage="<text>",
         description="Glsl codeblock"
-        )
+    )
     async def codeblock_glsl(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```glsl\n{text}\n```")
@@ -8541,7 +8679,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_diff",
         usage="<text>",
         description="Diff codeblock"
-        )
+    )
     async def codeblock_diff(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```diff\n{text}\n```")
@@ -8550,7 +8688,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_bash",
         usage="<text>",
         description="Bash codeblock"
-        )
+    )
     async def codeblock_bash(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```bash\n{text}\n```")
@@ -8559,7 +8697,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_cs",
         usage="<text>",
         description="C# codeblock"
-        )
+    )
     async def codeblock_cs(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```cs\n{text}\n```")
@@ -8568,7 +8706,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_cpp",
         usage="<text>",
         description="C++ codeblock"
-        )
+    )
     async def codeblock_cpp(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```cpp\n{text}\n```")
@@ -8577,7 +8715,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_ini",
         usage="<text>",
         description="Ini codeblock"
-        )
+    )
     async def codeblock_ini(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```ini\n{text}\n```")
@@ -8586,7 +8724,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_asciidoc",
         usage="<text>",
         description="Asciidoc codeblock"
-        )
+    )
     async def codeblock_asciidoc(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```asciidoc\n{text}\n```")
@@ -8595,7 +8733,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_autohotkey",
         usage="<text>",
         description="Autohotkey codeblock"
-        )
+    )
     async def codeblock_autohotkey(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```autohotkey\n{text}\n```")
@@ -8604,7 +8742,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_python",
         usage="<text>",
         description="Python codeblock"
-        )
+    )
     async def codeblock_python(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```python\n{text}\n```")
@@ -8613,7 +8751,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_lua",
         usage="<text>",
         description="Lua codeblock"
-        )
+    )
     async def codeblock_lua(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```lua\n{text}\n```")
@@ -8622,7 +8760,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_php",
         usage="<text>",
         description="PHP codeblock"
-        )
+    )
     async def codeblock_php(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```php\n{text}\n```")
@@ -8631,7 +8769,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_rust",
         usage="<text>",
         description="Rust codeblock"
-        )
+    )
     async def codeblock_rust(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```rust\n{text}\n```")
@@ -8640,7 +8778,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_java",
         usage="<text>",
         description="Java codeblock"
-        )
+    )
     async def codeblock_java(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```java\n{text}\n```")
@@ -8649,7 +8787,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_kotlin",
         usage="<text>",
         description="Kotlin codeblock"
-        )
+    )
     async def codeblock_kotlin(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```kotlin\n{text}\n```")
@@ -8658,7 +8796,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_js",
         usage="<text>",
         description="Javascript codeblock"
-        )
+    )
     async def codeblock_js(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```javascript\n{text}\n```")
@@ -8667,7 +8805,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_mysql",
         usage="<text>",
         description="MySQL codeblock"
-        )
+    )
     async def codeblock_mysql(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```MySQL\n{text}\n```")
@@ -8676,7 +8814,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_mk",
         usage="<text>",
         description="Markdown codeblock"
-        )
+    )
     async def codeblock_mk(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```markdown\n{text}\n```")
@@ -8685,7 +8823,7 @@ class CodeblockCog(commands.Cog, name="Codeblock commands"):
         name="codeblock_ansi",
         usage="<text>",
         description="Ansi codeblock"
-        )
+    )
     async def codeblock_ansi(self, luna, *, text: str):
         await luna.message.delete()
         await luna.send(f"```ansi\n{text}\n```")
@@ -8706,7 +8844,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         usage="[@member]",
         aliases=["av"],
         description="Send the avatar"
-        )
+    )
     async def av(self, luna, user_id=None):
         await luna.message.delete()
         if user_id is None:
@@ -8729,7 +8867,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         usage="<@member> <text>",
         asliases=["avt"],
         description="Send the avatar"
-        )
+    )
     async def avatart(self, luna, member: discord.Member, *, text: str):
         await luna.message.delete()
         embed = discord.Embed(title=text)
@@ -8742,7 +8880,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="searchav",
         usage="<@member>",
         description="Search link of the avatar"
-        )
+    )
     async def searchav(self, luna, member: discord.Member):
         await luna.message.delete()
         embed = discord.Embed(
@@ -8758,7 +8896,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="linkav",
         usage="<@member>",
         description="Link of the avatar"
-        )
+    )
     async def linkav(self, luna, member: discord.Member):
         await luna.message.delete()
         embed = discord.Embed(
@@ -8774,7 +8912,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="stealav",
         usage="<@member>",
         description="Steal the avatar"
-        )
+    )
     async def stealav(self, luna, member: discord.Member):
         await luna.message.delete()
         url = member.display_avatar
@@ -8799,11 +8937,11 @@ class ImageCog(commands.Cog, name="Image commands"):
             embed.set_footer(
                 text=theme.footer(),
                 icon_url=theme.footer_icon_url()
-                )
+            )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
                 ), icon_url=theme.author_icon_url()
-                )
+            )
 
             await send(luna, embed)
         except discord.HTTPException as e:
@@ -8813,7 +8951,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="setavatar",
         usage="<url>",
         description="Set your avatar"
-        )
+    )
     async def setavatar(self, luna, url: str):
         await luna.message.delete()
         if configs.password() == "password-here":
@@ -8837,11 +8975,11 @@ class ImageCog(commands.Cog, name="Image commands"):
             embed.set_footer(
                 text=theme.footer(),
                 icon_url=theme.footer_icon_url()
-                )
+            )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
                 ), icon_url=theme.author_icon_url()
-                )
+            )
 
             await send(luna, embed)
         except discord.HTTPException as e:
@@ -8851,7 +8989,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="invisav",
         usage="",
         description="Invisible avatar"
-        )
+    )
     async def invisav(self, luna):
         await luna.message.delete()
         url = "https://gauginggadgets.com/wp-content/uploads/2020/07/InvisibleProfileImage.png"
@@ -8876,11 +9014,11 @@ class ImageCog(commands.Cog, name="Image commands"):
             embed.set_footer(
                 text=theme.footer(),
                 icon_url=theme.footer_icon_url()
-                )
+            )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
                 ), icon_url=theme.author_icon_url()
-                )
+            )
 
             await send(luna, embed)
         except discord.HTTPException as e:
@@ -8893,7 +9031,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="dog",
         usage="",
         description="Send a random dog"
-        )
+    )
     async def dog(self, luna):
         await luna.message.delete()
         r = requests.get("https://dog.ceo/api/breeds/image/random").json()
@@ -8907,7 +9045,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="fox",
         usage="",
         description="Send a random fox"
-        )
+    )
     async def fox(self, luna):
         await luna.message.delete()
         r = requests.get('https://randomfox.ca/floof/').json()
@@ -8921,7 +9059,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="cat",
         usage="",
         description="Send a random cat"
-        )
+    )
     async def cat(self, luna):
         await luna.message.delete()
         r = requests.get("https://api.thecatapi.com/v1/images/search").json()
@@ -8935,7 +9073,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="sadcat",
         usage="",
         description="Send a random sad cat"
-        )
+    )
     async def sadcat(self, luna):
         await luna.message.delete()
         r = requests.get("https://api.alexflipnote.dev/sadcat").json()
@@ -8949,7 +9087,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="waifu",
         usage="",
         description="Send a random waifu"
-        )
+    )
     async def waifu(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/waifu").json()
@@ -8966,7 +9104,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="wallpaper",
         usage="",
         description="Send a random anime wallpaper"
-        )
+    )
     async def wallpaper(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/wallpaper").json()
@@ -8980,7 +9118,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="wide",
         usage="<@member>",
         description="Wide profile picture"
-        )
+    )
     async def wide(self, luna, user: discord.User):
         await luna.message.delete()
         embed = discord.Embed(title=theme.title())
@@ -8995,7 +9133,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="trumptweet",
         usage="<text>",
         description="Create a Trump tweet"
-        )
+    )
     async def trumptweet(self, luna, *, text: str):
         await luna.message.delete()
         request = requests.get(
@@ -9006,7 +9144,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(url=link)
@@ -9016,13 +9154,13 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="bidentweet",
         usage="<text>",
         description="Create a Biden tweet"
-        )
+    )
     async def bidentweet(self, luna, *, text: str):
         await luna.message.delete()
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9034,7 +9172,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="tweet",
         usage="<name> <text>",
         description="Create a tweet"
-        )
+    )
     async def tweet(self, luna, name, *, text: str):
         await luna.message.delete()
         request = requests.get(
@@ -9045,7 +9183,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(url=link)
@@ -9055,7 +9193,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="supreme",
         usage="<text>",
         description="Custom supreme logo"
-        )
+    )
     async def supreme(self, luna, *, text: str):
         await luna.message.delete()
         request = requests.get(
@@ -9065,7 +9203,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(url=f'{request}')
@@ -9075,7 +9213,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="changemymind",
         usage="<text>",
         description="Changemymind meme"
-        )
+    )
     async def changemymind(self, luna, *, text: str):
         await luna.message.delete()
         request = requests.get(
@@ -9086,7 +9224,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(url=link)
@@ -9097,7 +9235,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         aliases=['pornhubcomment'],
         usage="<@member> <text>",
         description="Pornhub comment"
-        )
+    )
     async def phcomment(self, luna, user: discord.User, *, text: str):
         await luna.message.delete()
         image_url = str(user.display_avatar).replace(".webp", ".png")
@@ -9109,7 +9247,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(url=link)
@@ -9119,7 +9257,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="clyde",
         usage="<text>",
         description="Custom Clyde message"
-        )
+    )
     async def clyde(self, luna, *, text: str):
         await luna.message.delete()
         request = requests.get(
@@ -9130,7 +9268,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(url=link)
@@ -9140,13 +9278,13 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="pikachu",
         usage="<text>",
         description="Surprised Pikachu"
-        )
+    )
     async def pikachu(self, luna, *, text: str):
         await luna.message.delete()
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9158,13 +9296,13 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="stonks",
         usage="<@member>",
         description="Stonks!"
-        )
+    )
     async def stonks(self, luna, user: discord.User):
         await luna.message.delete()
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9176,13 +9314,13 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="notstonks",
         usage="<@member>",
         description="Notstonks!"
-        )
+    )
     async def notstonks(self, luna, user: discord.User):
         await luna.message.delete()
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9194,13 +9332,13 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="emergencymeeting",
         usage="<text>",
         description="Emergency meeting!"
-        )
+    )
     async def emergencymeeting(self, luna, *, text):
         await luna.message.delete()
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9212,13 +9350,13 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="eject",
         usage="<true/false> <color> <@member>",
         description="Among Us"
-        )
+    )
     async def eject(self, luna, impostor: bool, crewmate: str, user: discord.User):
         await luna.message.delete()
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9230,13 +9368,13 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="drip",
         usage="<@member>",
         description="Drip meme"
-        )
+    )
     async def drip(self, luna, user: discord.User):
         await luna.message.delete()
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9248,13 +9386,13 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="gun",
         usage="<@member>",
         description="Gun meme"
-        )
+    )
     async def gun(self, luna, user: discord.User):
         await luna.message.delete()
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9266,13 +9404,13 @@ class ImageCog(commands.Cog, name="Image commands"):
         name="ad",
         usage="<@member>",
         description="Make yourself an ad"
-        )
+    )
     async def ad(self, luna, user: discord.User):
         await luna.message.delete()
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9292,13 +9430,13 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         name="alert",
         usage="<text>",
         description="Iphone alert"
-        )
+    )
     async def alert(self, luna, *, text: str):
         await luna.message.delete()
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9310,13 +9448,13 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         name="caution",
         usage="<text>",
         description="Caution image"
-        )
+    )
     async def caution(self, luna, *, text: str):
         await luna.message.delete()
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9328,13 +9466,13 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         name="distractedbf",
         usage="<@boyfriend> <@woman> <@girlfriend>",
         description="Distracted boyfriend meme"
-        )
+    )
     async def distractedbf(self, luna, boyfriend: discord.User, woman: discord.User, girlfriend: discord.User):
         await luna.message.delete()
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9346,13 +9484,13 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         name="icanmilkyou",
         usage="<@member1> <@member2>",
         description="ICanMilkYou"
-        )
+    )
     async def icanmilkyou(self, luna, user1: discord.User, user2: discord.User):
         await luna.message.delete()
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9364,13 +9502,13 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         name="heaven",
         usage="<@member>",
         description="Heaven meme"
-        )
+    )
     async def heaven(self, luna, user: discord.User):
         await luna.message.delete()
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9382,13 +9520,13 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         name="dockofshame",
         usage="<@member>",
         description="Heaven meme"
-        )
+    )
     async def dockofshame(self, luna, user: discord.User):
         await luna.message.delete()
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9400,13 +9538,13 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         name="firsttime",
         usage="<@member>",
         description="First time? meme"
-        )
+    )
     async def firsttime(self, luna, user: discord.User):
         await luna.message.delete()
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9418,13 +9556,13 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         name="trash",
         usage="<@member>",
         description="Trash meme"
-        )
+    )
     async def trash(self, luna, user: discord.User):
         await luna.message.delete()
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9436,13 +9574,13 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         name="simp",
         usage="<@member>",
         description="Simp card"
-        )
+    )
     async def simp(self, luna, user: discord.User):
         await luna.message.delete()
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9454,7 +9592,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         name="wanted",
         usage="<@member>",
         description="Wanted"
-        )
+    )
     async def wanted(self, luna, user: discord.User):
         await luna.message.delete()
         request = requests.get(
@@ -9465,7 +9603,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(url=link)
@@ -9475,7 +9613,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         name="wasted",
         usage="<@member>",
         description="GTA Wasted"
-        )
+    )
     async def wasted(self, luna, user: discord.User):
         await luna.message.delete()
         request = requests.get(
@@ -9486,7 +9624,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(url=link)
@@ -9496,7 +9634,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         name="continued",
         usage="<@member>",
         description="To be continued"
-        )
+    )
     async def continued(self, luna, user: discord.User):
         await luna.message.delete()
         request = requests.get(
@@ -9507,7 +9645,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(url=link)
@@ -9517,7 +9655,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         name="drake",
         usage="<no, yes>",
         description="Drake yes and no meme"
-        )
+    )
     async def drake(self, luna, *, text: str):
         await luna.message.delete()
         text = text.split(', ')
@@ -9526,7 +9664,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9538,7 +9676,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         name="takemymoney",
         usage="<text1, text2>",
         description="Take my money"
-        )
+    )
     async def takemymoney(self, luna, *, text: str):
         await luna.message.delete()
         text = text.split(', ')
@@ -9547,7 +9685,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
@@ -9559,7 +9697,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         name="pornhub",
         usage="<text1, text2>",
         description="PornHub logo"
-        )
+    )
     async def pornhub(self, luna, *, text: str):
         await luna.message.delete()
         text = text.split(', ')
@@ -9573,7 +9711,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(url=link)
@@ -9583,7 +9721,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         name="recaptcha",
         usage="<text>",
         description="reCAPTCHA"
-        )
+    )
     async def recaptcha(self, luna, *, text: str):
         await luna.message.delete()
         request = requests.get(
@@ -9594,7 +9732,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         embed = discord.Embed(
             title=theme.title(),
             url=theme.title_url()
-            )
+        )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(url=link)
@@ -9618,7 +9756,7 @@ class TrollCog(commands.Cog, name="Troll commands"):
         usage="<@member>",
         aliases=['gp'],
         description="Ghostping someone"
-        )
+    )
     async def ghostping(self, luna):
         await luna.message.delete()
 
@@ -9626,7 +9764,7 @@ class TrollCog(commands.Cog, name="Troll commands"):
         name="empty",
         usage="",
         description="Sends a empty message"
-        )
+    )
     async def empty(self, luna):
         await luna.message.delete()
         await luna.send("​")
@@ -9636,7 +9774,7 @@ class TrollCog(commands.Cog, name="Troll commands"):
         usage="<@member>",
         aliases=['copycat'],
         description="Copy every message a member"
-        )
+    )
     async def copy(self, luna, member: discord.User):
         await luna.message.delete()
         global copycat
@@ -9656,11 +9794,11 @@ class TrollCog(commands.Cog, name="Troll commands"):
             embed.set_footer(
                 text=theme.footer(),
                 icon_url=theme.footer_icon_url()
-                )
+            )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
                 ), icon_url=theme.author_icon_url()
-                )
+            )
 
             sent = await send(luna, embed)
             await asyncio.sleep(configs.delete_timer())
@@ -9671,7 +9809,7 @@ class TrollCog(commands.Cog, name="Troll commands"):
         usage="",
         aliases=['stopcopycat'],
         description="Stop copying a member"
-        )
+    )
     async def stopcopy(self, luna):
         await luna.message.delete()
         global copycat
@@ -9693,11 +9831,11 @@ class TrollCog(commands.Cog, name="Troll commands"):
                 embed.set_footer(
                     text=theme.footer(),
                     icon_url=theme.footer_icon_url()
-                    )
+                )
                 embed.set_author(
                     name=theme.author(), url=theme.author_url(
                     ), icon_url=theme.author_icon_url()
-                    )
+                )
 
                 sent = await send(luna, embed)
                 await asyncio.sleep(configs.delete_timer())
@@ -9722,11 +9860,11 @@ class TrollCog(commands.Cog, name="Troll commands"):
             embed.set_footer(
                 text=theme.footer(),
                 icon_url=theme.footer_icon_url()
-                )
+            )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
                 ), icon_url=theme.author_icon_url()
-                )
+            )
 
             sent = await send(luna, embed)
             copycat = None
@@ -9737,7 +9875,7 @@ class TrollCog(commands.Cog, name="Troll commands"):
         name="fakenitro",
         usage="[amount]",
         description="Generate fake nitro links"
-        )
+    )
     async def fakenitro(self, luna, amount: int = None):
         await luna.message.delete()
         try:
@@ -9753,7 +9891,7 @@ class TrollCog(commands.Cog, name="Troll commands"):
         name="trollnitro",
         usage="",
         description="Send a used nitro link"
-        )
+    )
     async def trollnitro(self, luna):
         await luna.message.delete()
         await luna.send("https://discord.gift/6PWNmA6NTuRkejaP")
@@ -9762,7 +9900,7 @@ class TrollCog(commands.Cog, name="Troll commands"):
         name="mreact",
         usage="",
         description="Mass reacts on last message"
-        )
+    )
     async def mreact(self, luna):
         await luna.message.delete()
         messages = await luna.message.channel.history(limit=1).flatten()
@@ -9788,7 +9926,7 @@ class TrollCog(commands.Cog, name="Troll commands"):
         name="fakenuke",
         usage="",
         description="Fakenuke"
-        )
+    )
     async def fakenuke(self, luna):
         await luna.message.delete()
         message = await luna.send(content=':bomb: :bomb: Nuking this server in 5 :rotating_light:')
@@ -9829,7 +9967,7 @@ class TrollCog(commands.Cog, name="Troll commands"):
         name="banroulette",
         usage="",
         description="Ban roulette"
-        )
+    )
     async def banroulette(self, luna):
         """
         Get a random user from the server and ban them
@@ -9856,7 +9994,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         name="impersonate",
         usage="<@member> <message>",
         description="Make them send your message"
-        )
+    )
     async def impersonate(self, luna, user: discord.User, *, message: str):
         await luna.message.delete()
         webhook = await luna.channel.create_webhook(name=user.name)
@@ -9867,32 +10005,32 @@ class FunCog(commands.Cog, name="Fun commands"):
         name="shoot",
         usage="<@member>",
         description="Shoot up someone"
-        )
+    )
     async def shoot(self, luna, user: discord.Member):
         await luna.message.delete()
         await message_builder(
             luna, description=f"{user.mention},  got shot up!",
             large_image="https://media1.tenor.com/images/cfb7817a23645120d4baba2dcb9205e0/tenor.gif", footer="None"
-            )
+        )
 
     @commands.command(
         name="feed",
         usage="<@member>",
         description="Feed someone"
-        )
+    )
     async def feed(self, luna, user: discord.Member):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/feed").json()
         await message_builder(
             luna, description=f"{luna.author.mention} feeds {user.mention}",
             large_image=str(r['url']), footer="None"
-            )
+        )
 
     @commands.command(
         name="bite",
         usage="<@member>",
         description="Bite someone"
-        )
+    )
     async def bite(self, luna, user: discord.Member):
         await luna.message.delete()
         gif_list = [
@@ -9903,39 +10041,39 @@ class FunCog(commands.Cog, name="Fun commands"):
         await message_builder(
             luna, description=f"{user.mention} got bitten by {luna.author.mention}!",
             large_image=random.choice(gif_list), footer="None"
-            )
+        )
 
     @commands.command(
         name="kiss",
         usage="<@member>",
         description="Kiss someone"
-        )
+    )
     async def kiss(self, luna, user: discord.Member):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/kiss").json()
         await message_builder(
             luna, description=f"{user.mention} got kissed by {luna.author.mention}!",
             large_image=str(r['url']), footer="None"
-            )
+        )
 
     @commands.command(
         name="hug",
         usage="<@member>",
         description="Hug someone"
-        )
+    )
     async def hug(self, luna, user: discord.Member):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/hug").json()
         await message_builder(
             luna, description=f"{user.mention} got hugged by {luna.author.mention}!",
             large_image=str(r['url']), footer="None"
-            )
+        )
 
     @commands.command(
         name="pat",
         usage="<@member>",
         description="Pat someone"
-        )
+    )
     async def pat(self, luna, user: discord.Member):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/pat").json()
@@ -9945,33 +10083,33 @@ class FunCog(commands.Cog, name="Fun commands"):
         name="slap",
         usage="<@member>",
         description="Slap someone"
-        )
+    )
     async def slap(self, luna, user: discord.Member):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/slap").json()
         await message_builder(
             luna, description=f"{luna.author.mention} slapped {user.mention}",
             large_image=str(r['url']), footer="None"
-            )
+        )
 
     @commands.command(
         name="tickle",
         usage="<@member>",
         description="Tickle someone"
-        )
+    )
     async def tickle(self, luna, user: discord.Member):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/tickle").json()
         await message_builder(
             luna, description=f"{luna.author.mention} tickles {user.mention}",
             large_image=str(r['url']), footer="None"
-            )
+        )
 
     @commands.command(
         name="fml",
         usage="",
         description="Fuck my life"
-        )
+    )
     async def fml(self, luna):
         await luna.message.delete()
         request = requests.get(
@@ -9985,7 +10123,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         name="gay",
         usage="[@member]",
         description="Gay rate somebody"
-        )
+    )
     async def gay(self, luna, user: discord.Member = None):
         await luna.message.delete()
         if user is None:
@@ -9997,7 +10135,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         name="iq",
         usage="[@member]",
         description="Somebody's IQ"
-        )
+    )
     async def iq(self, luna, user: discord.Member = None):
         await luna.message.delete()
         if user is None:
@@ -10013,7 +10151,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         name="love",
         usage="<@member> [@member]",
         description="Love rate"
-        )
+    )
     async def love(self, luna, user1: discord.Member, user2: discord.Member = None):
         await luna.message.delete()
         if user2 is None:
@@ -10034,7 +10172,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         name="coronatest",
         usage="<@member>",
         description="Test somebody for Corona"
-        )
+    )
     async def coronatest(self, luna, user: discord.Member = None):
         await luna.message.delete()
         if user is None:
@@ -10056,7 +10194,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         name="8ball",
         usage="<question>",
         description="Ask 8 Ball!"
-        )
+    )
     async def _8ball(self, luna, *, question: str):
         await luna.message.delete()
         responses = [
@@ -10085,7 +10223,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         usage="",
         aliases=['slots'],
         description="Play slots"
-        )
+    )
     async def slot(self, luna):
         await luna.message.delete()
         emojis = "🍎🍊🍐🍋🍉🍇🍓🍒"
@@ -10093,7 +10231,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         b = random.choice(emojis)
         c = random.choice(emojis)
         slotmachine = f"**------------------\n| {a} | {b} | {c} |\n------------------\n\n{luna.author.name}**,"
-        if (a == b == c):
+        if a == b == c:
             embed = discord.Embed(
                 title="Slot Machine",
                 description=f"{slotmachine} All matchings, you won!",
@@ -10102,11 +10240,11 @@ class FunCog(commands.Cog, name="Fun commands"):
             embed.set_footer(
                 text=theme.footer(),
                 icon_url=theme.footer_icon_url()
-                )
+            )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
                 ), icon_url=theme.author_icon_url()
-                )
+            )
             await send(luna, embed)
         elif (a == b) or (a == c) or (b == c):
             embed = discord.Embed(
@@ -10117,11 +10255,11 @@ class FunCog(commands.Cog, name="Fun commands"):
             embed.set_footer(
                 text=theme.footer(),
                 icon_url=theme.footer_icon_url()
-                )
+            )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
                 ), icon_url=theme.author_icon_url()
-                )
+            )
             await send(luna, embed)
         else:
             embed = discord.Embed(
@@ -10132,18 +10270,18 @@ class FunCog(commands.Cog, name="Fun commands"):
             embed.set_footer(
                 text=theme.footer(),
                 icon_url=theme.footer_icon_url()
-                )
+            )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
                 ), icon_url=theme.author_icon_url()
-                )
+            )
             await send(luna, embed)
 
     @commands.command(
         name="dadjoke",
         usage="",
         description="Dad jokes"
-        )
+    )
     async def dadjoke(self, luna):
         await luna.message.delete()
         request = requests.get(
@@ -10167,7 +10305,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         name="joke",
         usage="",
         description="Random jokes"
-        )
+    )
     async def dadjoke(self, luna):
         await luna.message.delete()
         request = requests.get(
@@ -10189,7 +10327,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         name="coinflip",
         usage="",
         description="Flip a coin"
-        )
+    )
     async def coinflip(self, luna):
         await luna.message.delete()
         lista = ['head', 'tails']
@@ -10209,7 +10347,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         name="prntsc",
         usage="",
         description="Send a random prnt.sc"
-        )
+    )
     async def prntsc(self, luna):
         await luna.message.delete()
         await luna.send(Randprntsc())
@@ -10218,7 +10356,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         name="farmer",
         usage="",
         description="Dank Memer farmer"
-        )
+    )
     async def farmer(self, luna):
         await luna.message.delete()
         global farming
@@ -10233,7 +10371,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         name="afarmer",
         usage="",
         description="Advanced Dank Memer farmer"
-        )
+    )
     async def afarmer(self, luna):
         await luna.message.delete()
         global farming
@@ -10254,7 +10392,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         name="cfarmer",
         usage="",
         description="Advanced Dank Memer farmer"
-        )
+    )
     async def cfarmer(self, luna):
         await luna.message.delete()
         global farming
@@ -10279,7 +10417,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         name="stopfarmer",
         usage="",
         description="Stops the Dank Memer farmer"
-        )
+    )
     async def stopfarmer(self, luna):
         await luna.message.delete()
         global farming
@@ -10299,7 +10437,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         aliases=['newnote'],
         usage="<name> <text>",
         description="Create a note"
-        )
+    )
     async def note(self, luna, name: str, *, text: str):
         await luna.message.delete()
 
@@ -10315,8 +10453,8 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                 os.path.join(
                     files.documents(),
                     f"Luna/notes/{name}.txt"
-                    ), "w"
-                )
+                ), "w"
+            )
             file.write(str(text))
             file.close()
             prints.message(f"Created note » {color.purple(name)}")
@@ -10330,11 +10468,11 @@ class ToolsCog(commands.Cog, name="Tools commands"):
             embed.set_footer(
                 text=theme.footer(),
                 icon_url=theme.footer_icon_url()
-                )
+            )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
                 ), icon_url=theme.author_icon_url()
-                )
+            )
 
             await send(luna, embed)
 
@@ -10342,7 +10480,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         name="editnote",
         usage="<name> <name>",
         description="Edit the note name"
-        )
+    )
     async def editnote(self, luna, name: str, themename: str):
         await luna.message.delete()
 
@@ -10377,11 +10515,11 @@ class ToolsCog(commands.Cog, name="Tools commands"):
             embed.set_footer(
                 text=theme.footer(),
                 icon_url=theme.footer_icon_url()
-                )
+            )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
                 ), icon_url=theme.author_icon_url()
-                )
+            )
 
             await send(luna, embed)
 
@@ -10389,7 +10527,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         name="delnote",
         usage="<name>",
         description="Delete a note"
-        )
+    )
     async def delnote(self, luna, name: str):
         await luna.message.delete()
 
@@ -10398,8 +10536,8 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                 os.path.join(
                     files.documents(),
                     f"Luna/notes/{name}.txt"
-                    )
                 )
+            )
             prints.message(f"Deleted note » {color.purple(name)}")
 
             embed = discord.Embed(
@@ -10412,11 +10550,11 @@ class ToolsCog(commands.Cog, name="Tools commands"):
             embed.set_footer(
                 text=theme.footer(),
                 icon_url=theme.footer_icon_url()
-                )
+            )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
                 ), icon_url=theme.author_icon_url()
-                )
+            )
 
             await send(luna, embed)
         else:
@@ -10429,7 +10567,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         name="sendnote",
         usage="<name>",
         description="Send the note"
-        )
+    )
     async def sendnote(self, luna, name: str):
         await luna.message.delete()
 
@@ -10449,7 +10587,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         name="shownote",
         usage="<name>",
         description="Send the content of the note"
-        )
+    )
     async def shownote(self, luna, name: str):
         await luna.message.delete()
 
@@ -10465,8 +10603,8 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                 os.path.join(
                     files.documents(),
                     f"Luna/notes/{name}.txt"
-                    ), "r"
-                )
+                ), "r"
+            )
             file_data = file.read()
             if file_data == "":
                 if configs.error_log() == "console":
@@ -10483,11 +10621,11 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                 embed.set_footer(
                     text=theme.footer(),
                     icon_url=theme.footer_icon_url()
-                    )
+                )
                 embed.set_author(
                     name=theme.author(), url=theme.author_url(
                     ), icon_url=theme.author_icon_url()
-                    )
+                )
 
                 await send(luna, embed)
 
@@ -10495,7 +10633,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         name="notes",
         usage="",
         description="Show all notes"
-        )
+    )
     async def notes(self, luna):
         await luna.message.delete()
 
@@ -10505,7 +10643,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         ) if pos_txt.endswith('.txt')]
         prefix = files.json("Luna/config.json", "prefix", documents=True)
 
-        if text_files == []:
+        if not text_files:
             stringedit = "None"
         else:
             string = f"{text_files}"
@@ -10528,7 +10666,13 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 
         embed = discord.Embed(
             title="Notes",
-            description=f"{theme.description()}```\nNote control\n\n{prefix}note <name> <text> » Create a note\n{prefix}editnote <name> <name> » Edit note name\n{prefix}delnote <name>   » Delete a note\n{prefix}sendnote <name>  » Send the note\n``````\nAvailable notes\n\n{stringedit}```"
+            description=f"{theme.description()}```\n"
+                        f"Note control\n\n"
+                        f"{prefix}note <name> <text> » Create a note\n"
+                        f"{prefix}editnote <name> <name> » Edit note name\n"
+                        f"{prefix}delnote <name>   » Delete a note\n"
+                        f"{prefix}sendnote <name>  » Send the note\n```"
+                        f"```\nAvailable notes\n\n{stringedit}```"
         )
 
         embed.set_footer(text=theme.footer())
@@ -10539,7 +10683,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         name="tokeninfo",
         usage="<token>",
         description="Check the token for information"
-        )
+    )
     async def tokeninfo(self, luna, token: str):
         await luna.message.delete()
         headers = {"Authorization": token, "Content-Type": "application/json"}
@@ -10591,7 +10735,6 @@ class ToolsCog(commands.Cog, name="Tools commands"):
             creation_date = datetime.fromtimestamp(
                 ((int(user_id) >> 22) + 1420070400000) / 1000
             ).strftime("%d-%m-%Y %H:%M:%S")
-            has_nitro = False
             res = requests.get(
                 "https://discordapp.com/api/v6/users/@me/billing/subscriptions",
                 headers=headers,
@@ -10640,9 +10783,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                         ),
                         "CC Exp. Date": (
                                             "0" + cc_month if len(cc_month) < 2 else cc_month
-                                        )
-                                        + "/"
-                                        + cc_year[2:4],
+                                        ) + "/" + cc_year[2:4],
                         "Address 1": address_1,
                         "Address 2": address_2 if address_2 else "",
                         "City": city,
@@ -10705,7 +10846,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         name="poll",
         usage="<question>",
         description="Create a poll"
-        )
+    )
     async def poll(self, luna, *, question):
         await luna.message.delete()
         message = await luna.send(f"> **Poll**\n> \n> {question}\n> \n> {theme.footer()}")
@@ -10716,7 +10857,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         name="cpoll",
         usage="<option1> <option2> <question>",
         description="Poll"
-        )
+    )
     async def cpoll(self, luna, option1, option2, *, poll):
         await luna.message.delete()
         message = await luna.send(f"> **Poll**\n> \n> {poll}\n> \n> 🅰️ = {option1}\n> 🅱️ = {option2}\n> \n> {theme.footer()}")
@@ -10727,7 +10868,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         name="color",
         usage="<hexcode>",
         description="Color information"
-        )
+    )
     async def color(self, luna, hexcode: str):
         await luna.message.delete()
         if hexcode == "random":
@@ -10742,13 +10883,13 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         await message_builder(
             luna, title=str(r["name"]),
             description=f"```\nHEX               » {r['hex']}\n``````\nRGB               » {r['rgb']}\n``````\nINT               » {r['int']}\n``````\nBrightness        » {r['brightness']}\n```"
-            )
+        )
 
     @commands.command(
         name="hiddenping",
         usage="<channel_id> <user_id> <message>",
         description="Ping someone without showing @member"
-        )
+    )
     async def hiddenping(self, luna, channel_id: int, user_id, *, message):
         await luna.message.delete()
 
@@ -10764,19 +10905,23 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         cuser = await self.bot.fetch_user(user_id)
         cchannel = await self.bot.fetch_channel(channel_id)
 
-        channel = self.bot.get_channel(channel_id)
-        charTT = "||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||"
-        await message.channel.send(f"<{message}>" + charTT + user)
+        char_tt = "||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||"
+        await message.channel.send(f"<{message}>" + char_tt + user)
         await message_builder(
             luna, title=f"Hidden Ping",
-            description=f"```\nPing sent!\n\nChannel ID        » {channel_id}\nChannel Name      » {cchannel.name}\nUser Name         » {cuser.name}#{cuser.discriminator}\nUser ID           » {user_id}\nMessage           » {message}```"
-            )
+            description=f"```\nPing sent!\n\n"
+                        f"Channel ID        » {channel_id}\n"
+                        f"Channel Name      » {cchannel.name}\n"
+                        f"User Name         » {cuser.name}#{cuser.discriminator}\n"
+                        f"User ID           » {user_id}\n"
+                        f"Message           » {message}```"
+        )
 
     @commands.command(
         name="hiddeneveryone",
         usage="<channel_id> <message>",
         description="Ping everyone without showing @everyone"
-        )
+    )
     async def hiddeneveryone(self, luna, channel_id: int, *, message):
         await luna.message.delete()
 
@@ -10784,55 +10929,52 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 
         cchannel = await self.bot.fetch_channel(channel_id)
 
-        channel = self.bot.get_channel(channel_id)
-        charTT = "||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||"
-        await message.channel.send(f"<{message}>" + charTT + user)
+        char_tt = "||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||"
+        await message.channel.send(f"<{message}>" + char_tt + user)
         await message_builder(
             luna, title=f"Hidden Everyone",
             description=f"```\nPing sent!\n\nChannel ID        » {channel_id}\nChannel Name      » {cchannel.name}\nMessage           » {message}```"
-            )
+        )
 
     @commands.command(
         name="hiddeninvite",
         usage="<channel_id> <invite> <message>",
         description="hide the invite"
-        )
+    )
     async def hiddeninvite(self, luna, channel_id: int, invite, *, message):
         await luna.message.delete()
 
         cchannel = await self.bot.fetch_channel(channel_id)
 
-        channel = self.bot.get_channel(channel_id)
-        charTT = "||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||"
-        await message.channel.send(f"<{message}>" + charTT + invite)
+        char_tt = "||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||"
+        await message.channel.send(f"<{message}>" + char_tt + invite)
         await message_builder(
             luna, title=f"Hidden Ping",
             description=f"```\nPing sent!\n\nChannel ID        » {channel_id}\nChannel Name      » {cchannel.name}\nInvite            » {invite}\nMessage           » {message}```"
-            )
+        )
 
     @commands.command(
         name="hiddenurl",
         usage="<channel_id> <url> <message>",
         description="Hide the url"
-        )
+    )
     async def hiddenurl(self, luna, channel_id: int, url, *, message):
         await luna.message.delete()
 
         cchannel = await self.bot.fetch_channel(channel_id)
-
-        channel = self.bot.get_channel(channel_id)
-        charTT = "||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||"
-        await message.channel.send(f"<{message}>" + charTT + url)
+        
+        char_tt = "||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||"
+        await message.channel.send(f"<{message}>" + char_tt + url)
         await message_builder(
             luna, title=f"Hidden Ping",
             description=f"```\nPing sent!\n\nChannel ID        » {channel_id}\nChannel Name      » {cchannel.name}\nURL               » {url}\nMessage           » {message}```"
-            )
+        )
 
     @commands.command(
         name="channels",
         usage="[guild_id]",
         description="Show all the channels"
-        )
+    )
     async def channels(self, luna, server_id: int = None):
         await luna.message.delete()
         if server_id is None:
@@ -10846,13 +10988,13 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         await message_builder(
             luna, title=f"Channels in {server}",
             description='\n'.join([f"{ch.name}" for ch in channel_list]) or 'None'
-            )
+        )
 
     @commands.command(
         name="firstmsg",
         usage="[#channel]",
         description="First message"
-        )
+    )
     async def firstmsg(self, luna, channel: discord.TextChannel = None):
         await luna.message.delete()
         if channel is None:
@@ -10864,7 +11006,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         name="compareservers",
         usage="<serverid1> <serverid2>",
         description="Checks if members are in the same server"
-        )
+    )
     async def compareservers(self, luna, server_id: int, server_id_2: int):
         await luna.message.delete()
         server_1 = self.bot.get_guild(server_id)
@@ -10878,13 +11020,13 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         await message_builder(
             luna, title=f"```\nMembers in the same Server » {count}```",
             description=f"```\n{server_1} - {server_2}\n``````\n{output}```"
-            )
+        )
 
     @commands.command(
         name="bots",
         usage="",
         description="Show all bots in the guild"
-        )
+    )
     async def bots(self, luna):
         await luna.message.delete()
         bots = []
@@ -10894,7 +11036,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                     str(member.name).replace("`", "\\`").replace(
                         "*", "\\*"
                     ).replace("_", "\\_") + "#" + member.discriminator
-                    )
+                )
         botslist = f"{', '.join(bots)}".replace(',', "\n")
         await message_builder(luna, title=f"Bots ({len(bots)})", description=f"{botslist}")
 
@@ -10902,7 +11044,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         name="tts",
         usage="<language> <text>",
         description="Text to speech"
-        )
+    )
     async def tts(self, luna, lang, *, text: str):
         await luna.message.delete()
         tts = gTTS(text, lang=lang)
@@ -10916,15 +11058,15 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         name="qrcode",
         usage="<text>",
         description="Create a QR code"
-        )
+    )
     async def qrcode(self, luna, *, text: str):
         await luna.message.delete()
         deletetimer = int(
             files.json(
                 "Luna/config.json",
                 "delete_timer", documents=True
-                )
             )
+        )
 
         qr = qrcode.QRCode(
             version=1,
@@ -10945,7 +11087,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         name="open",
         usage="<application>",
         description="Open an application"
-        )
+    )
     async def open(self, luna, *, application: str):
         await luna.message.delete()
         os.startfile(application)
@@ -10955,7 +11097,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         name="calc",
         usage="",
         description="Opens calculator"
-        )
+    )
     async def calc(self, luna):
         await luna.message.delete()
         from subprocess import call
@@ -10966,7 +11108,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         name="notepad",
         usage="",
         description="Opens notepad"
-        )
+    )
     async def notepad(self, luna):
         await luna.message.delete()
         from subprocess import call
@@ -10976,7 +11118,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         name="passgen",
         usage="[length]",
         description="Generate a password"
-        )
+    )
     async def passgen(self, luna, length: int = 16):
         await luna.message.delete()
         code = ''.join(
@@ -10998,7 +11140,7 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
         name="latency",
         usage="",
         description="Display Luna's latency"
-        )
+    )
     async def latency(self, luna):
         await luna.message.delete()
         await message_builder(luna, description=f"```\nPinging...```", delete_after=3)
@@ -11024,14 +11166,21 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
         average1 = values1[2][len("Average = "):]
         await message_builder(
             luna, title=f"Latency",
-            description=f"```\nDiscord API\n\nMinimum » {minimum}\nMaximum » {maximum}\nAverage » {average}``````\nLuna API\n\nMinimum » {minimum1}\nMaximum » {maximum1}\nAverage » {average1}```"
-            )
+            description=f"```\nDiscord API\n\n"
+                        f"Minimum » {minimum}\n"
+                        f"Maximum » {maximum}\n"
+                        f"Average » {average}```"
+                        f"```\nLuna API\n\n"
+                        f"Minimum » {minimum1}\n"
+                        f"Maximum » {maximum1}\n"
+                        f"Average » {average1}```"
+        )
 
     @commands.command(
         name="ping",
         usage="<url/ip>",
         description="Ping an IP or URL"
-        )
+    )
     async def ping(self, luna, *, url: str):
         await luna.message.delete()
         await message_builder(luna, description=f"```\nPinging...```", delete_after=3)
@@ -11054,13 +11203,13 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
         await message_builder(
             luna, title=f"{url}",
             description=f"```\nMinimum » {minimum}\nMaximum » {maximum}\nAverage » {average}```"
-            )
+        )
 
     @commands.command(
         name="ip",
         usage="",
         description="Display IP information"
-        )
+    )
     async def ip(self, luna, ip: str):
         await luna.message.delete()
         if ip is None:
@@ -11077,15 +11226,21 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
                         j = resp.json()
                         await message_builder(
                             luna, title=f"IP » {ip}",
-                            description=f'```\nCity\n{j["city"]}\n``````\nRegion\n{j["region"]}\n``````\nCountry\n{j["country"]}\n``````\nCoordinates\n{j["loc"]}\n``````\nPostal\n{j["postal"]}\n``````\nTimezone\n{j["timezone"]}\n``````\nOrganization\n{j["org"]}```'
-                            )
+                            description=f'```\nCity\n{j["city"]}\n```'
+                                        f'```\nRegion\n{j["region"]}\n```'
+                                        f'```\nCountry\n{j["country"]}\n```'
+                                        f'```\nCoordinates\n{j["loc"]}\n```'
+                                        f'```\nPostal\n{j["postal"]}\n```'
+                                        f'```\nTimezone\n{j["timezone"]}\n```'
+                                        f'```\nOrganization\n{j["org"]}```'
+                        )
             except Exception as e:
                 await luna.send(f"Error: {e}")
 
     @commands.command(
         name="tcpping", usage="<ip> <port>",
         description="Checks if host is online"
-        )
+    )
     async def tcpping(self, luna, ip, port):
         await luna.message.delete()
         if ip is None:
@@ -11102,17 +11257,17 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
             await message_builder(
                 luna, title="TCP-Ping",
                 description=f"```Status » Offline\n``````\nIP » {ip}\n``````\nPort » {port}\n```"
-                )
+            )
         else:
             await message_builder(
                 luna, title="TCP-Ping",
                 description=f"```Status » Online\n``````\nIP » {ip}\n``````\nPort » {port}\n```"
-                )
+            )
 
     @commands.command(
         name="portscan", usage="<ip>",
         description="Checks for common open ports"
-        )
+    )
     async def portscan(self, luna, ip):
         await luna.message.delete()
         if ip is None:
@@ -11172,12 +11327,12 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
         await message_builder(
             luna, title="Port Scanner",
             description=f'```\nIP » {ip}\n``````\nPorts Checked » {",".join(ports)}\n``````\nOpen Ports » {",".join(open_ports)}\n```'
-            )
+        )
 
     @commands.command(
         name="resolve", usage="<url>",
         description="Get the url host IP"
-        )
+    )
     async def resolve(self, luna, url):
         await luna.message.delete()
         new_url = ""
@@ -11199,22 +11354,26 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
     @commands.command(
         name="webhookinfo", usage="<id>",
         description="Webhook information"
-        )
-    async def webhookinfo(self, luna, id):
+    )
+    async def webhookinfo(self, luna, _id):
         await luna.message.delete()
         try:
-            webhook = await self.bot.fetch_webhook(id)
+            webhook = await self.bot.fetch_webhook(_id)
             await message_builder(
                 luna, title=f"Webhook » {webhook.name}",
-                description=f"```\nID » {webhook.id}\n``````\nName » {webhook.name}\n``````\nChannel » {webhook.channel.name}\n``````\nGuild » {webhook.guild.name}\n``````\nToken » {webhook.token}\n```"
-                )
+                description=f"```\nID » {webhook.id}\n```"
+                            f"```\nName » {webhook.name}\n```"
+                            f"```\nChannel » {webhook.channel.name}\n```"
+                            f"```\nGuild » {webhook.guild.name}\n```"
+                            f"```\nToken » {webhook.token}\n```"
+            )
         except BaseException:
             await error_builder(luna, "```\nInvalid webhook ID```")
 
     @commands.command(
         name="maclookup", usage="<mac>",
         description="MAC address Information"
-        )
+    )
     async def maclookup(self, luna, mac: str):
         await luna.message.delete()
         if mac is None:
@@ -11236,7 +11395,7 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
     @commands.command(
         name="reverseip", usage="<ip>",
         description="Reverse DNS"
-        )
+    )
     async def reverseip(self, luna, ip):
         await luna.message.delete()
         if ip is None:
@@ -11291,7 +11450,7 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
     @commands.command(
         name="zonetransfer", usage="<domain>",
         description="Zone Transfer"
-        )
+    )
     async def zonetransfer(self, luna, domain):
         await luna.message.delete()
         if domain is None:
@@ -11312,7 +11471,7 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
     @commands.command(
         name="httpheaders", usage="<url>",
         description="HTTP Headers"
-        )
+    )
     async def httpheaders(self, luna, url):
         await luna.message.delete()
         if url is None:
@@ -11333,7 +11492,7 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
     @commands.command(
         name="subnetcalc", usage="<ip>",
         description="Subnet Calculator"
-        )
+    )
     async def subnetcalc(self, luna, ip):
         await luna.message.delete()
         if ip is None:
@@ -11354,7 +11513,7 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
     @commands.command(
         name="crawl", usage="<url>",
         description="Crawl a website"
-        )
+    )
     async def crawl(self, luna, url):
         await luna.message.delete()
         if url is None:
@@ -11378,15 +11537,15 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
         aliases=['proxyscrape',
                  'scrapeproxy'],
         description="Scrape for proxies"
-        )
+    )
     async def scrapeproxies(self, luna):
         await luna.message.delete()
         file = open(
             os.path.join(
                 files.documents(),
                 "Luna/raiding/proxies/http.txt"
-                ), "a+"
-            )
+            ), "a+"
+        )
         res = requests.get(
             'https://api.proxyscrape.com/?request=displayproxies&proxytype=http&timeout=1500'
         )
@@ -11396,13 +11555,13 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
             if proxy:
                 proxies.append(proxy)
         for p in proxies:
-            file.write((p) + "\n")
+            file.write(p + "\n")
         file = open(
             os.path.join(
                 files.documents(),
                 "Luna/raiding/proxies/https.txt"
-                ), "a+"
-            )
+            ), "a+"
+        )
         res = requests.get(
             'https://api.proxyscrape.com/?request=displayproxies&proxytype=https&timeout=1500'
         )
@@ -11412,13 +11571,13 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
             if proxy:
                 proxies.append(proxy)
         for p in proxies:
-            file.write((p) + "\n")
+            file.write(p + "\n")
         file = open(
             os.path.join(
                 files.documents(),
                 "Luna/raiding/proxies/socks4.txt"
-                ), "a+"
-            )
+            ), "a+"
+        )
         res = requests.get(
             'https://api.proxyscrape.com/?request=displayproxies&proxytype=socks4&timeout=1500'
         )
@@ -11428,13 +11587,13 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
             if proxy:
                 proxies.append(proxy)
         for p in proxies:
-            file.write((p) + "\n")
+            file.write(p + "\n")
         file = open(
             os.path.join(
                 files.documents(),
                 "Luna/raiding/proxies/socks5.txt"
-                ), "a+"
-            )
+            ), "a+"
+        )
         res = requests.get(
             'https://api.proxyscrape.com/?request=displayproxies&proxytype=socks5&timeout=1500'
         )
@@ -11444,11 +11603,11 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
             if proxy:
                 proxies.append(proxy)
         for p in proxies:
-            file.write((p) + "\n")
+            file.write(p + "\n")
         await message_builder(
             luna, title="Proxy Scraper",
             description=f"```\nSaved all scraped proxies in Luna/raiding/proxies```"
-            )  #
+        )  #
 
     @commands.command(name="ip", usage="", description="Show your ip")
     async def ip(self, luna):
@@ -11460,7 +11619,7 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
 bot.add_cog(NettoolCog(bot))
 
 
-def get_size(bytes, suffix="B"):
+def get_size(_bytes, suffix="B"):
     """
     Scale bytes to its proper format
     e.g:
@@ -11469,9 +11628,9 @@ def get_size(bytes, suffix="B"):
     """
     factor = 1024
     for unit in ["", "K", "M", "G", "T", "P"]:
-        if bytes < factor:
-            return f"{bytes:.2f}{unit}{suffix}"
-        bytes /= factor
+        if _bytes < factor:
+            return f"{_bytes:.2f}{unit}{suffix}"
+        _bytes /= factor
 
 
 class UtilsCog(commands.Cog, name="Util commands"):
@@ -11483,7 +11642,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         usage="",
         aliases=['pc', 'specs'],
         description="Show your pc specs"
-        )
+    )
     async def pcspecs(self, luna):
         await luna.message.delete()
         uname = platform.uname()
@@ -11506,12 +11665,45 @@ class UtilsCog(commands.Cog, name="Util commands"):
                 partition_usage = psutil.disk_usage(partition.mountpoint)
             except PermissionError:
                 continue
-            partition_info += f"{'Device':17} » {partition.device}\n{'Mountpoint':17} » {partition.mountpoint}\n{'System Type':17} » {partition.fstype}\n{'Total Size':17} » {get_size(partition_usage.total)}\n{'Used':17} » {get_size(partition_usage.used)}\n{'Free':17} » {get_size(partition_usage.free)}\n{'Percentage':17} » {get_size(partition_usage.percent)}%\n{'Total Read':17} » {get_size(disk_io.read_bytes)}\n{'Total Write':17} » {get_size(disk_io.write_bytes)}\n\n"
+            partition_info += f"{'Device':17} » {partition.device}\n" \
+                              f"{'Mountpoint':17} » {partition.mountpoint}\n" \
+                              f"{'System Type':17} » {partition.fstype}\n" \
+                              f"{'Total Size':17} » {get_size(partition_usage.total)}\n" \
+                              f"{'Used':17} » {get_size(partition_usage.used)}\n" \
+                              f"{'Free':17} » {get_size(partition_usage.free)}\n" \
+                              f"{'Percentage':17} » {get_size(partition_usage.percent)}%\n" \
+                              f"{'Total Read':17} » {get_size(disk_io.read_bytes)}\n" \
+                              f"{'Total Write':17} » {get_size(disk_io.write_bytes)}\n\n"
         net_io = psutil.net_io_counters()
         await message_builder(
             luna, title="PC Specs",
-            description=f"```\nGeneral\n\n{'System':17} » {uname.system}\n{'Node':17} » {uname.node}\n{'Release':17} » {uname.release}\n{'Version':17} » {uname.version}\n{'Machine':17} » {uname.machine}\n{'Processor':17} » {uname.processor}\n``````\nCPU Information\n\n{'Physical Cores':17} » {psutil.cpu_count(logical=False)}\n{'Total Cores':17} » {psutil.cpu_count(logical=True)}\n{'Max Frequency':17} » {cpufreq.max:.2f}Mhz\n{'Min Frequency':17} » {cpufreq.min:.2f}Mhz\n{'Current Frequency':17} » {cpufreq.current:.2f}Mhz\n\nCurrent Usage{cores}\n``````\nMemory Information\n\n{'Total':17} » {get_size(svmem.total)}\n{'Available':17} » {get_size(svmem.available)}\n{'Used':17} » {get_size(svmem.used)}\n{'Percentage':17} » {get_size(svmem.percent)}%\n``````\nDisk Information\n\n{partition_info}\n``````\nNetwork\n\n{'Bytes Sent':17} » {get_size(net_io.bytes_sent)}\n{'Bytes Received':17} » {get_size(net_io.bytes_recv)}\n``````\nBoot Time\n\n{bt.year}/{bt.month}/{bt.day} {bt.hour}:{bt.minute}:{bt.second}\n```"
-            )
+            description=f"```\nGeneral\n\n"
+                        f"{'System':17} » {uname.system}\n"
+                        f"{'Node':17} » {uname.node}\n"
+                        f"{'Release':17} » {uname.release}\n"
+                        f"{'Version':17} » {uname.version}\n"
+                        f"{'Machine':17} » {uname.machine}\n"
+                        f"{'Processor':17} » {uname.processor}\n```"
+                        f"```\nCPU Information\n\n"
+                        f"{'Physical Cores':17} » {psutil.cpu_count(logical=False)}\n"
+                        f"{'Total Cores':17} » {psutil.cpu_count(logical=True)}\n"
+                        f"{'Max Frequency':17} » {cpufreq.max:.2f}Mhz\n"
+                        f"{'Min Frequency':17} » {cpufreq.min:.2f}Mhz\n"
+                        f"{'Current Frequency':17} » {cpufreq.current:.2f}Mhz\n\n"
+                        f"Current Usage{cores}\n```"
+                        f"```\nMemory Information\n\n"
+                        f"{'Total':17} » {get_size(svmem.total)}\n"
+                        f"{'Available':17} » {get_size(svmem.available)}\n"
+                        f"{'Used':17} » {get_size(svmem.used)}\n"
+                        f"{'Percentage':17} » {get_size(svmem.percent)}%\n```"
+                        f"```\nDisk Information\n\n"
+                        f"{partition_info}\n```"
+                        f"```\nNetwork\n\n"
+                        f"{'Bytes Sent':17} » {get_size(net_io.bytes_sent)}\n"
+                        f"{'Bytes Received':17} » {get_size(net_io.bytes_recv)}\n```"
+                        f"```\nBoot Time\n\n"
+                        f"{bt.year}/{bt.month}/{bt.day} {bt.hour}:{bt.minute}:{bt.second}\n```"
+        )
 
     @commands.command(
         name="serverjoiner",
@@ -11519,7 +11711,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                  'joinserver', 'joininvites'],
         usage="",
         description="Join all invites in data/invites.txt"
-        )
+    )
     async def serverjoiner(self, luna):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -11544,7 +11736,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                 await message_builder(
                     luna, title="Server Joiner",
                     description=f"```\nFound {line_count} invites in invites.txt\nJoining provided invites...```"
-                    )
+                )
                 with open(os.path.join(files.documents(), "Luna/invites.txt"), "r+") as f:
                     for line in f:
                         invite = line.strip("\n")
@@ -11563,7 +11755,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                                 await client.post(
                                     f'https://discord.com/api/{api_version}/invites/{invite}',
                                     headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'}
-                                    )
+                                )
                                 prints.event(f"Joined {invite}")
                                 await asyncio.sleep(0.5)
                         except Exception as e:
@@ -11576,15 +11768,15 @@ class UtilsCog(commands.Cog, name="Util commands"):
     @commands.command(
         name="proxyserverjoiner", usage="",
         description="Join all invites in data/invites.txt using proxies"
-        )
+    )
     async def proxyserverjoiner(self, luna):
         await luna.message.delete()
         proxies = open(
             os.path.join(
                 files.documents(),
                 "Luna/raiding/proxies.txt"
-                ), 'r'
-            )
+            ), 'r'
+        )
         proxylist = []
         for p, _proxy in enumerate(proxies):
             proxy = _proxy.split('\n')[0]
@@ -11611,7 +11803,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                 await message_builder(
                     luna, title="Server Joiner",
                     description=f"```\nFound {line_count} invites in invites.txt\nJoining provided invites...```"
-                    )
+                )
                 with open(os.path.join(files.documents(), "Luna/invites.txt"), "r+") as f:
                     for line in f:
                         invite = line.strip("\n")
@@ -11633,7 +11825,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                                         'authorization': user_token, 'user-agent': 'Mozilla/5.0'
                                     },
                                     proxies={'http://': f'http://{proxylist[p]}'}
-                                    )
+                                )
                                 prints.event(f"Joined {invite}")
                                 await asyncio.sleep(0.5)
                         except Exception as e:
@@ -11647,7 +11839,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         name="countdown",
         usage="<number>",
         description="Create a countdown"
-        )
+    )
     async def countdown(self, luna, number: int):
         await luna.message.delete()
         for count in range(number, 0, -1):
@@ -11658,7 +11850,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         name="countup",
         usage="<number>",
         description="Create a countup"
-        )
+    )
     async def countup(self, luna, number: int):
         await luna.message.delete()
         for count in range(0, number):
@@ -11669,7 +11861,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         name="emojis",
         usage="",
         description="List all emojis"
-        )
+    )
     async def emojis(self, luna):
         await luna.message.delete()
         server = luna.message.guild
@@ -11681,7 +11873,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         name="addemoji",
         usage="<emoji_name> <image_url>",
         description="Add an emoji"
-        )
+    )
     @has_permissions(manage_emojis=True)
     async def addemoji(self, luna, emoji_name, image_url=None):
         await luna.message.delete()
@@ -11706,7 +11898,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         name="editemoji",
         usage="<emoji> <new_name>",
         description="Edit an emoji"
-        )
+    )
     @has_permissions(manage_emojis=True)
     async def editemoji(self, luna, emoji: discord.Emoji, new_name):
         await luna.message.delete()
@@ -11726,7 +11918,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         name="delemoji",
         usage="<emoji>",
         description="Delete an emoji"
-        )
+    )
     @has_permissions(manage_emojis=True)
     async def delemoji(self, luna, emoji: discord.Emoji):
         await luna.message.delete()
@@ -11748,7 +11940,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         aliases=['stealemojis'],
         usage="<guild_id>",
         description="Steal all emojis from a guild"
-        )
+    )
     @has_permissions(manage_emojis=True)
     async def stealemoji(self, luna, guild_id):
         await luna.message.delete()
@@ -11756,7 +11948,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
             os.makedirs('data/emojis')
         guild_id = int(guild_id)
         try:
-            guildhit = self.bot.get_guild(guild_id)
+            _ = self.bot.get_guild(guild_id)
         except Exception as e:
             if configs.error_log() == "console":
                 prints.error(f"{e}")
@@ -11771,11 +11963,11 @@ class UtilsCog(commands.Cog, name="Util commands"):
                 embed.set_footer(
                     text=theme.footer(),
                     icon_url=theme.footer_icon_url()
-                    )
+                )
                 embed.set_author(
                     name=theme.author(), url=theme.author_url(
                     ), icon_url=theme.author_icon_url()
-                    )
+                )
 
                 await send(luna, embed)
             return
@@ -11784,7 +11976,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         name='playing',
         usage="<text>",
         description="Change your activity to playing."
-        )
+    )
     async def playing(self, luna, *, status: str = None):
         await luna.message.delete()
         if status is None:
@@ -11803,11 +11995,11 @@ class UtilsCog(commands.Cog, name="Util commands"):
                 embed.set_footer(
                     text=theme.footer(),
                     icon_url=theme.footer_icon_url()
-                    )
+                )
                 embed.set_author(
                     name=theme.author(), url=theme.author_url(
                     ), icon_url=theme.author_icon_url()
-                    )
+                )
 
                 await send(luna, embed)
             except Exception as e:
@@ -11817,7 +12009,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         name='streaming',
         usage="<text>",
         description="Change your activity to streaming."
-        )
+    )
     async def streaming(self, luna, *, status: str = None):
         await luna.message.delete()
         if status is None:
@@ -11838,11 +12030,11 @@ class UtilsCog(commands.Cog, name="Util commands"):
                 embed.set_footer(
                     text=theme.footer(),
                     icon_url=theme.footer_icon_url()
-                    )
+                )
                 embed.set_author(
                     name=theme.author(), url=theme.author_url(
                     ), icon_url=theme.author_icon_url()
-                    )
+                )
 
                 await send(luna, embed)
             except Exception as e:
@@ -11852,7 +12044,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         name='listening',
         usage="<text>",
         description="Change your activity to listening."
-        )
+    )
     async def listening(self, luna, *, status: str = None):
         await luna.message.delete()
         if status is None:
@@ -11871,11 +12063,11 @@ class UtilsCog(commands.Cog, name="Util commands"):
                 embed.set_footer(
                     text=theme.footer(),
                     icon_url=theme.footer_icon_url()
-                    )
+                )
                 embed.set_author(
                     name=theme.author(), url=theme.author_url(
                     ), icon_url=theme.author_icon_url()
-                    )
+                )
 
                 await send(luna, embed)
             except Exception as e:
@@ -11885,7 +12077,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         name='watching',
         usage="<text>",
         description="Change your activity to watching."
-        )
+    )
     async def watching(self, luna, *, status: str = None):
         await luna.message.delete()
         if status is None:
@@ -11904,11 +12096,11 @@ class UtilsCog(commands.Cog, name="Util commands"):
                 embed.set_footer(
                     text=theme.footer(),
                     icon_url=theme.footer_icon_url()
-                    )
+                )
                 embed.set_author(
                     name=theme.author(), url=theme.author_url(
                     ), icon_url=theme.author_icon_url()
-                    )
+                )
 
                 await send(luna, embed)
             except Exception as e:
@@ -11920,7 +12112,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         aliases=["stopstreaming", "stopstatus",
                  "stoplistening", "stopplaying", "stopwatching"],
         description="Stop your activity."
-        )
+    )
     async def stopactivity(self, luna):
         await luna.message.delete()
         await self.bot.change_presence(activity=None, status=discord.Status.dnd)
@@ -11938,7 +12130,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         name="clean",
         usage="<amount>",
         description="Clean your messages"
-        )
+    )
     async def clean(self, luna, amount: int = None):
         await luna.message.delete()
         try:
@@ -11953,11 +12145,11 @@ class UtilsCog(commands.Cog, name="Util commands"):
                 embed.set_footer(
                     text=theme.footer(),
                     icon_url=theme.footer_icon_url()
-                    )
+                )
                 embed.set_author(
                     name=theme.author(), url=theme.author_url(
                     ), icon_url=theme.author_icon_url()
-                    )
+                )
 
                 await send(luna, embed)
             else:
@@ -11979,7 +12171,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         aliases=['treact'],
         usage="<amount>",
         description="Text as reaction"
-        )
+    )
     async def textreact(self, luna, messageNo: typing.Optional[int] = 1, *, text):
         await luna.message.delete()
         text = (c for c in text.lower())
@@ -12021,7 +12213,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         name="afk",
         usage="<on/off>",
         description="AFK mode on/off"
-        )
+    )
     async def afk(self, luna, mode: str = None):
         await luna.message.delete()
 
@@ -12041,7 +12233,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         name="invisiblenick",
         usage="",
         description="Make your nickname invisible"
-        )
+    )
     async def invisiblenick(self, luna):
         await luna.message.delete()
 
@@ -12055,7 +12247,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         name="hypesquad",
         usage="<bravery/brilliance/balance>",
         description="Change Hypesquad house"
-        )
+    )
     async def hypesquad(self, luna, house: str):
         await luna.message.delete()
         request = requests.session()
@@ -12075,7 +12267,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
             request.post(
                 'https://discordapp.com/api/{api_version}/hypesquad/online',
                 headers=headers, json=payload
-                )
+            )
             prints.message(f"Successfully set your hypesquad house to {house}")
             embed = discord.Embed(
                 title="Hypesquad",
@@ -12087,11 +12279,11 @@ class UtilsCog(commands.Cog, name="Util commands"):
             embed.set_footer(
                 text=theme.footer(),
                 icon_url=theme.footer_icon_url()
-                )
+            )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
                 ), icon_url=theme.author_icon_url()
-                )
+            )
 
             await send(luna, embed)
         except BaseException:
@@ -12101,7 +12293,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         name="acceptfriends",
         usage="",
         description="Accept friend requests"
-        )
+    )
     async def acceptfriends(self, luna):
         await luna.message.delete()
         for relationship in self.bot.user.relationships:
@@ -12116,7 +12308,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         name="ignorefriends",
         usage="",
         description="Delete friend requests"
-        )
+    )
     async def ignorefriends(self, luna):
         await luna.message.delete()
         for relationship in self.bot.user.relationships:
@@ -12128,7 +12320,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         name="delfriends",
         usage="",
         description="Delete all friends"
-        )
+    )
     async def delfriends(self, luna):
         await luna.message.delete()
         for relationship in self.bot.user.relationships:
@@ -12143,7 +12335,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         name="clearblocked",
         usage="",
         description="Delete blocked friends"
-        )
+    )
     async def clearblocked(self, luna):
         await luna.message.delete()
         for relationship in self.bot.user.relationships:
@@ -12158,7 +12350,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         name="leaveservers",
         usage="",
         description="Leave all servers"
-        )
+    )
     async def leaveservers(self, luna):
         await luna.message.delete()
         try:
@@ -12194,7 +12386,7 @@ class SpamCog(commands.Cog, name="Spam commands"):
         name="spam",
         usage="<delay> <amount> <message>",
         description="Spammer"
-        )
+    )
     async def spam(self, luna, delay: int, amount: int, *, message: str):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -12211,7 +12403,7 @@ class SpamCog(commands.Cog, name="Spam commands"):
         name="spamdm",
         usage="<delay> <amount> <@user> <message>",
         description="DMs"
-        )
+    )
     async def spamdm(self, luna, delay: int, amount: int, user: discord.User, *, message: str):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -12228,13 +12420,13 @@ class SpamCog(commands.Cog, name="Spam commands"):
         name="spamch",
         usage="<delay> <amount> <message>",
         description="Channels"
-        )
+    )
     async def spamch(self, luna, delay: int, amount: int, *, message: str):
         await luna.message.delete()
         if configs.risk_mode() == "on":
             try:
                 for each in range(0, amount):
-                    for channel in luna.guild.text_channels:
+                    for _ in luna.guild.text_channels:
                         try:
                             await asyncio.sleep(delay)
                             await message.channel.send(f"{message}")
@@ -12250,7 +12442,7 @@ class SpamCog(commands.Cog, name="Spam commands"):
         usage="<delay> <amount> <@member>",
         aliases=['spg', 'spamghostping', 'sghostping'],
         description="Ghostpings"
-        )
+    )
     async def spamgp(self, luna, delay: int = None, amount: int = None, user: discord.Member = None):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -12271,7 +12463,7 @@ class SpamCog(commands.Cog, name="Spam commands"):
         usage="<message_id> <amount>",
         aliases=['spamreport'],
         description="Reports"
-        )
+    )
     async def spamrep(self, luna, message_id: str, amount: int):
         await luna.message.delete()
 
@@ -12297,7 +12489,7 @@ class SpamCog(commands.Cog, name="Spam commands"):
                 await message_builder(
                     luna, title="Report",
                     description=f"Message {message_id} has been reported {amount} times"
-                    )
+                )
             except Exception as e:
                 await error_builder(luna, description=e)
         else:
@@ -12307,7 +12499,7 @@ class SpamCog(commands.Cog, name="Spam commands"):
         name="spamhentai",
         usage="<delay> <amount>",
         description="Hentai"
-        )
+    )
     async def spamhentai(self, luna, delay: int, amount: int):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -12327,7 +12519,7 @@ class SpamCog(commands.Cog, name="Spam commands"):
         name="spamwebhook",
         usage="<delay> <amount> <url> <message>",
         description="Webhooks"
-        )
+    )
     async def spamwebhook(self, luna, delay: int, amount: int, url: str, message: str):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -12340,7 +12532,7 @@ class SpamCog(commands.Cog, name="Spam commands"):
                     await message_builder(
                         luna,
                         description=f"```\nSending webhooks...\n``````\nAmount » {amount}\nDelay » {delay}\nMessage » {message}\n``````\nURL » {url}```"
-                        )
+                    )
                     hook = dhooks.Webhook(
                         url=url, display_avatar=webhook.image_url()
                     )
@@ -12369,7 +12561,7 @@ class SpamCog(commands.Cog, name="Spam commands"):
         name="spamtts",
         usage="<delay> <amount> <message>",
         description="TTS"
-        )
+    )
     async def spamtts(self, luna, delay: int, amount: int, *, message: str):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -12394,7 +12586,7 @@ class AllCog(commands.Cog, name="All commands"):
         name="banall",
         usage="[reason]",
         description="Ban all"
-        )
+    )
     async def banall(self, luna, *, reason: str = None):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -12411,7 +12603,7 @@ class AllCog(commands.Cog, name="All commands"):
         name="banbots",
         usage="[reason]",
         description="Ban all bots"
-        )
+    )
     async def banbots(self, luna, *, reason: str = None):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -12430,7 +12622,7 @@ class AllCog(commands.Cog, name="All commands"):
         name="unbanall",
         usage="[reason]",
         description="Unban all"
-        )
+    )
     async def unbanall(self, luna, *, reason: str = None):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -12446,7 +12638,7 @@ class AllCog(commands.Cog, name="All commands"):
         name="kickall",
         usage="[reason]",
         description="Kick all"
-        )
+    )
     async def kickall(self, luna, *, reason: str = None):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -12463,7 +12655,7 @@ class AllCog(commands.Cog, name="All commands"):
         name="kickbots",
         usage="[reason]",
         description="Kick all bots"
-        )
+    )
     async def kickbots(self, luna, *, reason: str = None):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -12482,7 +12674,7 @@ class AllCog(commands.Cog, name="All commands"):
         name="dmall",
         usage="<message>",
         description="DM every member"
-        )
+    )
     async def dmall(self, luna, *, message: str):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -12508,7 +12700,7 @@ class AllCog(commands.Cog, name="All commands"):
         name="dmallfriends",
         usage="<message>",
         description="DM all friends"
-        )
+    )
     async def dmallfriends(self, luna, *, message: str):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -12532,13 +12724,13 @@ class AllCog(commands.Cog, name="All commands"):
         name="sendall",
         usage="<message>",
         description="Message in all channels"
-        )
+    )
     async def sendall(self, luna, *, message):
         await luna.message.delete()
         if configs.risk_mode() == "on":
             try:
                 channels = luna.guild.text_channels
-                for channel in channels:
+                for _ in channels:
                     await message.channel.send(message)
             except BaseException:
                 pass
@@ -12549,7 +12741,7 @@ class AllCog(commands.Cog, name="All commands"):
         name="blockall",
         usage="",
         description="Block everyone"
-        )
+    )
     async def blockall(self, luna):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -12579,7 +12771,7 @@ class MassCog(commands.Cog, name="Mass commands"):
         name="massping",
         usage="<delay> <amount>",
         description="Mass ping members"
-        )
+    )
     async def massping(self, luna, delay: int, amount: int):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -12591,11 +12783,11 @@ class MassCog(commands.Cog, name="Mass commands"):
                     else:
                         mentionamount = 30
                     sendamount = len(members) - mentionamount + 1
-                    for i in range(sendamount):
+                    for _ in range(sendamount):
                         if mentionamount == 0:
                             break
                         pingtext = ""
-                        for i in range(mentionamount):
+                        for _ in range(mentionamount):
                             pingtext += members.pop()
                         await luna.send(pingtext)
                         await asyncio.sleep(delay)
@@ -12603,7 +12795,6 @@ class MassCog(commands.Cog, name="Mass commands"):
                             mentionamount = len(members)
                         else:
                             mentionamount = 30
-                        sendamount = len(members) - mentionamount + 1
             except Exception as e:
                 prints.error(f"{e}")
         else:
@@ -12613,7 +12804,7 @@ class MassCog(commands.Cog, name="Mass commands"):
         name="massgp",
         usage="<delay> <amount>",
         description="Mass ghostping"
-        )
+    )
     async def massgp(self, luna, delay: int, amount: int):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -12625,11 +12816,11 @@ class MassCog(commands.Cog, name="Mass commands"):
                     else:
                         mentionamount = 30
                     sendamount = len(members) - mentionamount + 1
-                    for i in range(sendamount):
+                    for _ in range(sendamount):
                         if mentionamount == 0:
                             break
                         pingtext = ""
-                        for i in range(mentionamount):
+                        for _ in range(mentionamount):
                             pingtext += members.pop()
                         msg = await luna.send(pingtext)
                         await msg.delete()
@@ -12638,7 +12829,6 @@ class MassCog(commands.Cog, name="Mass commands"):
                             mentionamount = len(members)
                         else:
                             mentionamount = 40
-                        sendamount = len(members) - mentionamount + 1
             except Exception as e:
                 await error_builder(luna, description=e)
         else:
@@ -12648,16 +12838,16 @@ class MassCog(commands.Cog, name="Mass commands"):
         name="massnick",
         usage="<name>",
         description="Mass change nicknames"
-        )
+    )
     async def massnick(self, luna, name: str):
         import discum
         if configs.risk_mode() == "on":
             bot = discum.Client(
                 token=user_token, log=False,
                 user_agent="Mozilla/5.0"
-                )
+            )
 
-            def done_fetching(resp, guild_id):
+            def done_fetching(_, guild_id):
                 if bot.gateway.finishedMemberFetching(guild_id):
                     members = bot.gateway.session.guild(guild_id).members
                     bot.gateway.removeCommand(
@@ -12695,7 +12885,7 @@ class MassCog(commands.Cog, name="Mass commands"):
         name="masschannels",
         usage="<amount>",
         description="Mass create channels"
-        )
+    )
     async def masschannels(self, luna, amount: int):
         if configs.risk_mode() == "on":
             try:
@@ -12712,7 +12902,7 @@ class MassCog(commands.Cog, name="Mass commands"):
         name="massroles",
         usage="<amount>",
         description="Mass create roles"
-        )
+    )
     async def massroles(self, luna, amount: int):
         if configs.risk_mode() == "on":
             try:
@@ -12729,7 +12919,7 @@ class MassCog(commands.Cog, name="Mass commands"):
         name="prune",
         usage="<@role> [reason]",
         description="Prune a role"
-        )
+    )
     async def prune(self, luna, role, *, reason: str = None):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -12760,7 +12950,7 @@ class MassCog(commands.Cog, name="Mass commands"):
         name="pruneban",
         usage="<@role> [reason]",
         description="Prune & ban a role"
-        )
+    )
     async def pruneban(self, luna, role, *, reason: str = None):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -12799,7 +12989,7 @@ class GuildCog(commands.Cog, name="Guild commands"):
         name="renamechannels",
         usage="<name>",
         description="Rename all channels"
-        )
+    )
     async def renamechannels(self, luna, name: str):
         if configs.risk_mode() == "on":
             try:
@@ -12816,7 +13006,7 @@ class GuildCog(commands.Cog, name="Guild commands"):
         name="delchannels",
         usage="",
         description="Delete all channels"
-        )
+    )
     async def delchannels(self, luna):
         if configs.risk_mode() == "on":
             try:
@@ -12831,7 +13021,7 @@ class GuildCog(commands.Cog, name="Guild commands"):
         name="delroles",
         usage="",
         description="Delete all roles"
-        )
+    )
     async def delroles(self, luna):
         if configs.risk_mode() == "on":
             try:
@@ -12846,7 +13036,7 @@ class GuildCog(commands.Cog, name="Guild commands"):
         name="delemojis",
         usage="",
         description="Delete all emojis"
-        )
+    )
     async def delemojis(self, luna):
         if configs.risk_mode() == "on":
             try:
@@ -12869,13 +13059,13 @@ class ExploitCog(commands.Cog, name="Exploit commands"):
         usage="<channel_id> [amount]",
         aliases=["dosvc1"],
         description="VC Denial of Service"
-        )
+    )
     async def dosvc(self, luna, channel: discord.VoiceChannel, amount: int = 10):
         await luna.message.delete()
         await message_builder(
             luna, title="VC Denial of Service", description=f"```\nSending Attack...```",
             delete_after=3
-            )
+        )
 
         region = [
             'europe',
@@ -12915,13 +13105,13 @@ class ExploitCog(commands.Cog, name="Exploit commands"):
         name="dosvc2",
         usage="[amount]",
         description="VC Denial of Service"
-        )
+    )
     async def dosvc2(self, luna, amount: int = 10):
         await luna.message.delete()
         await message_builder(
             luna, title="VC Denial of Service", description=f"```\nSending Attack...```",
             delete_after=3
-            )
+        )
 
         region = [
             'europe',
@@ -13007,7 +13197,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
         name="purgehack",
         usage="",
         description="Purge a channel"
-        )
+    )
     async def purgehack(self, luna):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -13039,7 +13229,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
         name="mpreact",
         usage="<emoji>",
         description="Reacts the last 20 messages"
-        )
+    )
     async def mpreact(self, luna, emoji):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -13053,7 +13243,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
         name="junknick",
         usage="",
         description="Pure junk nickname"
-        )
+    )
     async def junknick(self, luna):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -13077,7 +13267,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
         name="tokencheck",
         usage="",
         description="Check the tokens.txt"
-        )
+    )
     async def tokencheck(self, luna):
         await luna.message.delete()
 
@@ -13085,8 +13275,8 @@ class RaidCog(commands.Cog, name="Raid commands"):
             os.path.join(
                 files.documents(),
                 "Luna/raiding/tokens.txt"
-                ), "r"
-            )
+            ), "r"
+        )
         nonempty_lines = [line.strip("\n") for line in file if line != "\n"]
         line_count = len(nonempty_lines)
         file.close()
@@ -13107,11 +13297,11 @@ class RaidCog(commands.Cog, name="Raid commands"):
             embed.set_footer(
                 text=theme.footer(),
                 icon_url=theme.footer_icon_url()
-                )
+            )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
                 ), icon_url=theme.author_icon_url()
-                )
+            )
 
             await send(luna, embed)
             return
@@ -13131,11 +13321,11 @@ class RaidCog(commands.Cog, name="Raid commands"):
             embed.set_footer(
                 text=theme.footer(),
                 icon_url=theme.footer_icon_url()
-                )
+            )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
                 ), icon_url=theme.author_icon_url()
-                )
+            )
 
             sent = await send(luna, embed)
 
@@ -13186,11 +13376,11 @@ class RaidCog(commands.Cog, name="Raid commands"):
             embed.set_footer(
                 text=theme.footer(),
                 icon_url=theme.footer_icon_url()
-                )
+            )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
                 ), icon_url=theme.author_icon_url()
-                )
+            )
 
             await sent.edit(embed=embed)
             await asyncio.sleep(configs.delete_timer())
@@ -13200,7 +13390,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
         name="raidjoin",
         usage="<invitelink>",
         description="Raid the server"
-        )
+    )
     async def raidjoin(self, luna, invitelink: str):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -13208,8 +13398,8 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 os.path.join(
                     files.documents(),
                     "Luna/raiding/tokens.txt"
-                    ), 'r'
-                )
+                ), 'r'
+            )
             for _token in tokens:
                 _token = _token.split('\n')
                 _token = _token[0]
@@ -13218,7 +13408,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                         await client.post(
                             f'https://discord.com/api/{api_version}/invites/{invitelink}',
                             headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'}
-                            )
+                        )
                         prints.event(f"{_token} joined {invitelink}")
                 except Exception:
                     prints.error(f"{_token} failed to join {invitelink}")
@@ -13230,7 +13420,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
         name="proxyjoin",
         usage="<invitelink>",
         description="Raid the server"
-        )
+    )
     async def proxyjoin(self, luna, invitelink: str):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -13239,14 +13429,14 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 os.path.join(
                     files.documents(),
                     "Luna/raiding/tokens.txt"
-                    ), 'r'
-                )
+                ), 'r'
+            )
             proxies = open(
                 os.path.join(
                     files.documents(),
                     "Luna/raiding/proxies.txt"
-                    ), 'r'
-                )
+                ), 'r'
+            )
 
             proxylist = []
 
@@ -13266,7 +13456,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                                 'user-agent': 'Mozilla/5.0'
                             },
                             proxies={'http://': f'http://{proxylist[p]}'}
-                            )
+                        )
                         prints.event(f"[PROXY] {_token} joined {invitelink}")
                 except Exception:
                     prints.error(
@@ -13280,7 +13470,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
         name="raidspam",
         usage="<channel_id> <amount> <message>",
         description="Spam"
-        )
+    )
     async def raidspam(self, luna, channel_id: str, amount: int, *, message: str):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -13289,8 +13479,8 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 os.path.join(
                     files.documents(),
                     "Luna/raiding/tokens.txt"
-                    ), 'r'
-                )
+                ), 'r'
+            )
             for _token in tokens:
                 _token = _token.split('\n')
                 _token = _token[0]
@@ -13303,7 +13493,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                                     'content': f'{message}', 'tts': 'false'
                                 },
                                 headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'}
-                                )
+                            )
                             prints.event(f"{_token} sent {message}")
                 except Exception:
                     prints.error(f"{_token} failed to send {message}")
@@ -13315,23 +13505,16 @@ class RaidCog(commands.Cog, name="Raid commands"):
         name="proxyspam",
         usage="<channel_id> <amount> <message>",
         description="Spam"
-        )
+    )
     async def proxyspam(self, luna, channel_id: str, amount: int, *, message: str):
         await luna.message.delete()
         if configs.risk_mode() == "on":
-
-            tokens = open(
-                os.path.join(
-                    files.documents(),
-                    "Luna/raiding/tokens.txt"
-                    ), 'r'
-                )
             proxies = open(
                 os.path.join(
                     files.documents(),
                     "Luna/raiding/proxies.txt"
-                    ), 'r'
-                )
+                ), 'r'
+            )
 
             proxylist = []
 
@@ -13343,8 +13526,8 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 os.path.join(
                     files.documents(),
                     "Luna/raiding/tokens.txt"
-                    ), 'r'
-                )
+                ), 'r'
+            )
             for _token in tokens:
                 _token = _token.split('\n')
                 _token = _token[0]
@@ -13360,7 +13543,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                                     'authorization': _token, 'user-agent': 'Mozilla/5.0'
                                 },
                                 proxies={'http://': f'http://{proxylist[p]}'}
-                                )
+                            )
                             prints.event(f"{_token} sent {message}")
                 except Exception:
                     prints.error(f"{_token} failed to send {message}")
@@ -13372,7 +13555,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
         name="raidmassping",
         usage="<channel_id> <delay> <amount>",
         description="Massping"
-        )
+    )
     async def raidmassping(self, luna, channel_id: str, delay: int, amount: int):
         await luna.message.delete()
         tokenposition = 0
@@ -13385,11 +13568,11 @@ class RaidCog(commands.Cog, name="Raid commands"):
                     else:
                         mentionamount = 30
                     sendamount = len(members) - mentionamount
-                    for i in range(sendamount):
+                    for _ in range(sendamount):
                         if mentionamount == 0:
                             break
                         pingtext = ""
-                        for i in range(mentionamount):
+                        for _ in range(mentionamount):
                             pingtext += members.pop()
 
                         tokens = open(
@@ -13402,14 +13585,14 @@ class RaidCog(commands.Cog, name="Raid commands"):
                             _token = _token[tokenposition]
                         try:
                             async with httpx.AsyncClient() as client:
-                                for i in range(0, amount):
+                                for _ in range(0, amount):
                                     await client.post(
                                         f'https://discord.com/api/{api_version}/channels/{channel_id}/messages',
                                         json={
                                             'content': f'{pingtext}', 'tts': 'false'
                                         },
                                         headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'}
-                                        )
+                                    )
                                     prints.event(f"{_token} masspinged")
                         except Exception:
                             prints.error(f"{_token} failed to massping")
@@ -13420,7 +13603,6 @@ class RaidCog(commands.Cog, name="Raid commands"):
                             mentionamount = len(members)
                         else:
                             mentionamount = 10
-                        sendamount = len(members) - mentionamount
             except Exception as e:
                 prints.error(f"{e}")
         else:
@@ -13433,24 +13615,24 @@ class RaidCog(commands.Cog, name="Raid commands"):
         name="raidmassping",
         usage="<channel_id> <delay> <amount>",
         description="Massping"
-        )
+    )
     async def raidmassping(self, luna, channel_id: str, delay: int, amount: int):
         await luna.message.delete()
         tokenposition = 0
         if configs.risk_mode() == "on":
             try:
-                for i in range(amount):
+                for _ in range(amount):
                     members = [m.mention for m in luna.guild.members]
                     if len(members) < 30:
                         mentionamount = len(members)
                     else:
                         mentionamount = 30
                     sendamount = len(members) - mentionamount
-                    for i in range(sendamount):
+                    for _ in range(sendamount):
                         if mentionamount == 0:
                             break
                         pingtext = ""
-                        for i in range(mentionamount):
+                        for _ in range(mentionamount):
                             pingtext += members.pop()
 
                         tokens = open(
@@ -13463,14 +13645,14 @@ class RaidCog(commands.Cog, name="Raid commands"):
                             _token = _token[tokenposition]
                         try:
                             async with httpx.AsyncClient() as client:
-                                for i in range(0, amount):
+                                for _ in range(0, amount):
                                     await client.post(
                                         f'https://discord.com/api/{api_version}/channels/{channel_id}/messages',
                                         json={
                                             'content': f'{pingtext}', 'tts': 'false'
                                         },
                                         headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'}
-                                        )
+                                    )
                                     prints.event(f"{_token} masspinged")
                         except Exception:
                             prints.error(f"{_token} failed to massping")
@@ -13481,7 +13663,6 @@ class RaidCog(commands.Cog, name="Raid commands"):
                             mentionamount = len(members)
                         else:
                             mentionamount = 10
-                        sendamount = len(members) - mentionamount
             except Exception as e:
                 prints.error(f"{e}")
         else:
@@ -13494,7 +13675,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
         name="raidleave",
         usage="<server_id>",
         description="Leave the tokens"
-        )
+    )
     async def raidleave(self, luna, server_id: str):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -13503,8 +13684,8 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 os.path.join(
                     files.documents(),
                     "Luna/raiding/tokens.txt"
-                    ), 'r'
-                )
+                ), 'r'
+            )
             for _token in tokens:
                 _token = _token.split('\n')
                 _token = _token[0]
@@ -13513,7 +13694,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                         await client.delete(
                             f'https://discord.com/api/{api_version}/users/@me/guilds/{server_id}',
                             headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'}
-                            )
+                        )
                         prints.event(f"{_token} left {server_id}")
                 except Exception:
                     prints.error(f"{_token} failed to leave {server_id}")
@@ -13525,7 +13706,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
         name="proxyleave",
         usage="<server_id>",
         description="Leave the tokens"
-        )
+    )
     async def proxyleave(self, luna, server_id: str):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -13534,14 +13715,14 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 os.path.join(
                     files.documents(),
                     "Luna/raiding/tokens.txt"
-                    ), 'r'
-                )
+                ), 'r'
+            )
             proxies = open(
                 os.path.join(
                     files.documents(),
                     "Luna/raiding/proxies.txt"
-                    ), 'r'
-                )
+                ), 'r'
+            )
 
             proxylist = []
 
@@ -13561,7 +13742,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
                                 'user-agent': 'Mozilla/5.0'
                             },
                             proxies={'http://': f'http://{proxylist[p]}'}
-                            )
+                        )
                         prints.event(f"[PROXY] {_token} left {server_id}")
                 except Exception:
                     prints.error(
@@ -13575,7 +13756,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
         name="raidreact",
         usage="<channel_id> <message_id> <emoji>",
         description="Raid react on a message"
-        )
+    )
     async def raidreact(self, luna, channel_id: str, message_id: str, emoji: str):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -13583,8 +13764,8 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 os.path.join(
                     files.documents(),
                     "Luna/raiding/tokens.txt"
-                    ), 'r'
-                )
+                ), 'r'
+            )
             for _token in tokens:
                 _token = _token.split('\n')
                 _token = _token[0]
@@ -13605,7 +13786,7 @@ class RaidCog(commands.Cog, name="Raid commands"):
         name="proxyreact",
         usage="<channel_id> <message_id> <emoji>",
         description="Raid react on a message"
-        )
+    )
     async def proxyreact(self, luna, channel_id: str, message_id: str, emoji: str):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -13613,14 +13794,14 @@ class RaidCog(commands.Cog, name="Raid commands"):
                 os.path.join(
                     files.documents(),
                     "Luna/raiding/tokens.txt"
-                    ), 'r'
-                )
+                ), 'r'
+            )
             proxies = open(
                 os.path.join(
                     files.documents(),
                     "Luna/raiding/proxies.txt"
-                    ), 'r'
-                )
+                ), 'r'
+            )
 
             proxylist = []
 
@@ -13662,7 +13843,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
         name="nuketoken",
         usage="<token>",
         description="Nuke the token"
-        )
+    )
     async def nuketoken(self, luna, token: str):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -13718,7 +13899,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
         name="messtoken",
         usage="<token>",
         description="Mess up the token"
-        )
+    )
     async def messtoken(self, luna, token: str):
         await luna.message.delete()
         if configs.risk_mode() == "on":
@@ -13752,11 +13933,11 @@ class NukingCog(commands.Cog, name="Nuking commands"):
                         await client.patch(
                             'https://discordapp.com/api/{api_version}/users/@me/settings', json={'theme': "light"},
                             headers={'authorization': token, 'user-agent': 'Mozilla/5.0'}
-                            )
+                        )
                         await client.patch(
                             'https://discordapp.com/api/{api_version}/users/@me/settings', json={'theme': "dark"},
                             headers={'authorization': token, 'user-agent': 'Mozilla/5.0'}
-                            )
+                        )
             except Exception:
                 return
         else:
@@ -13766,7 +13947,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
         name="massban",
         usage="<guild_id>",
         description="Massban a guild"
-        )
+    )
     @has_permissions(ban_members=True)
     async def massban(self, luna, guild_id: int):
         await luna.message.delete()
@@ -13795,7 +13976,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
         name="masskick",
         usage="<guild_id>",
         description="Masskick a guild"
-        )
+    )
     @has_permissions(kick_members=True)
     async def masskick(self, luna, guild_id: int):
         await luna.message.delete()
@@ -13827,7 +14008,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
         aliases=['destroy', 'wipe', 'nukeserver'],
         usage="<guild_id> <channel_name> <role_name>",
         description="Totally annihilate a guild"
-        )
+    )
     @has_permissions(manage_roles=True, manage_channels=True, ban_members=True)
     async def annihilate(self, luna):
         await luna.message.delete()
@@ -13854,7 +14035,7 @@ class NukingCog(commands.Cog, name="Nuking commands"):
                 await emoji.delete() for emoji in luna.guild.emojis if luna.guild.emojis
             ]
             create_channels = [
-                await luna.guild.create_text_channel(name="Luna Happened") for x in range(1, 70)
+                await luna.guild.create_text_channel(name="Luna Happened") for _ in range(1, 70)
             ]
             try:
                 ban_members = [
@@ -13881,7 +14062,7 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
         aliases=['streamermode'],
         usage="<on/off>",
         description="Privacy mode"
-        )
+    )
     async def privacy(self, ctx, mode: str):
         await ctx.message.delete()
 
@@ -13896,7 +14077,7 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
                 try:
                     custom = cog.get_commands()
                     custom_command_count = 0
-                    for command in custom:
+                    for _ in custom:
                         custom_command_count += 1
                 except BaseException:
                     custom_command_count = 0
@@ -13906,7 +14087,7 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
                 prefix = files.json(
                     "Luna/config.json",
                     "prefix", documents=True
-                    )
+                )
                 console_mode = files.json(
                     "Luna/console/console.json", "mode", documents=True
                 )
@@ -13985,7 +14166,7 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
                 try:
                     custom = cog.get_commands()
                     custom_command_count = 0
-                    for command in custom:
+                    for _ in custom:
                         custom_command_count += 1
                 except BaseException:
                     custom_command_count = 0
@@ -13995,7 +14176,7 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
                 prefix = files.json(
                     "Luna/config.json",
                     "prefix", documents=True
-                    )
+                )
                 console_mode = files.json(
                     "Luna/console/console.json", "mode", documents=True
                 )
@@ -14063,7 +14244,10 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
                         f"                           {color.purple('[')}+{color.purple('] CONNECTED')}"
                     )
                     print(
-                        f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends"
+                        f"                           {color.purple('[')}+{color.purple(']')} "
+                        f"{bot.user} | "
+                        f"{color.purple(f'{len(bot.guilds)}')} Guilds | "
+                        f"{color.purple(f'{len(bot.user.friends)}')} Friends"
                     )
                     print(
                         f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n"
@@ -14092,7 +14276,7 @@ class ProtectionGuildCog(commands.Cog, name="Protection Guild commands"):
         aliases=['pguild', 'protectguild'],
         usage="<guild_id>",
         description="Protect a guild"
-        )
+    )
     async def pguilds(self, luna, guild_id: int):
         await luna.message.delete()
         try:
@@ -14103,7 +14287,7 @@ class ProtectionGuildCog(commands.Cog, name="Protection Guild commands"):
         config._global(
             "Luna/protections/config.json",
             "guilds", guild_id, add=True
-            )
+        )
         prints.message(
             f"Added » {color.purple(f'{guild_id}')} to the list of protected guilds"
         )
@@ -14114,7 +14298,7 @@ class ProtectionGuildCog(commands.Cog, name="Protection Guild commands"):
         aliases=['rguild', 'removeguild'],
         usage="<guild_id>",
         description="Remove a protected guild"
-        )
+    )
     async def rguilds(self, luna, guild_id: int):
         await luna.message.delete()
         try:
@@ -14125,7 +14309,7 @@ class ProtectionGuildCog(commands.Cog, name="Protection Guild commands"):
         config._global(
             "Luna/protections/config.json",
             "guilds", guild_id, delete=True
-            )
+        )
         prints.message(
             f"Removed » {color.purple(f'{guild_id}')} from the list of protected guilds"
         )
@@ -14143,7 +14327,7 @@ class ProtectionCog(commands.Cog, name="Protection commands"):
         name="pfooter",
         usage="<on/off>",
         description="Protections footer info"
-        )
+    )
     async def pfooter(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -14162,7 +14346,7 @@ class ProtectionCog(commands.Cog, name="Protection commands"):
         name="anti_raid",
         usage="<on/off>",
         description="Protects against raids"
-        )
+    )
     async def antiraid(self, luna, mode: str):
         await luna.message.delete()
         global anti_raid
@@ -14186,7 +14370,7 @@ class ProtectionCog(commands.Cog, name="Protection commands"):
         name="anti_invite",
         usage="<on/off>",
         description="Protects against invites"
-        )
+    )
     async def antiinvite(self, luna, mode: str):
         await luna.message.delete()
         global anti_invite
@@ -14210,7 +14394,7 @@ class ProtectionCog(commands.Cog, name="Protection commands"):
         name="anti_upper",
         usage="<on/off>",
         description="Protects against uppercase"
-        )
+    )
     async def antiupper(self, luna, mode: str):
         await luna.message.delete()
         global anti_upper
@@ -14234,7 +14418,7 @@ class ProtectionCog(commands.Cog, name="Protection commands"):
         name="anti_phishing",
         usage="<on/off>",
         description="Protects against phishing"
-        )
+    )
     async def antiphishing(self, luna, mode: str):
         await luna.message.delete()
         global anti_phishing
@@ -14258,7 +14442,7 @@ class ProtectionCog(commands.Cog, name="Protection commands"):
         name="sbcheck",
         usage="",
         description="Check for bad selfbots"
-        )
+    )
     async def sbcheck(self, luna):
         await luna.message.delete()
         await message_builder(luna, title="GIVEAWAY")
@@ -14276,24 +14460,24 @@ class BackupsCog(commands.Cog, name="Backup commands"):
         name="backupserver",
         usage="",
         description="Backup the server"
-        )
+    )
     async def backupserver(self, luna):
         await luna.message.delete()
-        serverName = luna.guild.name
+        server_name = luna.guild.name
 
-        newGuild = await self.bot.create_guild(serverName)
+        new_guild = await self.bot.create_guild(server_name)
         prints.message(f"Created new guild")
-        newGuildDefaultChannels = await newGuild.fetch_channels()
-        for channel in newGuildDefaultChannels:
+        new_guild_default_channels = await new_guild.fetch_channels()
+        for channel in new_guild_default_channels:
             await channel.delete()
 
         for channel in luna.guild.channels:
             if str(channel.type).lower() == "category":
                 try:
-                    await newGuild.create_category(
+                    await new_guild.create_category(
                         channel.name, overwrites=channel.overwrites,
                         position=channel.position
-                        )
+                    )
                     prints.message(f"Created new category » {channel.name}")
                 except BaseException:
                     pass
@@ -14301,15 +14485,15 @@ class BackupsCog(commands.Cog, name="Backup commands"):
         for channel in luna.guild.voice_channels:
             try:
                 cat = ""
-                for category in newGuild.categories:
+                for category in new_guild.categories:
                     if channel.category.name == category.name:
                         cat = category
 
-                await newGuild.create_voice_channel(
+                await new_guild.create_voice_channel(
                     channel.name, category=cat, overwrites=channel.overwrites,
                     topic=channel.topic, slowmode_delay=channel.slowmode_delay,
                     nsfw=channel.nsfw, position=channel.position
-                    )
+                )
                 prints.message(f"Created new voice channel » {channel.name}")
             except BaseException:
                 pass
@@ -14317,14 +14501,14 @@ class BackupsCog(commands.Cog, name="Backup commands"):
         for channel in luna.guild.stage_channels:
             try:
                 cat = ""
-                for category in newGuild.categories:
+                for category in new_guild.categories:
                     if channel.category.name == category.name:
                         cat = category
-                await newGuild.create_stage_channel(
+                await new_guild.create_stage_channel(
                     channel.name, category=cat, overwrites=channel.overwrites,
                     topic=channel.topic, slowmode_delay=channel.slowmode_delay,
                     nsfw=channel.nsfw, position=channel.position
-                    )
+                )
                 prints.message(f"Created new stage channel » {channel.name}")
             except BaseException:
                 pass
@@ -14332,14 +14516,14 @@ class BackupsCog(commands.Cog, name="Backup commands"):
         for channel in luna.guild.text_channels:
             try:
                 cat = ""
-                for category in newGuild.categories:
+                for category in new_guild.categories:
                     if channel.category.name == category.name:
                         cat = category
-                await newGuild.create_text_channel(
+                await new_guild.create_text_channel(
                     channel.name, category=cat, overwrites=channel.overwrites,
                     topic=channel.topic, slowmode_delay=channel.slowmode_delay,
                     nsfw=channel.nsfw, position=channel.position
-                    )
+                )
                 prints.message(f"Created new text channel » {channel.name}")
             except BaseException:
                 pass
@@ -14347,10 +14531,10 @@ class BackupsCog(commands.Cog, name="Backup commands"):
         for role in luna.guild.roles[::-1]:
             if role.name != "@everyone":
                 try:
-                    await newGuild.create_role(
+                    await new_guild.create_role(
                         name=role.name, color=role.color, permissions=role.permissions,
                         hoist=role.hoist, mentionable=role.mentionable
-                        )
+                    )
                     prints.message(f"Created new role » {role.name}")
                 except BaseException:
                     pass
@@ -14361,7 +14545,7 @@ class BackupsCog(commands.Cog, name="Backup commands"):
         name="friendsbackup",
         usage="",
         description="Backup your friendslist"
-        )
+    )
     async def friendsbackup(self, luna):
         await luna.message.delete()
         prints.event("Backing up friendslist...")
@@ -14376,8 +14560,8 @@ class BackupsCog(commands.Cog, name="Backup commands"):
             os.path.join(
                 files.documents(),
                 "Luna/backup/friends.txt"
-                ), "w", encoding='utf-8'
-            )
+            ), "w", encoding='utf-8'
+        )
         file.write(friendslist)
         file.close()
         for block in self.bot.user.blocked:
@@ -14387,8 +14571,8 @@ class BackupsCog(commands.Cog, name="Backup commands"):
             os.path.join(
                 files.documents(),
                 "Luna/backup/blocked.txt"
-                ), "w", encoding='utf-8'
-            )
+            ), "w", encoding='utf-8'
+        )
         file.write(blockedlist)
         file.close()
         prints.message(
@@ -14397,7 +14581,7 @@ class BackupsCog(commands.Cog, name="Backup commands"):
         await message_builder(
             luna,
             description=f"```\nBacked up {friendsamount} friends in Documents/Luna/backup/friends.txt\nBacked up {blockedamount} blocked users in Documents/Luna/backup/blocked.txt```"
-            )
+        )
 
 
 bot.add_cog(BackupsCog(bot))
@@ -14411,7 +14595,7 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
         name="whitelist",
         usage="<@member>",
         description="Whitelist someone"
-        )
+    )
     async def whitelist(self, luna, user: discord.Member = None):
         await luna.message.delete()
         if user is None:
@@ -14423,23 +14607,23 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
                 await message_builder(
                     luna,
                     description=f"```\n{user.name}#{user.discriminator} is already whitelisted```"
-                    )
+                )
             else:
                 whitelisted_users[luna.guild.id][user.id] = 0
                 await message_builder(
                     luna, description=f"```\nWhitelisted " + user.name.replace("*", "\\*").replace(
                         "`",
                         "\\`"
-                        ).replace(
+                    ).replace(
                         "_", "\\_"
                     ) + "#" + user.discriminator + "```"
-                    )
+                )
 
     @commands.command(
         name="unwhitelist",
         usage="",
         description="Unwhitelist someone"
-        )
+    )
     async def unwhitelist(self, luna, user: discord.Member = None):
         await luna.message.delete()
         if user is None:
@@ -14450,22 +14634,21 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
                 return
             if user.id in whitelisted_users[luna.guild.id]:
                 whitelisted_users[luna.guild.id].pop(user.id, 0)
-                user2 = self.bot.get_user(user.id)
                 await message_builder(
                     luna,
                     description=f"```\nUnwhitelisted " + user.name.replace("*", "\\*").replace(
                         "`",
                         "\\`"
-                        ).replace(
+                    ).replace(
                         "_", "\\_"
                     ) + "#" + user.discriminator + "```"
-                    )
+                )
 
     @commands.command(
         name="whitelisted",
         usage="",
         description="Show the whitelisted list"
-        )
+    )
     async def whitelisted(self, luna, g=None):
         await luna.message.delete()
         if g == '-g' or g == '-global':
@@ -14495,7 +14678,7 @@ class WhitelistCog(commands.Cog, name="Whitelist commands"):
         name="clearwhitelist",
         usage="",
         description="Clear the whitelisted list"
-        )
+    )
     async def clearwhitelist(self, luna):
         await luna.message.delete()
         whitelisted_users.clear()
@@ -14513,7 +14696,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         name="prefix",
         usage="<prefix>",
         description="Change the prefix"
-        )
+    )
     async def prefix(self, ctx, newprefix):
         await ctx.message.delete()
         config.prefix(newprefix)
@@ -14525,7 +14708,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
             try:
                 custom = cog.get_commands()
                 custom_command_count = 0
-                for command in custom:
+                for _ in custom:
                     custom_command_count += 1
             except BaseException:
                 custom_command_count = 0
@@ -14539,7 +14722,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 riskmode = files.json(
                     "Luna/config.json",
                     "risk_mode", documents=True
-                    )
+                )
                 themesvar = files.json(
                     "Luna/config.json", "theme", documents=True
                 )
@@ -14608,7 +14791,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
             try:
                 custom = cog.get_commands()
                 custom_command_count = 0
-                for command in custom:
+                for _ in custom:
                     custom_command_count += 1
             except BaseException:
                 custom_command_count = 0
@@ -14622,7 +14805,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 riskmode = files.json(
                     "Luna/config.json",
                     "risk_mode", documents=True
-                    )
+                )
                 themesvar = files.json(
                     "Luna/config.json", "theme", documents=True
                 )
@@ -14681,7 +14864,10 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                     f"                           {color.purple('[')}+{color.purple('] CONNECTED')}"
                 )
                 print(
-                    f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends"
+                    f"                           {color.purple('[')}+{color.purple(']')} "
+                    f"{bot.user} | "
+                    f"{color.purple(f'{len(bot.guilds)}')} Guilds | "
+                    f"{color.purple(f'{len(bot.user.friends)}')} Friends"
                 )
                 print(
                     f"                           {color.purple('[')}+{color.purple(']')} {newprefix}\n"
@@ -14697,7 +14883,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         name="themes",
         usage="",
         description="Themes"
-        )
+    )
     async def themes(self, luna):
         await luna.message.delete()
         path_to_json = os.path.join(files.documents(), 'Luna/themes/')
@@ -14736,15 +14922,22 @@ class SettingsCog(commands.Cog, name="Settings commands"):
             helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
         await message_builder(
             luna, title="Themes",
-            description=f"{theme.description()}```\nCurrent theme     » {themesvar}\n``````\nTheme customization\n\n{prefix}customize        » Theme customization\n``````\nTheme control\n\n{helptext}\n``````\nAvailable themes\n\n{prefix}theme default\n{stringedit}```"
-            )
+            description=f"{theme.description()}"
+                        f"```\nCurrent theme     » {themesvar}\n```"
+                        f"```\nTheme customization\n\n"
+                        f"{prefix}customize        » Theme customization\n```"
+                        f"```\nTheme control\n\n"
+                        f"{helptext}\n```"
+                        f"```\nAvailable themes\n\n"
+                        f"{prefix}theme default\n{stringedit}```"
+        )
 
     @commands.command(
         name="customize",
         usage="",
         aliases=['customise', 'customization', 'customisation'],
         description="Theme customization"
-        )
+    )
     async def customize(self, luna):
         await luna.message.delete()
         themevar = files.json("Luna/config.json", "theme", documents=True)
@@ -14800,45 +14993,57 @@ class SettingsCog(commands.Cog, name="Settings commands"):
             helptext3 += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
         await message_builder(
             luna, title="Customization",
-            description=f"{theme.description()}```\nYour current theme settings\n\nTheme             » {themevar}\nTitle             » {title}\nFooter            » {footer}\nDescription       » {theme_description}\n``````\nSelfbot theme settings\n\n{helptext1}\n``````\nWebhook theme settings\n\n{helptext2}\n``````\nToast theme settings\n\n{helptext3}\n``````\nNote\n\nIf you want to remove a customization,\nYou can use \"None\" to remove it.\n```"
-            )
+            description=f"{theme.description()}"
+                        f"```\nYour current theme settings\n\n"
+                        f"Theme             » {themevar}\n"
+                        f"Title             » {title}\n"
+                        f"Footer            » {footer}\n"
+                        f"Description       » {theme_description}\n```"
+                        f"```\nSelfbot theme settings\n\n"
+                        f"{helptext1}\n```"
+                        f"```\nWebhook theme settings\n\n"
+                        f"{helptext2}\n```"
+                        f"```\nToast theme settings\n\n{helptext3}\n```"
+                        f"```\nNote\n\nIf you want to remove a customization,\n"
+                        f"You can use \"None\" to remove it.\n```"
+        )
 
     @commands.command(
         name="webhook",
         usage="[2]",
         description="Webhook settings"
-        )
+    )
     async def webhook(self, luna, page: str = "1"):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
         webhooks = files.json(
             "Luna/webhooks/webhooks.json",
             "webhooks", documents=True
-            )
+        )
         login = files.json(
             "Luna/webhooks/webhooks.json",
             "login", documents=True
-            )
+        )
         nitro = files.json(
             "Luna/webhooks/webhooks.json",
             "nitro", documents=True
-            )
+        )
         giveaway = files.json(
             "Luna/webhooks/webhooks.json",
             "giveaway", documents=True
-            )
+        )
         privnote = files.json(
             "Luna/webhooks/webhooks.json",
             "privnote", documents=True
-            )
+        )
         selfbot = files.json(
             "Luna/webhooks/webhooks.json",
             "selfbot", documents=True
-            )
+        )
         pings = files.json(
             "Luna/webhooks/webhooks.json",
             "pings", documents=True
-            )
+        )
         ghostpings = files.json(
             "Luna/webhooks/webhooks.json", "ghostpings", documents=True
         )
@@ -14876,33 +15081,50 @@ class SettingsCog(commands.Cog, name="Settings commands"):
             await message_builder(
                 luna, title="Webhooks",
                 description=f"{theme.description()}```\nWebhook url's\n\n{urltext}```"
-                )
+            )
         else:
             await message_builder(
                 luna, title="Webhooks",
-                description=f"{theme.description()}```\nWebhook configuration\n\nWebhooks          » {webhooks}\nLogin webhooks    » {login}\nNitro webhooks    » {nitro}\nGiveaway webhooks » {giveaway}\nPrivnote webhooks » {privnote}\nSelfbot webhooks  » {selfbot}\nPing webhooks     » {pings}\nGhostping webhooks » {ghostpings}\nFriendevent webhooks » {friendevents}\nGuildevent webhooks » {guildevents}\nRoleupdate webhooks » {roleupdates}\nNickname webhooks » {nickupdates}\nProtection webhooks » {protection}\n``````\nWebhook setup\n\n{setuptext}\n``````\nWebhook control\n\n{helptext}\n``````\nNote\n\n{prefix}webhook 2 » Page 2```"
-                )
+                description=f"{theme.description()}"
+                            f"```\nWebhook configuration\n\n"
+                            f"Webhooks          » {webhooks}\n"
+                            f"Login webhooks    » {login}\n"
+                            f"Nitro webhooks    » {nitro}\n"
+                            f"Giveaway webhooks » {giveaway}\n"
+                            f"Privnote webhooks » {privnote}\n"
+                            f"Selfbot webhooks  » {selfbot}\n"
+                            f"Ping webhooks     » {pings}\n"
+                            f"Ghostping webhooks » {ghostpings}\n"
+                            f"Friendevent webhooks » {friendevents}\n"
+                            f"Guildevent webhooks » {guildevents}\n"
+                            f"Roleupdate webhooks » {roleupdates}\n"
+                            f"Nickname webhooks » {nickupdates}\n"
+                            f"Protection webhooks » {protection}\n```"
+                            f"```\nWebhook setup\n\n{setuptext}\n```"
+                            f"```\nWebhook control\n\n{helptext}\n```"
+                            f"```\nNote\n\n{prefix}webhook 2 » Page 2```"
+            )
 
     @commands.command(
         name="notifications",
         usage="",
         description="Toast notifications"
-        )
+    )
     async def notifications(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
         toasts = files.json(
             "Luna/notifications/toasts.json",
             "toasts", documents=True
-            )
+        )
         login = files.json(
             "Luna/notifications/toasts.json",
             "login", documents=True
-            )
+        )
         nitro = files.json(
             "Luna/notifications/toasts.json",
             "nitro", documents=True
-            )
+        )
         giveaway = files.json(
             "Luna/notifications/toasts.json", "giveaway", documents=True
         )
@@ -14915,7 +15137,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         pings = files.json(
             "Luna/notifications/toasts.json",
             "pings", documents=True
-            )
+        )
         ghostpings = files.json(
             "Luna/notifications/toasts.json", "ghostpings", documents=True
         )
@@ -14941,8 +15163,23 @@ class SettingsCog(commands.Cog, name="Settings commands"):
             helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
         await message_builder(
             luna, title="Toast notifications",
-            description=f"{theme.description()}```\nToast configuration\n\nToasts            » {toasts}\nLogin toasts      » {login}\nNitro toasts      » {nitro}\nGiveaway toasts   » {giveaway}\nPrivnote toasts   » {privnote}\nSelfbot toasts    » {selfbot}\nPing toasts       » {pings}\nGhostping toasts  » {ghostpings}\nFriendevent toast » {friendevents}\nGuildevent toasts » {guildevents}\nRoleupdate toasts » {roleupdates}\nNickname toasts   » {nickupdates}\nProtection toasts » {protection}\n``````\nToast control\n\n{helptext}```"
-            )
+            description=f"{theme.description()}"
+                        f"```\nToast configuration\n\n"
+                        f"Toasts            » {toasts}\n"
+                        f"Login toasts      » {login}\n"
+                        f"Nitro toasts      » {nitro}\n"
+                        f"Giveaway toasts   » {giveaway}\n"
+                        f"Privnote toasts   » {privnote}\n"
+                        f"Selfbot toasts    » {selfbot}\n"
+                        f"Ping toasts       » {pings}\n"
+                        f"Ghostping toasts  » {ghostpings}\n"
+                        f"Friendevent toast » {friendevents}\n"
+                        f"Guildevent toasts » {guildevents}\n"
+                        f"Roleupdate toasts » {roleupdates}\n"
+                        f"Nickname toasts   » {nickupdates}\n"
+                        f"Protection toasts » {protection}\n```"
+                        f"```\nToast control\n\n{helptext}```"
+        )
 
     # @commands.command(name = "embedmode",
     # 				usage="",
@@ -14958,7 +15195,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         name="indentmode",
         usage="",
         description="Switch to indent mode"
-        )
+    )
     async def indentmode(self, luna):
         await luna.message.delete()
         config.mode("1")
@@ -14969,7 +15206,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         name="textmode",
         usage="",
         description="Switch to text mode"
-        )
+    )
     async def textmode(self, luna):
         await luna.message.delete()
         config.mode("2")
@@ -14980,7 +15217,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         name="sniper",
         usage="",
         description="Sniper settings"
-        )
+    )
     async def sniper(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -14998,13 +15235,13 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         await message_builder(
             luna, title="Sniper settings",
             description=f"{theme.description()}```\nYour current settings\n\nNitro Sniper      » {nitro_sniper}\nPrivnote Sniper   » {privnote_sniper}\n``````\nSettings\n\n{helptext}```"
-            )
+        )
 
     @commands.command(
         name="giveaway",
         usage="",
         description="Giveaway settings"
-        )
+    )
     async def giveaway(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -15025,14 +15262,19 @@ class SettingsCog(commands.Cog, name="Settings commands"):
             helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
         await message_builder(
             luna, title="Giveaway settings",
-            description=f"{theme.description()}```\nYour current settings\n\nGiveaway Joiner   » {giveaway_joiner}\nDelay             » {delay_in_minutes} minute/s\nServer Joiner     » {guild_joiner}\n``````\nSettings\n\n{helptext}```"
-            )
+            description=f"{theme.description()}"
+                        f"```\nYour current settings\n\n"
+                        f"Giveaway Joiner   » {giveaway_joiner}\n"
+                        f"Delay             » {delay_in_minutes} minute/s\n"
+                        f"Server Joiner     » {guild_joiner}\n```"
+                        f"```\nSettings\n\n{helptext}```"
+        )
 
     @commands.command(
         name="errorlog",
         usage="<console/message>",
         description="Switch errorlog"
-        )
+    )
     async def errorlog(self, luna, mode: str):
         await luna.message.delete()
         if mode == "message" or mode == "console":
@@ -15046,7 +15288,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         name="deletetimer",
         usage="<seconds>",
         description="Auto delete timer"
-        )
+    )
     async def deletetimer(self, luna, seconds: int):
         await luna.message.delete()
         await message_builder(luna, description=f"```\nAuto delete timer » {seconds} seconds```")
@@ -15059,7 +15301,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         name="afkmessage",
         usage="<text>",
         description="Change the afk message"
-        )
+    )
     async def afkmessage(self, luna, *, afkmessage):
         await luna.message.delete()
         await message_builder(luna, description=f"```\nAFK message » {afkmessage}```")
@@ -15070,7 +15312,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         name="riskmode",
         usage="<on/off>",
         description="Enable abusive commands"
-        )
+    )
     async def riskmode(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -15084,7 +15326,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         name="selfbotdetection",
         usage="<on/off>",
         description="Sb detection"
-        )
+    )
     async def selfbotdetection(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -15098,7 +15340,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         name="mention",
         usage="<on/off>",
         description="Mention notification"
-        )
+    )
     async def mention(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -15112,7 +15354,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         name="password",
         usage="<new_password>",
         description="Change password"
-        )
+    )
     async def password(self, luna, password: str):
         await luna.message.delete()
         await message_builder(luna, description=f"```\nChanged password to » {password}```")
@@ -15123,7 +15365,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         name="console",
         usage="<1/2>",
         description="Change console mode"
-        )
+    )
     async def console(self, ctx, mode: str):
         await ctx.message.delete()
         if mode == "1" or mode == "2":
@@ -15137,21 +15379,17 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 try:
                     custom = cog.get_commands()
                     custom_command_count = 0
-                    for command in custom:
+                    for _ in custom:
                         custom_command_count += 1
                 except BaseException:
                     custom_command_count = 0
-                prefix = files.json(
-                    "Luna/config.json",
-                    "prefix", documents=True
-                    )
                 print(motd.center(os.get_terminal_size().columns))
                 if beta:
                     print("Beta Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
                     "Luna/config.json",
                     "prefix", documents=True
-                    )
+                )
                 console_mode = files.json(
                     "Luna/console/console.json", "mode", documents=True
                 )
@@ -15229,21 +15467,17 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 try:
                     custom = cog.get_commands()
                     custom_command_count = 0
-                    for command in custom:
+                    for _ in custom:
                         custom_command_count += 1
                 except BaseException:
                     custom_command_count = 0
-                prefix = files.json(
-                    "Luna/config.json",
-                    "prefix", documents=True
-                    )
                 print(motd.center(os.get_terminal_size().columns))
                 if beta:
                     print("Beta Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
                     "Luna/config.json",
                     "prefix", documents=True
-                    )
+                )
                 console_mode = files.json(
                     "Luna/console/console.json", "mode", documents=True
                 )
@@ -15311,7 +15545,10 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                         f"                           {color.purple('[')}+{color.purple('] CONNECTED')}"
                     )
                     print(
-                        f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends"
+                        f"                           {color.purple('[')}+{color.purple(']')} "
+                        f"{bot.user} | "
+                        f"{color.purple(f'{len(bot.guilds)}')} Guilds | "
+                        f"{color.purple(f'{len(bot.user.friends)}')} Friends"
                     )
                     print(
                         f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n"
@@ -15329,7 +15566,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         name="reload",
         usage="",
         description="Reload custom commands"
-        )
+    )
     async def reload(self, ctx):
         await ctx.message.delete()
         path = getattr(sys, '_MEIPASS', os.getcwd())
@@ -15350,7 +15587,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         name="darkmode",
         usage="",
         description="Discord darkmode"
-        )
+    )
     async def darkmode(self, luna):
         await luna.message.delete()
         requests.patch(
@@ -15369,7 +15606,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         name="lightmode",
         usage="",
         description="Discord lightmode"
-        )
+    )
     async def lightmode(self, luna):
         await luna.message.delete()
         requests.patch(
@@ -15437,7 +15674,7 @@ class ShareCog(commands.Cog, name="Share commands"):
         name="share",
         usage="<on/off>",
         description="Share on/off"
-        )
+    )
     async def share(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -15451,7 +15688,7 @@ class ShareCog(commands.Cog, name="Share commands"):
         name="shareuser",
         usage="<@member>",
         description="Set the member for sharing"
-        )
+    )
     async def shareuser(self, luna, user_id):
         await luna.message.delete()
         if "<@!" and ">" in user_id:
@@ -15470,7 +15707,7 @@ class ShareCog(commands.Cog, name="Share commands"):
         name="sharenone",
         usage="",
         description="Share member to none"
-        )
+    )
     async def sharenone(self, luna):
         await luna.message.delete()
         config.user_id("")
@@ -15489,7 +15726,7 @@ class EncodeCog(commands.Cog, name="Encode commands"):
         name="encode_cea256",
         usage="<key> <text>",
         description="cea256"
-        )
+    )
     async def encode_cea256(self, luna, key, *, text):
         await luna.message.delete()
         if len(key) != 32:
@@ -15502,7 +15739,7 @@ class EncodeCog(commands.Cog, name="Encode commands"):
         name="encode_base64",
         usage="<text>",
         description="base64"
-        )
+    )
     async def encode_base64(self, luna, *, text: str):
         await luna.message.delete()
         enc = base64.b64encode('{}'.format(text).encode('ascii'))
@@ -15514,7 +15751,7 @@ class EncodeCog(commands.Cog, name="Encode commands"):
         name="encode_leet",
         usage="<text>",
         description="leet"
-        )
+    )
     async def encode_leet(self, luna, *, text: str):
         await luna.message.delete()
         encoded = text.replace(
@@ -15584,7 +15821,7 @@ class EncodeCog(commands.Cog, name="Encode commands"):
         name="encode_md5",
         usage="<text>",
         description="md5 (oneway)"
-        )
+    )
     async def encode_md5(self, luna, *, text: str):
         await luna.message.delete()
         enc = hashlib.md5(text.encode())
@@ -15595,7 +15832,7 @@ class EncodeCog(commands.Cog, name="Encode commands"):
         name="encode_sha1",
         usage="<text>",
         description="sha1 (oneway)"
-        )
+    )
     async def encode_sha1(self, luna, *, text: str):
         await luna.message.delete()
         enc = hashlib.sha1(text.encode())
@@ -15606,7 +15843,7 @@ class EncodeCog(commands.Cog, name="Encode commands"):
         name="encode_sha224",
         usage="<text>",
         description="sha224 (oneway)"
-        )
+    )
     async def encode_sha224(self, luna, *, text: str):
         await luna.message.delete()
         enc = hashlib.sha3_224(text.encode())
@@ -15617,7 +15854,7 @@ class EncodeCog(commands.Cog, name="Encode commands"):
         name="encode_sha256",
         usage="<text>",
         description="sha256 (oneway)"
-        )
+    )
     async def encode_sha256(self, luna, *, text: str):
         await luna.message.delete()
         enc = hashlib.sha3_256(text.encode())
@@ -15628,7 +15865,7 @@ class EncodeCog(commands.Cog, name="Encode commands"):
         name="encode_sha384",
         usage="<text>",
         description="sha384 (oneway)"
-        )
+    )
     async def encode_sha384(self, luna, *, text: str):
         await luna.message.delete()
         enc = hashlib.sha3_384(text.encode())
@@ -15639,7 +15876,7 @@ class EncodeCog(commands.Cog, name="Encode commands"):
         name="encode_sha512",
         usage="<text>",
         description="sha512 (oneway)"
-        )
+    )
     async def encode_sha512(self, luna, *, text: str):
         await luna.message.delete()
         enc = hashlib.sha3_512(text.encode())
@@ -15657,7 +15894,7 @@ class DecodeCog(commands.Cog, name="Decode commands"):
     @commands.command(
         name="decode_ai", usage="<text>",
         description="AI based decryption"
-        )
+    )
     async def decode_ai(self, luna, *, text: str):
         await luna.message.delete()
         try:
@@ -15724,12 +15961,12 @@ class DecodeCog(commands.Cog, name="Decode commands"):
                     else:
                         decipher += list(
                             to_morse.keys()
-                            )[list(to_morse.values()).index(cipher)]
+                        )[list(to_morse.values()).index(cipher)]
                         cipher = ''
             await message_builder(
                 luna,
                 description=f"```\nInput\n\n{text}\n``````\nDecrypted with Luna's AI\n\n{decipher}\n```"
-                )
+            )
         except Exception as e:
             await error_builder(luna, description=e)
 
@@ -15737,7 +15974,7 @@ class DecodeCog(commands.Cog, name="Decode commands"):
         name="decode_cea256",
         usage="<key> <text>",
         description="cea256"
-        )
+    )
     async def decode_cea256(self, luna, key, *, text):
         await luna.message.delete()
         if len(key) != 32:
@@ -15754,7 +15991,7 @@ class DecodeCog(commands.Cog, name="Decode commands"):
         name="decode_base64",
         usage="<text>",
         description="base64"
-        )
+    )
     async def decode_base64(self, luna, *, text: str):
         await luna.message.delete()
         dec = base64.b64decode('{}'.format(text).encode('ascii'))
@@ -15766,7 +16003,7 @@ class DecodeCog(commands.Cog, name="Decode commands"):
         name="decode_leet",
         usage="<text>",
         description="leet"
-        )
+    )
     async def decode_leet(self, luna, *, text: str):
         await luna.message.delete()
         encoded = text.replace(
@@ -15844,7 +16081,7 @@ class GiveawayCog(commands.Cog, name="Giveaway settings"):
         name="giveawayjoiner",
         usage="<on/off>",
         description="Giveaway sniper"
-        )
+    )
     async def giveawayjoiner(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -15858,7 +16095,7 @@ class GiveawayCog(commands.Cog, name="Giveaway settings"):
         name="delay",
         usage="<minutes>",
         description="Delay in minutes"
-        )
+    )
     async def delay(self, luna, minute: int):
         await luna.message.delete()
         await message_builder(luna, description=f"```\nGiveaway joiner delay » {str(minute)} minute/s```")
@@ -15869,7 +16106,7 @@ class GiveawayCog(commands.Cog, name="Giveaway settings"):
         name="giveawayguild",
         usage="<on/off>",
         description="Giveaway server joiner"
-        )
+    )
     async def giveawayguild(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -15891,7 +16128,7 @@ class CryptoCog(commands.Cog, name="Cryptocurrency commands"):
         name="crypto",
         usage="<crypto>",
         description="Cryptocurrency prices"
-        )
+    )
     async def crypto(self, luna, crypto: str):
         await luna.message.delete()
         request = requests.get(
@@ -15937,7 +16174,7 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
         name="ctitle",
         usage="<title>",
         description="Customize the title"
-        )
+    )
     async def ctitle(self, luna, *, newtitle: str):
         await luna.message.delete()
         if files.json(
@@ -15947,8 +16184,10 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
         ) == "default":
             await error_builder(
                 luna,
-                f"```\nYou can't change the title if you're using the default theme\n``````\nPlease change the theme first with {get_prefix()}theme\n\n({get_prefix()}themes to show all available themes)```"
-                )
+                f"```\nYou can't change the title if you're using the default theme\n```"
+                f"```\nPlease change the theme first with {get_prefix()}theme\n\n"
+                f"({get_prefix()}themes to show all available themes)```"
+            )
         else:
             prints.message(f"Changed title to » {color.purple(f'{newtitle}')}")
             if newtitle == "None":
@@ -15961,7 +16200,7 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
         name="cfooter",
         usage="<footer>",
         description="Customize the footer"
-        )
+    )
     async def cfooter(self, luna, *, newfooter: str):
         await luna.message.delete()
         if files.json(
@@ -15971,8 +16210,10 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
         ) == "default":
             await error_builder(
                 luna,
-                f"```\nYou can't change the footer if you're using the default theme\n``````\nPlease change the theme first with {get_prefix()}theme\n\n({get_prefix()}themes to show all available themes)```"
-                )
+                f"```\nYou can't change the footer if you're using the default theme\n```"
+                f"```\nPlease change the theme first with {get_prefix()}theme\n\n"
+                f"({get_prefix()}themes to show all available themes)```"
+            )
         else:
             prints.message(
                 f"Changed footer to » {color.purple(f'{newfooter}')}"
@@ -15988,7 +16229,7 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
         aliases=['cdescription'],
         usage="<on/off>",
         description="Hide/Show <> | []"
-        )
+    )
     async def description(self, luna, mode: str):
         await luna.message.delete()
         if files.json(
@@ -15998,8 +16239,10 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
         ) == "default":
             await error_builder(
                 luna,
-                f"```\nYou can't change the description mode if you're using the default theme\n``````\nPlease change the theme first with {get_prefix()}theme\n\n({get_prefix()}themes to show all available themes)```"
-                )
+                f"```\nYou can't change the description mode if you're using the default theme\n```"
+                f"```\nPlease change the theme first with {get_prefix()}theme\n\n"
+                f"({get_prefix()}themes to show all available themes)```"
+            )
         else:
             if mode == "on":
                 prints.message(
@@ -16028,7 +16271,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hclassic",
         usage="",
         description="Random classic hentai"
-        )
+    )
     async def hclassic(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/classic").json()
@@ -16038,7 +16281,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hrandom",
         usage="",
         description="Random hentai gif"
-        )
+    )
     async def hrandom(self, luna):
         await luna.message.delete()
         r = requests.get(
@@ -16050,7 +16293,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hass",
         usage="",
         description="Random hentai ass"
-        )
+    )
     async def hass(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekobot.xyz/api/image?type=hass").json()
@@ -16060,7 +16303,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hboobs",
         usage="",
         description="Random hentai boobs"
-        )
+    )
     async def hboobs(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/boobs").json()
@@ -16070,7 +16313,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hsmallboobs",
         usage="",
         description="Random hentai smallboobs"
-        )
+    )
     async def hsmallboobs(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/boobs").json()
@@ -16080,7 +16323,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="htits",
         usage="",
         description="Random hentai tits"
-        )
+    )
     async def htits(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/tits").json()
@@ -16090,7 +16333,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hpussy",
         usage="",
         description="Random hentai pussy"
-        )
+    )
     async def hpussy(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/pussy").json()
@@ -16100,7 +16343,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hanal",
         usage="",
         description="Random hentai anal"
-        )
+    )
     async def hanal(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/anal").json()
@@ -16110,7 +16353,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hcum",
         usage="",
         description="Random hentai cum gif"
-        )
+    )
     async def hcum(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/cum").json()
@@ -16120,7 +16363,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hcum1",
         usage="",
         description="Random hentai cum"
-        )
+    )
     async def hcum1(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/cum_jpg").json()
@@ -16130,7 +16373,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hblowjob",
         usage="",
         description="Random hentai blowjob gif"
-        )
+    )
     async def hblowjob(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/bj").json()
@@ -16140,7 +16383,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hblowjob1",
         usage="",
         description="Random hentai blowjob"
-        )
+    )
     async def hblowjob1(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/blowjob").json()
@@ -16150,7 +16393,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hneko",
         usage="",
         description="Random hentai neko"
-        )
+    )
     async def hneko(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/nsfw_neko_gif").json()
@@ -16160,7 +16403,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="htrap",
         usage="",
         description="Random hentai trap"
-        )
+    )
     async def htrap(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/trap").json()
@@ -16170,7 +16413,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hyuri",
         usage="",
         description="Random hentai yuri"
-        )
+    )
     async def hyuri(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/yuri").json()
@@ -16180,7 +16423,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hfutanari",
         usage="",
         description="Random hentai futanari"
-        )
+    )
     async def hfutanari(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/futanari").json()
@@ -16190,7 +16433,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hketa",
         usage="",
         description="Random hentai keta"
-        )
+    )
     async def hketa(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/keta").json()
@@ -16200,7 +16443,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hhololewd",
         usage="",
         description="Random hololewd hentai "
-        )
+    )
     async def hhololewd(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/hololewd").json()
@@ -16210,7 +16453,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hlewdkemo",
         usage="",
         description="Random lewdkemo hentai"
-        )
+    )
     async def hlewdkemo(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/lewdkemo").json()
@@ -16220,7 +16463,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hsolo",
         usage="",
         description="Random solo hentai"
-        )
+    )
     async def hsolo(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/solo").json()
@@ -16230,7 +16473,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hsolog",
         usage="",
         description="Random solo hentai"
-        )
+    )
     async def hsolog(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/solog").json()
@@ -16240,7 +16483,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hfeetg",
         usage="",
         description="Random hentai feet"
-        )
+    )
     async def hfeetg(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/feetg").json()
@@ -16250,7 +16493,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hero",
         usage="",
         description="Random erotic hentai"
-        )
+    )
     async def hero(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/ero").json()
@@ -16260,7 +16503,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="herok",
         usage="",
         description="Random erotic kitsune"
-        )
+    )
     async def herok(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/erok").json()
@@ -16270,7 +16513,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="herokemo",
         usage="",
         description="Random hentai erokemo"
-        )
+    )
     async def herokemo(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/erokemo").json()
@@ -16280,7 +16523,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hles",
         usage="",
         description="Random lesbian hentai"
-        )
+    )
     async def hles(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/les").json()
@@ -16290,7 +16533,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hwallpaper",
         usage="",
         description="Random hentai wallpaper"
-        )
+    )
     async def hwallpaper(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/wallpaper").json()
@@ -16300,7 +16543,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hlewdk",
         usage="",
         description="Random lewd hentai"
-        )
+    )
     async def hlewdk(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/lewdk").json()
@@ -16310,7 +16553,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hngif",
         usage="",
         description="Random hentai neko gif"
-        )
+    )
     async def hngif(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/ngif").json()
@@ -16320,7 +16563,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hkemonomimi",
         usage="",
         description="Random neko"
-        )
+    )
     async def hkemonomimi(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/kemonomimi").json()
@@ -16330,7 +16573,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hholoero",
         usage="",
         description="Random erotic hentai"
-        )
+    )
     async def hholoero(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/holoero").json()
@@ -16340,7 +16583,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hfoxgirl",
         usage="",
         description="Random hentai fox girl"
-        )
+    )
     async def hfoxgirl(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/fox_girl").json()
@@ -16350,7 +16593,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hfemdom",
         usage="",
         description="Random hentai female"
-        )
+    )
     async def hfemdom(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/femdom").json()
@@ -16360,7 +16603,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hgasm",
         usage="",
         description="Random hentai gasm"
-        )
+    )
     async def hgasm(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/gasm").json()
@@ -16370,7 +16613,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hkuni",
         usage="",
         description="Random hentai kuni"
-        )
+    )
     async def hkuni(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/kuni").json()
@@ -16380,7 +16623,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="hpwankg",
         usage="",
         description="Random hentai wank"
-        )
+    )
     async def hpwankg(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/pwankg").json()
@@ -16390,7 +16633,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="havatar",
         usage="",
         description="Random hentai avatar"
-        )
+    )
     async def havatar(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/nsfw_avatar").json()
@@ -16400,7 +16643,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         name="havatar1",
         usage="",
         description="Random hentai avatar"
-        )
+    )
     async def havatar1(self, luna):
         await luna.message.delete()
         r = requests.get("https://nekos.life/api/v2/img/avatar").json()
@@ -16446,7 +16689,8 @@ class OnMember(commands.Cog, name="on member events"):
                     guild = member.guild
                     async for i in guild.audit_logs(limit=1, action=discord.AuditLogAction.kick):
                         if guild.id in whitelisted_users.keys() and i.user.id in whitelisted_users[
-                            guild.id].keys() and i.user.id is not self.bot.user.id:
+                            guild.id
+                        ].keys() and i.user.id is not self.bot.user.id:
                             prints.message(
                                 f"{i.user.name}#{i.user.discriminator} not banned"
                             )
@@ -16470,7 +16714,7 @@ class SniperCog(commands.Cog, name="Sniper settings"):
         name="nitrosniper",
         usage="<on/off>",
         description="Nitro sniper"
-        )
+    )
     async def nitrosniper(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -16484,7 +16728,7 @@ class SniperCog(commands.Cog, name="Sniper settings"):
         name="privsniper",
         usage="<on/off>",
         description="Privnote sniper"
-        )
+    )
     async def privsniper(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -16498,7 +16742,7 @@ class SniperCog(commands.Cog, name="Sniper settings"):
         name="snipercharge",
         usage="<on/off>",
         description="Sniper visual charge"
-        )
+    )
     async def snipercharge(self, luna, mode: str):
         await luna.message.delete()
         global charge_sniper
@@ -16525,7 +16769,7 @@ class ThemeCog(commands.Cog, name="Theme command"):
         name="theme",
         usage="<theme>",
         description="Change theme"
-        )
+    )
     async def theme(self, luna, theme: str):
         await luna.message.delete()
         theme = theme.replace('.json', '')
@@ -16551,7 +16795,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
         name="newtheme",
         usage="<name>",
         description="Create a theme"
-        )
+    )
     async def newtheme(self, luna, themename: str):
         await luna.message.delete()
         themename = themename.replace('.json', '')
@@ -16574,7 +16818,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
         name="edittheme",
         usage="<name>",
         description="Edit current theme name"
-        )
+    )
     async def edittheme(self, luna, themename: str):
         await luna.message.delete()
         themesvar = files.json("Luna/config.json", "theme", documents=True)
@@ -16601,7 +16845,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
         name="deltheme",
         usage="<name>",
         description="Delete a theme"
-        )
+    )
     async def deltheme(self, luna, themename: str):
         await luna.message.delete()
         themename = themename.replace('.json', '')
@@ -16620,7 +16864,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
         name="sendtheme",
         usage="",
         description="Send the current theme file"
-        )
+    )
     async def sendtheme(self, luna):
         await luna.message.delete()
         themesvar = files.json("Luna/config.json", "theme", documents=True)
@@ -16631,14 +16875,29 @@ class ThemesCog(commands.Cog, name="Theme commands"):
         aliases=['communitythemes'],
         usage="",
         description="Community made themes"
-        )
+    )
     async def cthemes(self, luna):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
         await message_builder(
             luna, title="Community Themes",
-            description=f"{theme.description()}```\n{prefix}preview <theme>  » Preview a theme\n``````\n{prefix}install luna     » Luna theme\n{prefix}install lunaanimated » Luna theme\n{prefix}install chill    » Chill theme\n{prefix}install midnight » Midnight theme\n{prefix}install vaporwave » Vaporwave theme\n{prefix}install sweetrevenge » Sweetrevenge theme\n{prefix}install error    » Error theme\n{prefix}install lunapearl » Pearl theme\n{prefix}install gamesense » Gamesense theme\n{prefix}install aimware  » Aimware theme\n{prefix}install guilded  » Guilded theme\n{prefix}install lucifer  » Lucifer selfbot theme\n{prefix}install nighty   » Nighty selfbot theme\n{prefix}install aries    » Aries selfbot theme```"
-            )
+            description=f"{theme.description()}"
+                        f"```\n{prefix}preview <theme>  » Preview a theme\n```"
+                        f"```\n{prefix}install luna     » Luna theme\n"
+                        f"{prefix}install lunaanimated » Luna theme\n"
+                        f"{prefix}install chill    » Chill theme\n"
+                        f"{prefix}install midnight » Midnight theme\n"
+                        f"{prefix}install vaporwave » Vaporwave theme\n"
+                        f"{prefix}install sweetrevenge » Sweetrevenge theme\n"
+                        f"{prefix}install error    » Error theme\n"
+                        f"{prefix}install lunapearl » Pearl theme\n"
+                        f"{prefix}install gamesense » Gamesense theme\n"
+                        f"{prefix}install aimware  » Aimware theme\n"
+                        f"{prefix}install guilded  » Guilded theme\n"
+                        f"{prefix}install lucifer  » Lucifer selfbot theme\n"
+                        f"{prefix}install nighty   » Nighty selfbot theme\n"
+                        f"{prefix}install aries    » Aries selfbot theme```"
+        )
 
 
 bot.add_cog(ThemesCog(bot))
@@ -16652,7 +16911,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
         name="preview",
         usage="<theme>",
         description="Preview a theme"
-        )
+    )
     async def preview(self, luna, theme: str):
         await luna.message.delete()
         prefix = files.json("Luna/config.json", "prefix", documents=True)
@@ -16710,7 +16969,6 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
             madeby = "Dragon"
         elif theme == "guilded":
             title = "Guilded"
-            titleurl = "https://guilded.gg/"
             footer = "Guilded (Discord v2)| 2021"
             description = True
             madeby = "Exodus"
@@ -16734,15 +16992,15 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
         if notfound:
             await error_builder(luna, description=f"```\nNo theme called {theme} found```")
             return
-        if description:
-            description = "```\n<> is required | [] is optional\n\n```"
-        elif description == False:
+        if not description:
             description = ""
+        else:
+            description = "```\n<> is required | [] is optional\n\n```"
         command_count = len(bot.commands)
         cog = bot.get_cog('Custom commands')
         custom = cog.get_commands()
         custom_command_count = 0
-        for command in custom:
+        for _ in custom:
             custom_command_count += 1
         embed = discord.Embed(
             title=title,
@@ -16779,7 +17037,7 @@ Categories\n\n\
 {prefix}repeat           » Repeat last used command\n\
 {prefix}search <command> » Search for a command\n``````\n\
 Version\n\n{version}``````\nThis is a preview of the theme {theme}\nThis theme was made by {madeby}\n```"
-            )
+        )
         embed.set_footer(text=footer)
         await send(luna, embed)
 
@@ -16787,7 +17045,7 @@ Version\n\n{version}``````\nThis is a preview of the theme {theme}\nThis theme w
         name="install",
         usage="<theme>",
         description="Install a theme"
-        )
+    )
     async def install(self, luna, theme: str):
         await luna.message.delete()
         notfound = False
@@ -16877,7 +17135,7 @@ Version\n\n{version}``````\nThis is a preview of the theme {theme}\nThis theme w
         await message_builder(
             luna,
             description=f"```\nInstalled theme \"{theme}\" and applied it\nThis theme was made by {madeby}```"
-            )
+        )
 
 
 bot.add_cog(CommunitythemesCog(bot))
@@ -16891,7 +17149,7 @@ class ToastCog(commands.Cog, name="Toast customization"):
         name="toasticon",
         usage="<icon.ico>",
         description="Customize the toast icon"
-        )
+    )
     async def toasticon(self, luna, *, newicon: str):
         await luna.message.delete()
         if newicon.endswith(".ico"):
@@ -16907,7 +17165,7 @@ class ToastCog(commands.Cog, name="Toast customization"):
         name="toasttitle",
         usage="<title>",
         description="Customize the toast title"
-        )
+    )
     async def toasttitle(self, luna, *, newtitle: str):
         await luna.message.delete()
         prints.message(
@@ -16931,7 +17189,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
         name="toasts",
         usage="<on/off>",
         description="Turn toasts on or off"
-        )
+    )
     async def toasts(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -16945,7 +17203,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
         name="logintoasts",
         usage="<on/off>",
         description="Login toasts"
-        )
+    )
     async def logintoasts(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -16959,7 +17217,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
         name="nitrotoasts",
         usage="<on/off>",
         description="Nitro toasts"
-        )
+    )
     async def nitrotoasts(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -16973,7 +17231,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
         name="giveawaytoasts",
         usage="<on/off>",
         description="Giveaway toasts"
-        )
+    )
     async def giveawaytoasts(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -16987,7 +17245,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
         name="privnotetoasts",
         usage="<on/off>",
         description="Privnote toasts"
-        )
+    )
     async def privnotetoasts(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17001,7 +17259,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
         name="selfbottoasts",
         usage="<on/off>",
         description="Selfbot toasts"
-        )
+    )
     async def selfbottoasts(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17015,7 +17273,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
         name="pingtoasts",
         usage="<on/off>",
         description="Ping toasts"
-        )
+    )
     async def pingtoasts(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17029,7 +17287,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
         name="ghostpingtoasts",
         usage="<on/off>",
         description="Ghostping toasts"
-        )
+    )
     async def ghostpingtoasts(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17043,7 +17301,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
         name="friendtoasts",
         usage="<on/off>",
         description="Friend event toasts"
-        )
+    )
     async def friendtoasts(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17057,7 +17315,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
         name="guildtoasts",
         usage="<on/off>",
         description="Guild event toasts"
-        )
+    )
     async def guildtoasts(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17071,7 +17329,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
         name="roletoasts",
         usage="<on/off>",
         description="Role update toasts"
-        )
+    )
     async def roletoasts(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17085,7 +17343,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
         name="nicktoasts",
         usage="<on/off>",
         description="Nickname update toasts"
-        )
+    )
     async def nicktoasts(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17101,7 +17359,7 @@ class ToastsCog(commands.Cog, name="Toast commands"):
         name="protectiontoasts",
         usage="<on/off>",
         description="Protection toasts"
-        )
+    )
     async def protectiontoasts(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17123,7 +17381,7 @@ class WebhookSetupCog(commands.Cog, name="Webhook setup"):
         name="webhooksetup",
         usage="",
         description="Set up all webhooks"
-        )
+    )
     async def webhooksetup(self, luna):
         await luna.message.delete()
         try:
@@ -17174,7 +17432,7 @@ class WebhookSetupCog(commands.Cog, name="Webhook setup"):
             await message_builder(
                 luna, title="Webhooks Setup",
                 description=f"```\nSuccessfully created all webhooks and stored them in the config```"
-                )
+            )
         except Exception as e:
             await error_builder(luna, description=f"```\n{e}```")
 
@@ -17190,7 +17448,7 @@ class WebhooksCog(commands.Cog, name="Webhook commands"):
         name="webhooks",
         usage="<on/off>",
         description="Webhooks"
-        )
+    )
     async def webhooks(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17204,7 +17462,7 @@ class WebhooksCog(commands.Cog, name="Webhook commands"):
         name="wlogin",
         usage="<on/off>",
         description="Login webhooks"
-        )
+    )
     async def wlogin(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17218,7 +17476,7 @@ class WebhooksCog(commands.Cog, name="Webhook commands"):
         name="wnitro",
         usage="<on/off>",
         description="Nitro webhooks"
-        )
+    )
     async def wnitro(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17232,7 +17490,7 @@ class WebhooksCog(commands.Cog, name="Webhook commands"):
         name="wgiveaways",
         usage="<on/off>",
         description="Giveaway webhooks"
-        )
+    )
     async def wgiveaways(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17246,7 +17504,7 @@ class WebhooksCog(commands.Cog, name="Webhook commands"):
         name="wprivnote",
         usage="<on/off>",
         description="Privnote webhooks"
-        )
+    )
     async def wprivnote(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17260,7 +17518,7 @@ class WebhooksCog(commands.Cog, name="Webhook commands"):
         name="wselfbot",
         usage="<on/off>",
         description="Selfbot webhooks"
-        )
+    )
     async def wselfbot(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17274,7 +17532,7 @@ class WebhooksCog(commands.Cog, name="Webhook commands"):
         name="wpings",
         usage="<on/off>",
         description="Pings webhooks"
-        )
+    )
     async def wpings(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17288,7 +17546,7 @@ class WebhooksCog(commands.Cog, name="Webhook commands"):
         name="wghostpings",
         usage="<on/off>",
         description="Ghostpings webhooks"
-        )
+    )
     async def wghostpings(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17302,7 +17560,7 @@ class WebhooksCog(commands.Cog, name="Webhook commands"):
         name="wfriends",
         usage="<on/off>",
         description="Friend event webhooks"
-        )
+    )
     async def wfriends(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17318,7 +17576,7 @@ class WebhooksCog(commands.Cog, name="Webhook commands"):
         name="wguilds",
         usage="<on/off>",
         description="Guild event webhooks"
-        )
+    )
     async def wguilds(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17332,7 +17590,7 @@ class WebhooksCog(commands.Cog, name="Webhook commands"):
         name="wroles",
         usage="<on/off>",
         description="Role update webhooks"
-        )
+    )
     async def wroles(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17346,7 +17604,7 @@ class WebhooksCog(commands.Cog, name="Webhook commands"):
         name="wnick",
         usage="<on/off>",
         description="Nickname update webhooks"
-        )
+    )
     async def wnick(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17362,7 +17620,7 @@ class WebhooksCog(commands.Cog, name="Webhook commands"):
         name="wprotection",
         usage="<on/off>",
         description="Protection webhooks"
-        )
+    )
     async def wprotection(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on" or mode == "off":
@@ -17384,7 +17642,7 @@ class WebhookUrlCog(commands.Cog, name="Webhook urls"):
         name="wulogin",
         usage="<url>",
         description="Login webhook"
-        )
+    )
     async def wulogin(self, luna, url: str):
         await luna.message.delete()
         config.webhook.login_url(url)
@@ -17397,7 +17655,7 @@ class WebhookUrlCog(commands.Cog, name="Webhook urls"):
         name="wunitro",
         usage="<url>",
         description="Nitro webhook"
-        )
+    )
     async def wunitro(self, luna, url: str):
         await luna.message.delete()
         config.webhook.nitro_url(url)
@@ -17410,7 +17668,7 @@ class WebhookUrlCog(commands.Cog, name="Webhook urls"):
         name="wugiveaway",
         usage="<url>",
         description="Giveaways webhook"
-        )
+    )
     async def wugiveaway(self, luna, url: str):
         await luna.message.delete()
         config.webhook.giveaway_url(url)
@@ -17423,7 +17681,7 @@ class WebhookUrlCog(commands.Cog, name="Webhook urls"):
         name="wuprivnote",
         usage="<url>",
         description="Privnotes webhook"
-        )
+    )
     async def wuprivnote(self, luna, url: str):
         await luna.message.delete()
         config.webhook.privnote_url(url)
@@ -17436,7 +17694,7 @@ class WebhookUrlCog(commands.Cog, name="Webhook urls"):
         name="wuselfbot",
         usage="<url>",
         description="Selfbots webhook"
-        )
+    )
     async def wuselfbot(self, luna, url: str):
         await luna.message.delete()
         config.webhook.selfbot_url(url)
@@ -17449,7 +17707,7 @@ class WebhookUrlCog(commands.Cog, name="Webhook urls"):
         name="wupings",
         usage="<url>",
         description="Pings webhook"
-        )
+    )
     async def wupings(self, luna, url: str):
         await luna.message.delete()
         config.webhook.pings_url(url)
@@ -17462,7 +17720,7 @@ class WebhookUrlCog(commands.Cog, name="Webhook urls"):
         name="wughost",
         usage="<url>",
         description="Ghostpings webhook"
-        )
+    )
     async def wughost(self, luna, url: str):
         await luna.message.delete()
         config.webhook.ghostpings_url(url)
@@ -17475,7 +17733,7 @@ class WebhookUrlCog(commands.Cog, name="Webhook urls"):
         name="wufriends",
         usage="<url>",
         description="Friend events webhook"
-        )
+    )
     async def wufriends(self, luna, url: str):
         await luna.message.delete()
         config.webhook.friendevents_url(url)
@@ -17488,7 +17746,7 @@ class WebhookUrlCog(commands.Cog, name="Webhook urls"):
         name="wuguilds",
         usage="<url>",
         description="Guild events webhook"
-        )
+    )
     async def wuguilds(self, luna, url: str):
         await luna.message.delete()
         config.webhook.guildevents_url(url)
@@ -17501,7 +17759,7 @@ class WebhookUrlCog(commands.Cog, name="Webhook urls"):
         name="wuroles",
         usage="<url>",
         description="Role updates webhook"
-        )
+    )
     async def wuroles(self, luna, url: str):
         await luna.message.delete()
         config.webhook.roleupdates_url(url)
@@ -17514,7 +17772,7 @@ class WebhookUrlCog(commands.Cog, name="Webhook urls"):
         name="wunick",
         usage="<url>",
         description="Nick updates webhook"
-        )
+    )
     async def wunick(self, luna, url: str):
         await luna.message.delete()
         config.webhook.nickupdates_url(url)
@@ -17527,7 +17785,7 @@ class WebhookUrlCog(commands.Cog, name="Webhook urls"):
         name="wuprotection",
         usage="<url>",
         description="Protection webhook"
-        )
+    )
     async def wuprotection(self, luna, url: str):
         await luna.message.delete()
         config.webhook.protection_url(url)
@@ -17548,7 +17806,7 @@ class WebhookCog(commands.Cog, name="Webhook customisation"):
         name="wtitle",
         usage="<title>",
         description="Customize the webhook title"
-        )
+    )
     async def wtitle(self, luna, *, newtitle: str):
         await luna.message.delete()
         prints.message(
@@ -17564,7 +17822,7 @@ class WebhookCog(commands.Cog, name="Webhook customisation"):
         name="wfooter",
         usage="<footer>",
         description="Customize the webhook footer"
-        )
+    )
     async def wfooter(self, luna, *, newfooter: str):
         await luna.message.delete()
 
@@ -17581,7 +17839,7 @@ class WebhookCog(commands.Cog, name="Webhook customisation"):
         name="wimage",
         usage="<url>",
         description="Customize the thumbnail image"
-        )
+    )
     async def wimage(self, luna, newimageurl: str):
         await luna.message.delete()
 
@@ -17598,7 +17856,7 @@ class WebhookCog(commands.Cog, name="Webhook customisation"):
         name="whexcolor",
         usage="<#hex>",
         description="Webhook hexadecimal color"
-        )
+    )
     async def whexcolor(self, luna, newhexcolor: str):
         await luna.message.delete()
 
@@ -17623,25 +17881,25 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         name="uptime",
         usage="",
         description="Uptime"
-        )
+    )
     async def uptime(self, luna):
         await luna.message.delete()
         if day == 0:
             await message_builder(
                 luna, title="Uptime",
                 description=f"```\n{hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds```"
-                )
+            )
         else:
             await message_builder(
                 luna, title="Uptime",
                 description=f"```\n{day:02d} Days, {hour:02d} Hours, {minute:02d} Minutes and {second:02d} Seconds```"
-                )
+            )
 
     @commands.command(
         name="logout",
         usage="",
         description="Logout of the bot"
-        )
+    )
     async def logout(self, luna):
         await luna.message.delete()
         prints.message(f"Logging out of the bot")
@@ -17652,13 +17910,9 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         name="thelp",
         usage="",
         description="All commands in a text file"
-        )
+    )
     async def thelp(self, luna):
         await luna.message.delete()
-
-        # ///////////////////////////////////////////////////////////////////
-
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
 
         # ///////////////////////////////////////////////////////////////////
         try:
@@ -17975,7 +18229,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
             try:
                 custom = cog.get_commands()
                 custom_command_count = 0
-                for command in custom:
+                for _ in custom:
                     custom_command_count += 1
             except BaseException:
                 custom_command_count = 0
@@ -17991,7 +18245,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         name="update",
         usage="",
         description="Updates Luna"
-        )
+    )
     async def update(self, luna):
         await luna.message.delete()
         r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
@@ -18000,12 +18254,12 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
             await message_builder(
                 luna, title="Update",
                 description=f"```\nDeveloper mode active! No updates will be downloaded.```"
-                )
+            )
         elif version == version_url:
             await message_builder(
                 luna, title="Update",
                 description=f"```\nYou are on the latest version! ({version_url})```"
-                )
+            )
         else:
             if files.json(
                     "Luna/notifications/toasts.json",
@@ -18029,7 +18283,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
                 notify.webhook(
                     url=webhook.login_url(), name="login",
                     description=f"Starting update {version_url}"
-                    )
+                )
             await message_builder(luna, title="Update", description=f"```\nStarted update » {version_url}```")
             luna.update()
 
@@ -18038,7 +18292,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         usage="",
         aliases=['reboot'],
         description="Restart Luna"
-        )
+    )
     async def restart(self, luna):
         await luna.message.delete()
         # if configs.mode() == 2:
@@ -18064,7 +18318,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         name="shutdown",
         usage="",
         description="Shutdown Luna"
-        )
+    )
     async def shutdown(self, luna):
         await luna.message.delete()
         os._exit(0)
@@ -18073,7 +18327,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         name="panic",
         usage="",
         description="Quickly close Luna"
-        )
+    )
     async def panic(self, luna):
         await luna.message.delete()
         os._exit(0)
@@ -18083,7 +18337,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         aliases=['cls'],
         usage="",
         description="Clear the console"
-        )
+    )
     async def clear(self, ctx):
         await ctx.message.delete()
         luna.console(clear=True)
@@ -18093,11 +18347,10 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
             try:
                 custom = cog.get_commands()
                 custom_command_count = 0
-                for command in custom:
+                for _ in custom:
                     custom_command_count += 1
             except BaseException:
                 custom_command_count = 0
-            prefix = files.json("Luna/config.json", "prefix", documents=True)
             print(motd.center(os.get_terminal_size().columns))
             if beta:
                 print("Beta Build".center(os.get_terminal_size().columns))
@@ -18109,7 +18362,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
                 riskmode = files.json(
                     "Luna/config.json",
                     "risk_mode", documents=True
-                    )
+                )
                 themesvar = files.json(
                     "Luna/config.json", "theme", documents=True
                 )
@@ -18178,11 +18431,10 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
             try:
                 custom = cog.get_commands()
                 custom_command_count = 0
-                for command in custom:
+                for _ in custom:
                     custom_command_count += 1
             except BaseException:
                 custom_command_count = 0
-            prefix = files.json("Luna/config.json", "prefix", documents=True)
             print(motd.center(os.get_terminal_size().columns))
             if beta:
                 print("Beta Build".center(os.get_terminal_size().columns))
@@ -18194,7 +18446,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
                 riskmode = files.json(
                     "Luna/config.json",
                     "risk_mode", documents=True
-                    )
+                )
                 themesvar = files.json(
                     "Luna/config.json", "theme", documents=True
                 )
@@ -18253,7 +18505,10 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
                     f"                           {color.purple('[')}+{color.purple('] CONNECTED')}"
                 )
                 print(
-                    f"                           {color.purple('[')}+{color.purple(']')} {bot.user} | {color.purple(f'{len(bot.guilds)}')} Guilds | {color.purple(f'{len(bot.user.friends)}')} Friends"
+                    f"                           {color.purple('[')}+{color.purple(']')} "
+                    f"{bot.user} | "
+                    f"{color.purple(f'{len(bot.guilds)}')} Guilds | "
+                    f"{color.purple(f'{len(bot.user.friends)}')} Friends"
                 )
                 print(
                     f"                           {color.purple('[')}+{color.purple(']')} {prefix}\n"
@@ -18268,7 +18523,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         aliases=['corona'],
         usage="",
         description="Corona statistics"
-        )
+    )
     async def covid(self, luna):
         await luna.message.delete()
         request = requests.get(f'https://api.covid19api.com/summary')
@@ -18283,8 +18538,14 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         date = info['Date']
         await message_builder(
             luna, title="Covid-19 Statistics",
-            description=f"```Total Confirmed Cases\n{totalconfirmed}``````Total Deaths\n{totaldeaths}``````Total Recovered\n{totalrecovered}``````New Confirmed Cases\n{newconfirmed}``````New Deaths\n{newdeaths}``````New Recovered\n{newrecovered}``````Date\n{date}```"
-            )
+            description=f"```Total Confirmed Cases\n{totalconfirmed}```"
+                        f"```Total Deaths\n{totaldeaths}```"
+                        f"```Total Recovered\n{totalrecovered}```"
+                        f"```New Confirmed Cases\n{newconfirmed}```"
+                        f"```New Deaths\n{newdeaths}```"
+                        f"```New Recovered\n{newrecovered}```"
+                        f"```Date\n{date}```"
+        )
 
     typing = False
 
@@ -18292,7 +18553,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         name="typing",
         usage="<on/off>",
         description="Enable or disable typing"
-        )
+    )
     async def typing(self, luna, mode: str):
         await luna.message.delete()
         if mode == "on":
@@ -18305,7 +18566,6 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
                         break
         elif mode == "off":
             await message_builder(luna, title="Typing", description=f"```\nTyping disabled```")
-            typing = False
         else:
             await mode_error(luna, "on or off")
 
@@ -18313,7 +18573,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         name="hwid",
         usage="",
         description="Prints your hwid"
-        )
+    )
     async def hwid(self, luna):
         await luna.message.delete()
         hwid = str(subprocess.check_output('wmic csproduct get uuid')).split(
@@ -18325,22 +18585,22 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         name="edited",
         usage="<message>",
         description="Add the \"edited\" tag to the message"
-        )
+    )
     async def edited(self, luna, message: str):
         await luna.message.delete()
-        MAGIC_CHAR = '\u202b'
+        magic_char = '\u202b'
         headers = {'Authorization': user_token}
-        message_ = f'{MAGIC_CHAR} {message} {MAGIC_CHAR}'
+        message_ = f'{magic_char} {message} {magic_char}'
         res = requests.post(
             f'https://discordapp.com/api/{api_version}/channels/{luna.channel.id}/messages', headers=headers,
             json={'content': message_}
-            )
+        )
         if res.status_code == 200:
             message_id = res.json()['id']
             requests.patch(
                 f'https://discordapp.com/api/{api_version}/channels/{luna.channel.id}/messages/{message_id}',
                 headers=headers, json={'content': ' ' + message_}
-                )
+            )
 
 
 bot.add_cog(MiscCog(bot))
@@ -18354,7 +18614,7 @@ class GamesCog(commands.Cog, name="Game commands"):
         name="fnshop",
         usage="",
         description="Fortnite shop"
-        )
+    )
     async def fnshop(self, luna):
         await luna.message.delete()
         await message_builder(luna, title="Fortnite Shop", large_image="https://api.nitestats.com/v1/shop/image")
@@ -18363,19 +18623,19 @@ class GamesCog(commands.Cog, name="Game commands"):
         name="fnmap",
         usage="",
         description="Fortnite map"
-        )
+    )
     async def fnmap(self, luna):
         await luna.message.delete()
         await message_builder(
             luna, title="Fortnite Map",
             large_image="https://media.fortniteapi.io/images/map.png?showPOI=true"
-            )
+        )
 
     @commands.command(
         name="fnnews",
         usage="",
         description="Fortnite news"
-        )
+    )
     async def fnnews(self, luna):
         await luna.message.delete()
         fortnite = requests.get("https://fortnite-api.com/v2/news/br").json()
@@ -18506,7 +18766,7 @@ async def mode_error(luna, modes: str):
 async def message_builder(
         luna, title: str = None, description="", large_image: str = None,
         delete_after: int = None, footer_extra: str = None, footer: str = None
-        ):
+):
     """
     Luna's main function for creating messages with the theme applied.\n
     Parse `luna/ctx` as first argument. (Important)\n
@@ -18554,7 +18814,7 @@ async def message_builder(
     embed = discord.Embed(
         title=title,
         description=description
-        )
+    )
     embed.set_footer(text=footer_extra)
     embed.set_image(url=large_image)
     sent = await send(luna, embed, delete_after)
@@ -18577,47 +18837,6 @@ async def error_builder(luna, description=""):
         embed.set_footer(text=theme.footer())
         sent = await send(luna, embed)
         return sent
-
-
-# ///////////////////////////////////////////////////////////////
-
-# @bot.command(name = "speed", usage="", description = "Command speed test")
-# async def speed(luna):
-# 	sniped_start_time = time.time()
-# 	embed = discord.Embed(title="Help", description=f"This is a speed test", color=0xE10959)
-# 	embed.set_thumbnail(url="https://cdn.discordapp.com/avatars/406907871998246924/70bdf0218ac762d8a7dbf8c8758ec62d.webp?size=4096")
-# 	embed.set_footer(text="Luna", icon_url="https://cdn.discordapp.com/avatars/406907871998246924/70bdf0218ac762d8a7dbf8c8758ec62d.webp?size=4096")
-# 	await send(luna, embed)
-# await luna.send(f"It took {'%.3fs' % (time.time() - sniped_start_time)}
-# to send.")
-
-# RPC Main
-# if files.json("Luna/rpc.json", "rich_presence", documents=True) == "on":
-# 	try:
-# 		RPC = Presence(rpc.client_id())# you need to add () since its a function
-# 		RPC.connect()
-
-# 		if rpc.button_2_text() == "" and rpc.button_2_url() == "":
-# 			RPC.update(state=f"{rpc.state()}", details=f"{rpc.details()}", large_image=f"{rpc.large_image()}", large_text=f"{rpc.large_text()}", small_image=f"{rpc.small_image()}", small_text=f"{rpc.small_text()}", buttons=[{"label": f"{rpc.button_1_text()}", "url": f"{rpc.button_1_url()}"}])
-# 		elif rpc.small_image() == "" and rpc.small_text() == "":
-# 			RPC.update(state=f"{rpc.state()}", details=f"{rpc.details()}", large_image=f"{rpc.large_image()}", large_text=f"{rpc.large_text()}", buttons=[{"label": f"{rpc.button_1_text()}", "url": f"{rpc.button_1_url()}"},{"label":f"{rpc.button_2_text()}","url":f"{rpc.button_2_url()}"}])
-# 		elif rpc.large_text() == "":
-# 			RPC.update(state=f"{rpc.state()}", details=f"{rpc.details()}", large_image=f"{rpc.large_image()}", small_image=f"{rpc.small_image()}", small_image_text=f"{rpc.small_text()}", buttons=[{"label": f"{rpc.button_1_text()}", "url": f"{rpc.button_1_url()}"},{"label":f"{rpc.button_2_text()}","url":f"{rpc.button_2_url()}"}])
-# 		elif rpc.state() == "":
-# 			RPC.update(details=f"{rpc.details()}", large_image=f"{rpc.large_image()}", large_text=f"{rpc.large_text()}", small_image=f"{rpc.small_image()}", small_text=f"{rpc.small_text()}", buttons=[{"label": f"{rpc.button_1_text()}", "url": f"{rpc.button_1_url()}"},{"label":f"{rpc.button_2_text()}","url":f"{rpc.button_2_url()}"}])
-# 		else:
-# 			RPC.update(state=f"{rpc.state()}", details=f"{rpc.details()}", large_image=f"{rpc.large_image()}", large_text=f"{rpc.large_text()}", small_image=f"{rpc.small_image()}", small_text=f"{rpc.small_text()}", buttons=[{"label": f"{rpc.button_1_text()}", "url": f"{rpc.button_1_url()}"},{"label":f"{rpc.button_2_text()}","url":f"{rpc.button_2_url()}"}])
-# 	except Exception as e:
-# 		prints.error(e)
-# 		os.system('pause')
-
-# notify.webhook(url="https://discord.com/api/webhooks/909150388681310218/UTUTPihWbPzaOeXoxe7zyfHJJBBf4s_krKys-LB0uSmQZvB42QnQRVndygIc8ehq13cf", description="This is a test")
-
-# ///////////////////////////////////////////////////////////////
-# Main Thread, Don't Touch
-
-# if not developer_mode:
-# 	check_debuggers_thread()
 
 if os.path.splitext(__file__)[1] == ".pyc":
     os._exit(0)

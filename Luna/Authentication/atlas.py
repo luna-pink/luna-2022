@@ -1,5 +1,5 @@
 import socket
-from Luna.Encryption import *
+from Encryption import *
 
 # ///////////////////////////////////////////////////////////////
 # Auth API Module
