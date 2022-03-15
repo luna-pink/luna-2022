@@ -28,6 +28,7 @@ import psutil
 import pwinput
 import pyPrivnote
 import qrcode
+import pypresence
 from discord import *
 from discord.ext import commands
 from discord.ext.commands import MissingPermissions, CheckFailure, has_permissions
