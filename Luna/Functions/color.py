@@ -44,23 +44,25 @@ class color:
             case "2":
                 return color.blue(f"{text}")
             case "3":
-                return color.green(f"{text}")
+                return color.pink(f"{text}")
             case "4":
                 return color.yellow(f"{text}")
             case "5":
-                return color.red(f"{text}")
+                return color.green(f"{text}")
             case "6":
+                return color.red(f"{text}")
+            case "7":
                 return color.black(f"{text}")
-        if int(gradient) > 6:
+        if int(gradient) > 7:
             return color.purple(f"{text}")
 
     def black(text):
         os.system("")
         faded = ""
         for line in text.splitlines():
-            red = 0
-            green = 0
-            blue = 0
+            red = 25
+            green = 25
+            blue = 25
             for character in line:
                 red += 20
                 green += 20
@@ -94,6 +96,18 @@ class color:
                 if green > 255:
                     green = 255
                 faded += f"\033[38;2;0;{green};255m{character}\033[0m"
+        return faded
+
+    def pink(text):
+        os.system("")
+        faded = ""
+        for line in text.splitlines():
+            blue = 255
+            for character in line:
+                blue -= 20
+                if blue < 0:
+                    blue = 0
+                faded += f"\033[38;2;255;0;{blue}m{character}\033[0m"
         return faded
 
     def yellow(text):
@@ -205,15 +219,15 @@ class color:
     def black_white(text):
         os.system("")
         faded = ""
-        red = 0
-        green = 0
-        blue = 0
+        red = 25
+        green = 25
+        blue = 25
         for line in text.splitlines():
             faded += f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n"
             if not red == 255 and not green == 255 and not blue == 255:
-                red += 20
-                green += 20
-                blue += 20
+                red += 10
+                green += 10
+                blue += 10
                 if red > 255 and green > 255 and blue > 255:
                     red = 255
                     green = 255

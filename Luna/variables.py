@@ -1,4 +1,5 @@
 import requests
+import asyncpraw
 
 # ///////////////////////////////////////////////////////////////
 # Developer Variables
@@ -7,9 +8,12 @@ free_mode = True
 developer_mode = False
 
 beta = False
-version = '2021.3.37'
+version = '2021.3.43'
 api_version = 'v9'
 beta_version = 'v10'
+
+reddit_app_id = 'tpO3tUTb6mktmrhAKzej5Q'
+reddit_app_secret = 'QZvNrrMRVgl38lMJjewyCaiiVRnrFg'
 
 # ///////////////////////////////////////////////////////////////
 # Luna Variables
@@ -18,6 +22,7 @@ anti_raid = False
 anti_invite = False
 anti_upper = False
 anti_phishing = False
+anti_deleting = False
 
 farming = False
 
