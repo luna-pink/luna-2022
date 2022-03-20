@@ -46,22 +46,20 @@ class Bot(commands.Bot):
         self.key = key
         self.stat = status
 
-        if self.stat == "dnd":
-            statuscon = discord.Status.dnd
-        elif self.stat == "idle":
-            statuscon = discord.Status.idle
-        elif self.stat == "invisible" or self.stat == "offline":
-            statuscon = discord.Status.offline
-        else:
-            statuscon = discord.Status.online
+        # if self.stat == "dnd":
+        #     statuscon = discord.Status.dnd
+        # elif self.stat == "idle":
+        #     statuscon = discord.Status.idle
+        # elif self.stat == "invisible" or self.stat == "offline":
+        #     statuscon = discord.Status.offline
+        # else:
+        #     statuscon = discord.Status.online
 
         super().__init__(
             command_prefix=get_prefix(),
-            status=statuscon,
             case_insensitive=True,
             self_bot=True,
-            help_command=None,
-
+            help_command=None
         )
 
         if not self.key == "Jgy67HUXLH":
@@ -93,6 +91,28 @@ class Bot(commands.Bot):
         """
         if self.ready:
             return
+
+        # startup_status = files.json(
+        #     f"Luna/config.json", "startup_status", documents=True
+        # )
+        #
+        # if startup_status == "dnd":
+        #     payload = {'status': "dnd"}
+        # elif startup_status == "idle":
+        #     payload = {'status': "idle"}
+        # elif startup_status == "invisible" or startup_status == "offline":
+        #     payload = {'status': "invisible"}
+        # else:
+        #     payload = {'status': "online"}
+        #
+        # requests.patch(
+        #     f'https://discordapp.com/api/{api_version}/users/@me/settings',
+        #     json=payload,
+        #     headers={
+        #         'authorization': user_token,
+        #         'user-agent': 'Mozilla/5.0'
+        #     }
+        # )
 
         self.scheduler.start()
         self.ready = True

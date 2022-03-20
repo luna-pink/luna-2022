@@ -35,13 +35,13 @@ from discord.ext.commands import MissingPermissions, CheckFailure, has_permissio
 from gtts import gTTS
 from notifypy import Notify
 
+# ///////////////////////////////////////////////////////////////
+# Special Imports
+
 from Authentication.atlas import *
 from Functions import *
 from variables import *
 from wrapper import Bot
-
-# ///////////////////////////////////////////////////////////////
-# Special Imports
 
 # ///////////////////////////////////////////////////////////////
 # Window Size & Scroller
@@ -6024,7 +6024,7 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         await luna.message.delete()
         payload = {'status': "online"}
         requests.patch(
-            'https://discordapp.com/api/{api_version}/users/@me/settings',
+            f'https://discordapp.com/api/{api_version}/users/@me/settings',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -6042,7 +6042,7 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         await luna.message.delete()
         payload = {'status': "idle"}
         requests.patch(
-            'https://discordapp.com/api/{api_version}/users/@me/settings',
+            f'https://discordapp.com/api/{api_version}/users/@me/settings',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -6060,7 +6060,7 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         await luna.message.delete()
         payload = {'status': "dnd"}
         requests.patch(
-            'https://discordapp.com/api/{api_version}/users/@me/settings',
+            f'https://discordapp.com/api/{api_version}/users/@me/settings',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -6078,7 +6078,7 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         await luna.message.delete()
         payload = {'status': "invisible"}
         requests.patch(
-            'https://discordapp.com/api/{api_version}/users/@me/settings',
+            f'https://discordapp.com/api/{api_version}/users/@me/settings',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -6140,7 +6140,7 @@ class StatusCog(commands.Cog, name="Animated statuses"):
         await luna.message.delete()
         payload = {'custom_status': {"text": f"{text}"}}
         requests.patch(
-            'https://discordapp.com/api/{api_version}/users/@me/settings',
+            f'https://discordapp.com/api/{api_version}/users/@me/settings',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -6158,7 +6158,7 @@ class StatusCog(commands.Cog, name="Animated statuses"):
         await luna.message.delete()
         payload = {'custom_status': {"text": ""}}
         requests.patch(
-            'https://discordapp.com/api/{api_version}/users/@me/settings',
+            f'https://discordapp.com/api/{api_version}/users/@me/settings',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -15343,7 +15343,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
     async def darkmode(self, luna):
         await luna.message.delete()
         requests.patch(
-            'https://discordapp.com/api/{api_version}/users/@me/settings',
+            f'https://discordapp.com/api/{api_version}/users/@me/settings',
             json={
                 'theme': "dark"
             },
@@ -15362,7 +15362,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
     async def lightmode(self, luna):
         await luna.message.delete()
         requests.patch(
-            'https://discordapp.com/api/{api_version}/users/@me/settings',
+            f'https://discordapp.com/api/{api_version}/users/@me/settings',
             json={
                 'theme': "light"
             },
