@@ -7,8 +7,6 @@ from CEA256 import *
 from discord import *
 from discord.ext import commands
 
-from wrapper import Bot
-
 # ///////////////////////////////////////////////////////////////
 
 r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
@@ -74,7 +72,14 @@ class config:
 
 # ///////////////////////////////////////////////////////////////
 
-bot = Bot(key="Jgy67HUXLH")
+bot = commands.Bot(
+    command_prefix=".",
+    case_insensitive=True,
+    self_bot=True,
+    help_command=None,
+    guild_subscription_options=GuildSubscriptionOptions.off(),
+    key="Jgy67HUXLH!Luna"
+)
 guild_id = 893540274561765426
 upload_channel_id = 893540849852489758
 changelog_channel_id = 893639765855969345
@@ -158,13 +163,13 @@ async def on_ready():
     if not overwrite:
         try:
             await upload_channel.purge(limit=5)
-        except:
+        except BaseException:
             pass
 
     if not overwrite:
         try:
             await public_upload_channel.purge(limit=5)
-        except:
+        except BaseException:
             pass
 
     # await public_announcement_channel.send(announcement2)

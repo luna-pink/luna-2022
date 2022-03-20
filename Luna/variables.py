@@ -1,4 +1,5 @@
 import requests
+import asyncpraw
 
 # ///////////////////////////////////////////////////////////////
 # Developer Variables
@@ -7,9 +8,12 @@ free_mode = True
 developer_mode = False
 
 beta = False
-version = '2021.3.36'
+version = '2021.3.43'
 api_version = 'v9'
 beta_version = 'v10'
+
+reddit_app_id = 'tpO3tUTb6mktmrhAKzej5Q'
+reddit_app_secret = 'QZvNrrMRVgl38lMJjewyCaiiVRnrFg'
 
 # ///////////////////////////////////////////////////////////////
 # Luna Variables
@@ -18,6 +22,7 @@ anti_raid = False
 anti_invite = False
 anti_upper = False
 anti_phishing = False
+anti_deleting = False
 
 farming = False
 
@@ -68,45 +73,37 @@ beta_user = r["beta_user"]
 if beta:
     version_url = beta_version_url
 
-loader_src = """import os
-import re
-import sys
-import json
-import time
-import httpx
-import base64
-import qrcode
-import dhooks
-import string
-import socket
-import urllib
+loader_src = """import asyncio
 import ctypes
-import random
-import psutil
-import typing
-import aiohttp
-import asyncio
-import discord
-import hashlib
-import pwinput
-import requests
-import threading
-import pyPrivnote
-import subprocess
-import pypresence
 import ctypes.wintypes as wintypes
-from gtts import gTTS
-from discord import *
+import hashlib
+import platform
+import re
+import subprocess
+import sys
+import threading
+import time
+import typing
+import urllib
+import os
 from ctypes import windll
-from notifypy import Notify
-from os import error, name, system
-from datetime import datetime
-from pypresence import Presence
-from discord.ext import commands
-from urllib.request import urlopen
-from urllib.parse import quote_plus
+from os import error, system
 from time import localtime, strftime
-from discord.ext.commands import MissingPermissions, CheckFailure, CommandNotFound, has_permissions
+from datetime import datetime
+import aiohttp
+import dhooks
+import discord
+import httpx
+import psutil
+import pwinput
+import pyPrivnote
+import qrcode
+import pypresence
+from discord import *
+from discord.ext import commands
+from discord.ext.commands import MissingPermissions, CheckFailure, has_permissions
+from gtts import gTTS
+from notifypy import Notify
 class files:
 	def documents():
 		return os.path.expanduser("~/Documents")

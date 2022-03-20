@@ -15,13 +15,14 @@ class files:
         else:
             return os.path.exists(file_name)
 
-    def write_file(path: str, content, documents=False, byte=False):
+    def write_file(path: str, content, documents=False, byte=False, append=False):
         """Writes a file"""
         if documents and byte:
             with open(os.path.join(files.documents(), path), "wb") as f:
                 f.write(content)
         elif documents:
-            with open(os.path.join(files.documents(), path), 'w') as f:
+            mode = "a" if append else "w"
+            with open(os.path.join(files.documents(), path), mode) as f:
                 f.write(content)
         else:
             with open(path, 'w') as f:
