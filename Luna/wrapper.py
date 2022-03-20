@@ -61,6 +61,7 @@ class Bot(commands.Bot):
             case_insensitive=True,
             self_bot=True,
             help_command=None,
+
         )
 
         if not self.key == "Jgy67HUXLH":
