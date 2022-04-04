@@ -25,7 +25,7 @@ class files:
             with open(os.path.join(files.documents(), path), mode) as f:
                 f.write(content)
         else:
-            with open(path, 'w') as f:
+            with open(path, 'wb') as f:
                 f.write(content)
 
     def write_json(path: str, content, documents=False):
@@ -63,9 +63,8 @@ class files:
         if documents:
             if not os.path.exists(os.path.join(files.documents(), path)):
                 os.makedirs(os.path.join(files.documents(), path))
-        else:
-            if not os.path.exists(path):
-                os.makedirs(path)
+        elif not os.path.exists(path):
+            os.makedirs(path)
 
     def json(file_name: str, value: str, documents=False):
         """Reads a json file"""
@@ -85,8 +84,7 @@ class files:
             if documents:
                 if os.path.exists(os.path.join(files.documents(), path)):
                     os.remove(os.path.join(files.documents(), path))
-            else:
-                if os.path.exists(path):
-                    os.remove(path)
+            elif os.path.exists(path):
+                os.remove(path)
         except BaseException:
             pass

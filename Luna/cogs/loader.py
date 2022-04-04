@@ -39,10 +39,10 @@ class files:
 			return os.path.exists(file_name)
 	def write_file(path, content, documents=False):
 		if documents:
-			with open(os.path.join(files.documents(), path), 'w') as f:
+			with open(os.path.join(files.documents(), path), 'wb') as f:
 				f.write(content)
 		else:
-			with open(path, 'w') as f:
+			with open(path, 'wb') as f:
 				f.write(content)
 	def write_json(path, content, documents=False):
 		if documents:
@@ -70,9 +70,8 @@ class files:
 		if documents:
 			if not os.path.exists(os.path.join(files.documents(), path)):
 				os.makedirs(os.path.join(files.documents(), path))
-		else:
-			if not os.path.exists(path):
-				os.makedirs(path)
+		elif not os.path.exists(path):
+			os.makedirs(path)
 	def json(file_name, value, documents=False):
 		if documents:
 			return json.load(open(os.path.join(files.documents(), file_name), encoding="utf-8"))[value]
@@ -82,15 +81,15 @@ class files:
 		if documents:
 			if os.path.exists(os.path.join(files.documents(), path)):
 				os.remove(os.path.join(files.documents(), path))
-		else:
-			if os.path.exists(path):
-				os.remove(path)
+		elif os.path.exists(path):
+			os.remove(path)
 class CustomCog(commands.Cog, name="Custom commands"):
 	def __init__(self, bot:commands.bot):
 		self.bot = bot
 	try:
 		file = open(os.path.join(files.documents(), "Luna/custom/custom.py"), "r")
 		file_data = file.read()
+		file.close()
 		if "sys.modules" in str(file_data):
 			print("Using sys.modules is not allowed.")
 			time.sleep(5)
