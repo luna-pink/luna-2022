@@ -8,12 +8,9 @@ free_mode = True
 developer_mode = False
 
 beta = False
-version = '2021.3.43'
+version = '2021.3.44'
 api_version = 'v9'
 beta_version = 'v10'
-
-reddit_app_id = 'tpO3tUTb6mktmrhAKzej5Q'
-reddit_app_secret = 'QZvNrrMRVgl38lMJjewyCaiiVRnrFg'
 
 # ///////////////////////////////////////////////////////////////
 # Luna Variables

@@ -1,2 +1,9 @@
-[-] Removed {prefix}femboy
-[-] Removed {prefix}femboy1
+[+] Massively improved speed of Luna sending messages
+[+] Improved speed on getting info from members in several commands
+[+] Improved speed on looping through members in several commands
+[/] Improved user sharing
+[/] Improved error handlers on message deletion
+[!] Fixed {prefix}logout
+[!] Fixed 'username' error
+[!] Fixed multiple other small issues I can't remember
+[-] Removed {prefix}unbanall
