@@ -1,9 +1,79 @@
-[+] Massively improved speed of Luna sending messages
-[+] Improved speed on getting info from members in several commands
-[+] Improved speed on looping through members in several commands
-[/] Improved user sharing
-[/] Improved error handlers on message deletion
-[!] Fixed {prefix}logout
-[!] Fixed 'username' error
-[!] Fixed multiple other small issues I can't remember
-[-] Removed {prefix}unbanall
+[+] Added {prefix}boobs
+[+] Added {prefix}pussy
+[+] Added {prefix}4k
+[+] Added {prefix}cum
+[+] Added {prefix}ahegao
+[+] Added {prefix}lewd
+[+] Added {prefix}feet
+[+] Added {prefix}lesbian
+[+] Added {prefix}spam
+[+] Added {prefix}hwallpaper
+[+] Improved speed on caching
+[+] Improved the first login (directly asks for token)
+[+] Improved token login, should fail less
+[+] Improved custom commands, can be seperate files now
+[+] Improved custom commands loader
+[+] Improved custom command Documentation
+[+] Improved {prefix}newcmd (creates a seperate file now)
+[+] Improved updater (is faster now)
+[!] Fixed {prefix}virus
+[!] Fixed {prefix}cathi
+[!] Fixed {prefix}flop
+[!] Fixed {prefix}poof
+[!] Fixed {prefix}boom
+[!] Fixed {prefix}unflip
+[!] Fixed {prefix}flip
+[!] Fixed {prefix}warning
+[!] Fixed {prefix}drake
+[!] Fixed {prefix}mreact
+[!] Fixed 'title_url' error on several commands
+[/] Changed colors to match the new Luna design
+[/] Changed "custom" to "scripts"
+[-] Removed {prefix}hclassic
+[-] Removed {prefix}hsmallboobs
+[-] Removed {prefix}hboobs
+[-] Removed {prefix}htits
+[-] Removed {prefix}hpussy
+[-] Removed {prefix}hanal
+[-] Removed {prefix}hcum
+[-] Removed {prefix}hcum1
+[-] Removed {prefix}hblowjob1
+[-] Removed {prefix}hneko
+[-] Removed {prefix}htrap
+[-] Removed {prefix}hyuri
+[-] Removed {prefix}hfutanari
+[-] Removed {prefix}hketa
+[-] Removed {prefix}hhololewd
+[-] Removed {prefix}hlewdkemo
+[-] Removed {prefix}hsolo
+[-] Removed {prefix}hsolog
+[-] Removed {prefix}hfeetg
+[-] Removed {prefix}hero
+[-] Removed {prefix}herok
+[-] Removed {prefix}herokemo
+[-] Removed {prefix}hles
+[-] Removed {prefix}hlewdk
+[-] Removed {prefix}hngif
+[-] Removed {prefix}hkemonomimi
+[-] Removed {prefix}hholoero
+[-] Removed {prefix}hfoxgirl
+[-] Removed {prefix}hfemdom
+[-] Removed {prefix}hgasm
+[-] Removed {prefix}hkuni
+[-] Removed {prefix}hpwankg
+[-] Removed {prefix}havatar
+[-] Removed {prefix}havatar1
+[-] Removed {prefix}nuking
+[-] Removed {prefix}nuketoken
+[-] Removed {prefix}mmesstoken
+[-] Removed {prefix}annihilate
+[-] Removed {prefix}raiding
+[-] Removed {prefix}raidjoin
+[-] Removed {prefix}proxyjoin
+[-] Removed {prefix}raidspam
+[-] Removed {prefix}proxyspam
+[-] Removed {prefix}raidmassping
+[-] Removed {prefix}raidleave
+[-] Removed {prefix}proxyleave
+[-] Removed {prefix}raidreact
+[-] Removed {prefix}proxyreact

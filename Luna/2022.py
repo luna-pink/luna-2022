@@ -31,7 +31,7 @@ class DataDirectory:
     DATA_FOLDER = "data/"
 
 
-class FileDirectories:
+class sirectories:
     CUSTOM_FOLDER = f"{DataDirectory.DATA_FOLDER}/custom/"
     IMAGE_FOLDER = f"{DataDirectory.DATA_FOLDER}/image/"
     LOGGING_FOLDER = f"{DataDirectory.DATA_FOLDER}/logging/"
@@ -72,11 +72,6 @@ class LUNA:
         class CommandTheme:
             CUSTOM_TITLE_KEY = ("Custom Title", "Luna Self-Bot")
             EMBED_AUTHOR_KEY = ("Embed Author", "")
-            EMBED_AUTHOR_URL_KEY = ("Embed Author URL", "")
-            EMBED_AUTHOR_ICON_KEY = ("Embed Author Icon", "")
-            EMBED_THUMBNAIL_KEY = ("Embed Thumbnail", "https://cdn.discordapp.com/attachments/927033067468623882/927033385216520232/Luna_Logo.png")
-            EMBED_IMAGE_KEY = ("Embed Image", "")
-            EMBED_COLOR_KEY = ("Embed Color", "#E4BBF1")
             CUSTOM_FOOTER_KEY = ("Custom Footer", "Luna-sb.com")
             EMBED_FOOTER_ICON_KEY = ("Embed Footer Icon", "")
 
@@ -801,41 +796,11 @@ Luna = commands.Bot(
 Luna.remove_command("help")
 
 global_vars = {
-    "aiohttp": aiohttp,
-    "asyncio": asyncio,
-    "ctypes": ctypes,
-    "datetime": datetime,
-    "json": json,
-    "os": os,
-    "platform": platform,
-    "playsound": playsound,
-    "pypresence": pypresence,
-    "random": random,
-    "re": re,
-    "requests": requests,
-    "shutil": shutil,
-    "sys": sys,
-    "time": time,
-    "traceback": traceback,
-    "winreg": winreg,
-    "discord": discord,
-    "commands": commands,
-    "tasks": tasks,
-    "exit": exit,
-    "Union": Union,
-    "List": List,
-    "Any": Any,
-    "Dict": Dict,
-    "Center": Center,
-    "Colorate": Colorate,
-    "Colors": Colors,
-    "ToastNotifier": ToastNotifier,
-    "Luna": Luna,
-    "bot": Luna,
-    "LUNA": LUNA
+    "aiohttp": aiohttp, "asyncio": asyncio, "ctypes": ctypes, "datetime": datetime, "json": json, "os": os, "platform": platform, "playsound": playsound, "pypresence": pypresence,
+    "random": random, "re": re, "requests": requests, "shutil": shutil, "sys": sys, "time": time, "traceback": traceback, "winreg": winreg, "discord": discord, "commands": commands,
+    "tasks": tasks, "exit": exit, "Union": Union, "List": List, "Any": Any, "Dict": Dict, "Center": Center, "Colorate": Colorate, "Colors": Colors, "ToastNotifier": ToastNotifier, "Luna": Luna,
+    "bot": Luna, "LUNA": LUNA, "Optional": Optional
 }
-
-global_vars["Optional"] = Optional
 
 LUNA.JSON.Temp.update()
 

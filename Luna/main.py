@@ -4,11 +4,14 @@
 # Imports
 
 import asyncio
+import base64
 import ctypes
 import ctypes.wintypes as wintypes
 import hashlib
 import platform
+import random
 import re
+import string
 import subprocess
 import sys
 import threading
@@ -33,6 +36,7 @@ from discord.ext import commands
 from discord.ext.commands import MissingPermissions, CheckFailure, has_permissions
 from gtts import gTTS
 from notifypy import Notify
+from subprocess import call
 
 # ///////////////////////////////////////////////////////////////
 # Special Imports
@@ -142,7 +146,7 @@ def check_debuggers():
                     if x in blacklisted_processes:
                         try:
                             username = files.json(
-                                "Luna/auth.json", "username", documents=True
+                                "data/auth.json", "username", documents=False
                             )
                             username = Decryption(
                                 '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
@@ -217,19 +221,19 @@ def restart_program():
     It restarts the program
     """
     if files.json(
-            "Luna/notifications/toasts.json",
+            "data/notifications/toasts.json",
             "login",
-            documents=True
+            documents=False
     ) == "on" and files.json(
-        "Luna/notifications/toasts.json",
-        "toasts", documents=True
+        "data/notifications/toasts.json",
+        "toasts", documents=False
     ) == "on":
         notify.toast("Restarting Luna...")
     if (
-            files.json("Luna/webhooks/webhooks.json", "login", documents=True)
+            files.json("data/webhooks/webhooks.json", "login", documents=False)
             == "on"
             and files.json(
-        "Luna/webhooks/webhooks.json", "webhooks", documents=True
+        "data/webhooks/webhooks.json", "webhooks", documents=False
     )
             == "on"
             and webhook.login_url() != "webhook-url-here"
@@ -275,20 +279,20 @@ class luna:
             os.remove('Updater.exe')
         if version != version_url and not developer_mode:
             if files.json(
-                    "Luna/notifications/toasts.json",
+                    "data/notifications/toasts.json",
                     "login",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/notifications/toasts.json",
+                "data/notifications/toasts.json",
                 "toasts",
-                documents=True
+                documents=False
             ) == "on":
                 notify.toast(f"Starting update {version_url}")
             if (
-                    files.json("Luna/webhooks/webhooks.json", "login", documents=True)
+                    files.json("data/webhooks/webhooks.json", "login", documents=False)
                     == "on"
                     and files.json(
-                "Luna/webhooks/webhooks.json", "webhooks", documents=True
+                "data/webhooks/webhooks.json", "webhooks", documents=False
             )
                     == "on"
                     and webhook.login_url() != "webhook-url-here"
@@ -299,10 +303,10 @@ class luna:
                 )
             luna.update()
         elif (
-                files.file_exist('Luna/auth.json', documents=True)
-                or not files.file_exist('Luna/auth.json', documents=True)
+                files.file_exist('data/auth.json', documents=False)
+                or not files.file_exist('data/auth.json', documents=False)
                 and developer_mode
-                or not files.file_exist('Luna/auth.json', documents=True)
+                or not files.file_exist('data/auth.json', documents=False)
                 and not developer_mode
                 and free_mode
         ):
@@ -335,7 +339,7 @@ class luna:
         #         '\\r\\n'
         #     )[1].strip('\\r').strip()
         # except BaseException:
-        #     files.remove('Luna/auth.json', documents=True)
+        #     files.remove('data/auth.json', documents=False)
         #     prints.error(
         #         "There has been an issue with authenticating your hardware"
         #     )
@@ -348,10 +352,10 @@ class luna:
             if not developer_mode and not free_mode:
                 try:
                     username = files.json(
-                        "Luna/auth.json", "username", documents=True
+                        "data/auth.json", "username", documents=False
                     )
                     password = files.json(
-                        "Luna/auth.json", "password", documents=True
+                        "data/auth.json", "password", documents=False
                     )
                     username = Decryption(
                         '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
@@ -360,7 +364,7 @@ class luna:
                         '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
                     ).CEA256(password)
                 except BaseException:
-                    files.remove('Luna/auth.json', documents=True)
+                    files.remove('data/auth.json', documents=False)
                     prints.error("There has been an issue with your login")
                     luna._extracted_from_login_36("Redirecting to the main menu in 5 seconds » Code 2")
             try:
@@ -396,16 +400,19 @@ class luna:
             '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
         ).CEA256(password)
         data = {"username": f"{self}", "password": f"{password}"}
-        files.write_json("Luna/auth.json", data, documents=True)
+        files.write_json("data/auth.json", data, documents=False)
 
     # TODO Rename this here and in `login`
     def _extracted_from_login_54(self, arg1):
         prints.error(self)
-        files.remove('Luna/auth.json', documents=True)
+        files.remove('data/auth.json', documents=False)
         luna._extracted_from_login_36(arg1)
 
     # TODO Rename this here and in `login`
     def _extracted_from_login_49():
+        hwid = str(subprocess.check_output('wmic csproduct get uuid')).split(
+            '\\r\\n'
+        )[1].strip('\\r').strip()
         auth_luna.ValidateUserHWID(hwid)
         auth_luna.ValidateEntitlement("LunaSB")
         auth_luna.disconnect()
@@ -437,7 +444,7 @@ class luna:
                 '\\r\\n'
             )[1].strip('\\r').strip()
         except BaseException:
-            files.remove('Luna/auth.json', documents=True)
+            files.remove('data/auth.json', documents=False)
             luna._extracted_from_register_10("There has been an issue with authenticating your hardware", "Redirecting to the main menu in 5 seconds » Code 5")
 
         username = prints.input("Username")
@@ -490,7 +497,7 @@ class luna:
             "username": f"{username}",
             "password": f"{password}"
         }
-        files.write_json("Luna/auth.json", data, documents=True)
+        files.write_json("data/auth.json", data, documents=False)
 
     # TODO Rename this here and in `register`
     def _extracted_from_register_10(self, arg1):
@@ -550,26 +557,26 @@ class luna:
             os.system("cls")
         try:
             logo_variable = files.json(
-                "Luna/console/console.json", "logo", documents=True
+                "data/console/console.json", "logo", documents=False
             )
             if logo_variable in ["luna", "luna.txt"]:
                 logo_variable = logo
             else:
                 ending = "" if ".txt" in logo_variable else ".txt"
                 if not files.file_exist(
-                        f"Luna/console/{logo_variable}{ending}",
-                        documents=True
+                        f"data/console/{logo_variable}{ending}",
+                        documents=False
                 ):
                     logo_variable = logo
                 if files.json(
-                        "Luna/console/console.json",
+                        "data/console/console.json",
                         "center",
-                        documents=True
+                        documents=False
                 ):
                     logo_text = ""
                     for line in files.read_file(
-                            f"Luna/console/{logo_variable}{ending}",
-                            documents=True
+                            f"data/console/{logo_variable}{ending}",
+                            documents=False
                     ).splitlines():
                         logo_text += line.center(
                             os.get_terminal_size().columns
@@ -577,7 +584,7 @@ class luna:
                         logo_variable = logo_text
                 else:
                     logo_variable = files.read_file(
-                        f"Luna/console/{logo_variable}{ending}", documents=True
+                        f"data/console/{logo_variable}{ending}", documents=False
                     )
         except Exception as e:
             prints.error(e)
@@ -616,7 +623,7 @@ class luna:
             if not free_mode:
                 try:
                     username = files.json(
-                        "Luna/auth.json", "username", documents=True
+                        "data/auth.json", "username", documents=False
                     )
                     username = Decryption(
                         '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
@@ -648,7 +655,7 @@ class luna:
         try:
             luna._extracted_from_bot_login_16()
         except BaseException:
-            files.remove('Luna/discord.luna', documents=True)
+            files.remove('data/discord.luna', documents=False)
             prints.error("Invalid Token")
             time.sleep(5)
             prints.event("Redirecting to the main menu in 5 seconds » Code 7")
@@ -657,7 +664,7 @@ class luna:
 
     # TODO Rename this here and in `bot_login`
     def _extracted_from_bot_login_16():
-        token = files.json("Luna/discord.luna", "token", documents=True)
+        token = files.json("data/discord.luna", "token", documents=False)
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
             'Content-Type': 'application/json',
@@ -691,21 +698,18 @@ class luna:
         """
         luna.file_check(True)
         if files.json(
-                "Luna/discord.luna",
+                "data/discord.luna",
                 "token",
-                documents=True
+                documents=False
         ) == "token-here":
             luna.console(False, clear=True)
             prints.event(
-                "First time setup, Luna will search for tokens on your system"
+                "First time setup"
             )
             token = luna.ask_token()
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/discord.luna"
-                    ),
+                    "data/discord.luna",
                     encoding="utf-8"
                 )
             )
@@ -713,10 +717,7 @@ class luna:
                 '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
             ).CEA256(token)
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/discord.luna"
-                ),
+                "data/discord.luna",
                 json_object
             )
         luna.bot_login()
@@ -726,25 +727,9 @@ class luna:
 
     def check_token(self):
         """
-                Check the given token.\n
-                Returns `True` if the token is valid.
-                """
-        global valid_tokens
-        if isinstance(self, list):
-            valid_tokens = []
-            for i in self:
-                headers = {
-                    'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
-                    'Content-Type': 'application/json',
-                    'authorization': i
-                }
-                r = requests.get(
-                    f"https://discordapp.com/api/{api_version}/users/@me/library",
-                    headers=headers
-                )
-                if r.status_code == 200:
-                    valid_tokens.append(i)
-            return valid_tokens[0]
+        Check the given token.\n
+        Returns `True` if the token is valid.
+        """
 
         headers = {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7', 'Content-Type': 'application/json', 'authorization': self}
 
@@ -753,111 +738,17 @@ class luna:
         )
         return self if r.status_code == 200 else False
 
-    def find_tokens(self):
-        """
-        It finds all the tokens in the local storage folder
-        :return: A list of strings.
-        """
-        self += "\\Local Storage\\leveldb"
-        tokens = []
-
-        try:
-            for file_name in os.listdir(self):
-                if not file_name.endswith(".log") and not file_name.endswith(".ldb"):
-                    continue
-
-                for line in [
-                    x.strip()
-                    for x in open(f"{self}\\{file_name}", errors="ignore").readlines()
-                    if x.strip()
-                ]:
-                    for regex in (r"[\w-]{24}\.[\w-]{6}\.[\w-]{27}", r"mfa\.[\w-]{84}"):
-                        tokens.extend(iter(re.findall(regex, line)))
-            return tokens
-        except BaseException:
-            return tokens
-
-    def get_tokens():
-        """
-        It searches for the token files in the specified paths and returns the tokens if found
-        :return: A list of tokens.
-        """
-        local = os.getenv("LOCALAPPDATA")
-        roaming = os.getenv("APPDATA")
-
-        paths = {
-            "Discord": roaming + "\\Discord",
-            "Discord Canary": roaming + "\\discordcanary",
-            "Discord PTB": roaming + "\\discordptb",
-            "Google Chrome": local + "\\Google\\Chrome\\User Data\\Default",
-            "Opera": roaming + "\\Opera Software\\Opera Stable",
-            "Brave": local + "\\BraveSoftware\\Brave-Browser\\User Data\\Default",
-            "Yandex": local + "\\Yandex\\YandexBrowser\\User Data\\Default",
-            "Firefox": roaming + "\\Mozilla\\Firefox\\Profiles",
-        }
-        for platform, path in paths.items():
-            if not os.path.exists(path):
-                continue
-
-            tokens = luna.find_tokens(path)
-
-            return tokens if len(tokens) > 0 else None
-
     def ask_token():
         """
         It asks the user to select a token from a list of valid tokens
         :return: A token.
         """
-        tokens = luna.get_tokens()
-        working_emails = []
-        if tokens is None:
-            return _extracted_from_ask_token_6()
-        elif tokens:
-            num_token = {}
-            num = 1
-            for token in tokens:
-                headers = {
-                    "Authorization": token,
-                    'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
-                    "Content-Type": "application/json",
-                }
-                page = requests.get(
-                    f"https://discord.com/api/{api_version}/users/@me", headers=headers
-                )
-                if page.status_code == 200:
-                    page_json = page.json()
-                    email = page_json["email"]
-                    if email not in working_emails:
-                        num_token[num] = token
-                        _2fa = " » 2FA Active" if token.startswith("mfa") else " » 2FA Inactive"
-                        prints.message(
-                            f"{color.print_gradient(str(num))} » {color.print_gradient(page_json['username'])}#{color.print_gradient(page_json['discriminator'])}{_2fa}"
-                        )
-                        num = num + 1
-                        working_emails.append(email)
-            if not working_emails:
-                return _extracted_from_ask_token_6()
-            prints.message("Type \"c\" to manually enter a token")
-            token_input = prints.input(f"Select the account you want to use (1-{num - 1})")
-            try:
-                if token_input == "c":
-                    token = prints.input("Token")
-                    token = token.replace('"', '')
-                else:
-                    token = num_token[int(token_input)]
-                return token
-            except BaseException:
-                prints.error("Invalid choice")
-                time.sleep(3)
-                return luna.ask_token()
-
-    # TODO Rename this here and in `ask_token`
-    def _extracted_from_ask_token_6():
-        prints.message(
-            "Luna didn't find any valid tokens, please manually enter one instead"
-        )
         token = prints.input("Token")
         token = token.replace('"', '')
+        if not luna.check_token(token):
+            prints.error("Invalid Token")
+            return luna.ask_token()
+        prints.event("Token accepted")
         return token
 
     # ///////////////////////////////////////////////////////////////
@@ -870,82 +761,82 @@ class luna:
         # ///////////////////////////////////////////////////////////////
         # Folder Creation
 
-        if not files.file_exist("Luna/console", documents=True):
-            files.create_folder("Luna/console", documents=True)
+        if not files.file_exist("data/console", documents=False):
+            files.create_folder("data/console", documents=False)
 
-        if not files.file_exist("Luna/themes", documents=True):
-            files.create_folder("Luna/themes", documents=True)
+        if not files.file_exist("data/themes", documents=False):
+            files.create_folder("data/themes", documents=False)
 
-        if not files.file_exist("Luna/snipers", documents=True):
-            files.create_folder("Luna/snipers", documents=True)
+        if not files.file_exist("data/snipers", documents=False):
+            files.create_folder("data/snipers", documents=False)
 
-        if not files.file_exist("Luna/custom", documents=True):
-            files.create_folder("Luna/custom", documents=True)
+        if not files.file_exist("data/scripts", documents=False):
+            files.create_folder("data/scripts", documents=False)
 
-        if not files.file_exist("Luna/webhooks", documents=True):
-            files.create_folder("Luna/webhooks", documents=True)
+        if not files.file_exist("data/webhooks", documents=False):
+            files.create_folder("data/webhooks", documents=False)
 
-        if not files.file_exist("Luna/notifications", documents=True):
-            files.create_folder("Luna/notifications", documents=True)
+        if not files.file_exist("data/notifications", documents=False):
+            files.create_folder("data/notifications", documents=False)
 
-        if not files.file_exist("Luna/backup", documents=True):
-            files.create_folder("Luna/backup", documents=True)
+        if not files.file_exist("data/backup", documents=False):
+            files.create_folder("data/backup", documents=False)
 
-        if not files.file_exist("Luna/backup/guilds", documents=True):
-            files.create_folder("Luna/backup/guilds", documents=True)
+        if not files.file_exist("data/backup/guilds", documents=False):
+            files.create_folder("data/backup/guilds", documents=False)
 
-        if not files.file_exist("Luna/resources", documents=True):
-            files.create_folder("Luna/resources", documents=True)
+        if not files.file_exist("data/resources", documents=False):
+            files.create_folder("data/resources", documents=False)
 
-        if not files.file_exist("Luna/raiding", documents=True):
-            files.create_folder("Luna/raiding", documents=True)
+        if not files.file_exist("data/raiding", documents=False):
+            files.create_folder("data/raiding", documents=False)
 
-        if not files.file_exist("Luna/raiding/proxies", documents=True):
-            files.create_folder("Luna/raiding/proxies", documents=True)
+        if not files.file_exist("data/raiding/proxies", documents=False):
+            files.create_folder("data/raiding/proxies", documents=False)
 
-        if not files.file_exist("Luna/notes", documents=True):
-            files.create_folder("Luna/notes", documents=True)
+        if not files.file_exist("data/notes", documents=False):
+            files.create_folder("data/notes", documents=False)
 
-        if not files.file_exist("Luna/emojis", documents=True):
-            files.create_folder("Luna/emojis", documents=True)
+        if not files.file_exist("data/emojis", documents=False):
+            files.create_folder("data/emojis", documents=False)
 
-        if not files.file_exist("Luna/privnote", documents=True):
-            files.create_folder("Luna/privnote", documents=True)
+        if not files.file_exist("data/privnote", documents=False):
+            files.create_folder("data/privnote", documents=False)
 
-        if not files.file_exist("Luna/protections", documents=True):
-            files.create_folder("Luna/protections", documents=True)
+        if not files.file_exist("data/protections", documents=False):
+            files.create_folder("data/protections", documents=False)
 
-        if not files.file_exist("Luna/dumping", documents=True):
-            files.create_folder("Luna/dumping", documents=True)
+        if not files.file_exist("data/dumping", documents=False):
+            files.create_folder("data/dumping", documents=False)
 
-        if not files.file_exist("Luna/dumping/images", documents=True):
-            files.create_folder("Luna/dumping/images", documents=True)
+        if not files.file_exist("data/dumping/images", documents=False):
+            files.create_folder("data/dumping/images", documents=False)
 
-        if not files.file_exist("Luna/dumping/emojis", documents=True):
-            files.create_folder("Luna/dumping/emojis", documents=True)
+        if not files.file_exist("data/dumping/emojis", documents=False):
+            files.create_folder("data/dumping/emojis", documents=False)
 
-        if not files.file_exist("Luna/dumping/urls", documents=True):
-            files.create_folder("Luna/dumping/urls", documents=True)
+        if not files.file_exist("data/dumping/urls", documents=False):
+            files.create_folder("data/dumping/urls", documents=False)
 
-        if not files.file_exist("Luna/dumping/audio", documents=True):
-            files.create_folder("Luna/dumping/audio", documents=True)
+        if not files.file_exist("data/dumping/audio", documents=False):
+            files.create_folder("data/dumping/audio", documents=False)
 
-        if not files.file_exist("Luna/dumping/videos", documents=True):
-            files.create_folder("Luna/dumping/videos", documents=True)
+        if not files.file_exist("data/dumping/videos", documents=False):
+            files.create_folder("data/dumping/videos", documents=False)
 
-        if not files.file_exist("Luna/dumping/messages", documents=True):
-            files.create_folder("Luna/dumping/messages", documents=True)
+        if not files.file_exist("data/dumping/messages", documents=False):
+            files.create_folder("data/dumping/messages", documents=False)
 
-        if not files.file_exist("Luna/dumping/channels", documents=True):
-            files.create_folder("Luna/dumping/channels", documents=True)
+        if not files.file_exist("data/dumping/channels", documents=False):
+            files.create_folder("data/dumping/channels", documents=False)
 
-        if not files.file_exist("Luna/dumping/avatars", documents=True):
-            files.create_folder("Luna/dumping/avatars", documents=True)
+        if not files.file_exist("data/dumping/avatars", documents=False):
+            files.create_folder("data/dumping/avatars", documents=False)
 
         # ///////////////////////////////////////////////////////////////
         # Python Files
 
-        if not files.file_exist("Luna/custom/custom.py", documents=True):
+        if not files.file_exist("data/scripts/example.py", documents=False):
             content = """# Its as simple as writing commands for cogs! (Note: You need to use \"self\")
 # Documentation for custom commands can be found here: https://www.team-luna.org/documentation
 
@@ -955,44 +846,43 @@ class luna:
     description="Example of a custom command"
     )
 async def example(self, luna, *, text):
-    
     await luna.send(f"```{text}```")
 """
-            files.write_file("Luna/custom/custom.py", content, documents=True)
+            files.write_file("data/scripts/example.py", content, documents=False)
 
         # ///////////////////////////////////////////////////////////////
         # Protection Files
 
         if not files.file_exist(
-                "Luna/protections/config.json",
-                documents=True
+                "data/protections/config.json",
+                documents=False
         ):
             data = {
                 "footer": True,
                 "guilds": []
             }
             files.write_json(
-                "Luna/protections/config.json",
-                data, documents=True
+                "data/protections/config.json",
+                data, documents=False
             )
 
         if not files.file_exist(
-                "Luna/protections/invite.json",
-                documents=True
+                "data/protections/invite.json",
+                documents=False
         ):
             data = {
                 "delete": True,
                 "action": "warn"
             }
             files.write_json(
-                "Luna/protections/invite.json",
-                data, documents=True
+                "data/protections/invite.json",
+                data, documents=False
             )
 
         # ///////////////////////////////////////////////////////////////
         # Json Files
 
-        if not files.file_exist("Luna/rpc.json", documents=True):
+        if not files.file_exist("data/rpc.json", documents=False):
             data = {
                 "rich_presence": "on",
                 "client_id": "911815236825268234",
@@ -1007,9 +897,9 @@ async def example(self, luna, *, text):
                 "button_2_text": "",
                 "button_2_url": "",
             }
-            files.write_json("Luna/rpc.json", data, documents=True)
+            files.write_json("data/rpc.json", data, documents=False)
 
-        if not files.file_exist("Luna/config.json", documents=True):
+        if not files.file_exist("data/config.json", documents=False):
             data = {
                 "prefix": ".",
                 "stream_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
@@ -1021,16 +911,16 @@ async def example(self, luna, *, text):
                 "theme": "default",
                 "startup_status": "online"
             }
-            files.write_json("Luna/config.json", data, documents=True)
+            files.write_json("data/config.json", data, documents=False)
 
-        if not files.file_exist("Luna/discord.luna", documents=True):
+        if not files.file_exist("data/discord.luna", documents=False):
             data = {
                 "token": "token-here",
                 "password": "password-here"
             }
-            files.write_json("Luna/discord.luna", data, documents=True)
+            files.write_json("data/discord.luna", data, documents=False)
 
-        if not files.file_exist("Luna/console/console.json", documents=True):
+        if not files.file_exist("data/console/console.json", documents=False):
             data = {
                 "logo": "luna",
                 "logo_gradient": "1",
@@ -1041,31 +931,31 @@ async def example(self, luna, *, text):
                 "timestamp": True,
                 "mode": "1"
             }
-            files.write_json("Luna/console/console.json", data, documents=True)
+            files.write_json("data/console/console.json", data, documents=False)
 
-        if not files.file_exist("Luna/snipers/nitro.json", documents=True):
+        if not files.file_exist("data/snipers/nitro.json", documents=False):
             data = {
                 "sniper": "on",
                 "charge": "off"
             }
-            files.write_json("Luna/snipers/nitro.json", data, documents=True)
+            files.write_json("data/snipers/nitro.json", data, documents=False)
 
-        if not files.file_exist("Luna/snipers/privnote.json", documents=True):
+        if not files.file_exist("data/snipers/privnote.json", documents=False):
             data = {
                 "sniper": "on"
             }
             files.write_json(
-                "Luna/snipers/privnote.json",
-                data, documents=True
+                "data/snipers/privnote.json",
+                data, documents=False
             )
 
-        if not files.file_exist("Luna/snipers/selfbot.json", documents=True):
+        if not files.file_exist("data/snipers/selfbot.json", documents=False):
             data = {
                 "sniper": "on"
             }
-            files.write_json("Luna/snipers/selfbot.json", data, documents=True)
+            files.write_json("data/snipers/selfbot.json", data, documents=False)
 
-        if not files.file_exist("Luna/snipers/giveaway.json", documents=True):
+        if not files.file_exist("data/snipers/giveaway.json", documents=False):
             data = {
                 "joiner": "on",
                 "delay_in_minutes": "1",
@@ -1079,13 +969,13 @@ async def example(self, luna, *, text):
                 "guild_joiner": "on"
             }
             files.write_json(
-                "Luna/snipers/giveaway.json",
-                data, documents=True
+                "data/snipers/giveaway.json",
+                data, documents=False
             )
 
         if not files.file_exist(
-                "Luna/snipers/giveaway_bots.json",
-                documents=True
+                "data/snipers/giveaway_bots.json",
+                documents=False
         ):
             data = {
                 "716967712844414996": "🎉",
@@ -1108,61 +998,55 @@ async def example(self, luna, *, text):
                 "732003715426287676": "🎁"
             }
             files.write_json(
-                "Luna/snipers/giveaway_bots.json",
-                data, documents=True
+                "data/snipers/giveaway_bots.json",
+                data, documents=False
             )
 
-        if not files.file_exist("Luna/resources/luna.ico", documents=True):
+        if not files.file_exist("data/resources/luna.ico", documents=False):
             r = requests.get(
-                "https://cdn.discordapp.com/attachments/878593887113986048/926101890608025650/Luna_Logo.ico",
+                "https://cdn.discordapp.com/attachments/927033067468623882/981645188785111040/Luna_Logo.ico",
                 stream=True
             )
             open(
-                os.path.join(
-                    files.documents(),
-                    'Luna/resources/luna.ico'
-                ),
+                'data/resources/luna.ico',
                 'wb'
             ).write(
                 r.content
             )
 
-        if not files.file_exist("Luna/resources/luna.png", documents=True):
+        if not files.file_exist("data/resources/luna.png", documents=False):
             r = requests.get(
-                "https://cdn.discordapp.com/attachments/878593887113986048/925797624374759434/Luna_Logo.png",
+                "https://cdn.discordapp.com/attachments/927033067468623882/967102261060833310/Luna_Blurple.png",
                 stream=True
             )
             open(
-                os.path.join(
-                    files.documents(),
-                    'Luna/resources/luna.png'
-                ),
+                'data/resources/luna.png',
                 'wb'
             ).write(
                 r.content
             )
 
-        if not files.file_exist("Luna/backup/friends.txt", documents=True):
+        if not files.file_exist("data/backup/friends.txt", documents=False):
             content = "Use [prefix]friendsbackup"
             files.write_file(
-                "Luna/backup/friends.txt",
-                content, documents=True
+                "data/backup/friends.txt",
+                content, documents=False
             )
 
-        if not files.file_exist("Luna/invites.txt", documents=True):
+        if not files.file_exist("data/invites.txt", documents=False):
             content = "Put the invites of the servers you want to join here one after another"
-            files.write_file("Luna/invites.txt", content, documents=True)
+            files.write_file("data/invites.txt", content, documents=False)
 
-        if not files.file_exist("Luna/backup/blocked.txt", documents=True):
+        if not files.file_exist("data/backup/blocked.txt", documents=False):
             content = "Use [prefix]friendsbackup"
             files.write_file(
-                "Luna/backup/blocked.txt",
-                content, documents=True
+                "data/backup/blocked.txt",
+                content, documents=False
             )
 
         if not files.file_exist(
-                "Luna/notifications/toasts.json",
-                documents=True
+                "data/notifications/toasts.json",
+                documents=False
         ):
             data = {
                 "toasts": "on",
@@ -1180,69 +1064,69 @@ async def example(self, luna, *, text):
                 "protection": "on"
             }
             files.write_json(
-                "Luna/notifications/toasts.json",
-                data, documents=True
+                "data/notifications/toasts.json",
+                data, documents=False
             )
 
-        if not files.file_exist("Luna/sharing.json", documents=True):
+        if not files.file_exist("data/sharing.json", documents=False):
             data = {
                 "share": "off",
                 "user_id": ""
             }
-            files.write_json("Luna/sharing.json", data, documents=True)
+            files.write_json("data/sharing.json", data, documents=False)
 
         if not files.file_exist(
-                "Luna/notifications/console.json",
-                documents=True
+                "data/notifications/console.json",
+                documents=False
         ):
             data = {
                 "pings": "on"
             }
             files.write_json(
-                "Luna/notifications/console.json",
-                data, documents=True
+                "data/notifications/console.json",
+                data, documents=False
             )
 
         if not files.file_exist(
-                "Luna/notifications/toast.json",
-                documents=True
+                "data/notifications/toast.json",
+                documents=False
         ):
             data = {
                 "icon": "luna.ico",
                 "title": "Luna"
             }
             files.write_json(
-                "Luna/notifications/toast.json",
-                data, documents=True
+                "data/notifications/toast.json",
+                data, documents=False
             )
 
-        if not files.file_exist("Luna/raiding/tokens.txt", documents=True):
+        if not files.file_exist("data/raiding/tokens.txt", documents=False):
             content = "Put your tokens here line after line"
             files.write_file(
-                "Luna/raiding/tokens.txt",
-                content, documents=True
+                "data/raiding/tokens.txt",
+                content, documents=False
             )
 
-        if not files.file_exist("Luna/raiding/proxies.txt", documents=True):
+        if not files.file_exist("data/raiding/proxies.txt", documents=False):
             content = "Put your proxies here line after line. (HTTP Only)"
             files.write_file(
-                "Luna/raiding/proxies.txt",
-                content, documents=True
+                "data/raiding/proxies.txt",
+                content, documents=False
             )
 
-        if not files.file_exist("Luna/webhooks/webhook.json", documents=True):
+        if not files.file_exist("data/webhooks/webhook.json", documents=False):
             data = {
                 "title": "Luna",
                 "footer": "Luna",
-                "image_url": "https://cdn.discordapp.com/attachments/878593887113986048/925797624374759434/Luna_Logo.png",
+                "image_url": "https://cdn.discordapp.com/attachments/927033067468623882/967102261060833310/Luna_Blurple.png",
                 "hex_color": "#898eff"
             }
             files.write_json(
-                "Luna/webhooks/webhook.json",
-                data, documents=True
+                "data/webhooks/webhook.json",
+                data, documents=False
             )
 
-        if not files.file_exist("Luna/webhooks/url.json", documents=True):
+        if not files.file_exist("data/webhooks/url.json", documents=False):
             data = {
                 "login": "webhook-url-here",
                 "nitro": "webhook-url-here",
@@ -1257,9 +1141,9 @@ async def example(self, luna, *, text):
                 "nickupdates": "webhook-url-here",
                 "protection": "webhook-url-here"
             }
-            files.write_json("Luna/webhooks/url.json", data, documents=True)
+            files.write_json("data/webhooks/url.json", data, documents=False)
 
-        if not files.file_exist("Luna/webhooks/webhooks.json", documents=True):
+        if not files.file_exist("data/webhooks/webhooks.json", documents=False):
             data = {
                 "webhooks": "on",
                 "login": "on",
@@ -1276,8 +1160,8 @@ async def example(self, luna, *, text):
                 "protection": "on"
             }
             files.write_json(
-                "Luna/webhooks/webhooks.json",
-                data, documents=True
+                "data/webhooks/webhooks.json",
+                data, documents=False
             )
 
 
@@ -1294,51 +1178,51 @@ def _extracted_from_file_check_4():
     else:
         greeting = "Good evening"
 
-    if files.file_exist('Luna/auth.json', documents=True):
+    if files.file_exist('data/auth.json', documents=False):
         username = files.json(
-            "Luna/auth.json", "username", documents=True
+            "data/auth.json", "username", documents=False
         )
         username = Decryption(
             '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
         ).CEA256(username)
     prints.message(f"{greeting}, {color.print_gradient(username)}.")
-    time.sleep(1)
+    time.sleep(2)
 
 
 # ///////////////////////////////////////////////////////////////
 # Print Functions
 
 def get_prefix():
-    return files.json("Luna/config.json", "prefix", documents=True)
+    return files.json("data/config.json", "prefix", documents=False)
 
 
 class prints:
     luna.file_check(False)
     try:
-        if files.json("Luna/console/console.json", "spacers", documents=True):
+        if files.json("data/console/console.json", "spacers", documents=False):
             spacer_2 = " " + \
                        files.json(
-                           "Luna/console/console.json",
-                           "spacer", documents=True
+                           "data/console/console.json",
+                           "spacer", documents=False
                        ) + " "
         else:
             spacer_2 = " "
         if files.json(
-                "Luna/console/console.json",
+                "data/console/console.json",
                 "spacers",
-                documents=True
+                documents=False
         ) and files.json(
-            "Luna/console/console.json",
+            "data/console/console.json",
             "timestamp",
-            documents=True
+            documents=False
         ):
             spacer_1 = " " + \
                        files.json(
-                           "Luna/console/console.json",
-                           "spacer", documents=True
+                           "data/console/console.json",
+                           "spacer", documents=False
                        ) + " "
-        elif files.json("Luna/console/console.json", "spacers", documents=True) and files.json(
-                "Luna/console/console.json", "timestamp", documents=True
+        elif files.json("data/console/console.json", "spacers", documents=False) and files.json(
+                "data/console/console.json", "timestamp", documents=False
         ) is False:
             spacer_1 = ""
         else:
@@ -1349,9 +1233,9 @@ class prints:
     def command(self):
         """Prints a command log."""
         if files.json(
-                "Luna/console/console.json",
+                "data/console/console.json",
                 "timestamp",
-                documents=True
+                documents=False
         ):
             return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient('Command')}{prints.spacer_2}{get_prefix()}{self}")
 
@@ -1361,9 +1245,9 @@ class prints:
     def shared(self):
         """Prints a shared log."""
         if files.json(
-                "Luna/console/console.json",
+                "data/console/console.json",
                 "timestamp",
-                documents=True
+                documents=False
         ):
             return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient('Sharing')}{prints.spacer_2}{get_prefix()}{self}")
 
@@ -1373,9 +1257,9 @@ class prints:
     def message(self):
         """Prints a message log."""
         if files.json(
-                "Luna/console/console.json",
+                "data/console/console.json",
                 "timestamp",
-                documents=True
+                documents=False
         ):
             return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient('Message')}{prints.spacer_2}{self}")
 
@@ -1385,9 +1269,9 @@ class prints:
     def sniper(self):
         """Prints a sniper log."""
         if files.json(
-                "Luna/console/console.json",
+                "data/console/console.json",
                 "timestamp",
-                documents=True
+                documents=False
         ):
             return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient('Sniper ')}{prints.spacer_2}{self}")
 
@@ -1397,9 +1281,9 @@ class prints:
     def event(self):
         """Prints a event log."""
         if files.json(
-                "Luna/console/console.json",
+                "data/console/console.json",
                 "timestamp",
-                documents=True
+                documents=False
         ):
             return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient(' Event ')}{prints.spacer_2}{self}")
 
@@ -1409,9 +1293,9 @@ class prints:
     def selfbot(self):
         """Prints a selfbot log."""
         if files.json(
-                "Luna/console/console.json",
+                "data/console/console.json",
                 "timestamp",
-                documents=True
+                documents=False
         ):
             return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient('Selfbot')}{prints.spacer_2}{self}")
 
@@ -1421,9 +1305,9 @@ class prints:
     def error(self):
         """Prints a error log."""
         if files.json(
-                "Luna/console/console.json",
+                "data/console/console.json",
                 "timestamp",
-                documents=True
+                documents=False
         ):
             return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.error} Error {color.reset}{prints.spacer_2}{self}")
 
@@ -1433,7 +1317,7 @@ class prints:
     def input(self):
         """Prints an input."""
         return input(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient(' Input ')}{prints.spacer_2}{self}: ") if files.json(
-            "Luna/console/console.json", "timestamp", documents=True
+            "data/console/console.json", "timestamp", documents=False
         ) else input(
             f"{prints.spacer_1}{color.print_gradient(' Input ')}{prints.spacer_2}{self}: "
         )
@@ -1441,7 +1325,7 @@ class prints:
     def password(self):
         """Prints a password input. Masked with `*`"""
         return pwinput.pwinput(prompt=f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient(' Input ')}{prints.spacer_2}{self}: ", mask='*') if files.json(
-            "Luna/console/console.json", "timestamp", documents=True
+            "data/console/console.json", "timestamp", documents=False
         ) else pwinput.pwinput(prompt=f"{prints.spacer_1}{color.print_gradient(' Input ')}{prints.spacer_2}{self}: ", mask='*')
 
 
@@ -1455,16 +1339,13 @@ class notify:
         notification = Notify(default_notification_application_name="Luna")
         if title is None:
             notification.title = files.json(
-                "Luna/notifications/toast.json", "title", documents=True
+                "data/notifications/toast.json", "title", documents=False
             )
         else:
             notification.title = title
         if self is not None:
             notification.message = self
-        notification.icon = os.path.join(
-            files.documents(),
-            f'Luna/resources/{files.json("Luna/notifications/toast.json", "icon", documents=True)}'
-        )
+        notification.icon = f'data/resources/{files.json("data/notifications/toast.json", "icon", documents=False)}'
         if audio_path is not None:
             notification.audio = audio_path
         try:
@@ -1475,24 +1356,24 @@ class notify:
     def webhook(url, description="", name="", error=False):
         """Create a webhook notification"""
         try:
-            if self == "":
+            if url == "":
                 prints.error(
                     f"The webhook url can't be empty » {name} » Has been cleared"
                 )
-                json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/url.json"), encoding="utf-8"))
+                json_object = json.load(open("data/webhooks/url.json", encoding="utf-8"))
 
                 json_object[f"{name}"] = "webhook-url-here"
-                files.write_json(os.path.join(files.documents(), "Luna/webhooks/url.json"), json_object)
+                files.write_json("data/webhooks/url.json", json_object)
 
                 return
-            elif "https://discord.com/api/webhooks/" not in self:
+            elif "https://discord.com/api/webhooks/" not in url:
                 prints.error(
                     f"Invalid webhook url » {name} » Has been cleared"
                 )
-                json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/url.json"), encoding="utf-8"))
+                json_object = json.load(open("data/webhooks/url.json", encoding="utf-8"))
 
                 json_object[f"{name}"] = "webhook-url-here"
-                files.write_json(os.path.join(files.documents(), "Luna/webhooks/url.json"), json_object)
+                files.write_json("data/webhooks/url.json", json_object)
 
                 return
             hook = dhooks.Webhook(url=url, avatar_url=webhook.image_url())
@@ -1509,10 +1390,10 @@ class notify:
             embed.set_footer(text=webhook.footer())
             hook.send(embed=embed)
         except BaseException:
-            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/url.json"), encoding="utf-8"))
+            json_object = json.load(open("data/webhooks/url.json", encoding="utf-8"))
 
             json_object[f"{name}"] = "webhook-url-here"
-            files.write_json(os.path.join(files.documents(), "Luna/webhooks/url.json"), json_object)
+            files.write_json("data/webhooks/url.json", json_object)
 
             return
 
@@ -1526,7 +1407,7 @@ class config:
 
     def _global(self, value_holder: str, new_value, add=False, delete=False):
         """Overwrites a value in a config file. (Global configs)"""
-        json_object = json.load(open(os.path.join(files.documents(), self), encoding="utf-8"))
+        json_object = json.load(open(self, encoding="utf-8"))
 
         if add:
             json_object[value_holder].append(new_value)
@@ -1534,63 +1415,63 @@ class config:
             json_object[value_holder].remove(new_value)
         else:
             json_object[value_holder] = new_value
-        files.write_json(os.path.join(files.documents(), self), json_object)
+        files.write_json(self, json_object)
 
     # ///////////////////////////////////////////////////////////////
     # File overwrite (Config)
 
     def prefix(self):
         """Overwrites the prefix in the config file."""
-        json_object = json.load(open(os.path.join(files.documents(), "Luna/config.json"), encoding="utf-8"))
+        json_object = json.load(open("data/config.json", encoding="utf-8"))
 
         json_object["prefix"] = self
-        files.write_json(os.path.join(files.documents(), "Luna/config.json"), json_object)
+        files.write_json("data/config.json", json_object)
 
     def stream_url(self):
         """Overwrites the stream url in the config file."""
-        json_object = json.load(open(os.path.join(files.documents(), "Luna/config.json"), encoding="utf-8"))
+        json_object = json.load(open("data/config.json", encoding="utf-8"))
 
         json_object["stream_url"] = self
-        files.write_json(os.path.join(files.documents(), "Luna/config.json"), json_object)
+        files.write_json("data/config.json", json_object)
 
     def afk_message(self):
         """Overwrites the afk message in the config file."""
-        json_object = json.load(open(os.path.join(files.documents(), "Luna/config.json"), encoding="utf-8"))
+        json_object = json.load(open("data/config.json", encoding="utf-8"))
 
         json_object["afk_message"] = self
-        files.write_json(os.path.join(files.documents(), "Luna/config.json"), json_object)
+        files.write_json("data/config.json", json_object)
 
     def delete_timer(self):
         """Overwrites to delete timer in the config file."""
-        json_object = json.load(open(os.path.join(files.documents(), "Luna/config.json"), encoding="utf-8"))
+        json_object = json.load(open("data/config.json", encoding="utf-8"))
 
         json_object["delete_timer"] = self
-        files.write_json(os.path.join(files.documents(), "Luna/config.json"), json_object)
+        files.write_json("data/config.json", json_object)
 
     def mode(self):
         """Overwrites the mode in the config file."""
-        json_object = json.load(open(os.path.join(files.documents(), "Luna/config.json"), encoding="utf-8"))
+        json_object = json.load(open("data/config.json", encoding="utf-8"))
 
         json_object["mode"] = self
-        files.write_json(os.path.join(files.documents(), "Luna/config.json"), json_object)
+        files.write_json("data/config.json", json_object)
 
     def error_log(self):
         """Overwrites the error log in the config file."""
-        json_object = json.load(open(os.path.join(files.documents(), "Luna/config.json"), encoding="utf-8"))
+        json_object = json.load(open("data/config.json", encoding="utf-8"))
 
         json_object["error_log"] = self
-        files.write_json(os.path.join(files.documents(), "Luna/config.json"), json_object)
+        files.write_json("data/config.json", json_object)
 
     def risk_mode(self):
         """Overwrites the risk mode in the config file."""
-        json_object = json.load(open(os.path.join(files.documents(), "Luna/config.json"), encoding="utf-8"))
+        json_object = json.load(open("data/config.json", encoding="utf-8"))
 
         json_object["risk_mode"] = self
-        files.write_json(os.path.join(files.documents(), "Luna/config.json"), json_object)
+        files.write_json("data/config.json", json_object)
 
     def theme(self):
         """Overwrites the theme in the config file."""
-        json_object = json.load(open(os.path.join(files.documents(), "Luna/config.json"), encoding="utf-8"))
+        json_object = json.load(open("data/config.json", encoding="utf-8"))
 
         if self == "default":
             json_object["theme"] = self
@@ -1598,23 +1479,23 @@ class config:
             if ".json" in self:
                 self = self.replace('.json', '')
             json_object["theme"] = f'{self}.json'
-        files.write_json(os.path.join(files.documents(), "Luna/config.json"), json_object)
+        files.write_json("data/config.json", json_object)
 
     def startup_status(self):
         """Overwrites the startup status in the config file."""
-        json_object = json.load(open(os.path.join(files.documents(), "Luna/config.json"), encoding="utf-8"))
+        json_object = json.load(open("data/config.json", encoding="utf-8"))
 
         json_object["startup_status"] = self
-        files.write_json(os.path.join(files.documents(), "Luna/config.json"), json_object)
+        files.write_json("data/config.json", json_object)
 
     def password(self):
         """Overwrites the password in the config file."""
-        json_object = json.load(open(os.path.join(files.documents(), "Luna/discord.luna"), encoding="utf-8"))
+        json_object = json.load(open("data/discord.luna"), encoding="utf-8")
 
         password = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(self)
 
         json_object["password"] = password
-        files.write_json(os.path.join(files.documents(), "Luna/discord.luna"), json_object)
+        files.write_json("data/discord.luna", json_object)
 
     # ///////////////////////////////////////////////////////////////
     # File overwrite (Snipers)
@@ -1623,297 +1504,231 @@ class config:
 
         def sniper(self):
             """Overwrite the nitro sniper config"""
-            json_object = json.load(open(os.path.join(files.documents(), "Luna/snipers/nitro.json"), encoding="utf-8"))
+            json_object = json.load(open("data/snipers/nitro.json", encoding="utf-8"))
 
             json_object["sniper"] = self
-            files.write_json(os.path.join(files.documents(), "Luna/snipers/nitro.json"), json_object)
+            files.write_json("data/snipers/nitro.json", json_object)
 
     class privnote:
 
         def sniper(self):
             """Overwrite the privnote sniper config"""
-            json_object = json.load(open(os.path.join(files.documents(), "Luna/snipers/privnote.json"), encoding="utf-8"))
+            json_object = json.load(open("data/snipers/privnote.json", encoding="utf-8"))
 
             json_object["sniper"] = self
-            files.write_json(os.path.join(files.documents(), "Luna/snipers/privnote.json"), json_object)
+            files.write_json("data/snipers/privnote.json", json_object)
 
     class selfbot:
 
         def sniper(self):
             """Overwrite the selfbot sniper config"""
-            json_object = json.load(open(os.path.join(files.documents(), "Luna/snipers/selfbot.json"), encoding="utf-8"))
+            json_object = json.load(open("data/snipers/selfbot.json", encoding="utf-8"))
 
             json_object["sniper"] = self
-            files.write_json(os.path.join(files.documents(), "Luna/snipers/selfbot.json"), json_object)
+            files.write_json("data/snipers/selfbot.json", json_object)
 
     class giveaway:
 
         def joiner(self):
             """Overwrite the giveaway joiner config"""
-            json_object = json.load(open(os.path.join(files.documents(), "Luna/snipers/giveaway.json"), encoding="utf-8"))
+            json_object = json.load(open("data/snipers/giveaway.json", encoding="utf-8"))
 
             json_object["joiner"] = self
-            files.write_json(os.path.join(files.documents(), "Luna/snipers/giveaway.json"), json_object)
+            files.write_json("data/snipers/giveaway.json", json_object)
 
         def delay_in_minutes(self):
             """Overwrite the giveaway delay in minutes config"""
-            json_object = json.load(open(os.path.join(files.documents(), "Luna/snipers/giveaway.json"), encoding="utf-8"))
+            json_object = json.load(open("data/snipers/giveaway.json", encoding="utf-8"))
 
             json_object["delay_in_minutes"] = self
-            files.write_json(os.path.join(files.documents(), "Luna/snipers/giveaway.json"), json_object)
+            files.write_json("data/snipers/giveaway.json", json_object)
 
         def blocked_words(self):
             """Overwrite the giveaway blocked words config"""
-            json_object = json.load(open(os.path.join(files.documents(), "Luna/snipers/giveaway.json"), encoding="utf-8"))
+            json_object = json.load(open("data/snipers/giveaway.json", encoding="utf-8"))
 
             json_object["blocked_words"] = self
-            files.write_json(os.path.join(files.documents(), "Luna/snipers/giveaway.json"), json_object)
+            files.write_json("data/snipers/giveaway.json", json_object)
 
         def guild_joiner(self):
             """Overwrite the giveaway guild joiner config"""
-            json_object = json.load(open(os.path.join(files.documents(), "Luna/snipers/giveaway.json"), encoding="utf-8"))
+            json_object = json.load(open("data/snipers/giveaway.json", encoding="utf-8"))
 
             json_object["guild_joiner"] = self
-            files.write_json(os.path.join(files.documents(), "Luna/snipers/giveaway.json"), json_object)
+            files.write_json("data/snipers/giveaway.json", json_object)
 
     # ///////////////////////////////////////////////////////////////
     # File overwrite (Sharing)
 
     def share(self):
         """Overwrite the share config"""
-        json_object = json.load(open(os.path.join(files.documents(), "Luna/sharing.json"), encoding="utf-8"))
+        json_object = json.load(open("data/sharing.json", encoding="utf-8"))
 
         json_object["share"] = self
-        files.write_json(os.path.join(files.documents(), "Luna/sharing.json"), json_object)
+        files.write_json("data/sharing.json", json_object)
 
     def user_id(self):
         """Overwrite the user id config"""
-        json_object = json.load(open(os.path.join(files.documents(), "Luna/sharing.json"), encoding="utf-8"))
+        json_object = json.load(open("data/sharing.json", encoding="utf-8"))
 
         json_object["user_id"] = self
-        files.write_json(os.path.join(files.documents(), "Luna/sharing.json"), json_object)
+        files.write_json("data/sharing.json", json_object)
 
     # ///////////////////////////////////////////////////////////////
     # File overwrite (Themes)
 
     def title(self):
         """Overwrite the title config"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         json_object = json.load(
             open(
-                os.path.join(
-                    files.documents(),
-                    f"Luna/themes/{theme}"
-                ),
+                f"data/themes/{theme}",
                 encoding="utf-8"
             )
         )
         json_object["title"] = self
         files.write_json(
-            os.path.join(
-                files.documents(),
-                f"Luna/themes/{theme}"
-            ), json_object
+            f"data/themes/{theme}", json_object
         )
 
     def title_url(self):
         """Overwrite the title url config"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         json_object = json.load(
             open(
-                os.path.join(
-                    files.documents(),
-                    f"Luna/themes/{theme}"
-                ),
+                f"data/themes/{theme}",
                 encoding="utf-8"
             )
         )
         json_object["title_url"] = self
         files.write_json(
-            os.path.join(
-                files.documents(),
-                f"Luna/themes/{theme}"
-            ), json_object
+            f"data/themes/{theme}", json_object
         )
 
     def footer(self):
         """Overwrite the footer config"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         json_object = json.load(
             open(
-                os.path.join(
-                    files.documents(),
-                    f"Luna/themes/{theme}"
-                ),
+                f"data/themes/{theme}",
                 encoding="utf-8"
             )
         )
         json_object["footer"] = self
         files.write_json(
-            os.path.join(
-                files.documents(),
-                f"Luna/themes/{theme}"
-            ), json_object
+            f"data/themes/{theme}", json_object
         )
 
     def footer_icon_url(self):
         """Overwrite the footer icon url config"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         json_object = json.load(
             open(
-                os.path.join(
-                    files.documents(),
-                    f"Luna/themes/{theme}"
-                ),
+                f"data/themes/{theme}",
                 encoding="utf-8"
             )
         )
         json_object["footer_icon_url"] = self
         files.write_json(
-            os.path.join(
-                files.documents(),
-                f"Luna/themes/{theme}"
-            ), json_object
+            f"data/themes/{theme}", json_object
         )
 
     def image_url(self):
         """Overwrite the image url config"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         json_object = json.load(
             open(
-                os.path.join(
-                    files.documents(),
-                    f"Luna/themes/{theme}"
-                ),
+                f"data/themes/{theme}",
                 encoding="utf-8"
             )
         )
         json_object["image_url"] = self
         files.write_json(
-            os.path.join(
-                files.documents(),
-                f"Luna/themes/{theme}"
-            ), json_object
+            f"data/themes/{theme}", json_object
         )
 
     def large_image_url(self):
         """Overwrite the large image url config"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         json_object = json.load(
             open(
-                os.path.join(
-                    files.documents(),
-                    f"Luna/themes/{theme}"
-                ),
+                f"data/themes/{theme}",
                 encoding="utf-8"
             )
         )
         json_object["large_image_url"] = self
         files.write_json(
-            os.path.join(
-                files.documents(),
-                f"Luna/themes/{theme}"
-            ), json_object
+            f"data/themes/{theme}", json_object
         )
 
     def hex_color(self):
         """Overwrite the hex color config"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         json_object = json.load(
             open(
-                os.path.join(
-                    files.documents(),
-                    f"Luna/themes/{theme}"
-                ),
+                f"data/themes/{theme}",
                 encoding="utf-8"
             )
         )
         json_object["hex_color"] = self
         files.write_json(
-            os.path.join(
-                files.documents(),
-                f"Luna/themes/{theme}"
-            ), json_object
+            f"data/themes/{theme}", json_object
         )
 
     def author(self):
         """Overwrite the author config"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         json_object = json.load(
             open(
-                os.path.join(
-                    files.documents(),
-                    f"Luna/themes/{theme}"
-                ),
+                f"data/themes/{theme}",
                 encoding="utf-8"
             )
         )
         json_object["author"] = self
         files.write_json(
-            os.path.join(
-                files.documents(),
-                f"Luna/themes/{theme}"
-            ), json_object
+            f"data/themes/{theme}", json_object
         )
 
     def author_icon_url(self):
         """Overwrite the author icon url config"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         json_object = json.load(
             open(
-                os.path.join(
-                    files.documents(),
-                    f"Luna/themes/{theme}"
-                ),
+                f"data/themes/{theme}",
                 encoding="utf-8"
             )
         )
         json_object["author_icon_url"] = self
         files.write_json(
-            os.path.join(
-                files.documents(),
-                f"Luna/themes/{theme}"
-            ), json_object
+            f"data/themes/{theme}", json_object
         )
 
     def author_url(self):
         """Overwrite the author url config"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         json_object = json.load(
             open(
-                os.path.join(
-                    files.documents(),
-                    f"Luna/themes/{theme}"
-                ),
+                f"data/themes/{theme}",
                 encoding="utf-8"
             )
         )
         json_object["author_url"] = self
         files.write_json(
-            os.path.join(
-                files.documents(),
-                f"Luna/themes/{theme}"
-            ), json_object
+            f"data/themes/{theme}", json_object
         )
 
     def description(self):
         """Overwrite the description config"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         json_object = json.load(
             open(
-                os.path.join(
-                    files.documents(),
-                    f"Luna/themes/{theme}"
-                ),
+                f"data/themes/{theme}",
                 encoding="utf-8"
             )
         )
         json_object["description"] = self
         files.write_json(
-            os.path.join(
-                files.documents(),
-                f"Luna/themes/{theme}"
-            ), json_object
+            f"data/themes/{theme}", json_object
         )
 
     # ///////////////////////////////////////////////////////////////
@@ -1925,40 +1740,23 @@ class config:
 
         def icon(self):
             """Overwrite the icon config"""
-            json_object = json.load(
-                open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/notifications/toast.json"
-                    ),
-                    encoding="utf-8"
-                )
-            )
+            json_object = json.load(open("data/notifications/toast.json", encoding="utf-8"))
             json_object["icon"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/notifications/toast.json"
-                ), json_object
+                "data/notifications/toast.json", json_object
             )
 
         def title(self):
             """Overwrite the title config"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/notifications/toast.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/notifications/toast.json", encoding="utf-8"
                 )
             )
             json_object["title"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/notifications/toast.json"
-                ), json_object
+                "data/notifications/toast.json", json_object
             )
 
         # ///////////////////////////////////////////////////////////////
@@ -1968,247 +1766,156 @@ class config:
             """Overwrite the toasts config"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/notifications/toasts.json"
-                    ),
-                    encoding="utf-8"
+                    "data/notifications/toasts.json", encoding="utf-8"
                 )
             )
             json_object["toasts"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/notifications/toasts.json"
-                ), json_object
+                "data/notifications/toasts.json", json_object
             )
 
         def login(self):
             """Overwrite the login config"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/notifications/toasts.json"
-                    ),
-                    encoding="utf-8"
+                    "data/notifications/toasts.json", encoding="utf-8"
                 )
             )
             json_object["login"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/notifications/toasts.json"
-                ), json_object
+                "data/notifications/toasts.json", json_object
             )
 
         def nitro(self):
             """Overwrite the nitro config"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/notifications/toasts.json"
-                    ),
-                    encoding="utf-8"
+                    "data/notifications/toasts.json", encoding="utf-8"
                 )
             )
             json_object["nitro"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/notifications/toasts.json"
-                ), json_object
+                "data/notifications/toasts.json", json_object
             )
 
         def giveaway(self):
             """Overwrite the giveaway config"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/notifications/toasts.json"
-                    ),
-                    encoding="utf-8"
+                    "data/notifications/toasts.json", encoding="utf-8"
                 )
             )
             json_object["nitro"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/notifications/toasts.json"
-                ), json_object
+                "data/notifications/toasts.json", json_object
             )
 
         def privnote(self):
             """Overwrite the privnote config"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/notifications/toasts.json"
-                    ),
-                    encoding="utf-8"
+                    "data/notifications/toasts.json", encoding="utf-8"
                 )
             )
             json_object["privnote"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/notifications/toasts.json"
-                ), json_object
+                "data/notifications/toasts.json", json_object
             )
 
         def selfbot(self):
             """Overwrite the selfbot config"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/notifications/toasts.json"
-                    ),
-                    encoding="utf-8"
+                    "data/notifications/toasts.json", encoding="utf-8"
                 )
             )
             json_object["selfbot"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/notifications/toasts.json"
-                ), json_object
+                "data/notifications/toasts.json", json_object
             )
 
         def pings(self):
             """Overwrite the pings config"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/notifications/toasts.json"
-                    ),
-                    encoding="utf-8"
+                    "data/notifications/toasts.json", encoding="utf-8"
                 )
             )
             json_object["pings"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/notifications/toasts.json"
-                ), json_object
+                "data/notifications/toasts.json", json_object
             )
 
         def ghostpings(self):
             """Overwrite the ghostpings config"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/notifications/toasts.json"
-                    ),
-                    encoding="utf-8"
+                    "data/notifications/toasts.json", encoding="utf-8"
                 )
             )
             json_object["ghostpings"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/notifications/toasts.json"
-                ), json_object
+                "data/notifications/toasts.json", json_object
             )
 
         def friendevents(self):
             """Overwrite the friendevents config"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/notifications/toasts.json"
-                    ),
-                    encoding="utf-8"
+                    "data/notifications/toasts.json", encoding="utf-8"
                 )
             )
             json_object["friendevents"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/notifications/toasts.json"
-                ), json_object
+                "data/notifications/toasts.json", json_object
             )
 
         def guildevents(self):
             """Overwrite the guildevents config"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/notifications/toasts.json"
-                    ),
-                    encoding="utf-8"
+                    "data/notifications/toasts.json", encoding="utf-8"
                 )
             )
             json_object["guildevents"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/notifications/toasts.json"
-                ), json_object
+                "data/notifications/toasts.json", json_object
             )
 
         def roleupdates(self):
             """Overwrite the roleupdates config"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/notifications/toasts.json"
-                    ),
-                    encoding="utf-8"
+                    "data/notifications/toasts.json", encoding="utf-8"
                 )
             )
             json_object["roleupdates"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/notifications/toasts.json"
-                ), json_object
+                "data/notifications/toasts.json", json_object
             )
 
         def nickupdates(self):
             """Overwrite the nickupdates config"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/notifications/toasts.json"
-                    ),
-                    encoding="utf-8"
+                    "data/notifications/toasts.json", encoding="utf-8"
                 )
             )
             json_object["nickupdates"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/notifications/toasts.json"
-                ), json_object
+                "data/notifications/toasts.json", json_object
             )
 
         def protection(self):
             """Overwrite the protection config"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/notifications/toasts.json"
-                    ),
-                    encoding="utf-8"
+                    "data/notifications/toasts.json", encoding="utf-8"
                 )
             )
             json_object["protection"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/notifications/toasts.json"
-                ), json_object
+                "data/notifications/toasts.json", json_object
             )
 
     # ///////////////////////////////////////////////////////////////
@@ -2222,64 +1929,46 @@ class config:
             """Overwrite the webhook title"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/webhook.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/webhook.json", encoding="utf-8"
                 )
             )
             json_object["title"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/webhook.json"
-                ), json_object
+                "data/webhooks/webhook.json", json_object
             )
 
         def footer(self):
             """Overwrite the webhook footer"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/webhook.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/webhook.json", encoding="utf-8"
                 )
             )
             json_object["footer"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/webhook.json"
-                ), json_object
+                "data/webhooks/webhook.json", json_object
             )
 
         def image_url(self):
             """Overwrite the image url config"""
-            json_object = json.load(open(os.path.join(files.documents(), "Luna/webhooks/webhook.json"), encoding="utf-8"))
+            json_object = json.load(open("data/webhooks/webhook.json", encoding="utf-8"))
 
             json_object["image_url"] = self
-            files.write_json(os.path.join(files.documents(), "Luna/webhooks/webhook.json"), json_object)
+            files.write_json("data/webhooks/webhook.json", json_object)
 
         def hex_color(self):
             """Overwrite the webhook hex color"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/webhook.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/webhook.json", encoding="utf-8"
                 )
             )
             json_object["hex_color"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/webhook.json"
-                ), json_object
+                "data/webhooks/webhook.json", json_object
             )
 
         # ///////////////////////////////////////////////////////////////
@@ -2289,247 +1978,169 @@ class config:
             """Overwrite the webhooks webhook"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/webhooks.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/webhooks.json", encoding="utf-8"
                 )
             )
             json_object["webhooks"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/webhooks.json"
-                ), json_object
+                "data/webhooks/webhooks.json", json_object
             )
 
         def login(self):
             """Overwrite the login webhook"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/webhooks.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/webhooks.json", encoding="utf-8"
                 )
             )
             json_object["login"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/webhooks.json"
-                ), json_object
+                "data/webhooks/webhooks.json", json_object
             )
 
         def nitro(self):
             """Overwrite the nitro webhook"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/webhooks.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/webhooks.json", encoding="utf-8"
                 )
             )
             json_object["nitro"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/webhooks.json"
-                ), json_object
+                "data/webhooks/webhooks.json", json_object
             )
 
         def giveaway(self):
             """Overwrite the giveaway webhook"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/webhooks.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/webhooks.json", encoding="utf-8"
                 )
             )
             json_object["nitro"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/webhooks.json"
-                ), json_object
+                "data/webhooks/webhooks.json", json_object
             )
 
         def privnote(self):
             """Overwrite the private note webhook"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/webhooks.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/webhooks.json", encoding="utf-8"
                 )
             )
             json_object["privnote"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/webhooks.json"
-                ), json_object
+                "data/webhooks/webhooks.json", json_object
             )
 
         def selfbot(self):
             """Overwrite the selfbot webhook"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/webhooks.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/webhooks.json", encoding="utf-8"
                 )
             )
             json_object["selfbot"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/webhooks.json"
-                ), json_object
+                "data/webhooks/webhooks.json", json_object
             )
 
         def pings(self):
             """Overwrite the pings webhook"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/webhooks.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/webhooks.json", encoding="utf-8"
                 )
             )
             json_object["pings"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/webhooks.json"
-                ), json_object
+                "data/webhooks/webhooks.json", json_object
             )
 
         def ghostpings(self):
             """Overwrite the ghost pings webhook"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/webhooks.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/webhooks.json", encoding="utf-8"
                 )
             )
             json_object["ghostpings"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/webhooks.json"
-                ), json_object
+                "data/webhooks/webhooks.json", json_object
             )
 
         def friendevents(self):
             """Overwrite the friend events webhook"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/webhooks.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/webhooks.json", encoding="utf-8"
                 )
             )
             json_object["friendevents"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/webhooks.json"
-                ), json_object
+                "data/webhooks/webhooks.json", json_object
             )
 
         def guildevents(self):
             """Overwrite the guild events webhook"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/webhooks.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/webhooks.json", encoding="utf-8"
                 )
             )
             json_object["guildevents"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/webhooks.json"
-                ), json_object
+                "data/webhooks/webhooks.json", json_object
             )
 
         def roleupdates(self):
             """Overwrite the role updates webhook"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/webhooks.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/webhooks.json", encoding="utf-8"
                 )
             )
             json_object["roleupdates"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/webhooks.json"
-                ), json_object
+                "data/webhooks/webhooks.json", json_object
             )
 
         def nickupdates(self):
             """Overwrite the nick updates webhook"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/webhooks.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/webhooks.json", encoding="utf-8"
                 )
             )
             json_object["nickupdates"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/webhooks.json"
-                ), json_object
+                "data/webhooks/webhooks.json", json_object
             )
 
         def protection(self):
             """Overwrite the protection webhook"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/webhooks.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/webhooks.json", encoding="utf-8"
                 )
             )
             json_object["protection"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/webhooks.json"
-                ), json_object
+                "data/webhooks/webhooks.json", json_object
             )
 
         # ///////////////////////////////////////////////////////////////
@@ -2539,228 +2150,156 @@ class config:
             """Overwrite the login url"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/url.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/url.json", encoding="utf-8"
                 )
             )
             json_object["login"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/url.json"
-                ), json_object
+                "data/webhooks/url.json", json_object
             )
 
         def nitro_url(self):
             """Overwrite the nitro url"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/url.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/url.json", encoding="utf-8"
                 )
             )
             json_object["nitro"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/url.json"
-                ), json_object
+                "data/webhooks/url.json", json_object
             )
 
         def giveaway_url(self):
             """Overwrite the giveaway url"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/url.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/url.json", encoding="utf-8"
                 )
             )
             json_object["giveaway"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/url.json"
-                ), json_object
+                "data/webhooks/url.json", json_object
             )
 
         def privnote_url(self):
             """Overwrite the private note url"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/url.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/url.json", encoding="utf-8"
                 )
             )
             json_object["privnote"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/url.json"
-                ), json_object
+                "data/webhooks/url.json", json_object
             )
 
         def selfbot_url(self):
             """Overwrite the selfbot url"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/url.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/url.json", encoding="utf-8"
                 )
             )
             json_object["selfbot"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/url.json"
-                ), json_object
+                "data/webhooks/url.json", json_object
             )
 
         def pings_url(self):
             """Overwrite the pings url"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/url.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/url.json", encoding="utf-8"
                 )
             )
             json_object["pings"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/url.json"
-                ), json_object
+                "data/webhooks/url.json", json_object
             )
 
         def ghostpings_url(self):
             """Overwrite the ghost pings url"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/url.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/url.json", encoding="utf-8"
                 )
             )
             json_object["ghostpings"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/url.json"
-                ), json_object
+                "data/webhooks/url.json", json_object
             )
 
         def friendevents_url(self):
             """Overwrite the friend events url"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/url.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/url.json", encoding="utf-8"
                 )
             )
             json_object["friendevents"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/url.json"
-                ), json_object
+                "data/webhooks/url.json", json_object
             )
 
         def guildevents_url(self):
             """Overwrite the guild events url"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/url.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/url.json", encoding="utf-8"
                 )
             )
             json_object["guildevents"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/url.json"
-                ), json_object
+                "data/webhooks/url.json", json_object
             )
 
         def roleupdates_url(self):
             """Overwrite the role updates url"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/url.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/url.json", encoding="utf-8"
                 )
             )
             json_object["roleupdates"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/url.json"
-                ), json_object
+                "data/webhooks/url.json", json_object
             )
 
         def nickupdates_url(self):
             """Overwrite the nick updates url"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/url.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/url.json", encoding="utf-8"
                 )
             )
             json_object["nickupdates"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/url.json"
-                ), json_object
+                "data/webhooks/url.json", json_object
             )
 
         def protection_url(self):
             """Overwrite the protection url"""
             json_object = json.load(
                 open(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/webhooks/url.json"
-                    ),
-                    encoding="utf-8"
+
+                    "data/webhooks/url.json", encoding="utf-8"
                 )
             )
             json_object["protection"] = self
             files.write_json(
-                os.path.join(
-                    files.documents(),
-                    "Luna/webhooks/url.json"
-                ), json_object
+                "data/webhooks/url.json", json_object
             )
 
 
@@ -2771,42 +2310,42 @@ class configs:
 
     def delete_timer():
         """Get to delete timer in the config file"""
-        return int(files.json("Luna/config.json", "delete_timer", documents=True))
+        return int(files.json("data/config.json", "delete_timer", documents=False))
 
     def mode():
         """Get the mode in the config file"""
-        return int(files.json("Luna/config.json", "mode", documents=True))
+        return int(files.json("data/config.json", "mode", documents=False))
 
     def error_log():
         """Get the error log in the config file"""
-        return files.json("Luna/config.json", "error_log", documents=True)
+        return files.json("data/config.json", "error_log", documents=False)
 
     def risk_mode():
         """Get the risk mode in the config file"""
-        return files.json("Luna/config.json", "risk_mode", documents=True)
+        return files.json("data/config.json", "risk_mode", documents=False)
 
     def stream_url():
         """Get the stream url in the config file"""
-        return files.json("Luna/config.json", "stream_url", documents=True)
+        return files.json("data/config.json", "stream_url", documents=False)
 
     def startup_status():
         """Get the startup status in the config file"""
-        return files.json("Luna/config.json", "startup_status", documents=True)
+        return files.json("data/config.json", "startup_status", documents=False)
 
     def password():
         """
         It takes the password from the json file, and decrypts it
         :return: A string.
         """
-        return Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(files.json("Luna/discord.luna", "password", documents=True))
+        return Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(files.json("data/discord.luna", "password", documents=False))
 
     def share():
         """Get the share mode in the config file"""
-        return files.json("Luna/sharing.json", "share", documents=True)
+        return files.json("data/sharing.json", "share", documents=False)
 
     def share_id():
         """Get the share id in the config file"""
-        return files.json("Luna/sharing.json", "user_id", documents=True)
+        return files.json("data/sharing.json", "user_id", documents=False)
 
 
 # ///////////////////////////////////////////////////////////////
@@ -2851,23 +2390,23 @@ class theme:
 
     def title():
         """Get the title in the config file"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         if theme == "default":
             title = title_request
         else:
-            title = files.json(f"Luna/themes/{theme}", "title", documents=True)
+            title = files.json(f"data/themes/{theme}", "title", documents=False)
             if title is None:
                 title = ""
         return str(title)
 
     def title_url():
         """Get the title url in the config file"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         if theme == "default":
             title_url = title_url_request
         else:
             title_url = files.json(
-                f"Luna/themes/{theme}", "title_url", documents=True
+                f"data/themes/{theme}", "title_url", documents=False
             )
             if title_url is None:
                 title_url = ""
@@ -2875,12 +2414,12 @@ class theme:
 
     def footer():
         """Get the footer in the config file"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         if theme == "default":
             footer = footer_request
         else:
             footer = files.json(
-                f"Luna/themes/{theme}", "footer", documents=True
+                f"data/themes/{theme}", "footer", documents=False
             )
             if footer is None:
                 footer = ""
@@ -2888,14 +2427,14 @@ class theme:
 
     def footer_icon_url():
         """Get the footer icon url in the config file"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         if theme == "default":
             footer_icon_url = footer_icon_url_request
             if footer_icon_url == "$avatar":
                 footer_icon_url = bot.user.avatar_url
         else:
             footer_icon_url = files.json(
-                f"Luna/themes/{theme}", "footer_icon_url", documents=True
+                f"data/themes/{theme}", "footer_icon_url", documents=False
             )
             if footer_icon_url is None:
                 footer_icon_url = ""
@@ -2905,14 +2444,14 @@ class theme:
 
     def image_url():
         """Get the image url in the config file"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         if theme == "default":
             image_url = image_url_request
             if image_url == "$avatar":
                 image_url = bot.user.avatar_url
         else:
             image_url = files.json(
-                f"Luna/themes/{theme}", "image_url", documents=True
+                f"data/themes/{theme}", "image_url", documents=False
             )
             if image_url is None:
                 image_url = ""
@@ -2922,14 +2461,14 @@ class theme:
 
     def large_image_url():
         """Get the large image url in the config file"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         if theme == "default":
             large_image_url = large_image_url_request
             if large_image_url == "$avatar":
                 large_image_url = bot.user.avatar_url
         else:
             large_image_url = files.json(
-                f"Luna/themes/{theme}", "large_image_url", documents=True
+                f"data/themes/{theme}", "large_image_url", documents=False
             )
             if large_image_url is None:
                 large_image_url = ""
@@ -2939,7 +2478,7 @@ class theme:
 
     def hex_color():
         """Get the hex color in the config file"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         if theme == "default":
             hexcolorvar = hexcolorvar_request
             if hexcolorvar == "":
@@ -2952,7 +2491,7 @@ class theme:
                 hexcolorvar = int(hexcolorvar.replace('#', ''), 16)
         else:
             hexcolorvar = files.json(
-                f"Luna/themes/{theme}", "hex_color", documents=True
+                f"data/themes/{theme}", "hex_color", documents=False
             )
             if hexcolorvar is None:
                 hexcolorvar = "#000000"
@@ -2966,12 +2505,12 @@ class theme:
 
     def author():
         """Get the author in the config file"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         if theme == "default":
             author = author_request
         else:
             author = files.json(
-                f"Luna/themes/{theme}", "author", documents=True
+                f"data/themes/{theme}", "author", documents=False
             )
             if author is None:
                 author = ""
@@ -2979,14 +2518,14 @@ class theme:
 
     def author_icon_url():
         """Get the author icon url in the config file"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         if theme == "default":
             author_icon_url = author_icon_url_request
             if author_icon_url == "$avatar":
                 author_icon_url = bot.user.avatar_url
         else:
             author_icon_url = files.json(
-                f"Luna/themes/{theme}", "author_icon_url", documents=True
+                f"data/themes/{theme}", "author_icon_url", documents=False
             )
             if author_icon_url is None:
                 author_icon_url = ""
@@ -2996,12 +2535,12 @@ class theme:
 
     def author_url():
         """Get the author url in the config file"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         if theme == "default":
             author_url = author_url_request
         else:
             author_url = files.json(
-                f"Luna/themes/{theme}", "author_url", documents=True
+                f"data/themes/{theme}", "author_url", documents=False
             )
             if author_url is None:
                 author_url = ""
@@ -3009,14 +2548,14 @@ class theme:
 
     def description():
         """Get the description in the config file"""
-        theme = files.json("Luna/config.json", "theme", documents=True)
+        theme = files.json("data/config.json", "theme", documents=False)
         if theme == "default":
             descriptionvar = descriptionvar_request
             descriptionvar = "```\n<> is required | [] is optional\n```" if descriptionvar == "true" else ""
 
         else:
             descriptionvar = files.json(
-                f"Luna/themes/{theme}", "description", documents=True
+                f"data/themes/{theme}", "description", documents=False
             )
             if descriptionvar is None:
                 descriptionvar = True
@@ -3029,8 +2568,8 @@ class webhook:
     def title():
         """Get the title in the config file"""
         title = files.json(
-            "Luna/webhooks/webhook.json",
-            "title", documents=True
+            "data/webhooks/webhook.json",
+            "title", documents=False
         )
         if title is None:
             title = ""
@@ -3039,8 +2578,8 @@ class webhook:
     def footer():
         """Get the title in the config file"""
         footer = files.json(
-            "Luna/webhooks/webhook.json",
-            "footer", documents=True
+            "data/webhooks/webhook.json",
+            "footer", documents=False
         )
         if footer is None:
             footer = ""
@@ -3049,8 +2588,8 @@ class webhook:
     def image_url():
         """Get the image url in the config file"""
         image_url = files.json(
-            "Luna/webhooks/webhook.json",
-            "image_url", documents=True
+            "data/webhooks/webhook.json",
+            "image_url", documents=False
         )
         if image_url is None:
             image_url = ""
@@ -3061,7 +2600,7 @@ class webhook:
     def hex_color():
         """Get the hex color in the config file"""
         hexcolorvar = files.json(
-            "Luna/webhooks/webhook.json", "hex_color", documents=True
+            "data/webhooks/webhook.json", "hex_color", documents=False
         )
         if hexcolorvar is None:
             hexcolorvar = "#000000"
@@ -3076,87 +2615,87 @@ class webhook:
     def login_url():
         """Get the login webhook url in the config file"""
         login_url = files.json(
-            "Luna/webhooks/url.json",
-            "login", documents=True
+            "data/webhooks/url.json",
+            "login", documents=False
         )
         return str(login_url)
 
     def nitro_url():
         """Get the nitro webhook url in the config file"""
         nitro_url = files.json(
-            "Luna/webhooks/url.json",
-            "nitro", documents=True
+            "data/webhooks/url.json",
+            "nitro", documents=False
         )
         return str(nitro_url)
 
     def giveaway_url():
         """Get the giveaway webhook url in the config file"""
         giveaway_url = files.json(
-            "Luna/webhooks/url.json", "giveaway", documents=True
+            "data/webhooks/url.json", "giveaway", documents=False
         )
         return str(giveaway_url)
 
     def privnote_url():
         """Get the privnote webhook url in the config file"""
         privnote_url = files.json(
-            "Luna/webhooks/url.json", "privnote", documents=True
+            "data/webhooks/url.json", "privnote", documents=False
         )
         return str(privnote_url)
 
     def selfbot_url():
         """Get the selfbot webhook url in the config file"""
         selfbot_url = files.json(
-            "Luna/webhooks/url.json", "selfbot", documents=True
+            "data/webhooks/url.json", "selfbot", documents=False
         )
         return str(selfbot_url)
 
     def pings_url():
         """Get the pings' webhook url in the config file"""
         pings_url = files.json(
-            "Luna/webhooks/url.json",
-            "pings", documents=True
+            "data/webhooks/url.json",
+            "pings", documents=False
         )
         return str(pings_url)
 
     def ghostpings_url():
         """Get the ghostpings webhook url in the config file"""
         ghostpings_url = files.json(
-            "Luna/webhooks/url.json", "ghostpings", documents=True
+            "data/webhooks/url.json", "ghostpings", documents=False
         )
         return str(ghostpings_url)
 
     def friendevents_url():
         """Get the friendevents webhook url in the config file"""
         friendevents_url = files.json(
-            "Luna/webhooks/url.json", "friendevents", documents=True
+            "data/webhooks/url.json", "friendevents", documents=False
         )
         return str(friendevents_url)
 
     def guildevents_url():
         """Get the guildevents webhook url in the config file"""
         guildevents_url = files.json(
-            "Luna/webhooks/url.json", "guildevents", documents=True
+            "data/webhooks/url.json", "guildevents", documents=False
         )
         return str(guildevents_url)
 
     def roleupdates_url():
         """Get the roleupdates webhook url in the config file"""
         roleupdates_url = files.json(
-            "Luna/webhooks/url.json", "roleupdates", documents=True
+            "data/webhooks/url.json", "roleupdates", documents=False
         )
         return str(roleupdates_url)
 
     def nickupdates_url():
         """Get the nickupdates webhook url in the config file"""
         nickupdates_url = files.json(
-            "Luna/webhooks/url.json", "nickupdates", documents=True
+            "data/webhooks/url.json", "nickupdates", documents=False
         )
         return str(nickupdates_url)
 
     def protections_url():
         """Get the protections' webhook url in the config file"""
         protections_url = files.json(
-            "Luna/webhooks/url.json", "protections", documents=True
+            "data/webhooks/url.json", "protections", documents=False
         )
         return str(protections_url)
 
@@ -3187,8 +2726,8 @@ def uptime_thread():
     second = 0
     day = 0
     username = f"Dev - {os.getlogin()}" if developer_mode else os.getlogin()
-    if files.file_exist('Luna/auth.json', documents=True):
-        username = files.json("Luna/auth.json", "username", documents=True)
+    if files.file_exist('data/auth.json', documents=False):
+        username = files.json("data/auth.json", "username", documents=False)
         username = Decryption(
             '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
         ).CEA256(username)
@@ -3240,17 +2779,17 @@ def update_thread():
             version_url = beta_version_url
         if not developer_mode and version != version_url:
             if files.json(
-                    "Luna/notifications/toasts.json",
+                    "data/notifications/toasts.json",
                     "login",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/notifications/toasts.json",
+                "data/notifications/toasts.json",
                 "toasts",
-                documents=True
+                documents=False
             ) == "on":
                 notify.toast(f"Starting update {version_url}")
-            if files.json("Luna/webhooks/webhooks.json", "login", documents=True) == "on" and files.json(
-                    "Luna/webhooks/webhooks.json", "webhooks", documents=True
+            if files.json("data/webhooks/webhooks.json", "login", documents=False) == "on" and files.json(
+                    "data/webhooks/webhooks.json", "webhooks", documents=False
             ) == "on" and webhook.login_url() != "webhook-url-here":
                 notify.webhook(
                     url=webhook.login_url(), name="login",
@@ -3261,6 +2800,91 @@ def update_thread():
         if not update_found:
             time.sleep(300)
 
+# def show_gui(username, commmads, custom_commands):
+#     import dearpygui.dearpygui as dpg
+# 
+#     dpg.create_context()
+#     dpg.create_viewport(
+#         title='Luna', width=800, height=600, resizable=False, decorated=True, clear_color=(40, 40, 40, 255), small_icon="data/resources/luna.ico", large_icon="data/resources/luna.ico"
+#     )
+# 
+#     with dpg.window(tag="Primary Window", width=200, height=562, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, no_bring_to_front_on_focus=True):
+#         width, height, channels, data = dpg.load_image("data/resources/luna.png")
+# 
+#         with dpg.texture_registry():
+#             texture_id = dpg.add_static_texture(width, height, data)
+# 
+#         dpg.add_image(texture_id, width=19, height=19, pos=(40, 29))
+#         dpg.add_text("Luna", color=(114, 137, 218, 255))
+#         dpg.add_text(f"Welcome back, {username}")
+#         dpg.add_separator()
+#         dpg.add_text(f"{commmads} Commands")
+#         dpg.add_text(f"{custom_commands} Custom Command Loaded")
+#         dpg.add_separator()
+#         # dpg.add_button(label="Save")
+#         # dpg.add_input_text(label="string", default_value="Quick brown fox")
+#         # dpg.add_slider_float(label="float", default_value=0.273, max_value=1)
+# 
+#         with dpg.menu_bar():
+#             with dpg.menu(label="Settings"):
+#                 dpg.add_menu_item(label="Logout")
+#                 dpg.add_menu_item(label="Style Editor", callback=lambda: dpg.show_tool(dpg.mvTool_Style))
+#                 dpg.add_menu_item(label="Debug", callback=lambda: dpg.show_tool(dpg.mvTool_Debug))
+# 
+#     with dpg.window(
+#             tag="Secondary Window", width=584, height=562, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(200, 0), no_bring_to_front_on_focus=True
+#             ):
+#         dpg.add_text("Logged into Nshout#0001")
+#         dpg.add_separator()
+# 
+#         with dpg.window(label="Sniper Settings", width=260, height=320, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(220, 224)):
+#             dpg.add_text("Default")
+# 
+#         with dpg.window(label="Theme Settings", width=260, height=320, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(500, 224)):
+#             dpg.add_text("Default Theme Selected")
+# 
+#     with dpg.theme() as global_theme:
+#         with dpg.theme_component(dpg.mvAll):
+#             dpg.add_theme_style(dpg.mvStyleVar_WindowRounding, 6, category=dpg.mvThemeCat_Core)
+#             dpg.add_theme_style(dpg.mvStyleVar_ChildRounding, 6, category=dpg.mvThemeCat_Core)
+#             dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, 6, category=dpg.mvThemeCat_Core)
+#             dpg.add_theme_style(dpg.mvStyleVar_PopupRounding, 6, category=dpg.mvThemeCat_Core)
+#             dpg.add_theme_style(dpg.mvStyleVar_GrabRounding, 6, category=dpg.mvThemeCat_Core)
+# 
+#             dpg.add_theme_color(dpg.mvThemeCol_TabActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+# 
+#             dpg.add_theme_color(dpg.mvThemeCol_CheckMark, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+# 
+#             dpg.add_theme_color(dpg.mvThemeCol_SliderGrab, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+#             dpg.add_theme_color(dpg.mvThemeCol_SliderGrabActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+# 
+#             dpg.add_theme_color(dpg.mvThemeCol_Button, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+#             dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (80, 100, 150, 255), category=dpg.mvThemeCat_Core)
+#             dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+# 
+#             dpg.add_theme_color(dpg.mvThemeCol_HeaderHovered, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+#             dpg.add_theme_color(dpg.mvThemeCol_HeaderActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+# 
+#             dpg.add_theme_color(dpg.mvThemeCol_FrameBgHovered, (50, 50, 50, 255), category=dpg.mvThemeCat_Core)
+#             dpg.add_theme_color(dpg.mvThemeCol_FrameBgActive, (80, 100, 150, 255), category=dpg.mvThemeCat_Core)
+# 
+#             dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+# 
+#     dpg.bind_theme(global_theme)
+# 
+#     dpg.setup_dearpygui()
+#     dpg.show_viewport()
+#     dpg.start_dearpygui()
+#     dpg.destroy_context()
+# 
+# def check_thread(the_thread):
+#     while True:
+#         if the_thread.is_alive():
+#             time.sleep(5)
+#             pass
+#         else:
+#             os._exit(0)
+
 
 def anti_token_logger():
     """
@@ -3269,18 +2893,10 @@ def anti_token_logger():
         """
     while True:
         try:
-            if os.path.exists(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/discord.luna"
-                    )
-            ):
+            if os.path.exists("data/discord.luna"):
                 json_object = json.load(
                     open(
-                        os.path.join(
-                            files.documents(),
-                            "Luna/discord.luna"
-                        ),
+                        "data/discord.luna",
                         encoding="utf-8"
                     )
                 )
@@ -3341,20 +2957,22 @@ bot = commands.Bot(
 @bot.event
 async def on_ready():
     """Prints a ready log."""
+    prints.event("Caching...")
+    await asyncio.sleep(0.5)
     if files.json(
-            "Luna/notifications/toasts.json",
+            "data/notifications/toasts.json",
             "login",
-            documents=True
+            documents=False
     ) == "on" and files.json(
-        "Luna/notifications/toasts.json",
+        "data/notifications/toasts.json",
         "toasts",
-        documents=True
+        documents=False
     ) == "on":
         notify.toast(
             f"Logged into {bot.user}\nLuna Version » {version}"
         )
-    if files.json("Luna/webhooks/webhooks.json", "login", documents=True) == "on" and files.json(
-            "Luna/webhooks/webhooks.json", "webhooks", documents=True
+    if files.json("data/webhooks/webhooks.json", "login", documents=False) == "on" and files.json(
+            "data/webhooks/webhooks.json", "webhooks", documents=False
     ) == "on" and webhook.login_url() != "webhook-url-here":
         notify.webhook(
             url=webhook.login_url(), name="login",
@@ -3379,27 +2997,27 @@ async def on_ready():
             )
             time.sleep(5)
             os._exit(0)
-    prefix = files.json("Luna/config.json", "prefix", documents=True)
+    prefix = files.json("data/config.json", "prefix", documents=False)
     console_mode = files.json(
-        "Luna/console/console.json", "mode", documents=True
+        "data/console/console.json", "mode", documents=False
     )
     if console_mode == "2":
-        riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
-        themesvar = files.json("Luna/config.json", "theme", documents=True)
+        riskmode = files.json("data/config.json", "risk_mode", documents=False)
+        themesvar = files.json("data/config.json", "theme", documents=False)
         deletetimer = int(
             files.json(
-                "Luna/config.json",
-                "delete_timer", documents=True
+                "data/config.json",
+                "delete_timer", documents=False
             )
         )
         startup_status = files.json(
-            "Luna/config.json", "startup_status", documents=True
+            "data/config.json", "startup_status", documents=False
         )
         nitro_sniper = files.json(
-            "Luna/snipers/nitro.json", "sniper", documents=True
+            "data/snipers/nitro.json", "sniper", documents=False
         )
         giveawayjoiner = files.json(
-            "Luna/snipers/giveaway.json", "joiner", documents=True
+            "data/snipers/giveaway.json", "joiner", documents=False
         )
         if themesvar != "default":
             themesvar = themesvar[:-5]
@@ -3456,6 +3074,12 @@ async def on_ready():
     upd_thread.daemon = True
     if not developer_mode:
         upd_thread.start()
+    # gui_thread = threading.Thread(target=show_gui, args=(bot.user.name, command_count - custom_command_count, custom_command_count))
+    # gui_thread.daemon = True
+    # gui_thread.start()
+    # alive_thread = threading.Thread(target=check_thread, args=gui_thread)
+    # alive_thread.daemon = True
+    # alive_thread.start()
 
 
 # ///////////////////////////////////////////////////////////////
@@ -3484,9 +3108,9 @@ class OnMessage(commands.Cog, name="on message"):
         try:
             global nitro_cooldown
             if files.json(
-                    "Luna/snipers/nitro.json",
+                    "data/snipers/nitro.json",
                     "sniper",
-                    documents=True
+                    documents=False
             ) == "on" and 'discord.gift/' in message.content.lower():
                 elapsed_snipe = '%.4fs' % (time.time() - sniped_start_time)
                 code = re.search("discord.gift/(.*)", message.content).group(1)
@@ -3532,25 +3156,25 @@ class OnMessage(commands.Cog, name="on message"):
                         print()
 
                         if files.json(
-                                "Luna/notifications/toasts.json",
+                                "data/notifications/toasts.json",
                                 "nitro",
-                                documents=True
+                                documents=False
                         ) == "on" and files.json(
-                            "Luna/notifications/toasts.json",
+                            "data/notifications/toasts.json",
                             "toasts",
-                            documents=True
+                            documents=False
                         ) == "on":
                             notify.toast(
                                 f"{status}\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}"
                             )
                         if files.json(
-                                "Luna/webhooks/webhooks.json",
+                                "data/webhooks/webhooks.json",
                                 "nitro",
-                                documents=True
+                                documents=False
                         ) == "on" and files.json(
-                            "Luna/webhooks/webhooks.json",
+                            "data/webhooks/webhooks.json",
                             "webhooks",
-                            documents=True
+                            documents=False
                         ) == "on" and not webhook.nitro_url() == "webhook-url-here":
                             notify.webhook(
                                 url=webhook.nitro_url(),
@@ -3566,8 +3190,8 @@ class OnMessage(commands.Cog, name="on message"):
                             )
 
             elif files.json(
-                    "Luna/snipers/nitro.json", "sniper",
-                    documents=True
+                    "data/snipers/nitro.json", "sniper",
+                    documents=False
             ) == "on" and 'discord.com/gifts' in message.content.lower():
                 elapsed_snipe = '%.4fs' % (time.time() - sniped_start_time)
                 code = re.search(
@@ -3615,25 +3239,25 @@ class OnMessage(commands.Cog, name="on message"):
                         print()
 
                         if files.json(
-                                "Luna/notifications/toasts.json",
+                                "data/notifications/toasts.json",
                                 "nitro",
-                                documents=True
+                                documents=False
                         ) == "on" and files.json(
-                            "Luna/notifications/toasts.json",
+                            "data/notifications/toasts.json",
                             "toasts",
-                            documents=True
+                            documents=False
                         ) == "on":
                             notify.toast(
                                 f"{status}\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}"
                             )
                         if files.json(
-                                "Luna/webhooks/webhooks.json",
+                                "data/webhooks/webhooks.json",
                                 "nitro",
-                                documents=True
+                                documents=False
                         ) == "on" and files.json(
-                            "Luna/webhooks/webhooks.json",
+                            "data/webhooks/webhooks.json",
                             "webhooks",
-                            documents=True
+                            documents=False
                         ) == "on" and not webhook.nitro_url() == "webhook-url-here":
                             notify.webhook(
                                 url=webhook.nitro_url(),
@@ -3651,18 +3275,18 @@ class OnMessage(commands.Cog, name="on message"):
             prints.error(e)
 
         giveaway_joiner = files.json(
-            "Luna/snipers/giveaway.json", "joiner", documents=True
+            "data/snipers/giveaway.json", "joiner", documents=False
         )
         delay_in_minutes = int(
             files.json(
-                "Luna/snipers/giveaway.json", "delay_in_minutes", documents=True
+                "data/snipers/giveaway.json", "delay_in_minutes", documents=False
             )
         )
         giveaway_blocked_words = files.json(
-            "Luna/snipers/giveaway.json", "blocked_words", documents=True
+            "data/snipers/giveaway.json", "blocked_words", documents=False
         )
         guild_joiner = files.json(
-            "Luna/snipers/giveaway.json", "guild_joiner", documents=True
+            "data/snipers/giveaway.json", "guild_joiner", documents=False
         )
         if giveaway_joiner == "on" and message.author.bot and message.guild is not None and not isinstance(
                 message.channel, discord.GroupChannel
@@ -3670,14 +3294,9 @@ class OnMessage(commands.Cog, name="on message"):
             custom_giveaway_bot_ids = []
             custom_giveaway_bot_reactions = []
             try:
-                if os.path.exists(
-                        os.path.join(
-                            files.documents(),
-                            f"Luna/snipers/giveaway_bots.json"
-                        )
-                ):
+                if os.path.exists(f"data/snipers/giveaway_bots.json"):
                     with open(
-                            os.path.join(files.documents(), f"Luna/snipers/giveaway_bots.json"), "r",
+                            f"data/snipers/giveaway_bots.json", "r",
                             encoding="utf-8"
                     ) as jsonFile:
                         data = json.load(jsonFile)
@@ -3718,25 +3337,25 @@ class OnMessage(commands.Cog, name="on message"):
                             )
                             print()
                             if files.json(
-                                    "Luna/notifications/toasts.json",
+                                    "data/notifications/toasts.json",
                                     "giveaway",
-                                    documents=True
+                                    documents=False
                             ) == "on" and files.json(
-                                "Luna/notifications/toasts.json",
+                                "data/notifications/toasts.json",
                                 "toasts",
-                                documents=True
+                                documents=False
                             ) == "on":
                                 notify.toast(
                                     f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}"
                                 )
                             if files.json(
-                                    "Luna/webhooks/webhooks.json",
+                                    "data/webhooks/webhooks.json",
                                     "giveaway",
-                                    documents=True
+                                    documents=False
                             ) == "on" and files.json(
-                                "Luna/webhooks/webhooks.json",
+                                "data/webhooks/webhooks.json",
                                 "webhooks",
-                                documents=True
+                                documents=False
                             ) == "on" and not webhook.giveaway_url() == "webhook-url-here":
                                 notify.webhook(
                                     url=webhook.giveaway_url(),
@@ -3768,25 +3387,25 @@ class OnMessage(commands.Cog, name="on message"):
                                         )
                                         print()
                                         if files.json(
-                                                "Luna/notifications/toasts.json",
+                                                "data/notifications/toasts.json",
                                                 "giveaway",
-                                                documents=True
+                                                documents=False
                                         ) == "on" and files.json(
-                                            "Luna/notifications/toasts.json",
+                                            "data/notifications/toasts.json",
                                             "toasts",
-                                            documents=True
+                                            documents=False
                                         ) == "on":
                                             notify.toast(
                                                 f"Skipped giveaway\nReason » {blocked_word}\nServer »  {message.guild}\nChannel » {message.channel}"
                                             )
                                         if files.json(
-                                                "Luna/webhooks/webhooks.json",
+                                                "data/webhooks/webhooks.json",
                                                 "giveaway",
-                                                documents=True
+                                                documents=False
                                         ) == "on" and files.json(
-                                            "Luna/webhooks/webhooks.json",
+                                            "data/webhooks/webhooks.json",
                                             "webhooks",
-                                            documents=True
+                                            documents=False
                                         ) == "on" and not webhook.giveaway_url() == "webhook-url-here":
                                             notify.webhook(
                                                 url=webhook.giveaway_url(),
@@ -3820,7 +3439,7 @@ class OnMessage(commands.Cog, name="on message"):
                                     for embed_3 in embeds:
                                         embed_dict = embed_3.to_dict()
                                         code = re.findall(
-                                            r"\w[a-z]*\W*\w[a-z]+\.\w[g]*\W\S*", str(
+                                            r"\w[a-z]*\W*\w[a-z]+\.\wg*\W\S*", str(
                                                 embed_dict['description']
                                             )
                                         )[0].replace(
@@ -3855,25 +3474,25 @@ class OnMessage(commands.Cog, name="on message"):
                             )
                             print()
                             if files.json(
-                                    "Luna/notifications/toasts.json",
+                                    "data/notifications/toasts.json",
                                     "giveaway",
-                                    documents=True
+                                    documents=False
                             ) == "on" and files.json(
-                                "Luna/notifications/toasts.json",
+                                "data/notifications/toasts.json",
                                 "toasts",
-                                documents=True
+                                documents=False
                             ) == "on":
                                 notify.toast(
                                     f"Giveaway found\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}"
                                 )
                             if files.json(
-                                    "Luna/webhooks/webhooks.json",
+                                    "data/webhooks/webhooks.json",
                                     "giveaway",
-                                    documents=True
+                                    documents=False
                             ) == "on" and files.json(
-                                "Luna/webhooks/webhooks.json",
+                                "data/webhooks/webhooks.json",
                                 "webhooks",
-                                documents=True
+                                documents=False
                             ) == "on" and not webhook.giveaway_url() == "webhook-url-here":
                                 notify.webhook(
                                     url=webhook.giveaway_url(),
@@ -3913,25 +3532,25 @@ class OnMessage(commands.Cog, name="on message"):
                                 )
                                 print()
                                 if files.json(
-                                        "Luna/notifications/toasts.json",
+                                        "data/notifications/toasts.json",
                                         "giveaway",
-                                        documents=True
+                                        documents=False
                                 ) == "on" and files.json(
-                                    "Luna/notifications/toasts.json",
+                                    "data/notifications/toasts.json",
                                     "toasts",
-                                    documents=True
+                                    documents=False
                                 ) == "on":
                                     notify.toast(
                                         f"Joined giveaway\nPrize » {giveaway_prize}\nServer »  {message.guild}\nChannel » {message.channel}"
                                     )
                                 if files.json(
-                                        "Luna/webhooks/webhooks.json",
+                                        "data/webhooks/webhooks.json",
                                         "giveaway",
-                                        documents=True
+                                        documents=False
                                 ) == "on" and files.json(
-                                    "Luna/webhooks/webhooks.json",
+                                    "data/webhooks/webhooks.json",
                                     "webhooks",
-                                    documents=True
+                                    documents=False
                                 ) == "on" and not webhook.giveaway_url() == "webhook-url-here":
                                     notify.webhook(
                                         url=webhook.giveaway_url(),
@@ -3958,25 +3577,25 @@ class OnMessage(commands.Cog, name="on message"):
                     )
                     print()
                     if files.json(
-                            "Luna/notifications/toasts.json",
+                            "data/notifications/toasts.json",
                             "giveaway",
-                            documents=True
+                            documents=False
                     ) == "on" and files.json(
-                        "Luna/notifications/toasts.json",
+                        "data/notifications/toasts.json",
                         "toasts",
-                        documents=True
+                        documents=False
                     ) == "on":
                         notify.toast(
                             f"Won giveaway\nServer »  {message.guild}\nChannel » {message.channel}"
                         )
                     if files.json(
-                            "Luna/webhooks/webhooks.json",
+                            "data/webhooks/webhooks.json",
                             "giveaway",
-                            documents=True
+                            documents=False
                     ) == "on" and files.json(
-                        "Luna/webhooks/webhooks.json",
+                        "data/webhooks/webhooks.json",
                         "webhooks",
-                        documents=True
+                        documents=False
                     ) == "on" and not webhook.giveaway_url() == "webhook-url-here":
                         notify.webhook(
                             url=webhook.giveaway_url(),
@@ -4005,25 +3624,25 @@ class OnMessage(commands.Cog, name="on message"):
                                 )
                                 joined_server = f'discord.gg/{code}'
                                 if files.json(
-                                        "Luna/notifications/toasts.json",
+                                        "data/notifications/toasts.json",
                                         "giveaway",
-                                        documents=True
+                                        documents=False
                                 ) == "on" and files.json(
-                                    "Luna/notifications/toasts.json",
+                                    "data/notifications/toasts.json",
                                     "toasts",
-                                    documents=True
+                                    documents=False
                                 ) == "on":
                                     notify.toast(
                                         f"Joined guild\nInvite » {joined_server}"
                                     )
                                 if files.json(
-                                        "Luna/webhooks/webhooks.json",
+                                        "data/webhooks/webhooks.json",
                                         "giveaway",
-                                        documents=True
+                                        documents=False
                                 ) == "on" and files.json(
-                                    "Luna/webhooks/webhooks.json",
+                                    "data/webhooks/webhooks.json",
                                     "webhooks",
-                                    documents=True
+                                    documents=False
                                 ) == "on" and not webhook.giveaway_url() == "webhook-url-here":
                                     notify.webhook(
                                         url=webhook.giveaway_url(),
@@ -4043,9 +3662,9 @@ class OnMessage(commands.Cog, name="on message"):
 
         # ///////////////////////////////////////////////////////////////
         # Share command
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
-        share = files.json(f"Luna/sharing.json", "share", documents=True)
-        user_id = files.json(f"Luna/sharing.json", "user_id", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
+        share = files.json(f"data/sharing.json", "share", documents=False)
+        user_id = files.json(f"data/sharing.json", "user_id", documents=False)
 
         if share == "on":
             if message.author.id == user_id:
@@ -4106,7 +3725,7 @@ class OnMessage(commands.Cog, name="on message"):
 
         if afk_status == 1 and afk_user_id == 0:
             afkmessage = files.json(
-                "Luna/config.json", "afk_message", documents=True
+                "data/config.json", "afk_message", documents=False
             )
             if afkmessage == "":
                 afkmessage = "This is an autoresponse message! User is now AFK.."
@@ -4131,25 +3750,25 @@ class OnMessage(commands.Cog, name="on message"):
 
         if f'<@{self.bot.user.id}>' in message.content or f'<@!{self.bot.user.id}>' in message.content.lower():
             if files.json(
-                    "Luna/notifications/toasts.json",
+                    "data/notifications/toasts.json",
                     "pings",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/notifications/toasts.json",
+                "data/notifications/toasts.json",
                 "toasts",
-                documents=True
+                documents=False
             ) == "on":
                 notify.toast(
                     f"You have been mentioned\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}"
                 )
             if files.json(
-                    "Luna/webhooks/webhooks.json",
+                    "data/webhooks/webhooks.json",
                     "pings",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/webhooks/webhooks.json",
+                "data/webhooks/webhooks.json",
                 "webhooks",
-                documents=True
+                documents=False
             ) == "on" and not webhook.pings_url() == "webhook-url-here":
                 notify.webhook(
                     url=webhook.pings_url(),
@@ -4157,9 +3776,9 @@ class OnMessage(commands.Cog, name="on message"):
                     description=f"You have been mentioned\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}"
                 )
             if files.json(
-                    "Luna/notifications/console.json",
+                    "data/notifications/console.json",
                     "pings",
-                    documents=True
+                    documents=False
             ) == "on":
                 print()
                 prints.sniper(f"{color.print_gradient('You have been mentioned')}")
@@ -4176,7 +3795,7 @@ class OnMessage(commands.Cog, name="on message"):
         if 'privnote.com' in message.content.lower():
             elapsed_snipe = '%.3fs' % (time.time() - sniped_start_time)
             privnote_sniper = files.json(
-                f"Luna/snipers/privnote.json", "sniper", documents=True
+                f"data/snipers/privnote.json", "sniper", documents=False
             )
             if privnote_sniper == "on":
                 code = re.search('privnote.com/(.*)', message.content).group(1)
@@ -4207,10 +3826,8 @@ class OnMessage(commands.Cog, name="on message"):
                     )
                     print()
                     file = open(
-                        os.path.join(
-                            files.documents(),
-                            f"Luna/privnote/{code}.txt"
-                        ), "w"
+
+                        f"data/privnote/{code}.txt", 'wb'
                     )
                     file.write(str(note_text))
                     file.close()
@@ -4240,7 +3857,7 @@ class OnMessage(commands.Cog, name="on message"):
         # Anti-Invite
         if 'discord.gg/' in message.content.lower() and anti_invite:
             guilds = files.json(
-                "Luna/protections/config.json", "guilds", documents=True
+                "data/protections/config.json", "guilds", documents=False
             )
             if message.guild.id in guilds:
                 try:
@@ -4248,29 +3865,9 @@ class OnMessage(commands.Cog, name="on message"):
                 except BaseException:
                     pass
                 try:
-                    if configs.mode() == 1:
-                        embed = discord.Embed(
-                            title="Anti Invite",
-                            url=theme.title_url(),
-                            description="```\n\"Anti Invite\" is enabled, sending Discord invites is not allowed.```",
-                            color=theme.hex_color()
-                        )
-
-                        embed.set_footer(
-                            text=theme.footer(),
-                            icon_url=theme.footer_icon_url()
-                        )
-                        embed.set_author(
-                            name=theme.author(),
-                            url=theme.author_url(),
-                            icon_url=theme.author_icon_url()
-                        )
-
-                        sent = await message.channel.send(embed=embed)
-                    else:
-                        sent = await message.channel.send(
-                            f"```ini\n[ Anti Invite ]\n\n\"Anti Invite\" is enabled, sending Discord invites is not allowed.\n\n[ {theme.footer()} ]```"
-                        )
+                    sent = await message.channel.send(
+                        f"```ini\n[ Anti Invite ]\n\n\"Anti Invite\" is enabled, sending Discord invites is not allowed.\n\n[ {theme.footer()} ]```"
+                    )
                     await asyncio.sleep(30)
                     await sent.delete()
                 except BaseException:
@@ -4280,7 +3877,7 @@ class OnMessage(commands.Cog, name="on message"):
         # Anti-Upper
         if message.content.isupper() and anti_upper:
             guilds = files.json(
-                "Luna/protections/config.json", "guilds", documents=True
+                "data/protections/config.json", "guilds", documents=False
             )
             if message.guild.id in guilds:
                 try:
@@ -4288,29 +3885,9 @@ class OnMessage(commands.Cog, name="on message"):
                 except BaseException:
                     pass
                 try:
-                    if configs.mode() == 1:
-                        embed = discord.Embed(
-                            title="Anti Upper",
-                            url=theme.title_url(),
-                            description="```\n\"Anti Upper\" is enabled, sending all uppercase is not allowed.```",
-                            color=theme.hex_color()
-                        )
-
-                        embed.set_footer(
-                            text=theme.footer(),
-                            icon_url=theme.footer_icon_url()
-                        )
-                        embed.set_author(
-                            name=theme.author(),
-                            url=theme.author_url(),
-                            icon_url=theme.author_icon_url()
-                        )
-
-                        sent = await message.channel.send(embed=embed)
-                    else:
-                        sent = await message.channel.send(
-                            f"```ini\n[ Anti Upper ]\n\n\"Anti Upper\" is enabled, sending all uppercase is not allowed.\n\n[ {theme.footer()} ]```"
-                        )
+                    sent = await message.channel.send(
+                        f"```ini\n[ Anti Upper ]\n\n\"Anti Upper\" is enabled, sending all uppercase is not allowed.\n\n[ {theme.footer()} ]```"
+                    )
                     await asyncio.sleep(30)
                     await sent.delete()
                 except BaseException:
@@ -4320,7 +3897,7 @@ class OnMessage(commands.Cog, name="on message"):
         # Anti-Phishing
         if message.content in phishing_list and anti_phishing:
             guilds = files.json(
-                "Luna/protections/config.json", "guilds", documents=True
+                "data/protections/config.json", "guilds", documents=False
             )
             if message.guild.id in guilds:
                 try:
@@ -4328,29 +3905,9 @@ class OnMessage(commands.Cog, name="on message"):
                 except BaseException:
                     pass
                 try:
-                    if configs.mode() == 1:
-                        embed = discord.Embed(
-                            title="Anti Phishing Links",
-                            url=theme.title_url(),
-                            description="```\n\"Anti Phishing Links\" is enabled, the url you sent, is banned.```",
-                            color=theme.hex_color()
-                        )
-
-                        embed.set_footer(
-                            text=theme.footer(),
-                            icon_url=theme.footer_icon_url()
-                        )
-                        embed.set_author(
-                            name=theme.author(),
-                            url=theme.author_url(),
-                            icon_url=theme.author_icon_url()
-                        )
-
-                        sent = await message.channel.send(embed=embed)
-                    else:
-                        sent = await message.channel.send(
-                            f"```ini\n[ Anti Phishing Links ]\n\n\"Anti Phishing Links\" is enabled, the url you sent, is banned.\n\n[ {theme.footer()} ]```"
-                        )
+                    sent = await message.channel.send(
+                        f"```ini\n[ Anti Phishing Links ]\n\n\"Anti Phishing Links\" is enabled, the url you sent, is banned.\n\n[ {theme.footer()} ]```"
+                    )
                     await asyncio.sleep(30)
                     await sent.delete()
                 except BaseException:
@@ -4375,25 +3932,25 @@ class OnDelete(commands.Cog, name="on delete"):
 
         if f'<@!{self.bot.user.id}>' in message.content:
             if files.json(
-                    "Luna/notifications/toasts.json",
+                    "data/notifications/toasts.json",
                     "ghostpings",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/notifications/toasts.json",
+                "data/notifications/toasts.json",
                 "toasts",
-                documents=True
+                documents=False
             ) == "on":
                 notify.toast(
                     f"You have been ghostpinged\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}"
                 )
             if files.json(
-                    "Luna/webhooks/webhooks.json",
+                    "data/webhooks/webhooks.json",
                     "ghostpings",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/webhooks/webhooks.json",
+                "data/webhooks/webhooks.json",
                 "webhooks",
-                documents=True
+                documents=False
             ) == "on" and not webhook.ghostpings_url() == "webhook-url-here":
                 notify.webhook(
                     url=webhook.ghostpings_url(),
@@ -4414,7 +3971,7 @@ class OnDelete(commands.Cog, name="on delete"):
 
         if anti_deleting:
             guilds = files.json(
-                "Luna/protections/config.json", "guilds", documents=True
+                "data/protections/config.json", "guilds", documents=False
             )
             if message.guild.id in guilds:
                 print()
@@ -4437,25 +3994,25 @@ class OnDelete(commands.Cog, name="on delete"):
         #             if cooldown.count(message.author.id) == 0:
         #                 cooldown.append(message.author.id)
         #                 if files.json(
-        #                     "Luna/snipers/selfbot.json",
+        #                     "data/snipers/selfbot.json",
         #                     "sniper",
-        #                         documents=True) == "on":
+        #                         documents=False) == "on":
         #                     if files.json(
-        #                             "Luna/notifications/toasts.json",
+        #                             "data/notifications/toasts.json",
         #                             "selfbot",
-        #                             documents=True) == "on" and files.json(
-        #                             "Luna/notifications/toasts.json",
+        #                             documents=False) == "on" and files.json(
+        #                             "data/notifications/toasts.json",
         #                             "toasts",
-        #                             documents=True) == "on":
+        #                             documents=False) == "on":
         #                         notify.toast(
         #                             f"Selfbot Detected\nServer »  {message.guild}\nChannel » {message.channel}\nAuthor »  {message.author}")
         #                     if files.json(
-        #                             "Luna/webhooks/webhooks.json",
+        #                             "data/webhooks/webhooks.json",
         #                             "selfbot",
-        #                             documents=True) == "on" and files.json(
-        #                             "Luna/webhooks/webhooks.json",
+        #                             documents=False) == "on" and files.json(
+        #                             "data/webhooks/webhooks.json",
         #                             "webhooks",
-        #                             documents=True) == "on" and not webhook.selfbot_url() == "webhook-url-here":
+        #                             documents=False) == "on" and not webhook.selfbot_url() == "webhook-url-here":
         #                         notify.webhook(
         #                             url=webhook.selfbot_url(),
         #                             name="selfbot",
@@ -4496,23 +4053,23 @@ class OnTyping(commands.Cog, name="on typing"):
                 channel, discord.DMChannel
         ):
             if files.json(
-                    "Luna/notifications/toasts.json",
+                    "data/notifications/toasts.json",
                     "friendevents",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/notifications/toasts.json",
+                "data/notifications/toasts.json",
                 "toasts",
-                documents=True
+                documents=False
             ) == "on":
                 notify.toast(f"{member} is typing")
             if files.json(
-                    "Luna/webhooks/webhooks.json",
+                    "data/webhooks/webhooks.json",
                     "friendevents",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/webhooks/webhooks.json",
+                "data/webhooks/webhooks.json",
                 "webhooks",
-                documents=True
+                documents=False
             ) == "on" and not webhook.friendevents_url() == "webhook-url-here":
                 notify.webhook(
                     url=webhook.friendevents_url(
@@ -4535,22 +4092,25 @@ class OnCommand(commands.Cog, name="on command"):
     @commands.Cog.listener()
     async def on_command(self, luna: commands.Context):
         try:
-            await asyncio.sleep(0)
-            await luna.message.delete()
+            if "mreact" in luna.command.name:
+                pass
+            else:
+                await asyncio.sleep(0)
+                await luna.message.delete()
         except(discord.NotFound, AttributeError, RuntimeError):
             pass
         global last_used
         if not luna.command.name == "repeat":
             last_used = luna.command.name
         prints.command(luna.command.name)
-        theme_json = files.json("Luna/config.json", "theme", documents=True)
+        theme_json = files.json("data/config.json", "theme", documents=False)
         try:
             if theme_json == "default":
                 pass
             else:
                 files.json(
-                    f"Luna/themes/{theme_json}",
-                    "title", documents=True
+                    f"data/themes/{theme_json}",
+                    "title", documents=False
                 )
         except BaseException:
             config.theme("default")
@@ -4622,7 +4182,7 @@ class OnCommandErrorCog(commands.Cog, name="on command error"):
                 await luna.message.delete()
             except BaseException:
                 pass
-            prefix = files.json("Luna/config.json", "prefix", documents=True)
+            prefix = files.json("data/config.json", "prefix", documents=False)
             helptext = ""
             amount = 0
             for command in self.bot.commands:
@@ -4728,7 +4288,7 @@ class HelpCog(commands.Cog, name="Help commands"):
         aliases=['h', '?']
     )
     async def help(self, luna, commandName: str = None):
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
 
         command_name2 = None
         stop = False
@@ -4758,12 +4318,10 @@ Categories\n\n\
 {prefix}hentai           » Hentai explorer\n\
 {prefix}profile          » Profile settings\n\
 {prefix}protection       » Protections\n\
-{prefix}raiding          » Raiding tools\n\
 {prefix}text             » Text commands\n\
 {prefix}trolling         » Troll commands\n\
 {prefix}tools            » Tools\n\
 {prefix}networking       » Networking\n\
-{prefix}nuking           » Account nuking\n\
 {prefix}utility          » Utilities\n\
 {prefix}settings         » Settings\n\
 {prefix}sharing          » Share with somebody\n\
@@ -4900,7 +4458,7 @@ Version\n\n{version}```"
     )
     async def admin(self, luna, page: str = "1"):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         cog = self.bot.get_cog('Administrative commands')
         commands = cog.get_commands()
         helptext = ""
@@ -4968,7 +4526,7 @@ Version\n\n{version}```"
     )
     async def profile(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         cog = self.bot.get_cog('Profile commands')
         commands = cog.get_commands()
         helptext = ""
@@ -5001,7 +4559,7 @@ Version\n\n{version}```"
     )
     async def animated(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         cog = self.bot.get_cog('Animated commands')
         commands = cog.get_commands()
         helptext = ""
@@ -5016,7 +4574,7 @@ Version\n\n{version}```"
     )
     async def dump(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         cog = self.bot.get_cog('Dump commands')
         commands = cog.get_commands()
         helptext = ""
@@ -5031,7 +4589,7 @@ Version\n\n{version}```"
     )
     async def text(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         cog = self.bot.get_cog('Text commands')
         commands = cog.get_commands()
         helptext = ""
@@ -5051,7 +4609,7 @@ Version\n\n{version}```"
     )
     async def game(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         cog = self.bot.get_cog('Game commands')
         commands = cog.get_commands()
         helptext = ""
@@ -5066,7 +4624,7 @@ Version\n\n{version}```"
     )
     async def image(self, luna, page: str = "1"):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         cog = self.bot.get_cog('Image commands')
         commands = cog.get_commands()
         helptext = ""
@@ -5089,7 +4647,7 @@ Version\n\n{version}```"
     )
     async def hentai(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
 
         cog = self.bot.get_cog('Hentai commands')
         commands = cog.get_commands()
@@ -5113,7 +4671,7 @@ Version\n\n{version}```"
     )
     async def trolling(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         cog = self.bot.get_cog('Troll commands')
         commands = cog.get_commands()
         helptext = ""
@@ -5128,7 +4686,7 @@ Version\n\n{version}```"
     )
     async def fun(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         cog = self.bot.get_cog('Fun commands')
         commands = cog.get_commands()
         helptext = ""
@@ -5143,7 +4701,7 @@ Version\n\n{version}```"
     )
     async def tools(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         cog = self.bot.get_cog('Tools commands')
         commands = cog.get_commands()
         helptext = ""
@@ -5158,7 +4716,7 @@ Version\n\n{version}```"
     )
     async def networking(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         cog = self.bot.get_cog('Nettool commands')
         commands = cog.get_commands()
         helptext = ""
@@ -5174,7 +4732,7 @@ Version\n\n{version}```"
     )
     async def utility(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         cog = self.bot.get_cog('Util commands')
         commands = cog.get_commands()
         helptext = ""
@@ -5190,7 +4748,7 @@ Version\n\n{version}```"
     async def abusive(self, luna, page: str = "1"):
 
         if configs.risk_mode() == "on":
-            prefix = files.json("Luna/config.json", "prefix", documents=True)
+            prefix = files.json("data/config.json", "prefix", documents=False)
             cog = self.bot.get_cog('Abusive commands')
             commands = cog.get_commands()
             helptext = ""
@@ -5242,42 +4800,6 @@ Version\n\n{version}```"
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
     @commands.command(
-        name="raiding",
-        usage="",
-        description="Raiding servers"
-    )
-    async def raiding(self, luna):
-
-        if configs.risk_mode() == "on":
-            prefix = files.json("Luna/config.json", "prefix", documents=True)
-            cog = self.bot.get_cog('Raid commands')
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-            await message_builder(luna, title="Raiding", description=f"{theme.description()}```\n{helptext}```")
-        else:
-            await error_builder(luna, description="```\nRiskmode is disabled```")
-
-    @commands.command(
-        name="nuking",
-        usage="",
-        description="Account nuking"
-    )
-    async def nuking(self, luna):
-
-        if configs.risk_mode() == "on":
-            prefix = files.json("Luna/config.json", "prefix", documents=True)
-            cog = self.bot.get_cog('Nuking commands')
-            commands = cog.get_commands()
-            helptext = ""
-            for command in commands:
-                helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
-            await message_builder(luna, title="Nuking", description=f"{theme.description()}```\n{helptext}```")
-        else:
-            await error_builder(luna, description="```\nRiskmode is disabled```")
-
-    @commands.command(
         name="protection",
         usage="",
         aliases=['protections', 'protect'],
@@ -5285,7 +4807,7 @@ Version\n\n{version}```"
     )
     async def protection(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         cog = self.bot.get_cog('Protection commands')
         commands = cog.get_commands()
         helptext = ""
@@ -5317,8 +4839,8 @@ Version\n\n{version}```"
         for command in commands:
             guildtext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
         guilds = files.json(
-            "Luna/protections/config.json",
-            "guilds", documents=True
+            "data/protections/config.json",
+            "guilds", documents=False
         )
         activeguildtext = ""
         if not guilds == []:
@@ -5348,7 +4870,7 @@ Version\n\n{version}```"
     )
     async def misc(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         cog = self.bot.get_cog('Miscellaneous commands')
         commands = cog.get_commands()
         helptext = ""
@@ -5363,18 +4885,18 @@ Version\n\n{version}```"
     )
     async def settings(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         deletetimer = int(
             files.json(
-                "Luna/config.json",
-                "delete_timer", documents=True
+                "data/config.json",
+                "delete_timer", documents=False
             )
         )
-        errorlog = files.json("Luna/config.json", "error_log", documents=True)
-        riskmode = files.json("Luna/config.json", "risk_mode", documents=True)
-        themesvar = files.json("Luna/config.json", "theme", documents=True)
+        errorlog = files.json("data/config.json", "error_log", documents=False)
+        riskmode = files.json("data/config.json", "risk_mode", documents=False)
+        themesvar = files.json("data/config.json", "theme", documents=False)
         console_mode = files.json(
-            "Luna/console/console.json", "mode", documents=True
+            "data/console/console.json", "mode", documents=False
         )
         if console_mode == "2":
             console_mode = "information"
@@ -5392,10 +4914,10 @@ Version\n\n{version}```"
                 theme_description = "on"
         else:
             theme_json = files.json(
-                "Luna/config.json", "theme", documents=True
+                "data/config.json", "theme", documents=False
             )
             theme_description = files.json(
-                f"Luna/themes/{theme_json}", "description", documents=True
+                f"data/themes/{theme_json}", "description", documents=False
             )
             if theme_description is None:
                 theme_description = True
@@ -5404,16 +4926,16 @@ Version\n\n{version}```"
             else:
                 theme_description = "on"
         startup_status = files.json(
-            "Luna/config.json", "startup_status", documents=True
+            "data/config.json", "startup_status", documents=False
         )
         title = theme.title()
         footer = theme.footer()
         selfbotdetection = files.json(
-            "Luna/snipers/selfbot.json", "sniper", documents=True
+            "data/snipers/selfbot.json", "sniper", documents=False
         )
         pings = files.json(
-            "Luna/notifications/console.json",
-            "pings", documents=True
+            "data/notifications/console.json",
+            "pings", documents=False
         )
         if title == "":
             title = "None"
@@ -5461,7 +4983,7 @@ Version\n\n{version}```"
     )
     async def sharing(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         share = configs.share()
         user_id = configs.share_id()
         if user_id == "":
@@ -5486,7 +5008,7 @@ Version\n\n{version}```"
     )
     async def chelp(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         cog = self.bot.get_cog('Custom commands')
         commands = cog.get_commands()
         helptext = ""
@@ -5507,7 +5029,7 @@ Version\n\n{version}```"
     )
     async def repeat(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         await luna.send(f"{prefix}{last_used}")
 
     @commands.command(
@@ -5517,7 +5039,7 @@ Version\n\n{version}```"
     )
     async def search(self, luna, commandName: str):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         helptext = ""
         for command in self.bot.commands:
             helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description},"
@@ -6220,13 +5742,13 @@ class MemberCog(commands.Cog, name="Member commands"):
         bans = [
             f"{b.user.name}#{b.user.discriminator} | {b.user.id}" for b in bans]
         bans = "\n".join(bans)
-        files.create_folder(f"Luna/backup/guilds/{guild.name}", documents=True)
+        files.create_folder(f"data/backup/guilds/{guild.name}", documents=False)
         files.write_file(
-            f"Luna/backup/guilds/{guild.name}/bans.txt", bans, documents=True
+            f"data/backup/guilds/{guild.name}/bans.txt", bans, documents=False
         )
         await message_builder(
             luna, title=f"Saved Bans",
-            description=f"```\nSaved all bans in Luna/backup/guilds/{guild.name}/bans.txt\n``````{bans}```"
+            description=f"```\nSaved all bans in data/backup/guilds/{guild.name}/bans.txt\n``````{bans}```"
         )
 
     @commands.command(
@@ -6243,16 +5765,16 @@ class MemberCog(commands.Cog, name="Member commands"):
         else:
             guild = luna.guild
         if not files.file_exist(
-                f"Luna/backup/guilds/{guild.name}",
-                documents=True
+                f"data/backup/guilds/{guild.name}",
+                documents=False
         ):
             await message_builder(
                 luna, title=f"Load bans",
-                description=f"```\nNo bans were found in Luna/backup/{guild.name}/bans.txt```"
+                description=f"```\nNo bans were found in data/backup/{guild.name}/bans.txt```"
             )
             return
         bans = files.read_file(
-            f"Luna/backup/guilds/{guild.name}/bans.txt", documents=True
+            f"data/backup/guilds/{guild.name}/bans.txt", documents=False
         )
         bans = bans.split("\n")
         for ban in bans:
@@ -6263,7 +5785,7 @@ class MemberCog(commands.Cog, name="Member commands"):
             await guild.ban(user)
         await message_builder(
             luna, title=f"Load bans",
-            description=f"```\nLoaded all bans from Luna/backup/guilds/{guild.name}/bans.txt```"
+            description=f"```\nLoaded all bans from data/backup/guilds/{guild.name}/bans.txt```"
         )
 
 
@@ -6931,12 +6453,12 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
             embed = discord.Embed(
                 title="Animguild",
                 description=f"```\nAnimating: {name}```",
-                color=theme.hex_color()
+
             )
 
             embed.set_footer(
                 text=theme.footer(),
-                icon_url=theme.footer_icon_url()
+
             )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
@@ -6967,12 +6489,12 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
                 embed = discord.Embed(
                     title="Animguild",
                     description=f"```\nAnimating: {name}```",
-                    color=theme.hex_color()
+
                 )
 
                 embed.set_footer(
                     text=theme.footer(),
-                    icon_url=theme.footer_icon_url()
+
                 )
                 embed.set_author(
                     name=theme.author(), url=theme.author_url(
@@ -7115,6 +6637,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
     )
     async def virus(self, luna, user: discord.Member = None, *, virus: str = "trojan"):
         user = user or luna.author
+        start = await luna.send(f"{luna.author.mention} has started to spread {virus}")
         animation_list = (
             f"``[▓▓▓                    ] / {virus}-virus.exe Packing files.``",
             f"``[▓▓▓▓▓▓▓                ] - {virus}-virus.exe Packing files..``",
@@ -7131,7 +6654,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         )
         for i in animation_list:
             await asyncio.sleep(1.5)
-            await luna.message.edit(content=i)
+            await start.edit(content=i)
 
     @commands.command(
         name="cathi",
@@ -7139,6 +6662,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         description="Cute cat animation"
     )
     async def cathi(self, luna, *, text: str = "Hi..."):
+        start = await luna.send(f"A package arrived!")
         animation_list = (
             """ຸ 　　　＿＿_＿＿
 	　／　／　  ／|"
@@ -7155,7 +6679,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         for _ in range(3):
             for cat in animation_list:
                 await asyncio.sleep(2)
-                await luna.message.edit(content=cat)
+                await start.edit(content=cat)
 
     @commands.command(
         name="flop",
@@ -7163,6 +6687,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         description="Flop animation"
     )
     async def flop(self, luna):
+        start = await luna.send(f"{luna.author.mention} has started to flop")
         animation_list = (
             "(   ° - °) (' - '   )",
             "(\\\\° - °)\\ (' - '   )",
@@ -7172,7 +6697,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         )
         for i in animation_list:
             await asyncio.sleep(2)
-            await luna.message.edit(content=i)
+            await start.edit(content=i)
 
     @commands.command(
         name="poof",
@@ -7180,10 +6705,11 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         description="Poof animation"
     )
     async def poof(self, luna):
+        start = await luna.send(f"{luna.author.mention} has started to poof")
         animation_list = ("(   ' - ')", "' - ')", "- ')", "')", ")", "*poofness*")
         for i in animation_list:
             await asyncio.sleep(2)
-            await luna.message.edit(content=i)
+            await start.edit(content=i)
 
     @commands.command(
         name="boom",
@@ -7191,6 +6717,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         description="Boom animation"
     )
     async def boom(self, luna):
+        start = await luna.send(f"{luna.author.mention} has started to boom")
         animation_list = (
             "```THIS MESSAGE WILL SELFDESTRUCT IN 5```",
             "```THIS MESSAGE WILL SELFDESTRUCT IN 4```",
@@ -7203,14 +6730,15 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         )
         for i in animation_list:
             await asyncio.sleep(2)
-            await luna.message.edit(content=i)
+            await start.edit(content=i)
 
     @commands.command(
         name="tableflip",
         usage="",
-        description="Tableflip/rage animation"
+        description="Tableflip animation"
     )
     async def tableflip(self, luna):
+        start = await luna.send(f"{luna.author.mention} is flipping the table")
         animation_list = (
             "`(\\°-°)\\  ┬─┬`",
             "`(\\°□°)\\  ┬─┬`",
@@ -7226,7 +6754,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         )
         for i in animation_list:
             await asyncio.sleep(2)
-            await luna.message.edit(content=i)
+            await start.edit(content=i)
 
     @commands.command(
         name="unflip",
@@ -7234,6 +6762,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         description="Unflip animation"
     )
     async def tableflip(self, luna):
+        start = await luna.send(f"{luna.author.mention} is unflipping the table")
         animation_list = (
             "`(\\°-°)\\  ┻━┻`",
             "`(\\°□°)\\  ┻━┻`",
@@ -7243,7 +6772,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         )
         for i in animation_list:
             await asyncio.sleep(2)
-            await luna.message.edit(content=i)
+            await start.edit(content=i)
 
     @commands.command(
         name="warning",
@@ -7251,6 +6780,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         description="System overload animation"
     )
     async def warning(self, luna):
+        start = await luna.send(f"{luna.author.mention} is getting a warning")
         animation_list = (
             "`LOAD !! WARNING !! SYSTEM OVER`",
             "`OAD !! WARNING !! SYSTEM OVERL`",
@@ -7277,7 +6807,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         )
         for i in animation_list:
             await asyncio.sleep(2)
-            await luna.message.edit(content=i)
+            await start.edit(content=i)
 
 
 bot.add_cog(AnimatedCog(bot))
@@ -7295,12 +6825,12 @@ class DumpCog(commands.Cog, name="Dump commands"):
     async def alldump(self, luna, channel: discord.TextChannel):
 
         if not files.file_exist(
-                f"Luna/dumping/all/{channel.guild.name}/{channel.name}",
-                documents=True
+                f"data/dumping/all/{channel.guild.name}/{channel.name}",
+                documents=False
         ):
             files.create_folder(
-                f"Luna/dumping/all/{channel.guild.name}/{channel.name}",
-                documents=True
+                f"data/dumping/all/{channel.guild.name}/{channel.name}",
+                documents=False
             )
         try:
             prints.event(
@@ -7315,11 +6845,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
                     for attachment in message.attachments:
                         r = requests.get(attachment.url, stream=True)
                         open(
-                            os.path.join(
-                                files.documents(),
-                                f'Luna/dumping/all/{channel.guild.name}/{channel.name}/{attachment.filename}'
-                            ),
-                            'wb'
+                            f'data/dumping/all/{channel.guild.name}/{channel.name}/{attachment.filename}', 'wb'
                         ).write(
                             r.content
                         )
@@ -7331,7 +6857,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
                 description=f"```\nInfo\n\nDumped all from {channel.mention} ({channel.guild.name})```"
             )
         except Exception as e:
-            await error_builder(luna, e)
+            await error_builder(luna, description=f"```{e}```")
 
     @commands.command(
         name="imgdump",
@@ -7341,12 +6867,12 @@ class DumpCog(commands.Cog, name="Dump commands"):
     async def imgdump(self, luna, channel: discord.TextChannel):
 
         if not files.file_exist(
-                f"Luna/dumping/images/{channel.guild.name}/{channel.name}",
-                documents=True
+                f"data/dumping/images/{channel.guild.name}/{channel.name}",
+                documents=False
         ):
             files.create_folder(
-                f"Luna/dumping/images/{channel.guild.name}/{channel.name}",
-                documents=True
+                f"data/dumping/images/{channel.guild.name}/{channel.name}",
+                documents=False
             )
         try:
             prints.event(
@@ -7364,11 +6890,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
                         ) or attachment.url.endswith(".jpeg") or attachment.url.endswith(".gif"):
                             r = requests.get(attachment.url, stream=True)
                             open(
-                                os.path.join(
-                                    files.documents(),
-                                    f'Luna/dumping/images/{channel.guild.name}/{channel.name}/{attachment.filename}'
-                                ),
-                                'wb'
+                                f'data/dumping/images/{channel.guild.name}/{channel.name}/{attachment.filename}', 'wb'
                             ).write(
                                 r.content
                             )
@@ -7380,7 +6902,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
                 description=f"```\nInfo\n\nDumped images from {channel.mention} ({channel.guild.name})```"
             )
         except Exception as e:
-            await error_builder(luna, e)
+            await error_builder(luna, description=f"```{e}```")
 
     @commands.command(
         name="audiodump",
@@ -7390,12 +6912,12 @@ class DumpCog(commands.Cog, name="Dump commands"):
     async def audiodump(self, luna, channel: discord.TextChannel):
 
         if not files.file_exist(
-                f"Luna/dumping/audio/{channel.guild.name}/{channel.name}",
-                documents=True
+                f"data/dumping/audio/{channel.guild.name}/{channel.name}",
+                documents=False
         ):
             files.create_folder(
-                f"Luna/dumping/audio/{channel.guild.name}/{channel.name}",
-                documents=True
+                f"data/dumping/audio/{channel.guild.name}/{channel.name}",
+                documents=False
             )
         try:
             prints.event(
@@ -7411,11 +6933,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
                         if attachment.url.endswith(".mp3"):
                             r = requests.get(attachment.url, stream=True)
                             open(
-                                os.path.join(
-                                    files.documents(),
-                                    f'Luna/dumping/audio/{channel.guild.name}/{channel.name}/{attachment.filename}'
-                                ),
-                                'wb'
+                                f'data/dumping/audio/{channel.guild.name}/{channel.name}/{attachment.filename}', 'wb'
                             ).write(
                                 r.content
                             )
@@ -7427,7 +6945,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
                 description=f"```\nInfo\n\nDumped audio from {channel.mention} ({channel.guild.name})```"
             )
         except Exception as e:
-            await error_builder(luna, e)
+            await error_builder(luna, description=f"```{e}```")
 
     @commands.command(
         name="videodump",
@@ -7437,12 +6955,12 @@ class DumpCog(commands.Cog, name="Dump commands"):
     async def videodump(self, luna, channel: discord.TextChannel):
 
         if not files.file_exist(
-                f"Luna/dumping/videos/{channel.guild.name}/{channel.name}",
-                documents=True
+                f"data/dumping/videos/{channel.guild.name}/{channel.name}",
+                documents=False
         ):
             files.create_folder(
-                f"Luna/dumping/videos/{channel.guild.name}/{channel.name}",
-                documents=True
+                f"data/dumping/videos/{channel.guild.name}/{channel.name}",
+                documents=False
             )
         try:
             prints.event(
@@ -7460,11 +6978,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
                         ) or attachment.url.endswith(".mov"):
                             r = requests.get(attachment.url, stream=True)
                             open(
-                                os.path.join(
-                                    files.documents(),
-                                    f'Luna/dumping/videos/{channel.guild.name}/{channel.name}/{attachment.filename}'
-                                ),
-                                'wb'
+                                f'data/dumping/videos/{channel.guild.name}/{channel.name}/{attachment.filename}', 'wb'
                             ).write(
                                 r.content
                             )
@@ -7476,7 +6990,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
                 description=f"```\nInfo\n\nDumped videos from {channel.mention} ({channel.guild.name})```"
             )
         except Exception as e:
-            await error_builder(luna, e)
+            await error_builder(luna, description=f"```{e}```")
 
     @commands.command(
         name="textdump",
@@ -7486,12 +7000,12 @@ class DumpCog(commands.Cog, name="Dump commands"):
     async def textdump(self, luna, channel: discord.TextChannel):
 
         if not files.file_exist(
-                f"Luna/dumping/text/{channel.guild.name}/{channel.name}",
-                documents=True
+                f"data/dumping/text/{channel.guild.name}/{channel.name}",
+                documents=False
         ):
             files.create_folder(
-                f"Luna/dumping/text/{channel.guild.name}/{channel.name}",
-                documents=True
+                f"data/dumping/text/{channel.guild.name}/{channel.name}",
+                documents=False
             )
         try:
             prints.event(
@@ -7505,12 +7019,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
             async for message in channel.history(limit=1000):
                 text += f"{message.author.name}#{message.author.discriminator}: {message.content}\n"
             open(
-                os.path.join(
-                    files.documents(),
-                    f'Luna/dumping/text/{channel.guild.name}/{channel.name}/{channel.name}.txt'
-                ),
-                'w',
-                encoding='utf-8'
+                f'data/dumping/text/{channel.guild.name}/{channel.name}/{channel.name}.txt', 'w', encoding='utf-8'
             ).write(text)
             prints.message(
                 f"Dumped text from {channel.name} ({channel.guild.name})"
@@ -7520,7 +7029,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
                 description=f"```\nInfo\n\nDumped last 1000 messages from {channel.mention} ({channel.guild.name})```"
             )
         except Exception as e:
-            await error_builder(luna, e)
+            await error_builder(luna, description=f"```{e}```")
 
     @commands.command(
         name="emojidump",
@@ -7530,11 +7039,11 @@ class DumpCog(commands.Cog, name="Dump commands"):
     async def emojidump(self, luna, guild: discord.Guild):
 
         if not files.file_exist(
-                f"Luna/dumping/emojis/{guild.name}",
-                documents=True
+                f"data/dumping/emojis/{guild.name}",
+                documents=False
         ):
             files.create_folder(
-                f"Luna/dumping/emojis/{guild.name}", documents=True
+                f"data/dumping/emojis/{guild.name}", documents=False
             )
         try:
             prints.event(f"Dumping emojis from {guild.name}")
@@ -7548,28 +7057,21 @@ class DumpCog(commands.Cog, name="Dump commands"):
                 r = requests.get(url, stream=True)
                 if '.png' in url:
                     open(
-                        os.path.join(
-                            files.documents(),
-                            f'Luna/dumping/emojis/{guild.name}/{name}.png'
-                        ),
-                        'wb'
+
+                        f'data/dumping/emojis/{guild.name}/{name}.png', 'wb'
                     ).write(
                         r.content
                     )
                 elif '.gif' in url:
                     open(
-                        os.path.join(
-                            files.documents(),
-                            f'Luna/dumping/emojis/{guild.name}/{name}.gif'
-                        ),
-                        'wb'
+                        f'data/dumping/emojis/{guild.name}/{name}.gif', 'wb'
                     ).write(
                         r.content
                     )
             prints.message(f"Dumped emojis from {guild.name}")
             await message_builder(luna, title="Dumping", description=f"```\nInfo\n\nDumped emojis from {guild.name}```")
         except Exception as e:
-            await error_builder(luna, e)
+            await error_builder(luna, description=f"```{e}```")
 
     @commands.command(
         name="emojidownload",
@@ -7579,11 +7081,11 @@ class DumpCog(commands.Cog, name="Dump commands"):
     async def emojidownload(self, luna, guild: discord.Guild, emoji: discord.Emoji):
 
         if not files.file_exist(
-                f"Luna/dumping/emojis/{guild.name}",
-                documents=True
+                f"data/dumping/emojis/{guild.name}",
+                documents=False
         ):
             files.create_folder(
-                f"Luna/dumping/emojis/{guild.name}", documents=True
+                f"data/dumping/emojis/{guild.name}", documents=False
             )
         try:
             prints.event(f"Downloading emoji from {guild.name}")
@@ -7596,21 +7098,15 @@ class DumpCog(commands.Cog, name="Dump commands"):
             r = requests.get(url, stream=True)
             if '.png' in url:
                 open(
-                    os.path.join(
-                        files.documents(),
-                        f'Luna/emojis/{guild.name}/{name}.png'
-                    ),
-                    'wb'
+
+                    f'data/emojis/{guild.name}/{name}.png', 'wb'
                 ).write(
                     r.content
                 )
             elif '.gif' in url:
                 open(
-                    os.path.join(
-                        files.documents(),
-                        f'Luna/emojis/{guild.name}/{name}.gif'
-                    ),
-                    'wb'
+
+                    f'data/emojis/{guild.name}/{name}.gif', 'wb'
                 ).write(
                     r.content
                 )
@@ -7620,7 +7116,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
                 description=f"```\nInfo\n\nDownloaded emoji from {guild.name}```"
             )
         except Exception as e:
-            await error_builder(luna, e)
+            await error_builder(luna, description=f"```{e}```")
 
     @commands.command(
         name="avatardump",
@@ -7630,11 +7126,11 @@ class DumpCog(commands.Cog, name="Dump commands"):
     async def avatardump(self, luna, guild: discord.Guild):
 
         if not files.file_exist(
-                f"Luna/dumping/avatars/{guild.name}",
-                documents=True
+                f"data/dumping/avatars/{guild.name}",
+                documents=False
         ):
             files.create_folder(
-                f"Luna/dumping/avatars/{guild.name}", documents=True
+                f"data/dumping/avatars/{guild.name}", documents=False
             )
         try:
             prints.event(f"Dumping avatars from {guild.name}")
@@ -7648,21 +7144,15 @@ class DumpCog(commands.Cog, name="Dump commands"):
                 r = requests.get(url, stream=True)
                 if '.png' in url:
                     open(
-                        os.path.join(
-                            files.documents(),
-                            f'Luna/dumping/avatars/{guild.name}/{name}.png'
-                        ),
-                        'wb'
+
+                        f'data/dumping/avatars/{guild.name}/{name}.png', 'wb'
                     ).write(
                         r.content
                     )
                 elif '.gif' in url:
                     open(
-                        os.path.join(
-                            files.documents(),
-                            f'Luna/dumping/avatars/{guild.name}/{name}.gif'
-                        ),
-                        'wb'
+
+                        f'data/dumping/avatars/{guild.name}/{name}.gif', 'wb'
                     ).write(
                         r.content
                     )
@@ -7672,7 +7162,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
                 description=f"```\nInfo\n\nDumped avatars from {guild.name}```"
             )
         except Exception as e:
-            await error_builder(luna, e)
+            await error_builder(luna, description=f"```{e}```")
 
     @commands.command(
         name="channeldump",
@@ -7682,11 +7172,11 @@ class DumpCog(commands.Cog, name="Dump commands"):
     async def channelnamesdump(self, luna, guild: discord.Guild):
 
         if not files.file_exist(
-                f"Luna/dumping/channels/{guild.name}",
-                documents=True
+                f"data/dumping/channels/{guild.name}",
+                documents=False
         ):
             files.create_folder(
-                f"Luna/dumping/channels/{guild.name}", documents=True
+                f"data/dumping/channels/{guild.name}", documents=False
             )
         try:
             prints.event(f"Dumping channel names from {guild.name}")
@@ -7696,7 +7186,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
             )
             for channel in guild.channels:
                 name = str(channel.name)
-                with open(os.path.join(files.documents(), f'Luna/dumping/channels/{guild.name}/{name}.txt'), 'w') as f:
+                with open(f'data/dumping/channels/{guild.name}/{name}.txt', 'w') as f:
                     f.write(name)
             prints.message(f"Dumped channel names from {guild.name}")
             await message_builder(
@@ -7704,7 +7194,7 @@ class DumpCog(commands.Cog, name="Dump commands"):
                 description=f"```\nInfo\n\nDumped channel names from {guild.name}```"
             )
         except Exception as e:
-            await error_builder(luna, e)
+            await error_builder(luna, description=f"```{e}```")
 
 
 bot.add_cog(DumpCog(bot))
@@ -7734,7 +7224,7 @@ class TextCog(commands.Cog, name="Text commands"):
     )
     async def encode(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
 
         cog = self.bot.get_cog('Encode commands')
         commands = cog.get_commands()
@@ -7744,7 +7234,7 @@ class TextCog(commands.Cog, name="Text commands"):
 
         embed = discord.Embed(
             title="Encode Text",
-            url=theme.title_url(),
+
             description=f"{theme.description()}```\n{helptext}```"
         )
 
@@ -7759,7 +7249,7 @@ class TextCog(commands.Cog, name="Text commands"):
     )
     async def decode(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
 
         cog = self.bot.get_cog('Decode commands')
         commands = cog.get_commands()
@@ -7769,7 +7259,7 @@ class TextCog(commands.Cog, name="Text commands"):
 
         embed = discord.Embed(
             title="Decode Text",
-            url=theme.title_url(),
+
             description=f"{theme.description()}```\n{helptext}```"
         )
 
@@ -8178,7 +7668,7 @@ class ImageCog(commands.Cog, name="Image commands"):
     async def stealav(self, luna, user: discord.Member):
 
         url = user.avatar_url
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         if configs.password() == "password-here":
             await error_builder(luna, f"```\nYou didn't configurate your password yet, use {prefix}password <password>\n```")
         else:
@@ -8192,10 +7682,9 @@ class ImageCog(commands.Cog, name="Image commands"):
         try:
             with open('PFP-1.png', 'rb') as f:
                 await self.bot.user.edit(password=configs.password(), avatar=f.read())
-            await send(luna, embed)
             await message_builder(luna, description=f"```\nStole {user}'s avatar\n```", large_image=user.avatar_url)
         except discord.HTTPException as e:
-            await error_builder(luna, e)
+            await error_builder(luna, description=f"```{e}```")
 
     @commands.command(
         name="setavatar",
@@ -8203,7 +7692,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         description="Set your avatar"
     )
     async def setavatar(self, luna, url: str):
-
+        prefix = files.json("data/config.json", "prefix", documents=False)
         if configs.password() == "password-here":
             await error_builder(luna, f"```\nYou didn't configurate your password yet, use {prefix}password <password>\n```")
         else:
@@ -8219,7 +7708,7 @@ class ImageCog(commands.Cog, name="Image commands"):
                 await self.bot.user.edit(password=configs.password(), avatar=f.read())
             await message_builder(luna, description=f"```\nChanged avatar\n```", large_image=user.avatar_url)
         except discord.HTTPException as e:
-            await error_builder(luna, e)
+            await error_builder(luna, description=f"```{e}```")
 
     @commands.command(
         name="invisav",
@@ -8227,7 +7716,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         description="Invisible avatar"
     )
     async def invisav(self, luna):
-
+        prefix = files.json("data/config.json", "prefix", documents=False)
         url = "https://gauginggadgets.com/wp-content/uploads/2020/07/InvisibleProfileImage.png"
         if configs.password() == "password-here":
             await error_builder(luna, f"```\nYou didn't configurate your password yet, use {prefix}password <password>\n```")
@@ -8244,7 +7733,7 @@ class ImageCog(commands.Cog, name="Image commands"):
                 await self.bot.user.edit(password=configs.password(), avatar=f.read())
             await message_builder(luna, description=f"```\nChanged to an invisible avatar\n```", large_image=user.avatar_url)
         except discord.HTTPException as e:
-            await error_builder(luna, e)
+            await error_builder(luna, description=f"```{e}```")
 
     # ///////////////////////////////////////////////////////////////
     # Fun image commands
@@ -8364,8 +7853,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         data = request.json()
         link = data['message']
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8380,13 +7868,12 @@ class ImageCog(commands.Cog, name="Image commands"):
     async def bidentweet(self, luna, *, text: str):
 
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
-            url=f'https://api.popcatdev.repl.co/biden?text={str(urllib.parse.quote(text))}'
+            url=f'https://api.popcat.xyz/biden?text={str(urllib.parse.quote(text))}'
         )
         await send(luna, embed)
 
@@ -8403,8 +7890,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         data = request.json()
         link = data['message']
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8423,8 +7909,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         ).json()[
             'url']
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8444,8 +7929,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         data = request.json()
         link = data['message']
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8467,8 +7951,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         data = request.json()
         link = data['message']
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8488,8 +7971,7 @@ class ImageCog(commands.Cog, name="Image commands"):
         data = request.json()
         link = data['message']
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8504,13 +7986,12 @@ class ImageCog(commands.Cog, name="Image commands"):
     async def pikachu(self, luna, *, text: str):
 
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
-            url=f"https://api.popcatdev.repl.co/pikachu?text={urllib.parse.quote(str(text))}"
+            url=f"https://api.popcat.xyz/pikachu?text={urllib.parse.quote(str(text))}"
         )
         await send(luna, embed)
 
@@ -8522,8 +8003,7 @@ class ImageCog(commands.Cog, name="Image commands"):
     async def stonks(self, luna, user: discord.User):
 
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8540,8 +8020,7 @@ class ImageCog(commands.Cog, name="Image commands"):
     async def notstonks(self, luna, user: discord.User):
 
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8558,8 +8037,7 @@ class ImageCog(commands.Cog, name="Image commands"):
     async def emergencymeeting(self, luna, *, text):
 
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8576,8 +8054,7 @@ class ImageCog(commands.Cog, name="Image commands"):
     async def eject(self, luna, impostor: bool, crewmate: str, user: discord.User):
 
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8594,8 +8071,7 @@ class ImageCog(commands.Cog, name="Image commands"):
     async def drip(self, luna, user: discord.User):
 
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8612,13 +8088,12 @@ class ImageCog(commands.Cog, name="Image commands"):
     async def gun(self, luna, user: discord.User):
 
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
-            url=f"https://api.popcatdev.repl.co/gun?image={urllib.parse.quote(str(user.avatar_url).replace('webp', 'png'))}"
+            url=f"https://api.popcat.xyz/gun?image={urllib.parse.quote(str(user.avatar_url).replace('webp', 'png'))}"
         )
         await send(luna, embed)
 
@@ -8630,13 +8105,12 @@ class ImageCog(commands.Cog, name="Image commands"):
     async def ad(self, luna, user: discord.User):
 
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
-            url=f"https://api.popcatdev.repl.co/ad?image={urllib.parse.quote(str(user.avatar_url).replace('webp', 'png'))}"
+            url=f"https://api.popcat.xyz/ad?image={urllib.parse.quote(str(user.avatar_url).replace('webp', 'png'))}"
         )
         await send(luna, embed)
 
@@ -8655,13 +8129,12 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
     )
     async def alert(self, luna, *, text: str):
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
-            url=f"https://api.popcatdev.repl.co/alert?text={urllib.parse.quote(str(text))}"
+            url=f"https://api.popcat.xyz/alert?text={urllib.parse.quote(str(text))}"
         )
         await send(luna, embed)
 
@@ -8672,13 +8145,12 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
     )
     async def caution(self, luna, *, text: str):
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
         embed.set_image(
-            url=f"https://api.popcatdev.repl.co/caution?text={urllib.parse.quote(str(text))}"
+            url=f"https://api.popcat.xyz/caution?text={urllib.parse.quote(str(text))}"
         )
         await send(luna, embed)
 
@@ -8689,8 +8161,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
     )
     async def distractedbf(self, luna, boyfriend: discord.User, woman: discord.User, girlfriend: discord.User):
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8706,8 +8177,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
     )
     async def icanmilkyou(self, luna, user1: discord.User, user2: discord.User):
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8723,8 +8193,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
     )
     async def heaven(self, luna, user: discord.User):
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8740,8 +8209,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
     )
     async def dockofshame(self, luna, user: discord.User):
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8757,8 +8225,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
     )
     async def firsttime(self, luna, user: discord.User):
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8774,8 +8241,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
     )
     async def trash(self, luna, user: discord.User):
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8791,8 +8257,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
     )
     async def simp(self, luna, user: discord.User):
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8813,8 +8278,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         data = request.json()
         link = data['url']
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8833,8 +8297,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         data = request.json()
         link = data['url']
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8853,8 +8316,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         data = request.json()
         link = data['url']
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8867,19 +8329,22 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         description="Drake yes and no meme"
     )
     async def drake(self, luna, *, text: str):
-        text = text.split(', ')
-        text1 = text[0]
-        text2 = text[1]
-        embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
-        )
-        embed.set_footer(text=theme.footer())
+        try:
+            text = text.split(', ')
+            text1 = text[0]
+            text2 = text[1]
+            embed = discord.Embed(
+                title=theme.title()
+            )
+            embed.set_footer(text=theme.footer())
 
-        embed.set_image(
-            url=f'https://api.popcatdev.repl.co/drake?text1={str(urllib.parse.quote(text1))}&text2={str(urllib.parse.quote(text2))}'
-        )
-        await send(luna, embed)
+            embed.set_image(
+                url=f'https://api.popcat.xyz/drake?text1={str(urllib.parse.quote(text1))}&text2={str(urllib.parse.quote(text2))}'
+            )
+            await send(luna, embed)
+        except BaseException:
+            prefix = files.json("data/config.json", "prefix", documents=False)
+            await error_builder(luna, f"```Example: {prefix}drake Paid Selfbots, Luna\nThe space between the comma and the two words is required.```")
 
     @commands.command(
         name="takemymoney",
@@ -8891,8 +8356,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         text1 = text[0]
         text2 = text[1]
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8916,8 +8380,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         data = request.json()
         link = data['url']
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8936,8 +8399,7 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         data = request.json()
         link = data['url']
         embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url()
+            title=theme.title()
         )
         embed.set_footer(text=theme.footer())
 
@@ -8995,14 +8457,14 @@ class TrollCog(commands.Cog, name="Troll commands"):
         else:
             embed = discord.Embed(
                 title=theme.title(),
-                url=theme.title_url(),
+
                 description=f"Now copying {copycat}",
-                color=theme.hex_color()
+
             )
 
             embed.set_footer(
                 text=theme.footer(),
-                icon_url=theme.footer_icon_url()
+
             )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
@@ -9032,14 +8494,14 @@ class TrollCog(commands.Cog, name="Troll commands"):
             else:
                 embed = discord.Embed(
                     title=theme.title(),
-                    url=theme.title_url(),
+
                     description=f"No one was getting copied",
-                    color=theme.hex_color()
+
                 )
 
                 embed.set_footer(
                     text=theme.footer(),
-                    icon_url=theme.footer_icon_url()
+
                 )
                 embed.set_author(
                     name=theme.author(), url=theme.author_url(
@@ -9061,14 +8523,14 @@ class TrollCog(commands.Cog, name="Troll commands"):
         else:
             embed = discord.Embed(
                 title=theme.title(),
-                url=theme.title_url(),
+
                 description=f"Stopped copying {copycat}",
-                color=theme.hex_color()
+
             )
 
             embed.set_footer(
                 text=theme.footer(),
-                icon_url=theme.footer_icon_url()
+
             )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
@@ -9111,7 +8573,7 @@ class TrollCog(commands.Cog, name="Troll commands"):
         description="Mass reacts on last message"
     )
     async def mreact(self, luna):
-
+        await luna.message.delete()
         messages = await luna.message.channel.history(limit=1).flatten()
         for message in messages:
             await message.add_reaction("😂")
@@ -9188,7 +8650,7 @@ class TrollCog(commands.Cog, name="Troll commands"):
         try:
             await user.ban()
         except Exception as e:
-            await error_builder(luna, e)
+            await error_builder(luna, description=f"```{e}```")
         await message_builder(luna, "Ban Roulette", f"{user} has been banned")
 
 
@@ -9444,11 +8906,11 @@ class FunCog(commands.Cog, name="Fun commands"):
             embed = discord.Embed(
                 title="Slot Machine",
                 description=f"{slotmachine} All matchings, you won!",
-                color=theme.hex_color()
+
             )
             embed.set_footer(
                 text=theme.footer(),
-                icon_url=theme.footer_icon_url()
+
             )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
@@ -9459,11 +8921,11 @@ class FunCog(commands.Cog, name="Fun commands"):
             embed = discord.Embed(
                 title="Slot Machine",
                 description=f"{slotmachine} 2 in a row, you won!",
-                color=theme.hex_color()
+
             )
             embed.set_footer(
                 text=theme.footer(),
-                icon_url=theme.footer_icon_url()
+
             )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
@@ -9474,11 +8936,11 @@ class FunCog(commands.Cog, name="Fun commands"):
             embed = discord.Embed(
                 title="Slot Machine",
                 description=f"{slotmachine} No match, you lost!",
-                color=theme.hex_color()
+
             )
             embed.set_footer(
                 text=theme.footer(),
-                icon_url=theme.footer_icon_url()
+
             )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
@@ -9503,7 +8965,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         joke = data['joke']
         embed = discord.Embed(
             title=theme.title(),
-            url=theme.title_url(),
+
             description=f'```\n{joke}\n```'
         )
         embed.set_footer(text=theme.footer())
@@ -9525,7 +8987,7 @@ class FunCog(commands.Cog, name="Fun commands"):
         punchline = data['punchline']
         embed = discord.Embed(
             title=theme.title(),
-            url=theme.title_url(),
+
             description=f'```\nSetup\n\n{setup}\n``````\nPunchline\n\n{punchline}\n```'
         )
         embed.set_footer(text=theme.footer())
@@ -9649,7 +9111,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
     )
     async def note(self, luna, name: str, *, text: str):
 
-        if files.file_exist(f"Luna/notes/{name}.txt", documents=True):
+        if files.file_exist(f"data/notes/{name}.txt", documents=False):
             if configs.error_log() == "console":
                 prints.error(
                     f"A note already exists with the name » {color.print_gradient(name)}"
@@ -9658,24 +9120,19 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                 await error_builder(luna, description=f"```\nA note already exists with the name » {name}```")
         else:
             file = open(
-                os.path.join(
-                    files.documents(),
-                    f"Luna/notes/{name}.txt"
-                ), "w"
+                f"data/notes/{name}.txt", 'wb'
             )
             file.write(str(text))
             file.close()
             prints.message(f"Created note » {color.print_gradient(name)}")
             embed = discord.Embed(
                 title=theme.title(),
-                url=theme.title_url(),
-                description=f"```\nCreated note » {name}```",
-                color=theme.hex_color()
+                description=f"```\nCreated note » {name}```"
             )
 
             embed.set_footer(
                 text=theme.footer(),
-                icon_url=theme.footer_icon_url()
+
             )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
@@ -9691,7 +9148,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
     )
     async def editnote(self, luna, name: str, themename: str):
 
-        if not files.file_exist(f"Luna/notes/{name}.txt", documents=True):
+        if not files.file_exist(f"data/notes/{name}.txt", documents=False):
             if configs.error_log() == "console":
                 prints.error(
                     f"No note exists with the name » {color.print_gradient(name)}"
@@ -9700,32 +9157,22 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                 await error_builder(luna, description=f"```\nNo note exists with the name » {name}```")
         else:
             os.rename(
-                os.path.join(
-                    files.documents(),
-                    f"Luna/notes/{name}.txt"
-                ),
-                os.path.join(
-                    files.documents(),
-                    f"Luna/notes/{themename}.txt"
-                )
+                f"data/notes/{name}.txt", f"data/notes/{themename}.txt"
             )
             prints.message(
                 f"Edited note {name} to » {color.print_gradient(themename)}"
             )
             embed = discord.Embed(
                 title=theme.title(),
-                url=theme.title_url(),
-                description=f"```\nEdited \"note\" {name} to » {themename}```",
-                color=theme.hex_color()
+                description=f"```\nEdited \"note\" {name} to » {themename}```"
             )
 
             embed.set_footer(
                 text=theme.footer(),
-                icon_url=theme.footer_icon_url()
+
             )
             embed.set_author(
-                name=theme.author(), url=theme.author_url(
-                ), icon_url=theme.author_icon_url()
+                name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url()
             )
 
             await send(luna, embed)
@@ -9737,25 +9184,20 @@ class ToolsCog(commands.Cog, name="Tools commands"):
     )
     async def delnote(self, luna, name: str):
 
-        if files.file_exist(f"Luna/notes/{name}.txt", documents=True):
+        if files.file_exist(f"data/notes/{name}.txt", documents=False):
             os.remove(
-                os.path.join(
-                    files.documents(),
-                    f"Luna/notes/{name}.txt"
-                )
+                f"data/notes/{name}.txt"
             )
             prints.message(f"Deleted note » {color.print_gradient(name)}")
 
             embed = discord.Embed(
                 title=theme.title(),
-                url=theme.title_url(),
-                description=f"```\nDeleted note » {name}```",
-                color=theme.hex_color()
+                description=f"```\nDeleted note » {name}```"
             )
 
             embed.set_footer(
                 text=theme.footer(),
-                icon_url=theme.footer_icon_url()
+
             )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
@@ -9776,7 +9218,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
     )
     async def sendnote(self, luna, name: str):
 
-        if not files.file_exist(f"Luna/notes/{name}.txt", documents=True):
+        if not files.file_exist(f"data/notes/{name}.txt", documents=False):
             if configs.error_log() == "console":
                 prints.error(
                     f"No note exists with the name » {color.print_gradient(name)}"
@@ -9786,7 +9228,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         else:
             if name.endswith('.txt'):
                 name = name[:-4]
-            await luna.send(file=discord.File(os.path.join(files.documents(), f"Luna/notes/{name}.txt")))
+            await luna.send(file=discord.File(f"data/notes/{name}.txt"))
 
     @commands.command(
         name="shownote",
@@ -9795,7 +9237,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
     )
     async def shownote(self, luna, name: str):
 
-        if not files.file_exist(f"Luna/notes/{name}.txt", documents=True):
+        if not files.file_exist(f"data/notes/{name}.txt", documents=False):
             if configs.error_log() == "console":
                 prints.error(
                     f"No note exists with the name » {color.print_gradient(name)}"
@@ -9804,10 +9246,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                 await error_builder(luna, description=f"```\nNo note exists with the name » {name}```")
         else:
             file = open(
-                os.path.join(
-                    files.documents(),
-                    f"Luna/notes/{name}.txt"
-                ), "r"
+                f"data/notes/{name}.txt", "r"
             )
             file_data = file.read()
             if file_data == "":
@@ -9819,12 +9258,12 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                 embed = discord.Embed(
                     title="Notes",
                     description=f"```\nContent of {name}.txt ↴\n\n{str(file_data)}```",
-                    color=theme.hex_color()
+
                 )
 
                 embed.set_footer(
                     text=theme.footer(),
-                    icon_url=theme.footer_icon_url()
+
                 )
                 embed.set_author(
                     name=theme.author(), url=theme.author_url(
@@ -9840,11 +9279,11 @@ class ToolsCog(commands.Cog, name="Tools commands"):
     )
     async def notes(self, luna):
 
-        path_to_text = os.path.join(files.documents(), "Luna/notes")
+        path_to_text = "data/notes"
         text_files = [pos_txt for pos_txt in os.listdir(
             path_to_text
         ) if pos_txt.endswith('.txt')]
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
 
         if not text_files:
             stringedit = "None"
@@ -9881,6 +9320,53 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
+
+    @commands.command(
+        name="tokencheck",
+        usage="",
+        description="Check the tokens.txt"
+    )
+    async def tokencheck(self, luna):
+
+        file = open(
+            "data/raiding/tokens.txt", "r"
+        )
+        nonempty_lines = [line.strip("\n") for line in file if line != "\n"]
+        file.close()
+
+        if os.stat("data/raiding/tokens.txt").st_size == 0:
+            await message_builder(luna, title="Token Check", description="```\ntokens.txt is empty...```")
+            return
+
+        await message_builder(luna, title="Token Check", description="```\nChecking tokens...```")
+
+        valid_tokens = []
+        success = 0
+        failed = 0
+
+        with open("data/raiding/tokens.txt", "r+") as f:
+            for line in f:
+                token = line.strip("\n")
+                headers = {
+                    'Content-Type': 'application/json',
+                    'authorization': token
+                }
+                url = f"https://discordapp.com/api/v6/users/@me/library"
+                request = requests.get(url, headers=headers)
+                if request.status_code == 200:
+                    valid_tokens.append(token)
+                    success += 1
+                else:
+                    failed += 1
+                    pass
+
+        with open("data/raiding/tokens.txt", "w+") as f:
+            for i in valid_tokens:
+                f.write(i + "\n")
+        await message_builder(
+            luna, title="Token Check",
+            description="```\nSuccessfully checked all tokens and removed invalid ones.\n``````\nValid tokens » " + str(success) + "\nInvalid tokens » " + str(failed) + "```"
+        )
 
     @commands.command(
         name="tokeninfo",
@@ -10078,7 +9564,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
             hexcode = "%06x" % random.randint(0, 0xFFFFFF)
         if hexcode[:1] == "#":
             hexcode = hexcode[1:]
-        if not re.search(r'^(?:[0-9a-fA-F]{3}){1,2}$', hexcode):
+        if not re.search(r'^(?:[\da-fA-F]{3}){1,2}$', hexcode):
             return
         r = requests.get(
             f"https://react.flawcra.cc/api/generation.php?type=color&color={hexcode}"
@@ -10262,8 +9748,8 @@ class ToolsCog(commands.Cog, name="Tools commands"):
 
         deletetimer = int(
             files.json(
-                "Luna/config.json",
-                "delete_timer", documents=True
+                "data/config.json",
+                "delete_timer", documents=False
             )
         )
 
@@ -10298,8 +9784,6 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         description="Opens calculator"
     )
     async def calc(self, luna):
-
-        from subprocess import call
         call(["calc.exe"])
         await message_builder(luna, description=f"```\nOpened calculator```")
 
@@ -10309,8 +9793,6 @@ class ToolsCog(commands.Cog, name="Tools commands"):
         description="Opens notepad"
     )
     async def notepad(self, luna):
-
-        from subprocess import call
         call(["notepad.exe"])
 
     @commands.command(
@@ -10739,15 +10221,8 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
     )
     async def scrapeproxies(self, luna):
 
-        file = open(
-            os.path.join(
-                files.documents(),
-                "Luna/raiding/proxies/http.txt"
-            ), "a+"
-        )
-        res = requests.get(
-            'https://api.proxyscrape.com/?request=displayproxies&proxytype=http&timeout=1500'
-        )
+        file = open("data/raiding/proxies/http.txt", "a+")
+        res = requests.get("https://api.proxyscrape.com/?request=displayproxies&proxytype=http&timeout=1500")
         proxies = []
         for proxy in res.text.split('\n'):
             proxy = proxy.strip()
@@ -10756,10 +10231,7 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
         for p in proxies:
             file.write(p + "\n")
         file = open(
-            os.path.join(
-                files.documents(),
-                "Luna/raiding/proxies/https.txt"
-            ), "a+"
+            "data/raiding/proxies/https.txt", "a+"
         )
         res = requests.get(
             'https://api.proxyscrape.com/?request=displayproxies&proxytype=https&timeout=1500'
@@ -10772,10 +10244,7 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
         for p in proxies:
             file.write(p + "\n")
         file = open(
-            os.path.join(
-                files.documents(),
-                "Luna/raiding/proxies/socks4.txt"
-            ), "a+"
+            "data/raiding/proxies/socks4.txt", "a+"
         )
         res = requests.get(
             'https://api.proxyscrape.com/?request=displayproxies&proxytype=socks4&timeout=1500'
@@ -10788,10 +10257,7 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
         for p in proxies:
             file.write(p + "\n")
         file = open(
-            os.path.join(
-                files.documents(),
-                "Luna/raiding/proxies/socks5.txt"
-            ), "a+"
+            "data/raiding/proxies/socks5.txt", "a+"
         )
         res = requests.get(
             'https://api.proxyscrape.com/?request=displayproxies&proxytype=socks5&timeout=1500'
@@ -10805,7 +10271,7 @@ class NettoolCog(commands.Cog, name="Nettool commands"):
             file.write(p + "\n")
         await message_builder(
             luna, title="Proxy Scraper",
-            description=f"```\nSaved all scraped proxies in Luna/raiding/proxies```"
+            description=f"```\nSaved all scraped proxies in data/raiding/proxies```"
         )  #
 
     @commands.command(name="ip", usage="", description="Show your ip")
@@ -10953,28 +10419,20 @@ class UtilsCog(commands.Cog, name="Util commands"):
 
         if configs.risk_mode() == "on":
             if os.stat(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/invites.txt"
-                    )
+                    "data/invites.txt"
             ).st_size == 0:
                 await message_builder(luna, title="Server Joiner", description=f"```\ninvites.txt is empty...```")
                 return
             else:
-                file = open(
-                    os.path.join(
-                        files.documents(), "Luna/invites.txt"
-                    ), "r"
-                )
-                nonempty_lines = [line.strip("\n")
-                                  for line in file if line != "\n"]
+                file = open("data/invites.txt", "r")
+                nonempty_lines = [line.strip("\n") for line in file if line != "\n"]
                 line_count = len(nonempty_lines)
                 file.close()
                 await message_builder(
                     luna, title="Server Joiner",
                     description=f"```\nFound {line_count} invites in invites.txt\nJoining provided invites...```"
                 )
-                with open(os.path.join(files.documents(), "Luna/invites.txt"), "r+") as f:
+                with open("data/invites.txt", "r+") as f:
                     for line in f:
                         invite = line.strip("\n")
                         invite = invite.replace(
@@ -11009,29 +10467,19 @@ class UtilsCog(commands.Cog, name="Util commands"):
     async def proxyserverjoiner(self, luna):
 
         proxies = open(
-            os.path.join(
-                files.documents(),
-                "Luna/raiding/proxies.txt"
-            ), 'r'
+            "data/raiding/proxies.txt", 'r'
         )
         proxylist = []
         for p, _proxy in enumerate(proxies):
             proxy = _proxy.split('\n')[0]
             proxylist.append(proxy)
         if configs.risk_mode() == "on":
-            if os.stat(
-                    os.path.join(
-                        files.documents(),
-                        "Luna/invites.txt"
-                    )
-            ).st_size == 0:
+            if os.stat("data/invites.txt").st_size == 0:
                 await message_builder(luna, title="Server Joiner", description=f"```\ninvites.txt is empty...```")
                 return
             else:
                 file = open(
-                    os.path.join(
-                        files.documents(), "Luna/invites.txt"
-                    ), "r"
+                    "data/invites.txt", "r"
                 )
                 nonempty_lines = [line.strip("\n")
                                   for line in file if line != "\n"]
@@ -11041,7 +10489,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                     luna, title="Server Joiner",
                     description=f"```\nFound {line_count} invites in invites.txt\nJoining provided invites...```"
                 )
-                with open(os.path.join(files.documents(), "Luna/invites.txt"), "r+") as f:
+                with open("data/invites.txt", "r+") as f:
                     for line in f:
                         invite = line.strip("\n")
                         invite = invite.replace(
@@ -11123,7 +10571,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         await luna.guild.create_custom_emoji(name=emoji_name, image=image)
         embed = discord.Embed(
             title="Emoji Added",
-            url=theme.title_url(),
+
             description=f"{emoji_name}"
         )
         embed.set_thumbnail(url=image_url)
@@ -11143,7 +10591,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         await emoji.edit(name=new_name)
         embed = discord.Embed(
             title="Emoji Edited",
-            url=theme.title_url(),
+
             description=f"{oldname} to {new_name}"
         )
         embed.set_thumbnail(url=emoji.url)
@@ -11164,7 +10612,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         await emoji.delete()
         embed = discord.Embed(
             title="Emoji Deleted",
-            url=theme.title_url(),
+
             description=f"{name}"
         )
         embed.set_thumbnail(url=emojiurl)
@@ -11187,181 +10635,69 @@ class UtilsCog(commands.Cog, name="Util commands"):
         try:
             _ = self.bot.get_guild(guild_id)
         except Exception as e:
-            if configs.error_log() == "console":
-                prints.error(f"{e}")
-            else:
-                embed = discord.Embed(
-                    title="Error",
-                    url=theme.title_url(),
-                    description=f"```\n{e}```",
-                    color=theme.hex_color()
-                )
-
-                embed.set_footer(
-                    text=theme.footer(),
-                    icon_url=theme.footer_icon_url()
-                )
-                embed.set_author(
-                    name=theme.author(), url=theme.author_url(
-                    ), icon_url=theme.author_icon_url()
-                )
-
-                await send(luna, embed)
+            await error_builder(luna, description=f"```{e}```")
             return
 
     @commands.command(
         name='playing',
         usage="<text>",
-        description="Change your activity to playing."
+        description="Change your activity to playing"
     )
-    async def playing(self, luna, *, status: str = None):
-
-        if status is None:
-            prints.error("You didnt put a text to play")
-        else:
-            try:
-                game = discord.Activity(type=discord.ActivityType.playing, name=f"{status}")
-                await self.bot.change_presence(activity=game)
-                embed = discord.Embed(
-                    title=theme.title(),
-                    url=theme.title_url(),
-                    description=f"```\nStatus changed to » Playing {status}```",
-                    color=theme.hex_color()
-                )
-
-                embed.set_footer(
-                    text=theme.footer(),
-                    icon_url=theme.footer_icon_url()
-                )
-                embed.set_author(
-                    name=theme.author(), url=theme.author_url(
-                    ), icon_url=theme.author_icon_url()
-                )
-
-                await send(luna, embed)
-            except Exception as e:
-                await error_builder(luna, e)
+    async def playing(self, luna, *, status: str):
+        try:
+            await self.bot.change_presence(activity=discord.Game(name=status))
+            await message_builder(luna, title="Status Changed", description=f"```Status changed to » Playing {status}```")
+        except Exception as e:
+            await error_builder(luna, description=f"```{e}```")
 
     @commands.command(
         name='streaming',
         usage="<text>",
-        description="Change your activity to streaming."
+        description="Change your activity to streaming"
     )
-    async def streaming(self, luna, *, status: str = None):
-
-        if status is None:
-            prints.error("You didnt put a text to stream")
-        else:
-            try:
-                game = discord.Activity(
-                    type=discord.ActivityType.streaming, name=f"{status}", url=configs.stream_url()
-                )
-                await self.bot.change_presence(activity=game)
-                embed = discord.Embed(
-                    title=theme.title(),
-                    url=theme.title_url(),
-                    description=f"```\nStatus changed to » Streaming {status}```",
-                    color=theme.hex_color()
-                )
-
-                embed.set_footer(
-                    text=theme.footer(),
-                    icon_url=theme.footer_icon_url()
-                )
-                embed.set_author(
-                    name=theme.author(), url=theme.author_url(
-                    ), icon_url=theme.author_icon_url()
-                )
-
-                await send(luna, embed)
-            except Exception as e:
-                await error_builder(luna, e)
+    async def streaming(self, luna, *, status: str):
+        try:
+            await self.bot.change_presence(activity=discord.Streaming(name=status, url=configs.stream_url()))
+            await message_builder(luna, title="Status Changed", description=f"```Status changed to » Streaming {status}```")
+        except Exception as e:
+            await error_builder(luna, description=f"```{e}```")
 
     @commands.command(
         name='listening',
         usage="<text>",
-        description="Change your activity to listening."
+        description="Change your activity to listening"
     )
-    async def listening(self, luna, *, status: str = None):
-
-        if status is None:
-            prints.error("You didnt put a text to listen to")
-        else:
-            try:
-                game = discord.Activity(type=discord.ActivityType.listening, name=f"{status}")
-                await self.bot.change_presence(activity=game)
-                embed = discord.Embed(
-                    title=theme.title(),
-                    url=theme.title_url(),
-                    description=f"```\nStatus changed to » Listening {status}```",
-                    color=theme.hex_color()
-                )
-
-                embed.set_footer(
-                    text=theme.footer(),
-                    icon_url=theme.footer_icon_url()
-                )
-                embed.set_author(
-                    name=theme.author(), url=theme.author_url(
-                    ), icon_url=theme.author_icon_url()
-                )
-
-                await send(luna, embed)
-            except Exception as e:
-                await error_builder(luna, e)
+    async def listening(self, luna, *, status: str):
+        try:
+            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=status))
+            await message_builder(luna, title="Status Changed", description=f"```Status changed to » Listening to {status}```")
+        except Exception as e:
+            await error_builder(luna, description=f"```{e}```")
 
     @commands.command(
         name='watching',
         usage="<text>",
-        description="Change your activity to watching."
+        description="Change your activity to watching"
     )
     async def watching(self, luna, *, status: str = None):
-
-        if status is None:
-            prints.error("You didnt put a text to watch")
-        else:
-            try:
-                game = discord.Activity(type=discord.ActivityType.watching, name=f"{status}")
-                await self.bot.change_presence(activity=game)
-                embed = discord.Embed(
-                    title=theme.title(),
-                    url=theme.title_url(),
-                    description=f"```\nStatus changed to » Watching {status}```",
-                    color=theme.hex_color()
-                )
-
-                embed.set_footer(
-                    text=theme.footer(),
-                    icon_url=theme.footer_icon_url()
-                )
-                embed.set_author(
-                    name=theme.author(), url=theme.author_url(
-                    ), icon_url=theme.author_icon_url()
-                )
-
-                await send(luna, embed)
-            except Exception as e:
-                await error_builder(luna, e)
+        try:
+            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=status))
+            await message_builder(luna, title="Status Changed", description=f"```Status changed to » Watching {status}```")
+        except Exception as e:
+            await error_builder(luna, description=f"```{e}```")
 
     @commands.command(
         name='stopactivity',
         usage="",
-        aliases=["stopstreaming", "stopstatus",
-                 "stoplistening", "stopplaying", "stopwatching"],
-        description="Stop your activity."
+        aliases=['stopplaying', 'stopstreaming', 'stoplistening', 'stopwatching'],
+        description="Stop your activity"
     )
     async def stopactivity(self, luna):
-
-        await self.bot.change_presence(activity=None)
-        embed = discord.Embed(
-            title=theme.title(),
-            url=theme.title_url(),
-            description="```\nStopped activity```"
-        )
-
-        embed.set_footer(text=theme.footer())
-
-        await send(luna, embed)
+        try:
+            await self.bot.change_presence(activity=None)
+            await message_builder(luna, title="Status Changed", description="```Status changed to » Nothing```")
+        except Exception as e:
+            await error_builder(luna, description=f"```{e}```")
 
     @commands.command(
         name="clean",
@@ -11381,7 +10717,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
                     else:
                         pass
             except Exception as e:
-                await error_builder(luna, e)
+                await error_builder(luna, description=f"```{e}```")
                 return
 
     @commands.command(
@@ -11433,9 +10769,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         description="AFK mode on/off"
     )
     async def afk(self, luna, mode: str = None):
-
         global afk_status
-
         if mode == "on" or mode == "off":
             prints.message(f"AFK Mode » {color.print_gradient(f'{mode}')}")
             if mode == "on":
@@ -11452,7 +10786,6 @@ class UtilsCog(commands.Cog, name="Util commands"):
         description="Make your nickname invisible"
     )
     async def invisiblenick(self, luna):
-
         try:
             name = "‎‎‎‎‎‎‎‏‏‎ ឵឵ ឵឵ ឵឵ ឵឵‎"
             await luna.message.author.edit(nick=name)
@@ -11465,7 +10798,6 @@ class UtilsCog(commands.Cog, name="Util commands"):
         description="Change Hypesquad house"
     )
     async def hypesquad(self, luna, house: str):
-
         request = requests.session()
         headers = {
             'Authorization': user_token,
@@ -11487,14 +10819,14 @@ class UtilsCog(commands.Cog, name="Util commands"):
             prints.message(f"Successfully set your hypesquad house to {house}")
             embed = discord.Embed(
                 title="Hypesquad",
-                url=theme.title_url(),
+
                 description=f"```\nSuccessfully set your hypesquad house to {house}```",
-                color=theme.hex_color()
+
             )
 
             embed.set_footer(
                 text=theme.footer(),
-                icon_url=theme.footer_icon_url()
+
             )
             embed.set_author(
                 name=theme.author(), url=theme.author_url(
@@ -11611,7 +10943,7 @@ class SpamCog(commands.Cog, name="Spam commands"):
                     await asyncio.sleep(delay)
                     await luna.send(f"{message}")
             except Exception as e:
-                await error_builder(luna, description=f"```\n{e}\n```")
+                await error_builder(luna, description=f"```{e}```")
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -11628,7 +10960,7 @@ class SpamCog(commands.Cog, name="Spam commands"):
                     await asyncio.sleep(delay)
                     await user.send(f"{message}")
             except Exception as e:
-                await error_builder(luna, description=f"```\n{e}\n```")
+                await error_builder(luna, description=f"```{e}```")
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -11647,9 +10979,9 @@ class SpamCog(commands.Cog, name="Spam commands"):
                             await asyncio.sleep(delay)
                             await message.channel.send(f"{message}")
                         except Exception as e:
-                            await error_builder(luna, description=f"```\n{e}\n```")
+                            await error_builder(luna, description=f"```{e}```")
             except Exception as e:
-                await error_builder(luna, description=f"```\n{e}\n```")
+                await error_builder(luna, description=f"```{e}```")
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -11706,7 +11038,7 @@ class SpamCog(commands.Cog, name="Spam commands"):
                     description=f"Message {message_id} has been reported {amount} times"
                 )
             except Exception as e:
-                await error_builder(luna, description=f"```\n{e}\n```")
+                await error_builder(luna, description=f"```{e}```")
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -11722,11 +11054,11 @@ class SpamCog(commands.Cog, name="Spam commands"):
                 for each in range(0, amount):
                     await asyncio.sleep(delay)
                     r = requests.get(
-                        "https://nekos.life/api/v2/img/classic"
+                        "http://api.nekos.fun:8080/api/hentai"
                     ).json()
-                    await luna.send(r['url'])
+                    await luna.send(r['image'])
             except Exception as e:
-                await error_builder(luna, description=f"```\n{e}\n```")
+                await error_builder(luna, description=f"```{e}```")
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -11766,7 +11098,7 @@ class SpamCog(commands.Cog, name="Spam commands"):
                     embed.set_footer(text=webhook.footer())
                     hook.send(embed=embed)
             except Exception as e:
-                await error_builder(luna, description=f"```\n{e}\n```")
+                await error_builder(luna, description=f"```{e}```")
                 return
             await message_builder(luna, description=f"```\nWebhooks sent```")
         else:
@@ -11785,7 +11117,7 @@ class SpamCog(commands.Cog, name="Spam commands"):
                     await asyncio.sleep(delay)
                     await luna.send(message, tts=True)
             except Exception as e:
-                await error_builder(luna, description=f"```\n{e}\n```")
+                await error_builder(luna, description=f"```{e}```")
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -11810,7 +11142,7 @@ class AllCog(commands.Cog, name="All commands"):
                     if each is not luna.author or each is not luna.guild.owner:
                         await each.ban(reason=reason)
             except Exception as e:
-                await error_builder(luna, description=f"```\n{e}\n```")
+                await error_builder(luna, description=f"```{e}```")
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -11829,7 +11161,7 @@ class AllCog(commands.Cog, name="All commands"):
                     else:
                         pass
             except Exception as e:
-                await error_builder(luna, description=f"```\n{e}\n```")
+                await error_builder(luna, description=f"```{e}```")
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -11846,7 +11178,7 @@ class AllCog(commands.Cog, name="All commands"):
                     if each is not luna.author or each is not luna.guild.owner:
                         await each.kick(reason=reason)
             except Exception as e:
-                await error_builder(luna, description=f"```\n{e}\n```")
+                await error_builder(luna, description=f"```{e}```")
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -11865,7 +11197,7 @@ class AllCog(commands.Cog, name="All commands"):
                     else:
                         pass
             except Exception as e:
-                await error_builder(luna, description=f"```\n{e}\n```")
+                await error_builder(luna, description=f"```{e}```")
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -12029,7 +11361,7 @@ class MassCog(commands.Cog, name="Mass commands"):
                         else:
                             mentionamount = 40
             except Exception as e:
-                await error_builder(luna, description=f"```\n{e}\n```")
+                await error_builder(luna, description=f"```{e}```")
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -12093,7 +11425,7 @@ class MassCog(commands.Cog, name="Mass commands"):
                     await asyncio.sleep(1)
                 await message_builder(luna, title="Success", description=f"```\nCreated {amount} channels```")
             except Exception as e:
-                await error_builder(luna, description=f"```\n{e}\n```")
+                await error_builder(luna, description=f"```{e}```")
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -12110,7 +11442,7 @@ class MassCog(commands.Cog, name="Mass commands"):
                     await asyncio.sleep(1)
                 await message_builder(luna, title="Success", description=f"```\nCreated {amount} roles```")
             except Exception as e:
-                await error_builder(luna, description=f"```\n{e}\n```")
+                await error_builder(luna, description=f"```{e}```")
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -12197,7 +11529,7 @@ class GuildCog(commands.Cog, name="Guild commands"):
                     await asyncio.sleep(1)
                 await message_builder(luna, title="Success", description=f"```\nRenamed all channels to {name}```")
             except Exception as e:
-                await error_builder(luna, description=f"```\n{e}\n```")
+                await error_builder(luna, description=f"```{e}```")
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -12214,7 +11546,7 @@ class GuildCog(commands.Cog, name="Guild commands"):
                         await channel.delete()
                 await message_builder(luna, title="Success", description="```\nDeleted all channels```")
             except Exception as e:
-                await error_builder(luna, description=f"```\n{e}\n```")
+                await error_builder(luna, description=f"```{e}```")
 
     @commands.command(
         name="delroles",
@@ -12229,7 +11561,7 @@ class GuildCog(commands.Cog, name="Guild commands"):
                         await role.delete()
                 await message_builder(luna, title="Success", description="```\nDeleted all roles```")
             except Exception as e:
-                await error_builder(luna, description=f"```\n{e}\n```")
+                await error_builder(luna, description=f"```{e}```")
 
     @commands.command(
         name="delemojis",
@@ -12243,7 +11575,7 @@ class GuildCog(commands.Cog, name="Guild commands"):
                     await emoji.delete()
                 await message_builder(luna, title="Success", description="```\nDeleted all emojis```")
             except Exception as e:
-                await error_builder(luna, description=f"```\n{e}\n```")
+                await error_builder(luna, description=f"```{e}```")
 
 
 bot.add_cog(GuildCog(bot))
@@ -12450,694 +11782,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
                 name = "𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫𒐫"
                 await luna.author.edit(nick=name)
             except Exception as e:
-                await error_builder(luna, description=f"```\n{e}\n```")
-        else:
-            await error_builder(luna, description="```\nRiskmode is disabled```")
-
-
-bot.add_cog(AbuseCog(bot))
-
-
-class RaidCog(commands.Cog, name="Raid commands"):
-    def __init__(self, bot: commands.bot):
-        self.bot = bot
-
-    @commands.command(
-        name="tokencheck",
-        usage="",
-        description="Check the tokens.txt"
-    )
-    async def tokencheck(self, luna):
-
-        file = open(
-            os.path.join(
-                files.documents(),
-                "Luna/raiding/tokens.txt"
-            ), "r"
-        )
-        nonempty_lines = [line.strip("\n") for line in file if line != "\n"]
-        line_count = len(nonempty_lines)
-        file.close()
-
-        if os.stat(
-                os.path.join(
-                    files.documents(),
-                    "Luna/raiding/tokens.txt"
-                )
-        ).st_size == 0:
-            embed = discord.Embed(
-                title="Token check",
-                url=theme.title_url(),
-                description=f"```\ntokens.txt is empty...```",
-                color=theme.hex_color()
-            )
-
-            embed.set_footer(
-                text=theme.footer(),
-                icon_url=theme.footer_icon_url()
-            )
-            embed.set_author(
-                name=theme.author(), url=theme.author_url(
-                ), icon_url=theme.author_icon_url()
-            )
-
-            await send(luna, embed)
-            return
-
-        if configs.mode() == 2:
-            sent = await luna.send(
-                f"```ini\n[ Token check ]\n\nDetected {line_count} tokens.\nChecking tokens...\n\n[ {theme.footer()} ]```"
-            )
-        else:
-            embed = discord.Embed(
-                title="Token check",
-                url=theme.title_url(),
-                description=f"```\nDetected {line_count} tokens.\nChecking tokens...```",
-                color=theme.hex_color()
-            )
-
-            embed.set_footer(
-                text=theme.footer(),
-                icon_url=theme.footer_icon_url()
-            )
-            embed.set_author(
-                name=theme.author(), url=theme.author_url(
-                ), icon_url=theme.author_icon_url()
-            )
-
-            sent = await send(luna, embed)
-
-        valid_tokens = []
-        success = 0
-        failed = 0
-
-        with open(os.path.join(files.documents(), "Luna/raiding/tokens.txt"), "r+") as f:
-            for line in f:
-                token = line.strip("\n")
-                headers = {
-                    'Content-Type': 'application/json',
-                    'authorization': token
-                }
-                url = f"https://discordapp.com/api/v6/users/@me/library"
-                request = requests.get(url, headers=headers)
-                if request.status_code == 200:
-                    valid_tokens.append(token)
-                    success += 1
-                else:
-                    failed += 1
-                    pass
-
-        with open(os.path.join(files.documents(), "Luna/raiding/tokens.txt"), "w+") as f:
-            for i in valid_tokens:
-                f.write(i + "\n")
-
-        if configs.mode() == 2:
-            await sent.edit(
-                f"```ini\n[ Token check ]\n\nSuccessfully checked all tokens and removed invalid ones.\nValid tokens » " + str(
-                    success
-                ) + "\nInvalid tokens » " + str(failed) + "\n\n[ {theme.footer()} ]```"
-            )
-            await asyncio.sleep(configs.delete_timer())
-            await sent.delete()
-        else:
-            embed = discord.Embed(
-                title="Token check",
-                url=theme.title_url(),
-                description=f"```\nSuccessfully checked all tokens and removed invalid ones.\n``````\nValid tokens » " +
-                            str(success) +
-                            "\nInvalid tokens » " +
-                            str(failed) +
-                            "```",
-                color=theme.hex_color()
-            )
-
-            embed.set_footer(
-                text=theme.footer(),
-                icon_url=theme.footer_icon_url()
-            )
-            embed.set_author(
-                name=theme.author(), url=theme.author_url(
-                ), icon_url=theme.author_icon_url()
-            )
-
-            await sent.edit(embed=embed)
-            await asyncio.sleep(configs.delete_timer())
-            await sent.delete()
-
-    @commands.command(
-        name="raidjoin",
-        usage="<invitelink>",
-        description="Raid the server"
-    )
-    async def raidjoin(self, luna, invitelink: str):
-
-        if configs.risk_mode() == "on":
-            tokens = open(
-                os.path.join(
-                    files.documents(),
-                    "Luna/raiding/tokens.txt"
-                ), 'r'
-            )
-            for _token in tokens:
-                _token = _token.split('\n')
-                _token = _token[0]
-                try:
-                    async with httpx.AsyncClient() as client:
-                        await client.post(
-                            f'https://discord.com/api/{api_version}/invites/{invitelink}',
-                            headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'}
-                        )
-                        prints.event(f"{_token} joined {invitelink}")
-                except Exception:
-                    prints.error(f"{_token} failed to join {invitelink}")
-                    pass
-        else:
-            await error_builder(luna, description="```\nRiskmode is disabled```")
-
-    @commands.command(
-        name="proxyjoin",
-        usage="<invitelink>",
-        description="Raid the server"
-    )
-    async def proxyjoin(self, luna, invitelink: str):
-
-        if configs.risk_mode() == "on":
-
-            tokens = open(
-                os.path.join(
-                    files.documents(),
-                    "Luna/raiding/tokens.txt"
-                ), 'r'
-            )
-            proxies = open(
-                os.path.join(
-                    files.documents(),
-                    "Luna/raiding/proxies.txt"
-                ), 'r'
-            )
-
-            proxylist = []
-
-            for p, _proxy in enumerate(proxies):
-                proxy = _proxy.split('\n')[0]
-                proxylist.append(proxy)
-
-            for p, _token in enumerate(tokens):
-                _token = _token.split('\n')
-                _token = _token[0]
-                try:
-                    async with httpx.AsyncClient() as client:
-                        await client.post(
-                            f'https://discord.com/api/{api_version}/invites/{invitelink}',
-                            headers={
-                                'authorization': _token,
-                                'user-agent': 'Mozilla/5.0'
-                            },
-                            proxies={'http://': f'http://{proxylist[p]}'}
-                        )
-                        prints.event(f"[PROXY] {_token} joined {invitelink}")
-                except Exception:
-                    prints.error(
-                        f"[PROXY] {_token} failed to join {invitelink}"
-                    )
-                    pass
-        else:
-            await error_builder(luna, description="```\nRiskmode is disabled```")
-
-    @commands.command(
-        name="raidspam",
-        usage="<channel_id> <amount> <message>",
-        description="Spam"
-    )
-    async def raidspam(self, luna, channel_id: str, amount: int, *, message: str):
-
-        if configs.risk_mode() == "on":
-
-            tokens = open(
-                os.path.join(
-                    files.documents(),
-                    "Luna/raiding/tokens.txt"
-                ), 'r'
-            )
-            for _token in tokens:
-                _token = _token.split('\n')
-                _token = _token[0]
-                try:
-                    async with httpx.AsyncClient() as client:
-                        for i in range(0, amount):
-                            await client.post(
-                                f'https://discord.com/api/{api_version}/channels/{channel_id}/messages',
-                                json={
-                                    'content': f'{message}', 'tts': 'false'
-                                },
-                                headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'}
-                            )
-                            prints.event(f"{_token} sent {message}")
-                except Exception:
-                    prints.error(f"{_token} failed to send {message}")
-                    pass
-        else:
-            await error_builder(luna, description="```\nRiskmode is disabled```")
-
-    @commands.command(
-        name="proxyspam",
-        usage="<channel_id> <amount> <message>",
-        description="Spam"
-    )
-    async def proxyspam(self, luna, channel_id: str, amount: int, *, message: str):
-
-        if configs.risk_mode() == "on":
-            proxies = open(
-                os.path.join(
-                    files.documents(),
-                    "Luna/raiding/proxies.txt"
-                ), 'r'
-            )
-
-            proxylist = []
-
-            for p, _proxy in enumerate(proxies):
-                proxy = _proxy.split('\n')[0]
-                proxylist.append(proxy)
-
-            tokens = open(
-                os.path.join(
-                    files.documents(),
-                    "Luna/raiding/tokens.txt"
-                ), 'r'
-            )
-            for _token in tokens:
-                _token = _token.split('\n')
-                _token = _token[0]
-                try:
-                    async with httpx.AsyncClient() as client:
-                        for i in range(0, amount):
-                            await client.post(
-                                f'https://discord.com/api/{api_version}/channels/{channel_id}/messages',
-                                json={
-                                    'content': f'{message}', 'tts': 'false'
-                                },
-                                headers={
-                                    'authorization': _token, 'user-agent': 'Mozilla/5.0'
-                                },
-                                proxies={'http://': f'http://{proxylist[p]}'}
-                            )
-                            prints.event(f"{_token} sent {message}")
-                except Exception:
-                    prints.error(f"{_token} failed to send {message}")
-                    pass
-        else:
-            await error_builder(luna, description="```\nRiskmode is disabled```")
-
-    @commands.command(
-        name="raidmassping",
-        usage="<channel_id> <delay> <amount>",
-        description="Massping"
-    )
-    async def raidmassping(self, luna, channel_id: str, delay: int, amount: int):
-
-        tokenposition = 0
-        if configs.risk_mode() == "on":
-            try:
-                for i in range(amount):
-                    members = [m.mention for m in luna.guild.members]
-                    if len(members) < 30:
-                        mentionamount = len(members)
-                    else:
-                        mentionamount = 30
-                    sendamount = len(members) - mentionamount
-                    for _ in range(sendamount):
-                        if mentionamount == 0:
-                            break
-                        pingtext = ""
-                        for _ in range(mentionamount):
-                            pingtext += members.pop()
-
-                        tokens = open(
-                            os.path.join(
-                                files.documents(), "Luna/raiding/tokens.txt"
-                            ), 'r'
-                        )
-                        for _token in tokens:
-                            _token = _token.split('\n')
-                            _token = _token[tokenposition]
-                        try:
-                            async with httpx.AsyncClient() as client:
-                                for _ in range(0, amount):
-                                    await client.post(
-                                        f'https://discord.com/api/{api_version}/channels/{channel_id}/messages',
-                                        json={
-                                            'content': f'{pingtext}', 'tts': 'false'
-                                        },
-                                        headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'}
-                                    )
-                                    prints.event(f"{_token} masspinged")
-                        except Exception:
-                            prints.error(f"{_token} failed to massping")
-                            pass
-                        tokenposition += 1
-                        await asyncio.sleep(delay)
-                        if len(members) < 10:
-                            mentionamount = len(members)
-                        else:
-                            mentionamount = 10
-            except Exception as e:
-                prints.error(f"{e}")
-        else:
-            if configs.error_log() == "console":
-                prints.error("Riskmode is disabled")
-            else:
-                await error_builder(luna, description="```\nRiskmode is disabled```")
-
-    @commands.command(
-        name="raidmassping",
-        usage="<channel_id> <delay> <amount>",
-        description="Massping"
-    )
-    async def raidmassping(self, luna, channel_id: str, delay: int, amount: int):
-
-        tokenposition = 0
-        if configs.risk_mode() == "on":
-            try:
-                for _ in range(amount):
-                    members = [m.mention for m in luna.guild.members]
-                    if len(members) < 30:
-                        mentionamount = len(members)
-                    else:
-                        mentionamount = 30
-                    sendamount = len(members) - mentionamount
-                    for _ in range(sendamount):
-                        if mentionamount == 0:
-                            break
-                        pingtext = ""
-                        for _ in range(mentionamount):
-                            pingtext += members.pop()
-
-                        tokens = open(
-                            os.path.join(
-                                files.documents(), "Luna/raiding/tokens.txt"
-                            ), 'r'
-                        )
-                        for _token in tokens:
-                            _token = _token.split('\n')
-                            _token = _token[tokenposition]
-                        try:
-                            async with httpx.AsyncClient() as client:
-                                for _ in range(0, amount):
-                                    await client.post(
-                                        f'https://discord.com/api/{api_version}/channels/{channel_id}/messages',
-                                        json={
-                                            'content': f'{pingtext}', 'tts': 'false'
-                                        },
-                                        headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'}
-                                    )
-                                    prints.event(f"{_token} masspinged")
-                        except Exception:
-                            prints.error(f"{_token} failed to massping")
-                            pass
-                        tokenposition += 1
-                        await asyncio.sleep(delay)
-                        if len(members) < 10:
-                            mentionamount = len(members)
-                        else:
-                            mentionamount = 10
-            except Exception as e:
-                prints.error(f"{e}")
-        else:
-            if configs.error_log() == "console":
-                prints.error("Riskmode is disabled")
-            else:
-                await error_builder(luna, description="```\nRiskmode is disabled```")
-
-    @commands.command(
-        name="raidleave",
-        usage="<server_id>",
-        description="Leave the tokens"
-    )
-    async def raidleave(self, luna, server_id: str):
-
-        if configs.risk_mode() == "on":
-
-            tokens = open(
-                os.path.join(
-                    files.documents(),
-                    "Luna/raiding/tokens.txt"
-                ), 'r'
-            )
-            for _token in tokens:
-                _token = _token.split('\n')
-                _token = _token[0]
-                try:
-                    async with httpx.AsyncClient() as client:
-                        await client.delete(
-                            f'https://discord.com/api/{api_version}/users/@me/guilds/{server_id}',
-                            headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'}
-                        )
-                        prints.event(f"{_token} left {server_id}")
-                except Exception:
-                    prints.error(f"{_token} failed to leave {server_id}")
-                    pass
-        else:
-            await error_builder(luna, description="```\nRiskmode is disabled```")
-
-    @commands.command(
-        name="proxyleave",
-        usage="<server_id>",
-        description="Leave the tokens"
-    )
-    async def proxyleave(self, luna, server_id: str):
-
-        if configs.risk_mode() == "on":
-
-            tokens = open(
-                os.path.join(
-                    files.documents(),
-                    "Luna/raiding/tokens.txt"
-                ), 'r'
-            )
-            proxies = open(
-                os.path.join(
-                    files.documents(),
-                    "Luna/raiding/proxies.txt"
-                ), 'r'
-            )
-
-            proxylist = []
-
-            for p, _proxy in enumerate(proxies):
-                proxy = _proxy.split('\n')[0]
-                proxylist.append(proxy)
-
-            for _token in tokens:
-                _token = _token.split('\n')
-                _token = _token[0]
-                try:
-                    async with httpx.AsyncClient() as client:
-                        await client.delete(
-                            f'https://discord.com/api/{api_version}/users/@me/guilds/{server_id}',
-                            headers={
-                                'authorization': _token,
-                                'user-agent': 'Mozilla/5.0'
-                            },
-                            proxies={'http://': f'http://{proxylist[p]}'}
-                        )
-                        prints.event(f"[PROXY] {_token} left {server_id}")
-                except Exception:
-                    prints.error(
-                        f"[PROXY] {_token} failed to leave {server_id}"
-                    )
-                    pass
-        else:
-            await error_builder(luna, description="```\nRiskmode is disabled```")
-
-    @commands.command(
-        name="raidreact",
-        usage="<channel_id> <message_id> <emoji>",
-        description="Raid react on a message"
-    )
-    async def raidreact(self, luna, channel_id: str, message_id: str, emoji: str):
-
-        if configs.risk_mode() == "on":
-            tokens = open(
-                os.path.join(
-                    files.documents(),
-                    "Luna/raiding/tokens.txt"
-                ), 'r'
-            )
-            for _token in tokens:
-                _token = _token.split('\n')
-                _token = _token[0]
-                try:
-                    async with httpx.AsyncClient() as client:
-                        await client.put(
-                            f'https://discord.com/api/{api_version}/channels/{channel_id}/messages/{message_id}/reactions/{urllib.parse.quote(emoji)}/%40me',
-                            headers={'authorization': _token, 'user-agent': 'Mozilla/5.0'}
-                        )
-                        prints.event(f"{_token} reacted on {message_id}")
-                except Exception:
-                    prints.error(f"{_token} failed to react on {message_id}")
-                    pass
-        else:
-            await error_builder(luna, description="```\nRiskmode is disabled```")
-
-    @commands.command(
-        name="proxyreact",
-        usage="<channel_id> <message_id> <emoji>",
-        description="Raid react on a message"
-    )
-    async def proxyreact(self, luna, channel_id: str, message_id: str, emoji: str):
-
-        if configs.risk_mode() == "on":
-            tokens = open(
-                os.path.join(
-                    files.documents(),
-                    "Luna/raiding/tokens.txt"
-                ), 'r'
-            )
-            proxies = open(
-                os.path.join(
-                    files.documents(),
-                    "Luna/raiding/proxies.txt"
-                ), 'r'
-            )
-
-            proxylist = []
-
-            for p, _proxy in enumerate(proxies):
-                proxy = _proxy.split('\n')[0]
-                proxylist.append(proxy)
-
-            for _token in tokens:
-                _token = _token.split('\n')
-                _token = _token[0]
-                try:
-                    async with httpx.AsyncClient() as client:
-                        await client.put(
-                            f'https://discord.com/api/{api_version}/channels/{channel_id}/messages/{message_id}/reactions/{urllib.parse.quote(emoji)}/%40me',
-                            headers={
-                                'authorization': _token,
-                                'user-agent': 'Mozilla/5.0'
-                            },
-                            proxies={'http://': f'http://{proxylist[p]}'}
-                        )
-                        prints.event(f"{_token} reacted on {message_id}")
-                except Exception:
-                    prints.error(f"{_token} failed to react on {message_id}")
-                    pass
-        else:
-            await error_builder(luna, description="```\nRiskmode is disabled```")
-
-
-bot.add_cog(RaidCog(bot))
-
-start = datetime.now()
-
-
-class NukingCog(commands.Cog, name="Nuking commands"):
-    def __init__(self, bot: commands.bot):
-        self.bot = bot
-
-    @commands.command(
-        name="nuketoken",
-        usage="<token>",
-        description="Nuke the token"
-    )
-    async def nuketoken(self, luna, token: str):
-
-        if configs.risk_mode() == "on":
-            try:
-                guilds = requests.get(
-                    'https://discordapp.com/api/{api_version}/users/@me/guilds',
-                    headers={
-                        'authorization': token,
-                        'user-agent': 'Mozilla/5.0'
-                    }
-                ).json()
-                for guild in range(0, len(guilds)):
-                    guild_id = guilds[guild]['id']
-                    requests.delete(
-                        f'https://discordapp.com/api/{api_version}/users/@me/guilds/{guild_id}',
-                        headers={
-                            'authorization': token,
-                            'user-agent': 'Mozilla/5.0'
-                        }
-                    )
-                friends = requests.get(
-                    'https://discordapp.com/api/{api_version}/users/@me/relationships',
-                    headers={
-                        'authorization': token,
-                        'user-agent': 'Mozilla/5.0'
-                    }
-                ).json()
-                for friend in range(0, len(friends)):
-                    friend_id = friends[friend]['id']
-                    requests.put(
-                        f'https://discordapp.com/api/{api_version}/users/@me/relationships/{friend_id}',
-                        json={
-                            'type': 2
-                        },
-                        headers={
-                            'authorization': token,
-                            'user-agent': 'Mozilla/5.0'
-                        }
-                    )
-                    requests.delete(
-                        f'https://discordapp.com/api/{api_version}/channels/{friend_id}',
-                        headers={
-                            'authorization': token,
-                            'user-agent': 'Mozilla/5.0'
-                        }
-                    )
-            except Exception:
-                pass
-        else:
-            await error_builder(luna, description="```\nRiskmode is disabled```")
-
-    @commands.command(
-        name="messtoken",
-        usage="<token>",
-        description="Mess up the token"
-    )
-    async def messtoken(self, luna, token: str):
-
-        if configs.risk_mode() == "on":
-            payload = {
-                'theme': "light",
-                'locale': "ja",
-                'message_display_compact': False,
-                'inline_embed_media': False,
-                'inline_attachment_media': False,
-                'gif_auto_play': False,
-                'render_embeds': False,
-                'render_reactions': False,
-                'animate_emoji': False,
-                'convert_emoticons': False,
-                'enable_tts_command': False,
-                'explicit_content_filter': '0',
-                'status': "invisible"
-            }
-
-            requests.patch(
-                'https://discordapp.com/api/{api_version}/users/@me/settings',
-                json=payload,
-                headers={
-                    'authorization': token,
-                    'user-agent': 'Mozilla/5.0'
-                }
-            )
-            try:
-                while True:
-                    async with httpx.AsyncClient() as client:
-                        await client.patch(
-                            'https://discordapp.com/api/{api_version}/users/@me/settings', json={'theme': "light"},
-                            headers={'authorization': token, 'user-agent': 'Mozilla/5.0'}
-                        )
-                        await client.patch(
-                            'https://discordapp.com/api/{api_version}/users/@me/settings', json={'theme': "dark"},
-                            headers={'authorization': token, 'user-agent': 'Mozilla/5.0'}
-                        )
-            except Exception:
-                return
+                await error_builder(luna, description=f"```{e}```")
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -13201,55 +11846,8 @@ class NukingCog(commands.Cog, name="Nuking commands"):
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
-    @commands.command(
-        name="annihilate",
-        aliases=['destroy', 'wipe', 'nukeserver'],
-        usage="<guild_id> <channel_name> <role_name>",
-        description="Totally annihilate a guild"
-    )
-    @has_permissions(manage_roles=True, manage_channels=True, ban_members=True)
-    async def annihilate(self, luna):
 
-        if configs.risk_mode() == "on":
-            await message_builder(luna, description="```\nAnnihilating server...```")
-            await luna.guild.edit(name="Luna Happened", icon=None)
-            delete_roles = [
-                await role.delete()
-                for role in luna.guild.roles
-                if not role.name == "@everyone"
-            ]
-            delete_categories = [
-                await category.delete()
-                for category in luna.guild.categories
-                if luna.guild.categories
-            ]
-            delete_text_channels = [
-                await channel.delete() for channel in luna.guild.text_channels
-            ]
-            delete_voice_channels = [
-                await channel.delete() for channel in luna.guild.voice_channels
-            ]
-            delete_emojis = [
-                await emoji.delete() for emoji in luna.guild.emojis if luna.guild.emojis
-            ]
-            create_channels = [
-                await luna.guild.create_text_channel(name="Luna Happened") for _ in range(1, 70)
-            ]
-            try:
-                ban_members = [
-                    await member.ban(reason="Luna Happened")
-                    for member in luna.guild.members
-                    if luna.guild.members
-                ]
-            except BaseException:
-                pass
-            await message_builder(luna, description="```\nServer has been annihilated```")
-        else:
-            await error_builder(luna, description="```\nRiskmode is disabled```")
-
-
-bot.add_cog(NukingCog(bot))
-
+bot.add_cog(AbuseCog(bot))
 
 class PrivacyCog(commands.Cog, name="Privacy commands"):
     def __init__(self, bot: commands.bot):
@@ -13282,32 +11880,32 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
                 if beta:
                     print("Beta Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
-                    "Luna/config.json",
-                    "prefix", documents=True
+                    "data/config.json",
+                    "prefix", documents=False
                 )
                 console_mode = files.json(
-                    "Luna/console/console.json", "mode", documents=True
+                    "data/console/console.json", "mode", documents=False
                 )
                 if console_mode == "2":
                     riskmode = files.json(
-                        "Luna/config.json", "risk_mode", documents=True
+                        "data/config.json", "risk_mode", documents=False
                     )
                     themesvar = files.json(
-                        "Luna/config.json", "theme", documents=True
+                        "data/config.json", "theme", documents=False
                     )
                     deletetimer = int(
                         files.json(
-                            "Luna/config.json", "delete_timer", documents=True
+                            "data/config.json", "delete_timer", documents=False
                         )
                     )
                     startup_status = files.json(
-                        "Luna/config.json", "startup_status", documents=True
+                        "data/config.json", "startup_status", documents=False
                     )
                     nitro_sniper = files.json(
-                        "Luna/snipers/nitro.json", "sniper", documents=True
+                        "data/snipers/nitro.json", "sniper", documents=False
                     )
                     giveawayjoiner = files.json(
-                        "Luna/snipers/giveaway.json", "joiner", documents=True
+                        "data/snipers/giveaway.json", "joiner", documents=False
                     )
                     if themesvar == "default":
                         pass
@@ -13371,32 +11969,32 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
                 if beta:
                     print("Beta Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
-                    "Luna/config.json",
-                    "prefix", documents=True
+                    "data/config.json",
+                    "prefix", documents=False
                 )
                 console_mode = files.json(
-                    "Luna/console/console.json", "mode", documents=True
+                    "data/console/console.json", "mode", documents=False
                 )
                 if console_mode == "2":
                     riskmode = files.json(
-                        "Luna/config.json", "risk_mode", documents=True
+                        "data/config.json", "risk_mode", documents=False
                     )
                     themesvar = files.json(
-                        "Luna/config.json", "theme", documents=True
+                        "data/config.json", "theme", documents=False
                     )
                     deletetimer = int(
                         files.json(
-                            "Luna/config.json", "delete_timer", documents=True
+                            "data/config.json", "delete_timer", documents=False
                         )
                     )
                     startup_status = files.json(
-                        "Luna/config.json", "startup_status", documents=True
+                        "data/config.json", "startup_status", documents=False
                     )
                     nitro_sniper = files.json(
-                        "Luna/snipers/nitro.json", "sniper", documents=True
+                        "data/snipers/nitro.json", "sniper", documents=False
                     )
                     giveawayjoiner = files.json(
-                        "Luna/snipers/giveaway.json", "joiner", documents=True
+                        "data/snipers/giveaway.json", "joiner", documents=False
                     )
                     if themesvar == "default":
                         pass
@@ -13482,7 +12080,7 @@ class ProtectionGuildCog(commands.Cog, name="Protection Guild commands"):
             await error_builder(luna, description="Invalid guild")
             return
         config._global(
-            "Luna/protections/config.json",
+            "data/protections/config.json",
             "guilds", guild_id, add=True
         )
         prints.message(
@@ -13504,7 +12102,7 @@ class ProtectionGuildCog(commands.Cog, name="Protection Guild commands"):
             await error_builder(luna, description="Invalid guild")
             return
         config._global(
-            "Luna/protections/config.json",
+            "data/protections/config.json",
             "guilds", guild_id, delete=True
         )
         prints.message(
@@ -13532,9 +12130,9 @@ class ProtectionCog(commands.Cog, name="Protection commands"):
                 f"Protections footer info » {color.print_gradient(f'{mode}')}"
             )
             if mode == "on":
-                config._global("Luna/protections/config.json", "footer", True)
+                config._global("data/protections/config.json", "footer", True)
             else:
-                config._global("Luna/protections/config.json", "footer", False)
+                config._global("data/protections/config.json", "footer", False)
             await message_builder(luna, description=f"```\nProtections footer info » {mode}```")
         else:
             await mode_error(luna, "on or off")
@@ -13791,10 +12389,7 @@ class BackupsCog(commands.Cog, name="Backup commands"):
             friendslist += f"{friend.name}#{friend.discriminator}\n"
             friendsamount += 1
         file = open(
-            os.path.join(
-                files.documents(),
-                "Luna/backup/friends.txt"
-            ), "w", encoding='utf-8'
+            "data/backup/friends.txt", "w", encoding='utf-8'
         )
         file.write(friendslist)
         file.close()
@@ -13802,10 +12397,7 @@ class BackupsCog(commands.Cog, name="Backup commands"):
             blockedlist += f"{block.name}#{block.discriminator}\n"
             blockedamount += 1
         file = open(
-            os.path.join(
-                files.documents(),
-                "Luna/backup/blocked.txt"
-            ), "w", encoding='utf-8'
+            "data/backup/blocked.txt", "w", encoding='utf-8'
         )
         file.write(blockedlist)
         file.close()
@@ -13814,7 +12406,7 @@ class BackupsCog(commands.Cog, name="Backup commands"):
         )
         await message_builder(
             luna,
-            description=f"```\nBacked up {friendsamount} friends in Documents/Luna/backup/friends.txt\nBacked up {blockedamount} blocked users in Documents/Luna/backup/blocked.txt```"
+            description=f"```\nBacked up {friendsamount} friends in Documents/data/backup/friends.txt\nBacked up {blockedamount} blocked users in Documents/data/backup/blocked.txt```"
         )
 
 
@@ -13950,29 +12542,29 @@ class SettingsCog(commands.Cog, name="Settings commands"):
             if beta:
                 print("Beta Build".center(os.get_terminal_size().columns))
             console_mode = files.json(
-                "Luna/console/console.json", "mode", documents=True
+                "data/console/console.json", "mode", documents=False
             )
             if console_mode == "2":
                 riskmode = files.json(
-                    "Luna/config.json",
-                    "risk_mode", documents=True
+                    "data/config.json",
+                    "risk_mode", documents=False
                 )
                 themesvar = files.json(
-                    "Luna/config.json", "theme", documents=True
+                    "data/config.json", "theme", documents=False
                 )
                 deletetimer = int(
                     files.json(
-                        "Luna/config.json", "delete_timer", documents=True
+                        "data/config.json", "delete_timer", documents=False
                     )
                 )
                 startup_status = files.json(
-                    "Luna/config.json", "startup_status", documents=True
+                    "data/config.json", "startup_status", documents=False
                 )
                 nitro_sniper = files.json(
-                    "Luna/snipers/nitro.json", "sniper", documents=True
+                    "data/snipers/nitro.json", "sniper", documents=False
                 )
                 giveawayjoiner = files.json(
-                    "Luna/snipers/giveaway.json", "joiner", documents=True
+                    "data/snipers/giveaway.json", "joiner", documents=False
                 )
                 if themesvar == "default":
                     pass
@@ -14033,29 +12625,29 @@ class SettingsCog(commands.Cog, name="Settings commands"):
             if beta:
                 print("Beta Build".center(os.get_terminal_size().columns))
             console_mode = files.json(
-                "Luna/console/console.json", "mode", documents=True
+                "data/console/console.json", "mode", documents=False
             )
             if console_mode == "2":
                 riskmode = files.json(
-                    "Luna/config.json",
-                    "risk_mode", documents=True
+                    "data/config.json",
+                    "risk_mode", documents=False
                 )
                 themesvar = files.json(
-                    "Luna/config.json", "theme", documents=True
+                    "data/config.json", "theme", documents=False
                 )
                 deletetimer = int(
                     files.json(
-                        "Luna/config.json", "delete_timer", documents=True
+                        "data/config.json", "delete_timer", documents=False
                     )
                 )
                 startup_status = files.json(
-                    "Luna/config.json", "startup_status", documents=True
+                    "data/config.json", "startup_status", documents=False
                 )
                 nitro_sniper = files.json(
-                    "Luna/snipers/nitro.json", "sniper", documents=True
+                    "data/snipers/nitro.json", "sniper", documents=False
                 )
                 giveawayjoiner = files.json(
-                    "Luna/snipers/giveaway.json", "joiner", documents=True
+                    "data/snipers/giveaway.json", "joiner", documents=False
                 )
                 if themesvar == "default":
                     pass
@@ -14120,12 +12712,12 @@ class SettingsCog(commands.Cog, name="Settings commands"):
     )
     async def themes(self, luna):
 
-        path_to_json = os.path.join(files.documents(), 'Luna/themes/')
+        path_to_json = 'data/themes/'
         json_files = [pos_json for pos_json in os.listdir(
             path_to_json
         ) if pos_json.endswith('.json')]
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
-        themesvar = files.json("Luna/config.json", "theme", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
+        themesvar = files.json("data/config.json", "theme", documents=False)
         if themesvar == "default":
             pass
         else:
@@ -14174,8 +12766,8 @@ class SettingsCog(commands.Cog, name="Settings commands"):
     )
     async def customize(self, luna):
 
-        themevar = files.json("Luna/config.json", "theme", documents=True)
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        themevar = files.json("data/config.json", "theme", documents=False)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         title = theme.title()
         footer = theme.footer()
 
@@ -14191,10 +12783,10 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 theme_description = "on"
         else:
             theme_json = files.json(
-                "Luna/config.json", "theme", documents=True
+                "data/config.json", "theme", documents=False
             )
             theme_description = files.json(
-                f"Luna/themes/{theme_json}", "description", documents=True
+                f"data/themes/{theme_json}", "description", documents=False
             )
             if theme_description is None:
                 theme_description = True
@@ -14249,52 +12841,52 @@ class SettingsCog(commands.Cog, name="Settings commands"):
     )
     async def webhook(self, luna, page: str = "1"):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         webhooks = files.json(
-            "Luna/webhooks/webhooks.json",
-            "webhooks", documents=True
+            "data/webhooks/webhooks.json",
+            "webhooks", documents=False
         )
         login = files.json(
-            "Luna/webhooks/webhooks.json",
-            "login", documents=True
+            "data/webhooks/webhooks.json",
+            "login", documents=False
         )
         nitro = files.json(
-            "Luna/webhooks/webhooks.json",
-            "nitro", documents=True
+            "data/webhooks/webhooks.json",
+            "nitro", documents=False
         )
         giveaway = files.json(
-            "Luna/webhooks/webhooks.json",
-            "giveaway", documents=True
+            "data/webhooks/webhooks.json",
+            "giveaway", documents=False
         )
         privnote = files.json(
-            "Luna/webhooks/webhooks.json",
-            "privnote", documents=True
+            "data/webhooks/webhooks.json",
+            "privnote", documents=False
         )
         selfbot = files.json(
-            "Luna/webhooks/webhooks.json",
-            "selfbot", documents=True
+            "data/webhooks/webhooks.json",
+            "selfbot", documents=False
         )
         pings = files.json(
-            "Luna/webhooks/webhooks.json",
-            "pings", documents=True
+            "data/webhooks/webhooks.json",
+            "pings", documents=False
         )
         ghostpings = files.json(
-            "Luna/webhooks/webhooks.json", "ghostpings", documents=True
+            "data/webhooks/webhooks.json", "ghostpings", documents=False
         )
         friendevents = files.json(
-            "Luna/webhooks/webhooks.json", "friendevents", documents=True
+            "data/webhooks/webhooks.json", "friendevents", documents=False
         )
         guildevents = files.json(
-            "Luna/webhooks/webhooks.json", "guildevents", documents=True
+            "data/webhooks/webhooks.json", "guildevents", documents=False
         )
         roleupdates = files.json(
-            "Luna/webhooks/webhooks.json", "roleupdates", documents=True
+            "data/webhooks/webhooks.json", "roleupdates", documents=False
         )
         nickupdates = files.json(
-            "Luna/webhooks/webhooks.json", "nickupdates", documents=True
+            "data/webhooks/webhooks.json", "nickupdates", documents=False
         )
         protection = files.json(
-            "Luna/webhooks/webhooks.json", "protection", documents=True
+            "data/webhooks/webhooks.json", "protection", documents=False
         )
         cog = self.bot.get_cog('Webhook setup')
         commands = cog.get_commands()
@@ -14346,49 +12938,49 @@ class SettingsCog(commands.Cog, name="Settings commands"):
     )
     async def notifications(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         toasts = files.json(
-            "Luna/notifications/toasts.json",
-            "toasts", documents=True
+            "data/notifications/toasts.json",
+            "toasts", documents=False
         )
         login = files.json(
-            "Luna/notifications/toasts.json",
-            "login", documents=True
+            "data/notifications/toasts.json",
+            "login", documents=False
         )
         nitro = files.json(
-            "Luna/notifications/toasts.json",
-            "nitro", documents=True
+            "data/notifications/toasts.json",
+            "nitro", documents=False
         )
         giveaway = files.json(
-            "Luna/notifications/toasts.json", "giveaway", documents=True
+            "data/notifications/toasts.json", "giveaway", documents=False
         )
         privnote = files.json(
-            "Luna/notifications/toasts.json", "privnote", documents=True
+            "data/notifications/toasts.json", "privnote", documents=False
         )
         selfbot = files.json(
-            "Luna/notifications/toasts.json", "selfbot", documents=True
+            "data/notifications/toasts.json", "selfbot", documents=False
         )
         pings = files.json(
-            "Luna/notifications/toasts.json",
-            "pings", documents=True
+            "data/notifications/toasts.json",
+            "pings", documents=False
         )
         ghostpings = files.json(
-            "Luna/notifications/toasts.json", "ghostpings", documents=True
+            "data/notifications/toasts.json", "ghostpings", documents=False
         )
         friendevents = files.json(
-            "Luna/notifications/toasts.json", "friendevents", documents=True
+            "data/notifications/toasts.json", "friendevents", documents=False
         )
         guildevents = files.json(
-            "Luna/notifications/toasts.json", "guildevents", documents=True
+            "data/notifications/toasts.json", "guildevents", documents=False
         )
         roleupdates = files.json(
-            "Luna/notifications/toasts.json", "roleupdates", documents=True
+            "data/notifications/toasts.json", "roleupdates", documents=False
         )
         nickupdates = files.json(
-            "Luna/notifications/toasts.json", "nickupdates", documents=True
+            "data/notifications/toasts.json", "nickupdates", documents=False
         )
         protection = files.json(
-            "Luna/notifications/toasts.json", "protection", documents=True
+            "data/notifications/toasts.json", "protection", documents=False
         )
         cog = self.bot.get_cog('Toast commands')
         commands = cog.get_commands()
@@ -14454,12 +13046,12 @@ class SettingsCog(commands.Cog, name="Settings commands"):
     )
     async def sniper(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         nitro_sniper = files.json(
-            "Luna/snipers/nitro.json", "sniper", documents=True
+            "data/snipers/nitro.json", "sniper", documents=False
         )
         privnote_sniper = files.json(
-            "Luna/snipers/privnote.json", "sniper", documents=True
+            "data/snipers/privnote.json", "sniper", documents=False
         )
         cog = self.bot.get_cog('Sniper settings')
         commands = cog.get_commands()
@@ -14478,15 +13070,15 @@ class SettingsCog(commands.Cog, name="Settings commands"):
     )
     async def giveaway(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         giveaway_joiner = files.json(
-            "Luna/snipers/giveaway.json", "joiner", documents=True
+            "data/snipers/giveaway.json", "joiner", documents=False
         )
         delay_in_minutes = files.json(
-            "Luna/snipers/giveaway.json", "delay_in_minutes", documents=True
+            "data/snipers/giveaway.json", "delay_in_minutes", documents=False
         )
         guild_joiner = files.json(
-            "Luna/snipers/giveaway.json", "guild_joiner", documents=True
+            "data/snipers/giveaway.json", "guild_joiner", documents=False
         )
 
         cog = self.bot.get_cog('Giveaway settings')
@@ -14603,7 +13195,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
     async def console(self, ctx, mode: str):
 
         if mode == "1" or mode == "2":
-            config._global("Luna/console/console.json", "mode", mode)
+            config._global("data/console/console.json", "mode", mode)
             prints.message(f"Console mode » {color.print_gradient(f'{mode}')}")
             await message_builder(ctx, description=f"```\nConsole mode » {mode}```")
             luna.console(False, clear=True)
@@ -14621,32 +13213,32 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 if beta:
                     print("Beta Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
-                    "Luna/config.json",
-                    "prefix", documents=True
+                    "data/config.json",
+                    "prefix", documents=False
                 )
                 console_mode = files.json(
-                    "Luna/console/console.json", "mode", documents=True
+                    "data/console/console.json", "mode", documents=False
                 )
                 if console_mode == "2":
                     riskmode = files.json(
-                        "Luna/config.json", "risk_mode", documents=True
+                        "data/config.json", "risk_mode", documents=False
                     )
                     themesvar = files.json(
-                        "Luna/config.json", "theme", documents=True
+                        "data/config.json", "theme", documents=False
                     )
                     deletetimer = int(
                         files.json(
-                            "Luna/config.json", "delete_timer", documents=True
+                            "data/config.json", "delete_timer", documents=False
                         )
                     )
                     startup_status = files.json(
-                        "Luna/config.json", "startup_status", documents=True
+                        "data/config.json", "startup_status", documents=False
                     )
                     nitro_sniper = files.json(
-                        "Luna/snipers/nitro.json", "sniper", documents=True
+                        "data/snipers/nitro.json", "sniper", documents=False
                     )
                     giveawayjoiner = files.json(
-                        "Luna/snipers/giveaway.json", "joiner", documents=True
+                        "data/snipers/giveaway.json", "joiner", documents=False
                     )
                     if themesvar == "default":
                         pass
@@ -14709,32 +13301,32 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 if beta:
                     print("Beta Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
-                    "Luna/config.json",
-                    "prefix", documents=True
+                    "data/config.json",
+                    "prefix", documents=False
                 )
                 console_mode = files.json(
-                    "Luna/console/console.json", "mode", documents=True
+                    "data/console/console.json", "mode", documents=False
                 )
                 if console_mode == "2":
                     riskmode = files.json(
-                        "Luna/config.json", "risk_mode", documents=True
+                        "data/config.json", "risk_mode", documents=False
                     )
                     themesvar = files.json(
-                        "Luna/config.json", "theme", documents=True
+                        "data/config.json", "theme", documents=False
                     )
                     deletetimer = int(
                         files.json(
-                            "Luna/config.json", "delete_timer", documents=True
+                            "data/config.json", "delete_timer", documents=False
                         )
                     )
                     startup_status = files.json(
-                        "Luna/config.json", "startup_status", documents=True
+                        "data/config.json", "startup_status", documents=False
                     )
                     nitro_sniper = files.json(
-                        "Luna/snipers/nitro.json", "sniper", documents=True
+                        "data/snipers/nitro.json", "sniper", documents=False
                     )
                     giveawayjoiner = files.json(
-                        "Luna/snipers/giveaway.json", "joiner", documents=True
+                        "data/snipers/giveaway.json", "joiner", documents=False
                     )
                     if themesvar == "default":
                         pass
@@ -14804,7 +13396,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
     async def lgradient(self, ctx, mode: str):
 
         if mode == "1" or mode == "2" or mode == "3" or mode == "4" or mode == "5" or mode == "6" or mode == "7":
-            config._global("Luna/console/console.json", "logo_gradient", mode)
+            config._global("data/console/console.json", "logo_gradient", mode)
             prints.message(f"Logo gradient » {color.print_gradient(f'{mode}')}")
             await message_builder(ctx, description=f"```\nLogo gradient » {mode}```")
             luna.console(False, clear=True)
@@ -14822,32 +13414,32 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 if beta:
                     print("Beta Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
-                    "Luna/config.json",
-                    "prefix", documents=True
+                    "data/config.json",
+                    "prefix", documents=False
                 )
                 console_mode = files.json(
-                    "Luna/console/console.json", "mode", documents=True
+                    "data/console/console.json", "mode", documents=False
                 )
                 if console_mode == "2":
                     riskmode = files.json(
-                        "Luna/config.json", "risk_mode", documents=True
+                        "data/config.json", "risk_mode", documents=False
                     )
                     themesvar = files.json(
-                        "Luna/config.json", "theme", documents=True
+                        "data/config.json", "theme", documents=False
                     )
                     deletetimer = int(
                         files.json(
-                            "Luna/config.json", "delete_timer", documents=True
+                            "data/config.json", "delete_timer", documents=False
                         )
                     )
                     startup_status = files.json(
-                        "Luna/config.json", "startup_status", documents=True
+                        "data/config.json", "startup_status", documents=False
                     )
                     nitro_sniper = files.json(
-                        "Luna/snipers/nitro.json", "sniper", documents=True
+                        "data/snipers/nitro.json", "sniper", documents=False
                     )
                     giveawayjoiner = files.json(
-                        "Luna/snipers/giveaway.json", "joiner", documents=True
+                        "data/snipers/giveaway.json", "joiner", documents=False
                     )
                     if themesvar == "default":
                         pass
@@ -14910,32 +13502,32 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 if beta:
                     print("Beta Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
-                    "Luna/config.json",
-                    "prefix", documents=True
+                    "data/config.json",
+                    "prefix", documents=False
                 )
                 console_mode = files.json(
-                    "Luna/console/console.json", "mode", documents=True
+                    "data/console/console.json", "mode", documents=False
                 )
                 if console_mode == "2":
                     riskmode = files.json(
-                        "Luna/config.json", "risk_mode", documents=True
+                        "data/config.json", "risk_mode", documents=False
                     )
                     themesvar = files.json(
-                        "Luna/config.json", "theme", documents=True
+                        "data/config.json", "theme", documents=False
                     )
                     deletetimer = int(
                         files.json(
-                            "Luna/config.json", "delete_timer", documents=True
+                            "data/config.json", "delete_timer", documents=False
                         )
                     )
                     startup_status = files.json(
-                        "Luna/config.json", "startup_status", documents=True
+                        "data/config.json", "startup_status", documents=False
                     )
                     nitro_sniper = files.json(
-                        "Luna/snipers/nitro.json", "sniper", documents=True
+                        "data/snipers/nitro.json", "sniper", documents=False
                     )
                     giveawayjoiner = files.json(
-                        "Luna/snipers/giveaway.json", "joiner", documents=True
+                        "data/snipers/giveaway.json", "joiner", documents=False
                     )
                     if themesvar == "default":
                         pass
@@ -15005,7 +13597,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
     async def pgradient(self, ctx, mode: str):
 
         if mode == "1" or mode == "2" or mode == "3" or mode == "4" or mode == "5" or mode == "6" or mode == "7":
-            config._global("Luna/console/console.json", "print_gradient", mode)
+            config._global("data/console/console.json", "print_gradient", mode)
             prints.message(f"Print gradient » {color.print_gradient(f'{mode}')}")
             await message_builder(ctx, description=f"```\nPrint gradient » {mode}```")
             luna.console(False, clear=True)
@@ -15023,32 +13615,32 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 if beta:
                     print("Beta Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
-                    "Luna/config.json",
-                    "prefix", documents=True
+                    "data/config.json",
+                    "prefix", documents=False
                 )
                 console_mode = files.json(
-                    "Luna/console/console.json", "mode", documents=True
+                    "data/console/console.json", "mode", documents=False
                 )
                 if console_mode == "2":
                     riskmode = files.json(
-                        "Luna/config.json", "risk_mode", documents=True
+                        "data/config.json", "risk_mode", documents=False
                     )
                     themesvar = files.json(
-                        "Luna/config.json", "theme", documents=True
+                        "data/config.json", "theme", documents=False
                     )
                     deletetimer = int(
                         files.json(
-                            "Luna/config.json", "delete_timer", documents=True
+                            "data/config.json", "delete_timer", documents=False
                         )
                     )
                     startup_status = files.json(
-                        "Luna/config.json", "startup_status", documents=True
+                        "data/config.json", "startup_status", documents=False
                     )
                     nitro_sniper = files.json(
-                        "Luna/snipers/nitro.json", "sniper", documents=True
+                        "data/snipers/nitro.json", "sniper", documents=False
                     )
                     giveawayjoiner = files.json(
-                        "Luna/snipers/giveaway.json", "joiner", documents=True
+                        "data/snipers/giveaway.json", "joiner", documents=False
                     )
                     if themesvar == "default":
                         pass
@@ -15111,32 +13703,32 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 if beta:
                     print("Beta Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
-                    "Luna/config.json",
-                    "prefix", documents=True
+                    "data/config.json",
+                    "prefix", documents=False
                 )
                 console_mode = files.json(
-                    "Luna/console/console.json", "mode", documents=True
+                    "data/console/console.json", "mode", documents=False
                 )
                 if console_mode == "2":
                     riskmode = files.json(
-                        "Luna/config.json", "risk_mode", documents=True
+                        "data/config.json", "risk_mode", documents=False
                     )
                     themesvar = files.json(
-                        "Luna/config.json", "theme", documents=True
+                        "data/config.json", "theme", documents=False
                     )
                     deletetimer = int(
                         files.json(
-                            "Luna/config.json", "delete_timer", documents=True
+                            "data/config.json", "delete_timer", documents=False
                         )
                     )
                     startup_status = files.json(
-                        "Luna/config.json", "startup_status", documents=True
+                        "data/config.json", "startup_status", documents=False
                     )
                     nitro_sniper = files.json(
-                        "Luna/snipers/nitro.json", "sniper", documents=True
+                        "data/snipers/nitro.json", "sniper", documents=False
                     )
                     giveawayjoiner = files.json(
-                        "Luna/snipers/giveaway.json", "joiner", documents=True
+                        "data/snipers/giveaway.json", "joiner", documents=False
                     )
                     if themesvar == "default":
                         pass
@@ -15205,7 +13797,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
     )
     async def spacer(self, ctx, mode: str):
 
-        config._global("Luna/console/console.json", "spacer", mode)
+        config._global("data/console/console.json", "spacer", mode)
         prints.message(f"Print spacer » {color.print_gradient(f'{mode}')}")
         await message_builder(ctx, description=f"```\nPrint spacer » {mode}```")
         luna.console(False, clear=True)
@@ -15223,32 +13815,32 @@ class SettingsCog(commands.Cog, name="Settings commands"):
             if beta:
                 print("Beta Build".center(os.get_terminal_size().columns))
             prefix = files.json(
-                "Luna/config.json",
-                "prefix", documents=True
+                "data/config.json",
+                "prefix", documents=False
             )
             console_mode = files.json(
-                "Luna/console/console.json", "mode", documents=True
+                "data/console/console.json", "mode", documents=False
             )
             if console_mode == "2":
                 riskmode = files.json(
-                    "Luna/config.json", "risk_mode", documents=True
+                    "data/config.json", "risk_mode", documents=False
                 )
                 themesvar = files.json(
-                    "Luna/config.json", "theme", documents=True
+                    "data/config.json", "theme", documents=False
                 )
                 deletetimer = int(
                     files.json(
-                        "Luna/config.json", "delete_timer", documents=True
+                        "data/config.json", "delete_timer", documents=False
                     )
                 )
                 startup_status = files.json(
-                    "Luna/config.json", "startup_status", documents=True
+                    "data/config.json", "startup_status", documents=False
                 )
                 nitro_sniper = files.json(
-                    "Luna/snipers/nitro.json", "sniper", documents=True
+                    "data/snipers/nitro.json", "sniper", documents=False
                 )
                 giveawayjoiner = files.json(
-                    "Luna/snipers/giveaway.json", "joiner", documents=True
+                    "data/snipers/giveaway.json", "joiner", documents=False
                 )
                 if themesvar == "default":
                     pass
@@ -15311,32 +13903,32 @@ class SettingsCog(commands.Cog, name="Settings commands"):
             if beta:
                 print("Beta Build".center(os.get_terminal_size().columns))
             prefix = files.json(
-                "Luna/config.json",
-                "prefix", documents=True
+                "data/config.json",
+                "prefix", documents=False
             )
             console_mode = files.json(
-                "Luna/console/console.json", "mode", documents=True
+                "data/console/console.json", "mode", documents=False
             )
             if console_mode == "2":
                 riskmode = files.json(
-                    "Luna/config.json", "risk_mode", documents=True
+                    "data/config.json", "risk_mode", documents=False
                 )
                 themesvar = files.json(
-                    "Luna/config.json", "theme", documents=True
+                    "data/config.json", "theme", documents=False
                 )
                 deletetimer = int(
                     files.json(
-                        "Luna/config.json", "delete_timer", documents=True
+                        "data/config.json", "delete_timer", documents=False
                     )
                 )
                 startup_status = files.json(
-                    "Luna/config.json", "startup_status", documents=True
+                    "data/config.json", "startup_status", documents=False
                 )
                 nitro_sniper = files.json(
-                    "Luna/snipers/nitro.json", "sniper", documents=True
+                    "data/snipers/nitro.json", "sniper", documents=False
                 )
                 giveawayjoiner = files.json(
-                    "Luna/snipers/giveaway.json", "joiner", documents=True
+                    "data/snipers/giveaway.json", "joiner", documents=False
                 )
                 if themesvar == "default":
                     pass
@@ -15405,9 +13997,9 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 
         if mode == "on" or mode == "off":
             if mode == "off":
-                config._global("Luna/console/console.json", "spacers", False)
+                config._global("data/console/console.json", "spacers", False)
             else:
-                config._global("Luna/console/console.json", "spacers", True)
+                config._global("data/console/console.json", "spacers", True)
             prints.message(f"Print spacers » {color.print_gradient(f'{mode}')}")
             await message_builder(ctx, description=f"```\nPrint spacers » {mode}```")
             luna.console(False, clear=True)
@@ -15425,32 +14017,32 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 if beta:
                     print("Beta Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
-                    "Luna/config.json",
-                    "prefix", documents=True
+                    "data/config.json",
+                    "prefix", documents=False
                 )
                 console_mode = files.json(
-                    "Luna/console/console.json", "mode", documents=True
+                    "data/console/console.json", "mode", documents=False
                 )
                 if console_mode == "2":
                     riskmode = files.json(
-                        "Luna/config.json", "risk_mode", documents=True
+                        "data/config.json", "risk_mode", documents=False
                     )
                     themesvar = files.json(
-                        "Luna/config.json", "theme", documents=True
+                        "data/config.json", "theme", documents=False
                     )
                     deletetimer = int(
                         files.json(
-                            "Luna/config.json", "delete_timer", documents=True
+                            "data/config.json", "delete_timer", documents=False
                         )
                     )
                     startup_status = files.json(
-                        "Luna/config.json", "startup_status", documents=True
+                        "data/config.json", "startup_status", documents=False
                     )
                     nitro_sniper = files.json(
-                        "Luna/snipers/nitro.json", "sniper", documents=True
+                        "data/snipers/nitro.json", "sniper", documents=False
                     )
                     giveawayjoiner = files.json(
-                        "Luna/snipers/giveaway.json", "joiner", documents=True
+                        "data/snipers/giveaway.json", "joiner", documents=False
                     )
                     if themesvar == "default":
                         pass
@@ -15513,32 +14105,32 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 if beta:
                     print("Beta Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
-                    "Luna/config.json",
-                    "prefix", documents=True
+                    "data/config.json",
+                    "prefix", documents=False
                 )
                 console_mode = files.json(
-                    "Luna/console/console.json", "mode", documents=True
+                    "data/console/console.json", "mode", documents=False
                 )
                 if console_mode == "2":
                     riskmode = files.json(
-                        "Luna/config.json", "risk_mode", documents=True
+                        "data/config.json", "risk_mode", documents=False
                     )
                     themesvar = files.json(
-                        "Luna/config.json", "theme", documents=True
+                        "data/config.json", "theme", documents=False
                     )
                     deletetimer = int(
                         files.json(
-                            "Luna/config.json", "delete_timer", documents=True
+                            "data/config.json", "delete_timer", documents=False
                         )
                     )
                     startup_status = files.json(
-                        "Luna/config.json", "startup_status", documents=True
+                        "data/config.json", "startup_status", documents=False
                     )
                     nitro_sniper = files.json(
-                        "Luna/snipers/nitro.json", "sniper", documents=True
+                        "data/snipers/nitro.json", "sniper", documents=False
                     )
                     giveawayjoiner = files.json(
-                        "Luna/snipers/giveaway.json", "joiner", documents=True
+                        "data/snipers/giveaway.json", "joiner", documents=False
                     )
                     if themesvar == "default":
                         pass
@@ -15609,9 +14201,9 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 
         if mode == "on" or mode == "off":
             if mode == "off":
-                config._global("Luna/console/console.json", "timestamp", False)
+                config._global("data/console/console.json", "timestamp", False)
             else:
-                config._global("Luna/console/console.json", "timestamp", True)
+                config._global("data/console/console.json", "timestamp", True)
             prints.message(f"Print timestamp » {color.print_gradient(f'{mode}')}")
             await message_builder(ctx, description=f"```\nPrint timestamp » {mode}```")
             luna.console(False, clear=True)
@@ -15629,32 +14221,32 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 if beta:
                     print("Beta Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
-                    "Luna/config.json",
-                    "prefix", documents=True
+                    "data/config.json",
+                    "prefix", documents=False
                 )
                 console_mode = files.json(
-                    "Luna/console/console.json", "mode", documents=True
+                    "data/console/console.json", "mode", documents=False
                 )
                 if console_mode == "2":
                     riskmode = files.json(
-                        "Luna/config.json", "risk_mode", documents=True
+                        "data/config.json", "risk_mode", documents=False
                     )
                     themesvar = files.json(
-                        "Luna/config.json", "theme", documents=True
+                        "data/config.json", "theme", documents=False
                     )
                     deletetimer = int(
                         files.json(
-                            "Luna/config.json", "delete_timer", documents=True
+                            "data/config.json", "delete_timer", documents=False
                         )
                     )
                     startup_status = files.json(
-                        "Luna/config.json", "startup_status", documents=True
+                        "data/config.json", "startup_status", documents=False
                     )
                     nitro_sniper = files.json(
-                        "Luna/snipers/nitro.json", "sniper", documents=True
+                        "data/snipers/nitro.json", "sniper", documents=False
                     )
                     giveawayjoiner = files.json(
-                        "Luna/snipers/giveaway.json", "joiner", documents=True
+                        "data/snipers/giveaway.json", "joiner", documents=False
                     )
                     if themesvar == "default":
                         pass
@@ -15717,32 +14309,32 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 if beta:
                     print("Beta Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
-                    "Luna/config.json",
-                    "prefix", documents=True
+                    "data/config.json",
+                    "prefix", documents=False
                 )
                 console_mode = files.json(
-                    "Luna/console/console.json", "mode", documents=True
+                    "data/console/console.json", "mode", documents=False
                 )
                 if console_mode == "2":
                     riskmode = files.json(
-                        "Luna/config.json", "risk_mode", documents=True
+                        "data/config.json", "risk_mode", documents=False
                     )
                     themesvar = files.json(
-                        "Luna/config.json", "theme", documents=True
+                        "data/config.json", "theme", documents=False
                     )
                     deletetimer = int(
                         files.json(
-                            "Luna/config.json", "delete_timer", documents=True
+                            "data/config.json", "delete_timer", documents=False
                         )
                     )
                     startup_status = files.json(
-                        "Luna/config.json", "startup_status", documents=True
+                        "data/config.json", "startup_status", documents=False
                     )
                     nitro_sniper = files.json(
-                        "Luna/snipers/nitro.json", "sniper", documents=True
+                        "data/snipers/nitro.json", "sniper", documents=False
                     )
                     giveawayjoiner = files.json(
-                        "Luna/snipers/giveaway.json", "joiner", documents=True
+                        "data/snipers/giveaway.json", "joiner", documents=False
                     )
                     if themesvar == "default":
                         pass
@@ -15822,7 +14414,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
     #                 bot.load_extension(f"cogs.{filename[:-3]}")
     #     prints.message(f"Reloaded custom commands")
     #     await message_builder(ctx, description=f"```\nReloaded custom commands```")
-    #     # prefix = files.json("Luna/config.json", "prefix", documents=True)
+    #     # prefix = files.json("data/config.json", "prefix", documents=False)
     #     # await message_builder(ctx, description=f"```\nReload has been disabled until further notice, use {prefix}restart instead```")
 
     @commands.command(
@@ -15842,8 +14434,8 @@ async def {name}(self, luna):
     
     await luna.send("Documentation for custom commands can be found here: https://www.team-luna.org/documentation")
 """
-        files.write_file("Luna/custom/custom.py", content, documents=True, append=True)
-        await message_builder(ctx, description=f"```\nCreated new custom command in \"Documents/Luna/custom/custom.py\"```")
+        files.write_file(f"data/scripts/{name}.py", content, documents=False, append=True)
+        await message_builder(ctx, description=f"```\nCreated new custom command in \"Documents/data/scripts/{name}.py\"```")
 
     @commands.command(
         name="darkmode",
@@ -15892,13 +14484,19 @@ class CustomCog(commands.Cog, name="Custom commands"):
         self.bot = bot
 
     try:
-        file = open(
-            os.path.join(
-                files.documents(),
-                "Luna/custom/custom.py"
-            ), "r"
-        )
-        file_data = file.read()
+        # file = open(
+        #     "data/scripts/example.py", "r"
+        # )
+        file_data = ""
+
+        for filename in os.listdir("data/scripts"):
+            if filename.endswith(".py"):
+                file = open(
+                    f"data/scripts/{filename}", "r"
+                )
+                file_data += file.read()
+        file.close()
+
         if "sys.modules" in str(file_data):
             prints.error("Using sys.modules is not allowed.")
             time.sleep(5)
@@ -16149,85 +14747,6 @@ class DecodeCog(commands.Cog, name="Decode commands"):
         self.bot = bot
 
     @commands.command(
-        name="decode_ai", usage="<text>",
-        description="AI based decryption"
-    )
-    async def decode_ai(self, luna, *, text: str):
-
-        try:
-            to_morse = {
-                "a": "ɗรٱคร",
-                "b": "ɗรٱค",
-                "c": "รɗﻉ",
-                "d": "Շร๔є",
-                "e": "ፕነዕቿ",
-                "f": "丂d乇",
-                "g": "Շรɗﻉ",
-                "h": "ዪዐጌረዐሸሠሁነቿፕ5",
-                "i": "ዪዐጌረዐሸሠሁነቿፕ",
-                "j": "ዪዐጌረዐሸሠሁነቿ",
-                "k": "ዪዐጌረዐሸሠሁነ",
-                "l": "ዪዐጌረዐሸሠሁነቿ5",
-                "m": "ዪዐጌረዐሸሠሁዐ",
-                "n": "ዪዐጌረዐሸሠሁ",
-                "o": "ዪዐጌረዐሁነቿፕ5",
-                "p": "ዪዐጌረሸሠሁነቿፕ5",
-                "q": "ዪዐረዐሸሠሁነቿፕ5",
-                "r": "ዪዐጌረዐሸሠሁነቿ?5",
-                "s": "ዪዐጌረዐሠሁነቿፕ5",
-                "t": "ዐጌረዐሸሠሁነቿፕ5",
-                "u": "ҀФГЯД",
-                "v": "ҀФГЯ",
-                "w": "ҀФr",
-                "x": "ҀФГ",
-                "y": "ℜ𝔄",
-                "z": "ｷ乇ｲg",
-                "1": ".คŦгเςค",
-                "2": ".. ልቻዪጎርል",
-                "3": "ₐfᵣᵢcₐ",
-                "4": "丂 乃o尺刀",
-                "5": "ﾶﾘ ﾶoﾶ",
-                "6": "🇲🇾 🇲🇴🇲",
-                "7": "cﾑ",
-                "8": "Ў",
-                "9": "𝓶𝓸𝓶",
-                "0": "-----",
-                "-": "ልዪፕዐር",
-                ".": "ↄoTᴙA",
-                "?": "£$R%T:$£PT",
-                "!": "𝐜𝐨𝐭𝐫𝐚",
-                "/": "???????",
-                "£": "ȼøŧɍȺ",
-                "$": "ᶜᵒᵗʳᵃ",
-                ",": "ዪልኗክልዪዐጕ",
-                "_": " ",
-                ":": "???!??!sped!?!?!",
-                "#": "???!??!cotra!?!?!"
-            }
-            text += ' '
-            decipher = ''
-            cipher = ''
-            for letter in text:
-                if letter != ' ':
-                    i = 0
-                    cipher += letter
-                else:
-                    i += 1
-                    if i == 2:
-                        decipher += ' '
-                    else:
-                        decipher += list(
-                            to_morse.keys()
-                        )[list(to_morse.values()).index(cipher)]
-                        cipher = ''
-            await message_builder(
-                luna,
-                description=f"```\nInput\n\n{text}\n``````\nDecrypted with Luna's AI\n\n{decipher}\n```"
-            )
-        except Exception as e:
-            await error_builder(luna, description=f"```\n{e}\n```")
-
-    @commands.command(
         name="decode_cea256",
         usage="<key> <text>",
         description="cea256"
@@ -16434,9 +14953,9 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
     async def ctitle(self, luna, *, newtitle: str):
 
         if files.json(
-                "Luna/config.json",
+                "data/config.json",
                 "theme",
-                documents=True
+                documents=False
         ) == "default":
             await error_builder(
                 luna,
@@ -16460,9 +14979,9 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
     async def cfooter(self, luna, *, newfooter: str):
 
         if files.json(
-                "Luna/config.json",
+                "data/config.json",
                 "theme",
-                documents=True
+                documents=False
         ) == "default":
             await error_builder(
                 luna,
@@ -16489,9 +15008,9 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
     async def description(self, luna, mode: str):
 
         if files.json(
-                "Luna/config.json",
+                "data/config.json",
                 "theme",
-                documents=True
+                documents=False
         ) == "default":
             await error_builder(
                 luna,
@@ -16524,24 +15043,15 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         self.bot = bot
 
     @commands.command(
-        name="hclassic",
-        usage="",
-        description="Random classic hentai"
-    )
-    async def hclassic(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/classic").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
         name="hrandom",
         usage="",
-        description="Random hentai gif"
+        description="Random hentai"
     )
     async def hrandom(self, luna):
         r = requests.get(
-            "https://nekos.life/api/v2/img/Random_hentai_gif"
+            "http://api.nekos.fun:8080/api/hentai"
         ).json()
-        await message_builder(luna, large_image=str(r['url']))
+        await message_builder(luna, large_image=str(r['image']))
 
     @commands.command(
         name="hass",
@@ -16549,323 +15059,153 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         description="Random hentai ass"
     )
     async def hass(self, luna):
-        r = requests.get("https://nekobot.xyz/api/image?type=hass").json()
+        r = requests.get(
+            "https://nekobot.xyz/api/image?type=hass"
+        ).json()
         await message_builder(luna, large_image=str(r['message']))
 
     @commands.command(
-        name="hboobs",
+        name="ass",
         usage="",
-        description="Random hentai boobs"
+        description="Random ass"
     )
-    async def hboobs(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/boobs").json()
-        await message_builder(luna, large_image=str(r['url']))
+    async def ass(self, luna):
+        r = requests.get(
+            "http://api.nekos.fun:8080/api/ass"
+        ).json()
+        await message_builder(luna, large_image=str(r['image']))
 
     @commands.command(
-        name="hsmallboobs",
+        name="boobs",
         usage="",
-        description="Random hentai smallboobs"
+        description="Real breasts"
     )
-    async def hsmallboobs(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/boobs").json()
-        await message_builder(luna, large_image=str(r['url']))
+    async def ass(self, luna):
+        r = requests.get(
+            "http://api.nekos.fun:8080/api/boobs"
+        ).json()
+        await message_builder(luna, large_image=str(r['image']))
 
     @commands.command(
-        name="htits",
+        name="pussy",
         usage="",
-        description="Random hentai tits"
+        description="Random pussy"
     )
-    async def htits(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/tits").json()
-        await message_builder(luna, large_image=str(r['url']))
+    async def pussy(self, luna):
+        r = requests.get(
+            "http://api.nekos.fun:8080/api/pussy"
+        ).json()
+        await message_builder(luna, large_image=str(r['image']))
 
     @commands.command(
-        name="hpussy",
+        name="4k",
         usage="",
-        description="Random hentai pussy"
+        description="4k NSFW"
     )
-    async def hpussy(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/pussy").json()
-        await message_builder(luna, large_image=str(r['url']))
+    async def fk(self, luna):
+        r = requests.get(
+            "http://api.nekos.fun:8080/api/4k"
+        ).json()
+        await message_builder(luna, large_image=str(r['image']))
 
     @commands.command(
-        name="hanal",
+        name="cum",
         usage="",
-        description="Random hentai anal"
+        description="Baby gravy!"
     )
-    async def hanal(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/anal").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="hcum",
-        usage="",
-        description="Random hentai cum gif"
-    )
-    async def hcum(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/cum").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="hcum1",
-        usage="",
-        description="Random hentai cum"
-    )
-    async def hcum1(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/cum_jpg").json()
-        await message_builder(luna, large_image=str(r['url']))
+    async def cum(self, luna):
+        r = requests.get(
+            "http://api.nekos.fun:8080/api/cum"
+        ).json()
+        await message_builder(luna, large_image=str(r['image']))
 
     @commands.command(
         name="hblowjob",
         usage="",
-        description="Random hentai blowjob gif"
+        description="Self explainable"
     )
-    async def hblowjob(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/bj").json()
-        await message_builder(luna, large_image=str(r['url']))
+    async def blowjob(self, luna):
+        r = requests.get(
+            "http://api.nekos.fun:8080/api/blowjob"
+        ).json()
+        await message_builder(luna, large_image=str(r['image']))
 
     @commands.command(
-        name="hblowjob1",
+        name="ahegao",
         usage="",
-        description="Random hentai blowjob"
+        description="Ahegao"
     )
-    async def hblowjob1(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/blowjob").json()
-        await message_builder(luna, large_image=str(r['url']))
+    async def ahegao(self, luna):
+        r = requests.get(
+            "http://api.nekos.fun:8080/api/gasm"
+        ).json()
+        await message_builder(luna, large_image=str(r['image']))
 
     @commands.command(
-        name="hneko",
+        name="lewd",
         usage="",
-        description="Random hentai neko"
+        description="Lewd loli"
     )
-    async def hneko(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/nsfw_neko_gif").json()
-        await message_builder(luna, large_image=str(r['url']))
+    async def lewd(self, luna):
+        r = requests.get(
+            "http://api.nekos.fun:8080/api/lewd"
+        ).json()
+        await message_builder(luna, large_image=str(r['image']))
 
     @commands.command(
-        name="htrap",
+        name="feet",
         usage="",
-        description="Random hentai trap"
+        description="Random feet"
     )
-    async def htrap(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/trap").json()
-        await message_builder(luna, large_image=str(r['url']))
+    async def feet(self, luna):
+        r = requests.get(
+            "http://api.nekos.fun:8080/api/feet"
+        ).json()
+        await message_builder(luna, large_image=str(r['image']))
 
     @commands.command(
-        name="hyuri",
+        name="feet",
         usage="",
-        description="Random hentai yuri"
+        description="Random feet"
     )
-    async def hyuri(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/yuri").json()
-        await message_builder(luna, large_image=str(r['url']))
+    async def feet(self, luna):
+        r = requests.get(
+            "http://api.nekos.fun:8080/api/feet"
+        ).json()
+        await message_builder(luna, large_image=str(r['image']))
 
     @commands.command(
-        name="hfutanari",
+        name="lesbian",
         usage="",
-        description="Random hentai futanari"
+        description="Girls rule!"
     )
-    async def hfutanari(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/futanari").json()
-        await message_builder(luna, large_image=str(r['url']))
+    async def lesbian(self, luna):
+        r = requests.get(
+            "http://api.nekos.fun:8080/api/lesbian"
+        ).json()
+        await message_builder(luna, large_image=str(r['image']))
 
     @commands.command(
-        name="hketa",
+        name="spank",
         usage="",
-        description="Random hentai keta"
+        description="NSFW for butts"
     )
-    async def hketa(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/keta").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="hhololewd",
-        usage="",
-        description="Random hololewd hentai "
-    )
-    async def hhololewd(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/hololewd").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="hlewdkemo",
-        usage="",
-        description="Random lewdkemo hentai"
-    )
-    async def hlewdkemo(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/lewdkemo").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="hsolo",
-        usage="",
-        description="Random solo hentai"
-    )
-    async def hsolo(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/solo").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="hsolog",
-        usage="",
-        description="Random solo hentai"
-    )
-    async def hsolog(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/solog").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="hfeetg",
-        usage="",
-        description="Random hentai feet"
-    )
-    async def hfeetg(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/feetg").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="hero",
-        usage="",
-        description="Random erotic hentai"
-    )
-    async def hero(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/ero").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="herok",
-        usage="",
-        description="Random erotic kitsune"
-    )
-    async def herok(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/erok").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="herokemo",
-        usage="",
-        description="Random hentai erokemo"
-    )
-    async def herokemo(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/erokemo").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="hles",
-        usage="",
-        description="Random lesbian hentai"
-    )
-    async def hles(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/les").json()
-        await message_builder(luna, large_image=str(r['url']))
+    async def spank(self, luna):
+        r = requests.get(
+            "http://api.nekos.fun:8080/api/spank"
+        ).json()
+        await message_builder(luna, large_image=str(r['image']))
 
     @commands.command(
         name="hwallpaper",
         usage="",
-        description="Random hentai wallpaper"
+        description="99% SFW"
     )
     async def hwallpaper(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/wallpaper").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="hlewdk",
-        usage="",
-        description="Random lewd hentai"
-    )
-    async def hlewdk(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/lewdk").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="hngif",
-        usage="",
-        description="Random hentai neko gif"
-    )
-    async def hngif(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/ngif").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="hkemonomimi",
-        usage="",
-        description="Random neko"
-    )
-    async def hkemonomimi(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/kemonomimi").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="hholoero",
-        usage="",
-        description="Random erotic hentai"
-    )
-    async def hholoero(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/holoero").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="hfoxgirl",
-        usage="",
-        description="Random hentai fox girl"
-    )
-    async def hfoxgirl(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/fox_girl").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="hfemdom",
-        usage="",
-        description="Random hentai female"
-    )
-    async def hfemdom(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/femdom").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="hgasm",
-        usage="",
-        description="Random hentai gasm"
-    )
-    async def hgasm(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/gasm").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="hkuni",
-        usage="",
-        description="Random hentai kuni"
-    )
-    async def hkuni(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/kuni").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="hpwankg",
-        usage="",
-        description="Random hentai wank"
-    )
-    async def hpwankg(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/pwankg").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="havatar",
-        usage="",
-        description="Random hentai avatar"
-    )
-    async def havatar(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/nsfw_avatar").json()
-        await message_builder(luna, large_image=str(r['url']))
-
-    @commands.command(
-        name="havatar1",
-        usage="",
-        description="Random hentai avatar"
-    )
-    async def havatar1(self, luna):
-        r = requests.get("https://nekos.life/api/v2/img/avatar").json()
-        await message_builder(luna, large_image=str(r['url']))
+        r = requests.get(
+            "http://api.nekos.fun:8080/api/wallpaper"
+        ).json()
+        await message_builder(luna, large_image=str(r['image']))
 
 
 bot.add_cog(HentaiCog(bot))
@@ -16879,7 +15219,7 @@ class OnMember(commands.Cog, name="on member events"):
     async def on_member_join(self, member):
         if anti_raid is True:
             guilds = files.json(
-                "Luna/protections/config.json", "guilds", documents=True
+                "data/protections/config.json", "guilds", documents=False
             )
             if member.guild.id in guilds:
                 try:
@@ -16900,7 +15240,7 @@ class OnMember(commands.Cog, name="on member events"):
     async def on_member_remove(self, member):
         if anti_raid is True:
             guilds = files.json(
-                "Luna/protections/config.json", "guilds", documents=True
+                "data/protections/config.json", "guilds", documents=False
             )
             if member.guild.id in guilds:
                 try:
@@ -16924,13 +15264,13 @@ class OnMember(commands.Cog, name="on member events"):
     async def on_member_ban(self, guild, user):
         if bot.user is user:
             if files.json(
-                    "Luna/notifications/toasts.json",
+                    "data/notifications/toasts.json",
                     "guildevents",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/notifications/toasts.json",
+                "data/notifications/toasts.json",
                 "toasts",
-                documents=True
+                documents=False
             ) == "on":
                 notify.toast(
                     f"You have been banned\nServer »  {guild.name}"
@@ -16940,13 +15280,13 @@ class OnMember(commands.Cog, name="on member events"):
                 prints.message(f"Server » {guild.name}")
                 print()
             if files.json(
-                    "Luna/webhooks/webhooks.json",
+                    "data/webhooks/webhooks.json",
                     "guildevents",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/webhooks/webhooks.json",
+                "data/webhooks/webhooks.json",
                 "webhooks",
-                documents=True
+                documents=False
             ) == "on" and not webhook.ghostpings_url() == "webhook-url-here":
                 notify.webhook(
                     url=webhook.ghostpings_url(),
@@ -16960,13 +15300,13 @@ class OnMember(commands.Cog, name="on member events"):
     #             channel.guild.me
     #     ).read_messages:
     #         if files.json(
-    #                 "Luna/notifications/toasts.json",
+    #                 "data/notifications/toasts.json",
     #                 "guildevents",
-    #                 documents=True
+    #                 documents=False
     #         ) == "on" and files.json(
-    #             "Luna/notifications/toasts.json",
+    #             "data/notifications/toasts.json",
     #             "toasts",
-    #             documents=True
+    #             documents=False
     #         ) == "on":
     #             notify.toast(
     #                 f"New Ticket\nServer » {channel.guild.name}\nChannel » {channel.name}"
@@ -16981,13 +15321,13 @@ class OnMember(commands.Cog, name="on member events"):
     #             )
     #             print()
     #         if files.json(
-    #                 "Luna/webhooks/webhooks.json",
+    #                 "data/webhooks/webhooks.json",
     #                 "guildevents",
-    #                 documents=True
+    #                 documents=False
     #         ) == "on" and files.json(
-    #             "Luna/webhooks/webhooks.json",
+    #             "data/webhooks/webhooks.json",
     #             "webhooks",
-    #             documents=True
+    #             documents=False
     #         ) == "on" and not webhook.ghostpings_url() == "webhook-url-here":
     #             notify.webhook(
     #                 url=webhook.ghostpings_url(),
@@ -16999,13 +15339,13 @@ class OnMember(commands.Cog, name="on member events"):
     async def on_relationship_add(self, relationship):
         if isinstance(relationship.type, discord.RelationshipType.incoming_request):
             if files.json(
-                    "Luna/notifications/toasts.json",
+                    "data/notifications/toasts.json",
                     "friendevents",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/notifications/toasts.json",
+                "data/notifications/toasts.json",
                 "toasts",
-                documents=True
+                documents=False
             ) == "on":
                 notify.toast(
                     f"Incoming Friend Request\nUser » {relationship.user}\nID » {relationship.user.id}"
@@ -17020,13 +15360,13 @@ class OnMember(commands.Cog, name="on member events"):
                 )
                 print()
             if files.json(
-                    "Luna/webhooks/webhooks.json",
+                    "data/webhooks/webhooks.json",
                     "friendevents",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/webhooks/webhooks.json",
+                "data/webhooks/webhooks.json",
                 "webhooks",
-                documents=True
+                documents=False
             ) == "on" and not webhook.ghostpings_url() == "webhook-url-here":
                 notify.webhook(
                     url=webhook.ghostpings_url(),
@@ -17035,13 +15375,13 @@ class OnMember(commands.Cog, name="on member events"):
                 )
         if isinstance(relationship.type, discord.RelationshipType.friend):
             if files.json(
-                    "Luna/notifications/toasts.json",
+                    "data/notifications/toasts.json",
                     "friendevents",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/notifications/toasts.json",
+                "data/notifications/toasts.json",
                 "toasts",
-                documents=True
+                documents=False
             ) == "on":
                 notify.toast(
                     f"New Friend\nUser » {relationship.user}\nID » {relationship.user.id}"
@@ -17056,13 +15396,13 @@ class OnMember(commands.Cog, name="on member events"):
                 )
                 print()
             if files.json(
-                    "Luna/webhooks/webhooks.json",
+                    "data/webhooks/webhooks.json",
                     "friendevents",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/webhooks/webhooks.json",
+                "data/webhooks/webhooks.json",
                 "webhooks",
-                documents=True
+                documents=False
             ) == "on" and not webhook.ghostpings_url() == "webhook-url-here":
                 notify.webhook(
                     url=webhook.ghostpings_url(),
@@ -17074,13 +15414,13 @@ class OnMember(commands.Cog, name="on member events"):
     async def on_relationship_remove(self, relationship):
         if isinstance(relationship.type, discord.RelationshipType.outgoing_request):
             if files.json(
-                    "Luna/notifications/toasts.json",
+                    "data/notifications/toasts.json",
                     "friendevents",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/notifications/toasts.json",
+                "data/notifications/toasts.json",
                 "toasts",
-                documents=True
+                documents=False
             ) == "on":
                 notify.toast(
                     f"Outgoing Friend Request\nUser » {relationship.user}\nID » {relationship.user.id}"
@@ -17095,13 +15435,13 @@ class OnMember(commands.Cog, name="on member events"):
                 )
                 print()
             if files.json(
-                    "Luna/webhooks/webhooks.json",
+                    "data/webhooks/webhooks.json",
                     "friendevents",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/webhooks/webhooks.json",
+                "data/webhooks/webhooks.json",
                 "webhooks",
-                documents=True
+                documents=False
             ) == "on" and not webhook.ghostpings_url() == "webhook-url-here":
                 notify.webhook(
                     url=webhook.ghostpings_url(),
@@ -17111,13 +15451,13 @@ class OnMember(commands.Cog, name="on member events"):
 
         if isinstance(relationship.type, discord.RelationshipType.blocked):
             if files.json(
-                    "Luna/notifications/toasts.json",
+                    "data/notifications/toasts.json",
                     "friendevents",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/notifications/toasts.json",
+                "data/notifications/toasts.json",
                 "toasts",
-                documents=True
+                documents=False
             ) == "on":
                 notify.toast(
                     f"Blocked/Removed Friend\nUser » {relationship.user}\nID » {relationship.user.id}"
@@ -17132,13 +15472,13 @@ class OnMember(commands.Cog, name="on member events"):
                 )
                 print()
             if files.json(
-                    "Luna/webhooks/webhooks.json",
+                    "data/webhooks/webhooks.json",
                     "friendevents",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/webhooks/webhooks.json",
+                "data/webhooks/webhooks.json",
                 "webhooks",
-                documents=True
+                documents=False
             ) == "on" and not webhook.ghostpings_url() == "webhook-url-here":
                 notify.webhook(
                     url=webhook.ghostpings_url(),
@@ -17192,7 +15532,7 @@ class SniperCog(commands.Cog, name="Sniper settings"):
         global charge_sniper
         if mode == "on" or mode == "off":
             prints.message(f"Nitro sniper charge » {color.print_gradient(f'{mode}')}")
-            config._global("Luna/snipers/nitro.json", "charge", mode)
+            config._global("data/snipers/nitro.json", "charge", mode)
             if mode == "on":
                 charge_sniper = True
             elif mode == "off":
@@ -17221,7 +15561,7 @@ class ThemeCog(commands.Cog, name="Theme command"):
             config.theme(theme)
             await message_builder(luna, description=f"```\nChanged theme to » {theme}```")
         else:
-            if files.file_exist(f"Luna/themes/{theme}.json", documents=True):
+            if files.file_exist(f"data/themes/{theme}.json", documents=False):
                 config.theme(theme)
                 await message_builder(luna, description=f"```\nChanged theme to » {theme}```")
             else:
@@ -17243,7 +15583,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
     async def newtheme(self, luna, themename: str):
 
         themename = themename.replace('.json', '')
-        if files.file_exist(f"Luna/themes/{themename}.json", documents=True):
+        if files.file_exist(f"data/themes/{themename}.json", documents=False):
             await error_builder(luna, description=f"```\nA theme already exists with the name » {themename}```")
         else:
             prints.message(f"Created theme » {color.print_gradient(f'{themename}')}")
@@ -17253,7 +15593,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
                 "description": True
             }
             files.write_json(
-                f"Luna/themes/{themename}.json", data, documents=True
+                f"data/themes/{themename}.json", data, documents=False
             )
             config.theme(f"{themename}")
             await message_builder(luna, description=f"```\nCreated theme » {themename}```")
@@ -17265,22 +15605,16 @@ class ThemesCog(commands.Cog, name="Theme commands"):
     )
     async def edittheme(self, luna, themename: str):
 
-        themesvar = files.json("Luna/config.json", "theme", documents=True)
-        if files.file_exist(f"Luna/themes/{themename}.json", documents=True):
+        themesvar = files.json("data/config.json", "theme", documents=False)
+        if files.file_exist(f"data/themes/{themename}.json", documents=False):
             await error_builder(luna, description=f"```\nA theme already exists with the name » {themename}```")
         else:
             prints.message(
                 f"Edited theme name to » {color.print_gradient(f'{themename}')}"
             )
             os.rename(
-                os.path.join(
-                    files.documents(),
-                    f"Luna/themes/{themesvar}"
-                ),
-                os.path.join(
-                    files.documents(),
-                    f"Luna/themes/{themename}.json"
-                )
+                f"data/themes/{themesvar}",
+                f"data/themes/{themename}.json"
             )
             config.theme(f"{themename}")
             await message_builder(luna, description=f"```\nEdited theme name to » {themename}```")
@@ -17293,12 +15627,12 @@ class ThemesCog(commands.Cog, name="Theme commands"):
     async def deltheme(self, luna, themename: str):
 
         themename = themename.replace('.json', '')
-        themesvar = files.json("Luna/config.json", "theme", documents=True)
+        themesvar = files.json("data/config.json", "theme", documents=False)
         if themesvar == f"{themename}.json":
             await error_builder(luna, description="```\nYou cant delete the theme you are currently using```")
             return
-        if files.file_exist(f"Luna/themes/{themename}.json", documents=True):
-            files.remove(f"Luna/themes/{themename}.json", documents=True)
+        if files.file_exist(f"data/themes/{themename}.json", documents=False):
+            files.remove(f"data/themes/{themename}.json", documents=False)
             prints.message(f"Deleted theme » {color.print_gradient(f'{themename}')}")
             await message_builder(luna, description=f"```\nDeleted theme » {themename}```")
         else:
@@ -17311,8 +15645,8 @@ class ThemesCog(commands.Cog, name="Theme commands"):
     )
     async def sendtheme(self, luna):
 
-        themesvar = files.json("Luna/config.json", "theme", documents=True)
-        await luna.send(file=discord.File(os.path.join(files.documents(), f"Luna/themes/{themesvar}")))
+        themesvar = files.json("data/config.json", "theme", documents=False)
+        await luna.send(file=discord.File(f"data/themes/{themesvar}"))
 
     @commands.command(
         name="cthemes",
@@ -17322,7 +15656,7 @@ class ThemesCog(commands.Cog, name="Theme commands"):
     )
     async def cthemes(self, luna):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         await message_builder(
             luna, title="Community Themes",
             description=f"{theme.description()}"
@@ -17358,7 +15692,7 @@ class CommunitythemesCog(commands.Cog, name="Community themes"):
     )
     async def preview(self, luna, theme: str):
 
-        prefix = files.json("Luna/config.json", "prefix", documents=True)
+        prefix = files.json("data/config.json", "prefix", documents=False)
         notfound = False
         theme = theme.lower()
         if theme == "luna":
@@ -17574,7 +15908,7 @@ Version\n\n{version}``````\nThis is a preview of the theme {theme}\nThis theme w
             "footer": f"{footer}",
             "description": description
         }
-        files.write_json(f"Luna/themes/{theme}.json", data, documents=True)
+        files.write_json(f"data/themes/{theme}.json", data, documents=False)
         config.theme(f"{theme}")
         await message_builder(
             luna,
@@ -17878,7 +16212,7 @@ class WebhookSetupCog(commands.Cog, name="Webhook setup"):
                 description=f"```\nSuccessfully created all webhooks and stored them in the config```"
             )
         except Exception as e:
-            await error_builder(luna, description=f"```\n{e}```")
+            await error_builder(luna, description=f"```{e}```")
 
 
 bot.add_cog(WebhookSetupCog(bot))
@@ -18366,7 +16700,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 
         prints.message(f"Logging out of the bot")
         await message_builder(luna, description=f"```\nLogging out of the bot```")
-        files.remove('Luna/discord.luna', documents=True)
+        files.remove('data/discord.luna', documents=False)
         restart_program()
 
     @commands.command(
@@ -18696,12 +17030,12 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
             except BaseException:
                 custom_command_count = 0
 
-            file = open(os.path.join(files.documents(), "Luna/commands.txt"), "w")
+            file = open("data/commands.txt", "w")
             file.write(f"{commandcount - custom_command_count} Commands\n\n<> is required | [] is optional\n\n{helptext}")
             file.close()
-            await message_builder(luna, title="Text Help", description=f"```\nSaved all commands in Documents/Luna/commands.txt```")
+            await message_builder(luna, title="Text Help", description=f"```\nSaved all commands in Documents/data/commands.txt```")
         except Exception as e:
-            print(e)
+            await error_builder(luna, e)
 
     @commands.command(
         name="update",
@@ -18724,23 +17058,23 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
             )
         else:
             if files.json(
-                    "Luna/notifications/toasts.json",
+                    "data/notifications/toasts.json",
                     "login",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/notifications/toasts.json",
+                "data/notifications/toasts.json",
                 "toasts",
-                documents=True
+                documents=False
             ) == "on":
                 notify.toast(f"Starting update {version_url}")
             if files.json(
-                    "Luna/webhooks/webhooks.json",
+                    "data/webhooks/webhooks.json",
                     "login",
-                    documents=True
+                    documents=False
             ) == "on" and files.json(
-                "Luna/webhooks/webhooks.json",
+                "data/webhooks/webhooks.json",
                 "webhooks",
-                documents=True
+                documents=False
             ) == "on" and not webhook.login_url() == "webhook-url-here":
                 notify.webhook(
                     url=webhook.login_url(), name="login",
@@ -18816,31 +17150,31 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
             print(motd.center(os.get_terminal_size().columns))
             if beta:
                 print("Beta Build".center(os.get_terminal_size().columns))
-            prefix = files.json("Luna/config.json", "prefix", documents=True)
+            prefix = files.json("data/config.json", "prefix", documents=False)
             console_mode = files.json(
-                "Luna/console/console.json", "mode", documents=True
+                "data/console/console.json", "mode", documents=False
             )
             if console_mode == "2":
                 riskmode = files.json(
-                    "Luna/config.json",
-                    "risk_mode", documents=True
+                    "data/config.json",
+                    "risk_mode", documents=False
                 )
                 themesvar = files.json(
-                    "Luna/config.json", "theme", documents=True
+                    "data/config.json", "theme", documents=False
                 )
                 deletetimer = int(
                     files.json(
-                        "Luna/config.json", "delete_timer", documents=True
+                        "data/config.json", "delete_timer", documents=False
                     )
                 )
                 startup_status = files.json(
-                    "Luna/config.json", "startup_status", documents=True
+                    "data/config.json", "startup_status", documents=False
                 )
                 nitro_sniper = files.json(
-                    "Luna/snipers/nitro.json", "sniper", documents=True
+                    "data/snipers/nitro.json", "sniper", documents=False
                 )
                 giveawayjoiner = files.json(
-                    "Luna/snipers/giveaway.json", "joiner", documents=True
+                    "data/snipers/giveaway.json", "joiner", documents=False
                 )
                 if themesvar == "default":
                     pass
@@ -18900,31 +17234,31 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
             print(motd.center(os.get_terminal_size().columns))
             if beta:
                 print("Beta Build".center(os.get_terminal_size().columns))
-            prefix = files.json("Luna/config.json", "prefix", documents=True)
+            prefix = files.json("data/config.json", "prefix", documents=False)
             console_mode = files.json(
-                "Luna/console/console.json", "mode", documents=True
+                "data/console/console.json", "mode", documents=False
             )
             if console_mode == "2":
                 riskmode = files.json(
-                    "Luna/config.json",
-                    "risk_mode", documents=True
+                    "data/config.json",
+                    "risk_mode", documents=False
                 )
                 themesvar = files.json(
-                    "Luna/config.json", "theme", documents=True
+                    "data/config.json", "theme", documents=False
                 )
                 deletetimer = int(
                     files.json(
-                        "Luna/config.json", "delete_timer", documents=True
+                        "data/config.json", "delete_timer", documents=False
                     )
                 )
                 startup_status = files.json(
-                    "Luna/config.json", "startup_status", documents=True
+                    "data/config.json", "startup_status", documents=False
                 )
                 nitro_sniper = files.json(
-                    "Luna/snipers/nitro.json", "sniper", documents=True
+                    "data/snipers/nitro.json", "sniper", documents=False
                 )
                 giveawayjoiner = files.json(
-                    "Luna/snipers/giveaway.json", "joiner", documents=True
+                    "data/snipers/giveaway.json", "joiner", documents=False
                 )
                 if themesvar == "default":
                     pass
@@ -19228,7 +17562,7 @@ async def message_builder(
 ):
     """
     Luna's main function for creating messages with the theme applied.\n
-    Parse `luna/ctx` as first argument. (Important)\n
+    Parse `data/ctx` as first argument. (Important)\n
     `title="foo"` <- Defines the title. (Optional)\n
     `description="foo"` <- Defines the description. (Optional)\n
     `large_image="url"` <- Defines the large image url. (Optional)\n
@@ -19252,18 +17586,18 @@ async def message_builder(
     if not footer == "None":
         if footer_extra is None:
             if files.json(
-                    "Luna/protections/config.json",
+                    "data/protections/config.json",
                     "footer",
-                    documents=True
+                    documents=False
             ):
                 footer_extra = f"Enabled Protections » {active_protections} | {theme.footer()}"
             else:
                 footer_extra = theme.footer()
         else:
             if files.json(
-                    "Luna/protections/config.json",
+                    "data/protections/config.json",
                     "footer",
-                    documents=True
+                    documents=False
             ):
                 footer_extra = f"{footer_extra} | Enabled Protections » {active_protections} | {theme.footer()}"
             else:

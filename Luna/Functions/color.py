@@ -11,8 +11,8 @@ class color:
     def logo_gradient(text):
         """Gradient for the logo"""
         gradient = files.json(
-            "Luna/console/console.json",
-            "logo_gradient", documents=True
+            "data/console/console.json",
+            "logo_gradient", documents=False
         )
         match gradient:
             case "1":
@@ -35,8 +35,8 @@ class color:
     def print_gradient(text):
         """Gradient for the console"""
         gradient = files.json(
-            "Luna/console/console.json",
-            "print_gradient", documents=True
+            "data/console/console.json",
+            "print_gradient", documents=False
         )
         match gradient:
             case "1":
@@ -138,17 +138,17 @@ class color:
         faded = ""
         down = False
         for line in text.splitlines():
-            red = 137
-            green = 142
-            blue = 255
+            red = 114
+            green = 137
+            blue = 218
             for character in line:
 
                 if down:
-                    red -= 3
+                    blue -= 3
                 else:
-                    red += 3
-                if red > 254:
-                    red = 255
+                    blue += 3
+                if blue > 254:
+                    blue = 255
                     down = True
                 elif red < 1:
                     red = 30
@@ -171,19 +171,19 @@ class color:
     def purple_blue(text):
         os.system("")
         faded = ""
-        red = 137
-        green = 142
-        blue = 255
+        red = 114
+        green = 137
+        blue = 218
         for line in text.splitlines():
             faded += f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n"
             if not green == 0:
                 green -= 5
                 if green < 0:
                     green = 0
-            if not red == 255:
-                red += 5
-                if red > 255:
-                    red = 255
+            if not blue == 255:
+                blue += 5
+                if blue > 255:
+                    blue = 255
         return faded
 
     def purple_cyan(text):
