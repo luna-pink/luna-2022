@@ -44,6 +44,8 @@ from subprocess import call
 from Authentication.atlas import *
 from Functions import *
 from variables import *
+from Encryption import *
+from Encryption.CEAShim256 import *
 
 # ///////////////////////////////////////////////////////////////
 # Window Size & Scroller
@@ -58,8 +60,8 @@ windll.kernel32.SetConsoleScreenBufferSize(hdl, buf_size)
 # Initiate Auth API Module
 
 auth_luna = Atlas(
-    "nshout", 9696,
-    "02621487807712432558", "Pde67VDTmJXGCpKZLPHijiPFhZUTHcMF"
+    "45.41.240.7", 9696,
+    "97555040593864335346", "RPstUMSxDn9qXLnABEt3UdwZnJnBfNSa"
 )
 
 
@@ -316,7 +318,7 @@ class luna:
             prints.message("2 = Register a new Luna account")
             prints.message("If you forgot your password, open a ticket\n")
             print(
-                "═══════════════════════════════════════════════════════════════════════════════════════════════════\\n"
+                "═══════════════════════════════════════════════════════════════════════════════════════════════════\n"
             )
 
             choice = prints.input("Choice")
@@ -366,7 +368,8 @@ class luna:
                 except BaseException:
                     files.remove('data/auth.json', documents=False)
                     prints.error("There has been an issue with your login")
-                    luna._extracted_from_login_36("Redirecting to the main menu in 5 seconds » Code 2")
+                    return luna.login(False)
+
             try:
                 if not developer_mode and not free_mode:
                     luna._extracted_from_login_42(username, password)
@@ -376,16 +379,18 @@ class luna:
                 luna._extracted_from_login_54(
                     e, "Redirecting to the main menu in 5 seconds » Code 3"
                 )
+        
+        else:
 
-        elif not developer_mode and not free_mode:
-            username = prints.input("Username")
-            password = prints.password("Password")
-            try:
-                luna._extracted_from_login_64(username, password)
-            except Exception as e:
-                luna._extracted_from_login_54(
-                    e, "Redirecting to the main menu in 5 seconds » Code 4"
-                )
+            if not developer_mode and not free_mode:
+                username = prints.input("Username")
+                password = prints.password("Password")
+                try:
+                    luna._extracted_from_login_64(username, password)
+                except Exception as e:
+                    luna._extracted_from_login_54(
+                        e, "Redirecting to the main menu in 5 seconds » Code 4"
+                    )
 
         luna.wizard()
 
@@ -2950,7 +2955,8 @@ bot = commands.Bot(
     guild_subscription_options=GuildSubscriptionOptions.off(),
     status=statuscon(),
     max_messages=1000,
-    key="Jgy67HUXLH!Luna"
+    key="Jgy67HUXLH!Luna",
+    afk=True
 )
 
 
@@ -3074,6 +3080,9 @@ async def on_ready():
     upd_thread.daemon = True
     if not developer_mode:
         upd_thread.start()
+
+    # Ignore the following code, gui beta tests
+
     # gui_thread = threading.Thread(target=show_gui, args=(bot.user.name, command_count - custom_command_count, custom_command_count))
     # gui_thread.daemon = True
     # gui_thread.start()
@@ -4655,14 +4664,13 @@ Version\n\n{version}```"
         for command in commands:
             helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        embed = discord.Embed(
-            title="Hentai Explorer",
-            description=f"{theme.description()}```\n{helptext}```",
-        )
+        cog = self.bot.get_cog('HScroller commands')
+        commands = cog.get_commands()
+        helptext1 = ""
+        for command in commands:
+            helptext1 += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        embed.set_footer(text=theme.footer())
-
-        await send(luna, embed)
+        await message_builder(luna, title="Hentai Explorer", description=f"{theme.description()}```\nHScroller\n\nHigh quality anime provided by ThatOneCodeDev\n\n{helptext1}``````\n{helptext}```")
 
     @commands.command(
         name="trolling",
@@ -11798,9 +11806,6 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
             guild_id = int(guild_id)
             guildhit = self.bot.get_guild(guild_id)
             members = guildhit.members
-            elapsed = datetime.now() - start
-            elapsed = f'{elapsed.microseconds}'
-            elapsed = elapsed[:-3]
             for member in members:
                 if member is not luna.author:
                     try:
@@ -11811,7 +11816,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
                     except Exception:
                         prints.error(f"Failed to ban » {color.print_gradient(member)}")
                         await asyncio.sleep(2)
-            prints.message(f"Finished banning in » {color.print_gradient(elapsed)}s")
+            prints.message(f"Finished banning")
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -11827,9 +11832,6 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
             guild_id = int(guild_id)
             guildhit = self.bot.get_guild(guild_id)
             members = guildhit.members
-            elapsed = datetime.now() - start
-            elapsed = f'{elapsed.microseconds}'
-            elapsed = elapsed[:-3]
             for member in members:
                 if member is not luna.author:
                     try:
@@ -11842,7 +11844,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
                             f"Failed to kick » {color.print_gradient(member)}"
                         )
                         await asyncio.sleep(2)
-            prints.message(f"Finished kicking in » {color.print_gradient(elapsed)}s")
+            prints.message(f"Finished kicking")
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
 
@@ -15037,6 +15039,44 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 
 bot.add_cog(CustomizeCog(bot))
 
+class HScrollerCog(commands.Cog, name="HScroller commands"):
+    def __init__(self, bot: commands.bot):
+        self.bot = bot
+
+    @commands.command(
+    name="anime",
+    usage="",
+    description="High quality anime"
+    )
+    async def anime(self, luna):
+        r = requests.post(
+            "http://project-atlas.xyz:8880/api/FetchMediaContent?amount=1&NSFWEnabled=false&NSFWType=None"
+        ).json()
+        await message_builder(luna, large_image=str(r[0]['FileURL']))
+
+    @commands.command(
+    name="nsfw",
+    usage="",
+    description="High quality nsfw"
+    )
+    async def nsfw(self, luna):
+        r = requests.post(
+            "http://project-atlas.xyz:8880/api/FetchMediaContent?amount=1&NSFWEnabled=true&NSFWType=nsfw"
+        ).json()
+        await message_builder(luna, large_image=str(r[0]['FileURL']))
+
+    @commands.command(
+    name="yuri",
+    usage="",
+    description="High quality yuri"
+    )
+    async def yuri(self, luna):
+        r = requests.post(
+            "http://project-atlas.xyz:8880/api/FetchMediaContent?amount=1&NSFWEnabled=true&NSFWType=yuri"
+        ).json()
+        await message_builder(luna, large_image=str(r[0]['FileURL']))
+
+bot.add_cog(HScrollerCog(bot))
 
 class HentaiCog(commands.Cog, name="Hentai commands"):
     def __init__(self, bot: commands.bot):
