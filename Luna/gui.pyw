@@ -66,9 +66,158 @@ bot = commands.Bot(
 )
 
 
+def get_prefix():
+    return files.json("data/config.json", "prefix", documents=False)
+
+
+class prints:
+    # luna.file_check(False)
+    try:
+        if files.json("data/console/console.json", "spacers", documents=False):
+            spacer_2 = " " + \
+                       files.json(
+                           "data/console/console.json",
+                           "spacer", documents=False
+                       ) + " "
+        else:
+            spacer_2 = " "
+        if files.json(
+                "data/console/console.json",
+                "spacers",
+                documents=False
+        ) and files.json(
+            "data/console/console.json",
+            "timestamp",
+            documents=False
+        ):
+            spacer_1 = " " + \
+                       files.json(
+                           "data/console/console.json",
+                           "spacer", documents=False
+                       ) + " "
+        elif files.json("data/console/console.json", "spacers", documents=False) and files.json(
+                "data/console/console.json", "timestamp", documents=False
+        ) is False:
+            spacer_1 = ""
+        else:
+            spacer_1 = " "
+    except Exception as e:
+        print(e)
+
+    def command(self):
+        """Prints a command log."""
+        if files.json(
+                "data/console/console.json",
+                "timestamp",
+                documents=False
+        ):
+            return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient('Command')}{prints.spacer_2}{get_prefix()}{self}")
+
+        else:
+            return print(f"{prints.spacer_1}{color.print_gradient('Command')}{prints.spacer_2}{get_prefix()}{self}")
+
+    def shared(self):
+        """Prints a shared log."""
+        if files.json(
+                "data/console/console.json",
+                "timestamp",
+                documents=False
+        ):
+            return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient('Sharing')}{prints.spacer_2}{get_prefix()}{self}")
+
+        else:
+            return print(f"{prints.spacer_1}{color.print_gradient('Sharing')}{prints.spacer_2}{get_prefix()}{self}")
+
+    def info(self):
+        """Prints a info log."""
+        if files.json(
+                "data/console/console.json",
+                "timestamp",
+                documents=False
+        ):
+            return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient(' info  ')}{prints.spacer_2}{get_prefix()}{self}")
+
+        else:
+            return print(f"{prints.spacer_1}{color.print_gradient('Sharing')}{prints.spacer_2}{get_prefix()}{self}")
+
+    def message(self):
+        """Prints a message log."""
+        if files.json(
+                "data/console/console.json",
+                "timestamp",
+                documents=False
+        ):
+            return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient('Message')}{prints.spacer_2}{self}")
+
+        else:
+            return print(f"{prints.spacer_1}{color.print_gradient('Message')}{prints.spacer_2}{self}")
+
+    def sniper(self):
+        """Prints a sniper log."""
+        if files.json(
+                "data/console/console.json",
+                "timestamp",
+                documents=False
+        ):
+            return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient('Sniper ')}{prints.spacer_2}{self}")
+
+        else:
+            return print(f"{prints.spacer_1}{color.print_gradient('Sniper ')}{prints.spacer_2}{self}")
+
+    def event(self):
+        """Prints a event log."""
+        if files.json(
+                "data/console/console.json",
+                "timestamp",
+                documents=False
+        ):
+            return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient(' Event ')}{prints.spacer_2}{self}")
+
+        else:
+            return print(f"{prints.spacer_1}{color.print_gradient(' Event ')}{prints.spacer_2}{self}")
+
+    def selfbot(self):
+        """Prints a selfbot log."""
+        if files.json(
+                "data/console/console.json",
+                "timestamp",
+                documents=False
+        ):
+            return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient('Selfbot')}{prints.spacer_2}{self}")
+
+        else:
+            return print(f"{prints.spacer_1}{color.print_gradient('Selfbot')}{prints.spacer_2}{self}")
+
+    def error(self):
+        """Prints a error log."""
+        if files.json(
+                "data/console/console.json",
+                "timestamp",
+                documents=False
+        ):
+            return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.error} Error {color.reset}{prints.spacer_2}{self}")
+
+        else:
+            return print(f'{prints.spacer_1}{color.error} Error {color.reset}{prints.spacer_2}{self}')
+
+    def input(self):
+        """Prints an input."""
+        return input(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient(' Input ')}{prints.spacer_2}{self}: ") if files.json(
+            "data/console/console.json", "timestamp", documents=False
+        ) else input(
+            f"{prints.spacer_1}{color.print_gradient(' Input ')}{prints.spacer_2}{self}: "
+        )
+
+    def password(self):
+        """Prints a password input. Masked with `*`"""
+        return pwinput.pwinput(prompt=f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient(' Input ')}{prints.spacer_2}{self}: ", mask='*') if files.json(
+            "data/console/console.json", "timestamp", documents=False
+        ) else pwinput.pwinput(prompt=f"{prints.spacer_1}{color.print_gradient(' Input ')}{prints.spacer_2}{self}: ", mask='*')
+
+
 def login():
     if not files.file_exist('data/auth.json', documents=False):
-        def auth_connect(username, password):
+        def auth_connect(username):
             dpg.set_value(status, "Status: Connecting to server...")
             print("Connecting to Atlas...")
             try:
@@ -147,7 +296,7 @@ def login():
                 }
                 files.write_json("data/auth.json", data, documents=False)
 
-                # dpg.delete_item(item="register")
+                dpg.delete_item(item="register")
 
             def close_register():
                 dpg.delete_item(item="register")
@@ -173,18 +322,18 @@ def login():
                 dpg.set_value(status, "Status: Please enter a username and password.")
                 return
             try:
-                auth_connect(username_value, password_value)
+                auth_connect(username_value)
+                print("Connected to Atlas")
                 auth_luna.Login(username_value, password_value)
+                print("Logged in")
                 auth_validate()
+                print("Validated")
                 username_value = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username_value)
-
-                password_value = Encryption(
-                    '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
-                ).CEA256(password_value)
+                password_value = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password_value)
                 data = {"username": f"{username_value}", "password": f"{password_value}"}
                 files.write_json("data/auth.json", data, documents=False)
                 dpg.set_value(status, "Status: Logged in")
-                # dpg.delete_item(item="auth")
+                dpg.delete_item(item="auth")
                 auth_luna.disconnect()
                 return login()
             except BaseException:
@@ -194,21 +343,59 @@ def login():
 
         # ///////////////////////////////////////////////////////////////
 
-        with dpg.window(label="Authentication", tag="auth", width=784, height=600, no_resize=True, no_collapse=True):
+        with dpg.window(label="Authentication", tag="auth", width=784, height=600, no_resize=True, no_collapse=True, no_move=True):
             username = dpg.add_input_text(label="Username", default_value="")
             password = dpg.add_input_text(label="Password", default_value="", password=True)
             dpg.add_separator()
             status = dpg.add_text("Status: Not Authenticated")
             dpg.add_separator()
-            with dpg.group(horizontal=True, label="group_buttons"):
+            with dpg.group(horizontal=True, label="group_buttons2"):
                 dpg.add_button(label="Register", callback=auth_register)
                 dpg.add_button(label="Login", callback=auth_login)
     else:
+        now = datetime.now()
+        hour = now.hour
+        username = f"Dev - {os.getlogin()}" if developer_mode else os.getlogin()
+        if hour < 12:
+            greeting = "Good morning"
+        elif hour < 18:
+            greeting = "Good afternoon"
+        else:
+            greeting = "Good evening"
+
+        if files.file_exist('data/auth.json', documents=False):
+            username = files.json(
+                "data/auth.json", "username", documents=False
+            )
+            username = Decryption(
+                '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
+            ).CEA256(username)
+        print(f"{greeting}, {color.print_gradient(username)}.")
+        dpg.set_value(luna_user, f"{greeting}, {username}")
 
         # ///////////////////////////////////////////////////////////////
 
+        def login_after():
+            print("login_after")
+            token = files.json("data/discord.luna", "token", documents=False)
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
+                'Content-Type': 'application/json',
+                'authorization': Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)
+            }
+            r = requests.get(f"https://discordapp.com/api/{api_version}/users/@me", headers=headers).json()
+            print(f"Logging into {color.print_gradient(r['username'])}#{color.print_gradient(r['discriminator'])}...")
+            dpg.set_value(logged, f"Logging into {r['username']}#{r['discriminator']}...")
+            global user_token
+            user_token = Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)
+            bot.run(user_token, reconnect=True)
+
+        def login_thread():
+            debugger_thread = threading.Thread(target=login_after)
+            debugger_thread.daemon = True
+            debugger_thread.start()
+
         if files.json("data/discord.luna", "token", documents=False) == "token-here":
-            print("login()")
 
             def get_token_value():
                 token = dpg.get_value(token_input)
@@ -223,6 +410,7 @@ def login():
                     dpg.set_value(account, "Check the account first")
                     return
                 print("Valid Token Entered")
+
                 json_object = json.load(
                     open(
                         "data/discord.luna",
@@ -236,13 +424,18 @@ def login():
                     "data/discord.luna",
                     json_object
                 )
+
                 print("Token Saved")
                 dpg.set_value(account, "Logging in...")
 
-                # ///////////////////////////////////////////////////////////////
-                dpg.delete_item(item="setup")
+                print(f"Token: {token}")
+                print(f"Check: {check}")
 
-                return login()
+                # ///////////////////////////////////////////////////////////////
+
+                dpg.delete_item(item="setup")
+                print("Returning")
+                return login_thread()
 
             def get_token_user():
                 token = dpg.get_value(token_input)
@@ -261,49 +454,31 @@ def login():
                         headers=headers
                     ).json()
                     dpg.set_value(account, f"Valid Token: {r['username']}#{r['discriminator']}")
+                    return
                 except BaseException:
                     dpg.set_value(account, "Invalid Token")
+                    return
 
-            with dpg.window(label="First Time Setup", tag="setup", width=784, height=600, no_resize=True, no_collapse=True, no_close=True):
+            with dpg.window(label="First Time Setup", tag="setup", width=784, height=600, no_resize=True, no_collapse=True, no_move=True):
                 dpg.add_text("Please enter your Discord token")
-                token_input = dpg.add_input_text(label="Token", default_value="", password=True)
+                token_input = dpg.add_input_text(
+                    label="Token", tag="token", default_value="", password=True
+                )  # mfa.799GSIdRXAlODobCj0DNwN3RMqSIXe6pOOGp8QI3GX0_R4U6uC7XZo7OvUFGZ-QirraFposF1IFU8d4pJ0Ux
                 dpg.add_separator()
                 account = dpg.add_text("Check the account after entering the token")
                 dpg.add_separator()
-                with dpg.group(horizontal=True, label="group_buttons"):
+                with dpg.group(horizontal=True, label="group_buttons1"):
                     dpg.add_button(label="Check", callback=get_token_user)
                     dpg.add_button(label="Login", callback=get_token_value)
+            return
         else:
-            token = files.json("data/discord.luna", "token", documents=False)
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
-                'Content-Type': 'application/json',
-                'authorization': Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)
-            }
-            r = requests.get(
-                f"https://discordapp.com/api/{api_version}/users/@me",
-                headers=headers
-            ).json()
-            print(
-                f"Logging into {color.print_gradient(r['username'])}#{color.print_gradient(r['discriminator'])}..."
-            )
-            dpg.set_value(logged, f"Logging into {r['username']}#{r['discriminator']}...")
-            global user_token
-            user_token = Decryption(
-                '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
-            ).CEA256(token)
-            bot.run(
-                Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(
-                    token
-                ),
-                reconnect=True
-            )
+            login_thread()
 
 
 def file_check(self):
     """Run a check for the files, create if needed."""
     # if self:
-    #     _extracted_from_file_check_4()
+    #     _extracted_from_file_check4()
     # ///////////////////////////////////////////////////////////////
     # Folder Creation
 
@@ -728,8 +903,16 @@ file_check(False)
 
 @bot.event
 async def on_ready():
-    print(f"Logged into {color.print_gradient(bot.user)}")
+    print(f"Logged into {color.print_gradient(bot.user.name)}#{color.print_gradient(bot.user.discriminator)}")
     dpg.set_value(logged, f"Logged into {bot.user}")
+
+    cog = bot.get_cog('Custom commands')
+    try:
+        custom = cog.get_commands()
+        custom_command_count = sum(1 for _ in custom)
+    except BaseException:
+        custom_command_count = 0
+    dpg.set_value(custom_amount_text, f"{custom_command_count} Custom Command Loaded")
 
 
 @bot.command()
@@ -745,14 +928,41 @@ async def privacy(ctx):
     await ctx.message.delete()
     global privacy_mode
     if privacy_mode:
+        now = datetime.now()
+        hour = now.hour
+        username = f"Dev - {os.getlogin()}" if developer_mode else os.getlogin()
+        if hour < 12:
+            greeting = "Good morning"
+        elif hour < 18:
+            greeting = "Good afternoon"
+        else:
+            greeting = "Good evening"
+
+        if files.file_exist('data/auth.json', documents=False):
+            username = files.json(
+                "data/auth.json", "username", documents=False
+            )
+            username = Decryption(
+                '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
+            ).CEA256(username)
+        dpg.set_value(luna_user, f"{greeting}, {username}")
+
         dpg.set_value(logged, f"Logged into {bot.user}")
         privacy_mode = False
         await ctx.send("Privacy mode disabled.")
     else:
+        now = datetime.now()
+        hour = now.hour
+        if hour < 12:
+            greeting = "Good morning"
+        elif hour < 18:
+            greeting = "Good afternoon"
+        else:
+            greeting = "Good evening"
+        dpg.set_value(luna_user, f"{greeting}, Luna")
         dpg.set_value(logged, "Logged into Luna#0000")
         privacy_mode = True
         await ctx.send("Privacy mode enabled.")
-
 
 command_count = len(bot.commands)
 
@@ -774,11 +984,11 @@ with dpg.window(tag="Primary Window", width=200, height=562, no_title_bar=True, 
     dpg.add_image(texture_id, width=75, height=75, pos=(58, 28))
     dpg.add_spacer(height=80)
     dpg.add_separator()
-    dpg.add_text(f"Welcome back, {os.getlogin()}")
+    luna_user = dpg.add_text("Unknown User")
     dpg.add_text("Beta Build V1 (Paid)")
     dpg.add_separator()
     dpg.add_text(f"{command_count} Commands")
-    dpg.add_text("1 Custom Command Loaded")
+    custom_amount_text = dpg.add_text("Loading custom commands...")
     dpg.add_separator()
 
     with dpg.menu_bar():
@@ -863,9 +1073,55 @@ with dpg.theme() as global_theme:
 
         dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
 
-debugger_thread = threading.Thread(target=login)
-debugger_thread.daemon = True
-debugger_thread.start()
+
+class CustomCog(commands.Cog, name="Custom commands"):
+    def __init__(self, bot: commands.bot):
+        self.bot = bot
+
+    try:
+        file_data = ""
+
+        for filename in os.listdir("data/scripts"):
+            if filename.endswith(".py"):
+                file = open(
+                    f"data/scripts/{filename}", "r"
+                )
+                file_data += file.read()
+        file.close()
+
+        if "sys.modules" in str(file_data):
+            prints.error("Using sys.modules is not allowed.")
+            time.sleep(5)
+            os._exit(0)
+        if "import inspect" in str(file_data):
+            prints.error("Importing inspect is not allowed.")
+            time.sleep(5)
+            os._exit(0)
+        if "import dill" in str(file_data):
+            prints.error("Importing dill is not allowed.")
+            time.sleep(5)
+            os._exit(0)
+        if "exec" in str(file_data):
+            prints.error("Using exec is not allowed.")
+            time.sleep(5)
+            os._exit(0)
+        if "auth_luna" in str(file_data):
+            prints.error("\"auth_luna\" not allowed.")
+            time.sleep(5)
+            os._exit(0)
+        if "atlas" in str(file_data):
+            prints.error("\"atlas\" not allowed.")
+            time.sleep(5)
+            os._exit(0)
+        exec(file_data)
+    except Exception as e:
+        prints.error(e)
+        pass
+
+
+bot.add_cog(CustomCog(bot))
+
+login()
 
 dpg.bind_theme(global_theme)
 
