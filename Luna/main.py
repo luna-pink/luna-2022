@@ -1351,10 +1351,10 @@ class notify:
         except BaseException:
             pass
 
-    def webhook(url, description="", name="", error=False):
+    def webhook(self, description="", name="", error=False):
         """Create a webhook notification"""
         try:
-            if url == "":
+            if self == "":
                 prints.error(
                     f"The webhook url can't be empty » {name} » Has been cleared"
                 )
@@ -1364,7 +1364,7 @@ class notify:
                 files.write_json("data/webhooks/url.json", json_object)
 
                 return
-            elif "https://discord.com/api/webhooks/" not in url:
+            elif "https://discord.com/api/webhooks/" not in self:
                 prints.error(
                     f"Invalid webhook url » {name} » Has been cleared"
                 )
@@ -1374,7 +1374,7 @@ class notify:
                 files.write_json("data/webhooks/url.json", json_object)
 
                 return
-            hook = dhooks.Webhook(url=url, avatar_url=webhook.image_url())
+            hook = dhooks.Webhook(url=self, avatar_url=webhook.image_url())
             color = 0x000000
             if error:
                 color = 0xE10959
