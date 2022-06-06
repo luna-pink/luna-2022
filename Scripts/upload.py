@@ -1,3 +1,4 @@
+import contextlib
 import json
 import os
 
@@ -157,17 +158,11 @@ async def on_ready():
     # ///////////////////////////////////////////////////////////////
 
     if not overwrite:
-        try:
+        with contextlib.suppress(BaseException):
             await upload_channel.purge(limit=5)
-        except BaseException:
-            pass
-
     if not overwrite:
-        try:
+        with contextlib.suppress(BaseException):
             await public_upload_channel.purge(limit=5)
-        except BaseException:
-            pass
-
     await public_announcement_channel.send(announcement2)
     await announcement_channel.send(announcement1)
     await public_upload_channel.send(file=discord.File(r'Luna.exe'))

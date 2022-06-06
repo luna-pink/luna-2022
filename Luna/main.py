@@ -304,14 +304,7 @@ class luna:
                     description=f"Starting update {version_url}"
                 )
             luna.update()
-        elif (
-                files.file_exist('data/auth.json', documents=False)
-                or not files.file_exist('data/auth.json', documents=False)
-                and developer_mode
-                or not files.file_exist('data/auth.json', documents=False)
-                and not developer_mode
-                and free_mode
-        ):
+        elif files.file_exist('data/auth.json', documents=False):
             luna.login(True)
         else:
             prints.message("1 = Log into an existing Luna account")
@@ -379,7 +372,7 @@ class luna:
                 luna._extracted_from_login_54(
                     e, "Redirecting to the main menu in 5 seconds » Code 3"
                 )
-        
+
         else:
 
             if not developer_mode and not free_mode:
@@ -2805,49 +2798,59 @@ def update_thread():
         if not update_found:
             time.sleep(300)
 
+
 # def show_gui(username, commmads, custom_commands):
 #     import dearpygui.dearpygui as dpg
-# 
+#
 #     dpg.create_context()
 #     dpg.create_viewport(
 #         title='Luna', width=800, height=600, resizable=False, decorated=True, clear_color=(40, 40, 40, 255), small_icon="data/resources/luna.ico", large_icon="data/resources/luna.ico"
 #     )
-# 
+#
 #     with dpg.window(tag="Primary Window", width=200, height=562, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, no_bring_to_front_on_focus=True):
 #         width, height, channels, data = dpg.load_image("data/resources/luna.png")
-# 
+#
 #         with dpg.texture_registry():
 #             texture_id = dpg.add_static_texture(width, height, data)
-# 
+#
 #         dpg.add_image(texture_id, width=19, height=19, pos=(40, 29))
 #         dpg.add_text("Luna", color=(114, 137, 218, 255))
-#         dpg.add_text(f"Welcome back, {username}")
+#         dpg.add_text(f"Welcome back, {os.getlogin()}")
 #         dpg.add_separator()
-#         dpg.add_text(f"{commmads} Commands")
+#
+#         command_count = len(bot.commands)
+#         cog = bot.get_cog('Custom commands')
+#         try:
+#             custom = cog.get_commands()
+#             custom_command_count = sum(1 for _ in custom)
+#         except BaseException:
+#             custom_command_count = 0
+#
+#         dpg.add_text(f"{command_count - custom_command_count} Commands")
 #         dpg.add_text(f"{custom_commands} Custom Command Loaded")
 #         dpg.add_separator()
 #         # dpg.add_button(label="Save")
 #         # dpg.add_input_text(label="string", default_value="Quick brown fox")
 #         # dpg.add_slider_float(label="float", default_value=0.273, max_value=1)
-# 
+#
 #         with dpg.menu_bar():
 #             with dpg.menu(label="Settings"):
 #                 dpg.add_menu_item(label="Logout")
 #                 dpg.add_menu_item(label="Style Editor", callback=lambda: dpg.show_tool(dpg.mvTool_Style))
 #                 dpg.add_menu_item(label="Debug", callback=lambda: dpg.show_tool(dpg.mvTool_Debug))
-# 
+#
 #     with dpg.window(
 #             tag="Secondary Window", width=584, height=562, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(200, 0), no_bring_to_front_on_focus=True
 #             ):
-#         dpg.add_text("Logged into Nshout#0001")
+#         dpg.add_text(f"Logged into {bot.user}")
 #         dpg.add_separator()
-# 
+#
 #         with dpg.window(label="Sniper Settings", width=260, height=320, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(220, 224)):
 #             dpg.add_text("Default")
-# 
+#
 #         with dpg.window(label="Theme Settings", width=260, height=320, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(500, 224)):
 #             dpg.add_text("Default Theme Selected")
-# 
+#
 #     with dpg.theme() as global_theme:
 #         with dpg.theme_component(dpg.mvAll):
 #             dpg.add_theme_style(dpg.mvStyleVar_WindowRounding, 6, category=dpg.mvThemeCat_Core)
@@ -2855,40 +2858,32 @@ def update_thread():
 #             dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, 6, category=dpg.mvThemeCat_Core)
 #             dpg.add_theme_style(dpg.mvStyleVar_PopupRounding, 6, category=dpg.mvThemeCat_Core)
 #             dpg.add_theme_style(dpg.mvStyleVar_GrabRounding, 6, category=dpg.mvThemeCat_Core)
-# 
+#
 #             dpg.add_theme_color(dpg.mvThemeCol_TabActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
-# 
+#
 #             dpg.add_theme_color(dpg.mvThemeCol_CheckMark, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
-# 
+#
 #             dpg.add_theme_color(dpg.mvThemeCol_SliderGrab, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
 #             dpg.add_theme_color(dpg.mvThemeCol_SliderGrabActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
-# 
+#
 #             dpg.add_theme_color(dpg.mvThemeCol_Button, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
 #             dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (80, 100, 150, 255), category=dpg.mvThemeCat_Core)
 #             dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
-# 
+#
 #             dpg.add_theme_color(dpg.mvThemeCol_HeaderHovered, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
 #             dpg.add_theme_color(dpg.mvThemeCol_HeaderActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
-# 
+#
 #             dpg.add_theme_color(dpg.mvThemeCol_FrameBgHovered, (50, 50, 50, 255), category=dpg.mvThemeCat_Core)
 #             dpg.add_theme_color(dpg.mvThemeCol_FrameBgActive, (80, 100, 150, 255), category=dpg.mvThemeCat_Core)
-# 
+#
 #             dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
-# 
+#
 #     dpg.bind_theme(global_theme)
-# 
+#
 #     dpg.setup_dearpygui()
 #     dpg.show_viewport()
 #     dpg.start_dearpygui()
 #     dpg.destroy_context()
-# 
-# def check_thread(the_thread):
-#     while True:
-#         if the_thread.is_alive():
-#             time.sleep(5)
-#             pass
-#         else:
-#             os._exit(0)
 
 
 def anti_token_logger():
@@ -2943,7 +2938,7 @@ def anti_token_logger():
 
 
 # ///////////////////////////////////////////////////////////////
-# ON_READY
+# ON READY
 
 # bot = Bot(key="Jgy67HUXLH", status=statuscon())
 bot = commands.Bot(
@@ -2963,6 +2958,7 @@ bot = commands.Bot(
 @bot.event
 async def on_ready():
     """Prints a ready log."""
+    await bot.change_presence(afk=True)
     prints.event("Caching...")
     await asyncio.sleep(0.5)
     if files.json(
@@ -3086,9 +3082,6 @@ async def on_ready():
     # gui_thread = threading.Thread(target=show_gui, args=(bot.user.name, command_count - custom_command_count, custom_command_count))
     # gui_thread.daemon = True
     # gui_thread.start()
-    # alive_thread = threading.Thread(target=check_thread, args=gui_thread)
-    # alive_thread.daemon = True
-    # alive_thread.start()
 
 
 # ///////////////////////////////////////////////////////////////
@@ -4670,7 +4663,9 @@ Version\n\n{version}```"
         for command in commands:
             helptext1 += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
 
-        await message_builder(luna, title="Hentai Explorer", description=f"{theme.description()}```\nHScroller\n\nHigh quality anime provided by ThatOneCodeDev\n\n{helptext1}``````\n{helptext}```")
+        await message_builder(
+            luna, title="Hentai Explorer", description=f"{theme.description()}```\nHScroller\n\nHigh quality anime provided by ThatOneCodeDev\n\n{helptext1}``````\n{helptext}```"
+        )
 
     @commands.command(
         name="trolling",
@@ -9340,13 +9335,14 @@ class ToolsCog(commands.Cog, name="Tools commands"):
             "data/raiding/tokens.txt", "r"
         )
         nonempty_lines = [line.strip("\n") for line in file if line != "\n"]
+        line_count = len(nonempty_lines)
         file.close()
 
         if os.stat("data/raiding/tokens.txt").st_size == 0:
             await message_builder(luna, title="Token Check", description="```\ntokens.txt is empty...```")
             return
 
-        await message_builder(luna, title="Token Check", description="```\nChecking tokens...```")
+        await message_builder(luna, title="Token Check", description=f"```\nChecking {line_count} tokens...```")
 
         valid_tokens = []
         success = 0
@@ -11850,6 +11846,7 @@ class AbuseCog(commands.Cog, name="Abusive commands"):
 
 
 bot.add_cog(AbuseCog(bot))
+
 
 class PrivacyCog(commands.Cog, name="Privacy commands"):
     def __init__(self, bot: commands.bot):
@@ -14398,11 +14395,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         else:
             await mode_error(ctx, "on or off")
 
-    # @commands.command(
-    #     name="reload",
-    #     usage="",
-    #     description="Reload custom commands"
-    # )
+    # @commands.command(name="reload", usage="", description="Reload custom commands")
     # async def reload(self, ctx):
     #
     #     path = getattr(sys, '_MEIPASS', os.getcwd())
@@ -15039,14 +15032,15 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
 
 bot.add_cog(CustomizeCog(bot))
 
+
 class HScrollerCog(commands.Cog, name="HScroller commands"):
     def __init__(self, bot: commands.bot):
         self.bot = bot
 
     @commands.command(
-    name="anime",
-    usage="",
-    description="High quality anime"
+        name="anime",
+        usage="",
+        description="High quality anime"
     )
     async def anime(self, luna):
         r = requests.post(
@@ -15055,9 +15049,9 @@ class HScrollerCog(commands.Cog, name="HScroller commands"):
         await message_builder(luna, large_image=str(r[0]['FileURL']))
 
     @commands.command(
-    name="nsfw",
-    usage="",
-    description="High quality nsfw"
+        name="nsfw",
+        usage="",
+        description="High quality nsfw"
     )
     async def nsfw(self, luna):
         r = requests.post(
@@ -15066,9 +15060,9 @@ class HScrollerCog(commands.Cog, name="HScroller commands"):
         await message_builder(luna, large_image=str(r[0]['FileURL']))
 
     @commands.command(
-    name="yuri",
-    usage="",
-    description="High quality yuri"
+        name="yuri",
+        usage="",
+        description="High quality yuri"
     )
     async def yuri(self, luna):
         r = requests.post(
@@ -15076,7 +15070,9 @@ class HScrollerCog(commands.Cog, name="HScroller commands"):
         ).json()
         await message_builder(luna, large_image=str(r[0]['FileURL']))
 
+
 bot.add_cog(HScrollerCog(bot))
+
 
 class HentaiCog(commands.Cog, name="Hentai commands"):
     def __init__(self, bot: commands.bot):

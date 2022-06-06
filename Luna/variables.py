@@ -1,10 +1,9 @@
 import requests
-import asyncpraw
 
 # ///////////////////////////////////////////////////////////////
 # Developer Variables
 
-free_mode = True
+free_mode = False
 developer_mode = False
 
 beta = False
