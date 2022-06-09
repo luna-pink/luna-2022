@@ -6,10 +6,11 @@ import requests
 free_mode = False
 developer_mode = False
 
-beta = False
-version = '2022.2'
+beta = True
+
+version = '2022.26'
 api_version = 'v9'
-beta_version = 'v10'
+beta_version = 'v9'
 
 # ///////////////////////////////////////////////////////////////
 # Luna Variables
@@ -60,11 +61,10 @@ r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 updater_url = r["updater"]
 version_url = r["version"]
 
-r = requests.get(
-    "https://raw.githubusercontent.com/Nshout/Luna/main/beta.json").json()
+r = requests.get("https://pastebin.com/raw/eSGbZgms").json()
 beta_updater_url = r["updater"]
 beta_version_url = r["version"]
-beta_user = r["beta_user"]
+# beta_user = r["beta_user"]
 
 if beta:
     version_url = beta_version_url

@@ -16,6 +16,7 @@ import threading
 import time
 import typing
 import urllib
+import json
 from ctypes import windll
 from datetime import datetime
 from os import error, system
@@ -29,6 +30,8 @@ import psutil
 import pwinput
 import pyPrivnote
 import qrcode
+import sys
+import win32gui, win32con
 from discord import *
 from discord.ext import commands
 from discord.ext.commands import MissingPermissions, CheckFailure, has_permissions
@@ -44,6 +47,27 @@ from Functions import *
 from variables import *
 from Encryption import *
 from Encryption.CEAShim256 import *
+
+def is_admin():
+    admin = ctypes.windll.shell32.IsUserAnAdmin()
+    if admin == 0:
+        return False
+    else:
+        return True
+
+if is_admin():
+    pass
+else:
+    ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+    sys.exit()
+
+# hide = win32gui.GetForegroundWindow()
+# win32gui.ShowWindow(hide , win32con.SW_HIDE)
+
+ctypes.windll.user32.ShowWindow( ctypes.windll.kernel32.GetConsoleWindow(), 0 )
+
+if files.file_exist('Updater.exe'):
+    os.remove('Updater.exe')
 
 # ///////////////////////////////////////////////////////////////
 # Special Variables
@@ -1957,9 +1981,7 @@ class luna:
         r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
         updater_url = r["updater"]
 
-        r = requests.get(
-            "https://raw.githubusercontent.com/Nshout/Luna/main/beta.json"
-        ).json()
+        r = requests.get("https://pastebin.com/raw/eSGbZgms").json()
         beta_updater_url = r["updater"]
 
         url = updater_url
@@ -2157,7 +2179,7 @@ class prints:
         else:
             command_logs += f"{prints.spacer_1}{self}\n"
             dpg.set_value(logs_text, command_logs)
-            return print(f"{prints.spacer_1}{color.print_gradient('Sharing')}{prints.spacer_2}{self}")
+            return print(f"{prints.spacer_1}{color.print_gradient(' info  ')}{prints.spacer_2}{self}")
 
     def message(self):
         """Prints a message log."""
@@ -2260,6 +2282,31 @@ class prints:
 
 
 def login():
+    if version != version_url and not developer_mode:
+        if files.json(
+                "data/notifications/toasts.json",
+                "login",
+                documents=False
+        ) == "on" and files.json(
+            "data/notifications/toasts.json",
+            "toasts",
+            documents=False
+        ) == "on":
+            notify.toast(f"Starting update {version_url}")
+        if (
+                files.json("data/webhooks/webhooks.json", "login", documents=False)
+                == "on"
+                and files.json(
+            "data/webhooks/webhooks.json", "webhooks", documents=False
+        )
+                == "on"
+                and webhook.login_url() != "webhook-url-here"
+        ):
+            notify.webhook(
+                url=webhook.login_url(), name="login",
+                description=f"Starting update {version_url}"
+            )
+        luna.update()
 
     # ///////////////////////////////////////////////////////////////
 
@@ -2309,6 +2356,8 @@ def login():
                     auth_luna.connect()
                     dpg.set_value(status, "Status: Connected to server")
                 except BaseException:
+                    auth_luna.disconnect()
+                    print("Disconnected from server")
                     dpg.set_value(status, "Status: Connection failed, try again later")
                     print("Connection failed, try again later")
                     return
@@ -2319,6 +2368,8 @@ def login():
                         auth_luna.CheckLicenseKeyValidity(invite_value)
                         dpg.set_value(status, "Status: Invite is valid")
                     except BaseException:
+                        auth_luna.disconnect()
+                        print("Disconnected from server")
                         dpg.set_value(status, "Status: Invite is invalid")
                         return
 
@@ -2327,6 +2378,8 @@ def login():
                         auth_luna.CheckLicenseKeyValidity(key_value)
                         dpg.set_value(status, "Status: Key is valid")
                     except BaseException:
+                        auth_luna.disconnect()
+                        print("Disconnected from server")
                         dpg.set_value(status, "Status: Key is invalid")
                         return
 
@@ -2339,10 +2392,12 @@ def login():
                     auth_luna.RedeemEntitlement(invite_value, "inviteSKU")
                     auth_luna.RedeemEntitlement(key_value, "LunaSB")
                     auth_luna.disconnect()
+                    print("Disconnected from server")
                 except BaseException:
                     dpg.set_value(status, "Status: Failed to register")
                     print("Failed to register")
                     auth_luna.disconnect()
+                    print("Disconnected from server")
                     return
 
                 print("Successfully registered")
@@ -2402,8 +2457,10 @@ def login():
                 dpg.set_value(status, f"Status: Logged in. Welcome back, {username_value}")
                 dpg.delete_item(item="auth")
                 auth_luna.disconnect()
+                print("Disconnected from server")
                 return login()
             except Exception as e:
+                auth_luna.disconnect()
                 print(e)
                 dpg.set_value(status, f"Status: {e}")
                 return
@@ -2440,6 +2497,7 @@ def login():
                 auth_luna.connect()
                 print("Connected to server")
             except BaseException:
+                auth_luna.disconnect()
                 print("Failed to connect, try again later")
                 ctypes.windll.user32.MessageBoxW(0, "Failed to connect, try again later", "Error", 0)
                 print(e)
@@ -2456,7 +2514,11 @@ def login():
             auth_luna.ValidateUserHWID(hwid)
             auth_luna.ValidateEntitlement("LunaSB")
             print("Validated")
+            auth_luna.disconnect()
+            print("Disconnected from server")
         except Exception as e:
+            auth_luna.disconnect()
+            print("Disconnected from server")
             print(e)
             ctypes.windll.user32.MessageBoxW(0, e, "Error", 0)
             files.remove('data/auth.luna', documents=False)
@@ -3883,14 +3945,14 @@ Version\n\n{version}```"
                             alias_list += f"{alias}, "
                         alias_list = alias_list[:-2]
                         sent = await luna.send(
-                            f"> **{command_name2.name.title()} Command**\n>n> " f"```\n> Name\n> {command_name2.name}```" f"```\n> Aliases\n> {alias_list}```" f"```\n> Usage\n> None```" f"```\n> Description\n> {command_name2.description}```\n" f"> {theme.footer()}"
+                            f"> **{command_name2.name.title()} Command**\n>   " f"```\n> Name\n> {command_name2.name}```" f"```\n> Aliases\n> {alias_list}```" f"```\n> Usage\n> None```" f"```\n> Description\n> {command_name2.description}```\n" f"> {theme.footer()}"
                         ) if command_name2.usage is None else await luna.send(
-                            f"> **{command_name2.name.title()} Command**\n>n> " f"```\n> Name\n> {command_name2.name}```" f"```\n> Aliases\n> {alias_list}```" f"```\n> Usage\n> {prefix}{command_name2.name} {command_name2.usage}```" f"```\n> Description\n> {command_name2.description}```\n" f"> {theme.footer()}"
+                            f"> **{command_name2.name.title()} Command**\n>   " f"```\n> Name\n> {command_name2.name}```" f"```\n> Aliases\n> {alias_list}```" f"```\n> Usage\n> {prefix}{command_name2.name} {command_name2.usage}```" f"```\n> Description\n> {command_name2.description}```\n" f"> {theme.footer()}"
                         )
 
                     elif command_name2.usage is None:
                         sent = await luna.send(
-                            f"> **{command_name2.name.title()} Command**\n>n> "
+                            f"> **{command_name2.name.title()} Command**\n>   "
                             f"```\n> Name\n> {command_name2.name}```"
                             f"```\n> Aliases\n> None```"
                             f"```\n> Usage\n> None```"
@@ -3899,7 +3961,7 @@ Version\n\n{version}```"
                         )
                     else:
                         sent = await luna.send(
-                            f"> **{command_name2.name.title()} Command**\n>n> "
+                            f"> **{command_name2.name.title()} Command**\n>   "
                             f"```\n> Name\n> {command_name2.name}```"
                             f"```\n> Aliases\n> None```"
                             f"```\n> Usage\n> {prefix}{command_name2.name} {command_name2.usage}```"
