@@ -1,6 +1,12 @@
 from turtle import color
 import dearpygui.dearpygui as dpg
 
+
+# //////////////////////////////////////////////////////////////////////////
+# Create viewport and bind font
+# //////////////////////////////////////////////////////////////////////////
+
+
 dpg.create_context()
 dpg.create_viewport(
     title='Luna', width=760, height=600, resizable=False, decorated=True, clear_color=(114, 137, 218, 255), small_icon="data/resources/luna.ico", large_icon="data/resources/luna.ico"
@@ -10,6 +16,12 @@ with dpg.font_registry():
     default_font = dpg.add_font("C:/Windows/Fonts/arial.ttf", 13)
 
 dpg.bind_font(default_font)
+
+
+# //////////////////////////////////////////////////////////////////////////
+# Create Windows
+# //////////////////////////////////////////////////////////////////////////
+
 
 with dpg.window(tag="side_bar", width=140, height=500, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, no_bring_to_front_on_focus=True, pos=(0, 1)) as side_bar:
     width, height, channels, data = dpg.load_image("data/resources/luna.png")
@@ -56,6 +68,11 @@ with dpg.window(tag="misc_window", width=604, height=500, no_title_bar=True, no_
         dpg.add_text("Misc", indent=3)
 
 
+# //////////////////////////////////////////////////////////////////////////
+# Functions for the bottom bar
+# //////////////////////////////////////////////////////////////////////////
+
+
 def toggle_main_window():
     dpg.show_item("main_window")
     dpg.hide_item("logs_window")
@@ -92,6 +109,11 @@ def toggle_misc_window():
     dpg.hide_item(misc_text)
 
 
+# //////////////////////////////////////////////////////////////////////////
+# Bottom Bar
+# //////////////////////////////////////////////////////////////////////////
+
+
 with dpg.window(tag="bottom_bar", width=744, height=10, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(0, 502), no_bring_to_front_on_focus=True) as bottom_bar:
     with dpg.group(horizontal=True, label="tab_buttons", indent=290, pos=(0, 5)):
 
@@ -117,6 +139,12 @@ with dpg.window(tag="bottom_bar", width=744, height=10, no_title_bar=True, no_re
         main_text_colored = dpg.add_text("Main", indent=6, pos=(0, 40), color=(114, 137, 218, 255))
         logs_text_colored = dpg.add_text("Logs", indent=52, pos=(0, 40), show=False, color=(114, 137, 218, 255))
         misc_text_colored = dpg.add_text("Misc", indent=100, pos=(0, 40), show=False, color=(114, 137, 218, 255))
+
+
+# //////////////////////////////////////////////////////////////////////////
+# Theme Settings
+# //////////////////////////////////////////////////////////////////////////
+
 
 with dpg.theme() as global_theme:
     with dpg.theme_component(dpg.mvAll):
@@ -200,6 +228,12 @@ with dpg.theme() as bottom_bar_theme:
         # dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (41, 41, 41, 255), category=dpg.mvThemeCat_Core)
 
 dpg.bind_item_theme(bottom_bar, bottom_bar_theme)
+
+
+# //////////////////////////////////////////////////////////////////////////
+# Create viewport and context
+# //////////////////////////////////////////////////////////////////////////
+
 
 dpg.setup_dearpygui()
 dpg.show_viewport()

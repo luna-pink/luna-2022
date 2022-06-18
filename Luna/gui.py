@@ -181,7 +181,6 @@ class config:
     def prefix(self):
         """Overwrites the prefix in the config file."""
         json_object = json.load(open("data/config.json", encoding="utf-8"))
-
         json_object["prefix"] = self
         files.write_json("data/config.json", json_object)
 
@@ -2811,37 +2810,37 @@ class OnMessage(commands.Cog, name="on message"):
                             request = requests.Session()
                             setting = {
                                 'status': startup_status,
-                                "custom_status": {"text": f"Charge: [⠀⠀⠀⠀⠀]"}
+                                "custom_status": {"text": f"Ratelimit: [⠀⠀⠀⠀⠀]"}
                             }
                             request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
-                                "custom_status": {"text": f"Charge: [#⠀⠀⠀⠀]"}
+                                "custom_status": {"text": f"Ratelimit: [#⠀⠀⠀⠀]"}
                             }
                             request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
-                                "custom_status": {"text": f"Charge: [##⠀⠀⠀]"}
+                                "custom_status": {"text": f"Ratelimit: [##⠀⠀⠀]"}
                             }
                             request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
-                                "custom_status": {"text": f"Charge: [###⠀⠀]"}
+                                "custom_status": {"text": f"Ratelimit: [###⠀⠀]"}
                             }
                             request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
-                                "custom_status": {"text": f"Charge: [####⠀]"}
+                                "custom_status": {"text": f"Ratelimit: [####⠀]"}
                             }
                             request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
-                                "custom_status": {"text": f"Charge: [#####]"}
+                                "custom_status": {"text": f"Ratelimit: [#####]"}
                             }
                             request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
 
@@ -2943,37 +2942,37 @@ class OnMessage(commands.Cog, name="on message"):
                             request = requests.Session()
                             setting = {
                                 'status': startup_status,
-                                "custom_status": {"text": f"Charge: [⠀⠀⠀⠀⠀]"}
+                                "custom_status": {"text": f"Ratelimit: [⠀⠀⠀⠀⠀]"}
                             }
                             request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
-                                "custom_status": {"text": f"Charge: [#⠀⠀⠀⠀]"}
+                                "custom_status": {"text": f"Ratelimit: [#⠀⠀⠀⠀]"}
                             }
                             request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
-                                "custom_status": {"text": f"Charge: [##⠀⠀⠀]"}
+                                "custom_status": {"text": f"Ratelimit: [##⠀⠀⠀]"}
                             }
                             request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
-                                "custom_status": {"text": f"Charge: [###⠀⠀]"}
+                                "custom_status": {"text": f"Ratelimit: [###⠀⠀]"}
                             }
                             request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
-                                "custom_status": {"text": f"Charge: [####⠀]"}
+                                "custom_status": {"text": f"Ratelimit: [####⠀]"}
                             }
                             request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
-                                "custom_status": {"text": f"Charge: [#####]"}
+                                "custom_status": {"text": f"Ratelimit: [#####]"}
                             }
                             request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
         except Exception as e:
@@ -3737,6 +3736,8 @@ class OnCommand(commands.Cog, name="on command"):
 
     @commands.Cog.listener()
     async def on_command(self, luna: commands.Context):
+        prints.command(luna.command.name)
+
         with contextlib.suppress(discord.NotFound, AttributeError, RuntimeError):
             if "mreact" not in luna.command.name:
                 await asyncio.sleep(0)
@@ -6884,13 +6885,11 @@ class TextCog(commands.Cog, name="Text commands"):
         description="Ascii text"
     )
     async def ascii(self, luna, *, text: str):
-
-        r = requests.get(
-            f'http://artii.herokuapp.com/make?text={urllib.parse.quote_plus(text)}'
-        ).text
-        if len('```' + r + '```') > 2000:
+        r = requests.get(f'http://artii.herokuapp.com/make?text={urllib.parse.quote_plus(text)}').text
+        if len(f'```{r}```') > 2000:
+            await error_builder(luna, description='```Text is too long```')
             return
-        await luna.send(f"```{r}```")
+        await luna.send(f'```{r}```')
 
     @commands.command(
         name="vape",
@@ -6947,7 +6946,7 @@ class TextCog(commands.Cog, name="Text commands"):
     @commands.command(
         name="bold",
         usage="<text>",
-        description="Bold codeblock"
+        scription="Bold codeblock"
     )
     async def bold(self, luna, *, text: str):
 
@@ -7708,14 +7707,9 @@ class ImageCog2(commands.Cog, name="Image commands 2"):
         description="Caution image"
     )
     async def caution(self, luna, *, text: str):
-        embed = discord.Embed(
-            title=theme.title()
-        )
+        embed = discord.Embed(title=theme.title())
         embed.set_footer(text=theme.footer())
-
-        embed.set_image(
-            url=f"https://api.popcat.xyz/caution?text={urllib.parse.quote(str(text))}"
-        )
+        embed.set_image(url=f"https://api.popcat.xyz/caution?text={urllib.parse.quote(str(text))}")
         await send(luna, embed)
 
     @commands.command(
@@ -11928,7 +11922,6 @@ class SettingsCog(commands.Cog, name="Settings commands"):
         description="Change the prefix"
     )
     async def prefix(self, ctx, newprefix):
-
         config.prefix(newprefix)
         bot.command_prefix = newprefix
         prints.message(f"Prefix changed to {newprefix}")
@@ -14249,9 +14242,7 @@ class HentaiCog(commands.Cog, name="Hentai commands"):
         description="Random hentai"
     )
     async def hrandom(self, luna):
-        r = requests.get(
-            "http://api.nekos.fun:8080/api/hentai"
-        ).json()
+        r = requests.get("http://api.nekos.fun:8080/api/hentai").json()
         await message_builder(luna, large_image=str(r['image']))
 
     @commands.command(
@@ -14745,7 +14736,7 @@ class SniperCog(commands.Cog, name="Sniper settings"):
                 request = requests.Session()
                 setting = {
                     'status': startup_status,
-                    "custom_status": {"text": f"Charge: [#####]"}
+                    "custom_status": {"text": f"Ratelimit: [#####]"}
                 }
                 request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
             else:
@@ -16859,7 +16850,7 @@ with dpg.window(tag="secondary_window", width=586, height=562, no_title_bar=True
             request = requests.Session()
             setting = {
                 'status': startup_status,
-                "custom_status": {"text": f"Charge: [#####]"}
+                "custom_status": {"text": f"Ratelimit: [#####]"}
             }
             request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
         else:

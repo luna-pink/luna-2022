@@ -56,16 +56,16 @@ def is_admin():
     else:
         return True
 
-if is_admin():
-    pass
-else:
-    ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
-    sys.exit()
+# if is_admin():
+#     pass
+# else:
+#     ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+#     sys.exit()
 
 # hide = win32gui.GetForegroundWindow()
 # win32gui.ShowWindow(hide , win32con.SW_HIDE)
 
-ctypes.windll.user32.ShowWindow( ctypes.windll.kernel32.GetConsoleWindow(), 0 )
+# ctypes.windll.user32.ShowWindow( ctypes.windll.kernel32.GetConsoleWindow(), 0 )
 
 if files.file_exist('Updater.exe'):
     os.remove('Updater.exe')
