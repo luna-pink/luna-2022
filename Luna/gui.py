@@ -32,6 +32,7 @@ import pyPrivnote
 import qrcode
 import sys
 import win32gui, win32con
+import spotipy
 from discord import *
 from discord.ext import commands
 from discord.ext.commands import MissingPermissions, CheckFailure, has_permissions
@@ -1976,7 +1977,6 @@ class luna:
         Will download the latest Updater.exe and download the latest Luna.exe\n
         Uses the link for the Updater.exe from `updater_url` or `beta_update_url`\n
         """
-        luna.console(False, clear=True)
 
         r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
         updater_url = r["updater"]
@@ -2310,7 +2310,7 @@ def login():
 
     # ///////////////////////////////////////////////////////////////
 
-    if not files.file_exist('data/auth.luna', documents=False):
+    if not files.file_exist('data/auth.luna', documents=False) and not developer_mode:
         def auth_connect(username):
             dpg.set_value(status, "Status: Connecting to server...")
             print("Connecting to Atlas...")
@@ -2339,9 +2339,8 @@ def login():
                 password_value = dpg.get_value(password)
                 confirm_password_value = dpg.get_value(confirm_password)
                 key_value = dpg.get_value(key)
-                invite_value = dpg.get_value(invite)
 
-                if username_value == "" or password_value == "" or confirm_password_value == "" or key_value == "" or invite_value == "":
+                if username_value == "" or password_value == "" or confirm_password_value == "" or key_value == "":
                     dpg.set_value(status, "Status: Please fill in all fields")
                     return
 
@@ -2362,16 +2361,6 @@ def login():
                     print("Connection failed, try again later")
                     return
                 try:
-                    dpg.set_value(status, "Status: Checking Invite...")
-
-                    try:
-                        auth_luna.CheckLicenseKeyValidity(invite_value)
-                        dpg.set_value(status, "Status: Invite is valid")
-                    except BaseException:
-                        auth_luna.disconnect()
-                        print("Disconnected from server")
-                        dpg.set_value(status, "Status: Invite is invalid")
-                        return
 
                     dpg.set_value(status, "Status: Checking Key...")
                     try:
@@ -2389,7 +2378,6 @@ def login():
                     auth_luna.Login(username_value, password_value)
                     dpg.set_value(status, "Status: Logging in...")
                     auth_luna.InitAppUser(hwid)
-                    auth_luna.RedeemEntitlement(invite_value, "inviteSKU")
                     auth_luna.RedeemEntitlement(key_value, "LunaSB")
                     auth_luna.disconnect()
                     print("Disconnected from server")
@@ -2428,7 +2416,6 @@ def login():
                 password = dpg.add_input_text(label="Password", default_value="", password=True, indent=230, width=300)
                 confirm_password = dpg.add_input_text(label="Confirm Password", default_value="", password=True, indent=230, width=300)
                 key = dpg.add_input_text(label="Key", default_value="", indent=230, width=300)
-                invite = dpg.add_input_text(label="Invite", default_value="", indent=230, width=300)
                 dpg.add_separator()
                 status = dpg.add_text("Status: Not Registered.", indent=230)
                 dpg.add_separator()
@@ -2477,52 +2464,55 @@ def login():
                 dpg.add_button(label="Register", callback=auth_register)
                 dpg.add_button(label="Login", callback=auth_login)
     else:
-        try:
-            username = files.json(
-                "data/auth.luna", "username", documents=False
-            )
-            username = Decryption(
-                '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
-            ).CEA256(username)
-
-            password = files.json(
-                "data/auth.luna", "password", documents=False
-            )
-            password = Decryption(
-                '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
-            ).CEA256(password)
-
+        if not developer_mode:
             try:
-                print("Connecting to server...")
-                auth_luna.connect()
-                print("Connected to server")
-            except BaseException:
+                username = files.json(
+                    "data/auth.luna", "username", documents=False
+                )
+                username = Decryption(
+                    '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
+                ).CEA256(username)
+
+                password = files.json(
+                    "data/auth.luna", "password", documents=False
+                )
+                password = Decryption(
+                    '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
+                ).CEA256(password)
+
+                try:
+                    print("Connecting to server...")
+                    auth_luna.connect()
+                    print("Connected to server")
+                except BaseException:
+                    auth_luna.disconnect()
+                    print("Failed to connect, try again later")
+                    ctypes.windll.user32.MessageBoxW(0, "Failed to connect, try again later", "Error", 0)
+                    print(e)
+                    files.remove('data/auth.luna', documents=False)
+                    return login()
+
+                auth_luna.Identify(username)
+                print("Connected to Atlas")
+                auth_luna.Login(username, password)
+                print("Logged in")
+                hwid = str(subprocess.check_output('wmic csproduct get uuid')).split(
+                    '\\r\\n'
+                )[1].strip('\\r').strip()
+                auth_luna.ValidateUserHWID(hwid)
+                auth_luna.ValidateEntitlement("LunaSB")
+                print("Validated")
                 auth_luna.disconnect()
-                print("Failed to connect, try again later")
-                ctypes.windll.user32.MessageBoxW(0, "Failed to connect, try again later", "Error", 0)
+                print("Disconnected from server")
+            except Exception as e:
+                auth_luna.disconnect()
+                print("Disconnected from server")
                 print(e)
+                ctypes.windll.user32.MessageBoxW(0, e, "Error", 0)
                 files.remove('data/auth.luna', documents=False)
                 return login()
-
-            auth_luna.Identify(username)
-            print("Connected to Atlas")
-            auth_luna.Login(username, password)
-            print("Logged in")
-            hwid = str(subprocess.check_output('wmic csproduct get uuid')).split(
-                '\\r\\n'
-            )[1].strip('\\r').strip()
-            auth_luna.ValidateUserHWID(hwid)
-            auth_luna.ValidateEntitlement("LunaSB")
-            print("Validated")
-            auth_luna.disconnect()
-            print("Disconnected from server")
-        except Exception as e:
-            auth_luna.disconnect()
-            print("Disconnected from server")
-            print(e)
-            ctypes.windll.user32.MessageBoxW(0, e, "Error", 0)
-            files.remove('data/auth.luna', documents=False)
-            return login()
+        else:
+            username = "Developer"
 
         now = datetime.now()
         hour = now.hour
@@ -2669,7 +2659,6 @@ def uptime_thread():
             second = 0
             day += 1
 
-
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 # Events
 
@@ -2807,6 +2796,55 @@ class OnMessage(commands.Cog, name="on message"):
                                             f"Request » {elapsed}"
                             )
 
+                        nitro_charge = files.json(
+                            "data/snipers/nitro.json", "charge", documents=False
+                        )
+                        if nitro_charge == "on":
+                            startup_status = files.json(
+                                "data/config.json", "startup_status", documents=False
+                            )
+                            headers = {
+                            'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
+                            'Content-Type': 'application/json',
+                            'Authorization': user_token,
+                            }
+                            request = requests.Session()
+                            setting = {
+                                'status': startup_status,
+                                "custom_status": {"text": f"Charge: [⠀⠀⠀⠀⠀]"}
+                            }
+                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            await asyncio.sleep(1)
+                            setting = {
+                                'status': startup_status,
+                                "custom_status": {"text": f"Charge: [#⠀⠀⠀⠀]"}
+                            }
+                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            await asyncio.sleep(1)
+                            setting = {
+                                'status': startup_status,
+                                "custom_status": {"text": f"Charge: [##⠀⠀⠀]"}
+                            }
+                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            await asyncio.sleep(1)
+                            setting = {
+                                'status': startup_status,
+                                "custom_status": {"text": f"Charge: [###⠀⠀]"}
+                            }
+                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            await asyncio.sleep(1)
+                            setting = {
+                                'status': startup_status,
+                                "custom_status": {"text": f"Charge: [####⠀]"}
+                            }
+                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            await asyncio.sleep(1)
+                            setting = {
+                                'status': startup_status,
+                                "custom_status": {"text": f"Charge: [#####]"}
+                            }
+                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+
             elif files.json(
                     "data/snipers/nitro.json", "sniper",
                     documents=False
@@ -2889,6 +2927,55 @@ class OnMessage(commands.Cog, name="on message"):
                                             f"Sniped » {elapsed_snipe}\n"
                                             f"Request » {elapsed}"
                             )
+
+                        nitro_charge = files.json(
+                            "data/snipers/nitro.json", "charge", documents=False
+                        )
+                        if nitro_charge == "on":
+                            startup_status = files.json(
+                                "data/config.json", "startup_status", documents=False
+                            )
+                            headers = {
+                            'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
+                            'Content-Type': 'application/json',
+                            'Authorization': user_token,
+                            }
+                            request = requests.Session()
+                            setting = {
+                                'status': startup_status,
+                                "custom_status": {"text": f"Charge: [⠀⠀⠀⠀⠀]"}
+                            }
+                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            await asyncio.sleep(1)
+                            setting = {
+                                'status': startup_status,
+                                "custom_status": {"text": f"Charge: [#⠀⠀⠀⠀]"}
+                            }
+                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            await asyncio.sleep(1)
+                            setting = {
+                                'status': startup_status,
+                                "custom_status": {"text": f"Charge: [##⠀⠀⠀]"}
+                            }
+                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            await asyncio.sleep(1)
+                            setting = {
+                                'status': startup_status,
+                                "custom_status": {"text": f"Charge: [###⠀⠀]"}
+                            }
+                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            await asyncio.sleep(1)
+                            setting = {
+                                'status': startup_status,
+                                "custom_status": {"text": f"Charge: [####⠀]"}
+                            }
+                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            await asyncio.sleep(1)
+                            setting = {
+                                'status': startup_status,
+                                "custom_status": {"text": f"Charge: [#####]"}
+                            }
+                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
         except Exception as e:
             prints.error(e)
 
@@ -3846,7 +3933,6 @@ class HelpCog(commands.Cog, name="Help commands"):
 
         command_name2 = None
         stop = False
-
         if commandName is None:
             command_count = len(bot.commands)
             cog = bot.get_cog('Custom commands')
@@ -11845,182 +11931,7 @@ class SettingsCog(commands.Cog, name="Settings commands"):
 
         config.prefix(newprefix)
         bot.command_prefix = newprefix
-        luna.console(False, clear=True)
-        if privacy:
-            command_count = len(bot.commands)
-            cog = bot.get_cog('Custom commands')
-            try:
-                custom = cog.get_commands()
-                custom_command_count = 0
-                for _ in custom:
-                    custom_command_count += 1
-            except BaseException:
-                custom_command_count = 0
-            print(motd.center(os.get_terminal_size().columns))
-            if beta:
-                print("Beta Build".center(os.get_terminal_size().columns))
-            console_mode = files.json(
-                "data/console/console.json", "mode", documents=False
-            )
-            if console_mode == "2":
-                riskmode = files.json(
-                    "data/config.json",
-                    "risk_mode", documents=False
-                )
-                themesvar = files.json(
-                    "data/config.json", "theme", documents=False
-                )
-                deletetimer = int(
-                    files.json(
-                        "data/config.json", "delete_timer", documents=False
-                    )
-                )
-                startup_status = files.json(
-                    "data/config.json", "startup_status", documents=False
-                )
-                nitro_sniper = files.json(
-                    "data/snipers/nitro.json", "sniper", documents=False
-                )
-                giveawayjoiner = files.json(
-                    "data/snipers/giveaway.json", "joiner", documents=False
-                )
-                if themesvar == "default":
-                    pass
-                else:
-                    themesvar = themesvar[:-5]
-                ui_user = f" {color.print_gradient('User:')} {'Luna#0000':<26}"
-                ui_guilds = f" {color.print_gradient('Guilds:')} {'0':<24}"
-                ui_friends = f" {color.print_gradient('Friends:')} {'0':<23}"
-                ui_prefix = f" {color.print_gradient('Prefix:')} {newprefix:<24}"
-                ui_theme = f" {color.print_gradient('Theme:')} {themesvar:<25}"
-                ui_commands = f" {color.print_gradient('Commands:')} {command_count - custom_command_count:<22}"
-                ui_commands_custom = f" {color.print_gradient('Custom Commands:')} {custom_command_count:<15}"
-                ui_nitro_sniper = f" {color.print_gradient('Nitro Sniper:')} {nitro_sniper}"
-                ui_giveaway_sniper = f" {color.print_gradient('Giveaway Joiner:')} {giveawayjoiner}"
-                ui_riskmode = f" {color.print_gradient('Riskmode:')} {riskmode}"
-                ui_deletetimer = f" {color.print_gradient('Delete Timer:')} {deletetimer}"
-                ui_startup = f" {color.print_gradient('Startup Status:')} {startup_status}"
-                print()
-                print(
-                    f"               ═════════════ {color.print_gradient('User')} ═════════════      ═══════════ {color.print_gradient('Settings')} ═══════════"
-                )
-                print(f"               {ui_user}     {ui_prefix}")
-                print(f"               {ui_guilds}     {ui_theme}")
-                print(f"               {ui_friends}     {ui_nitro_sniper}")
-                print(
-                    f"               ════════════════════════════════      {ui_giveaway_sniper}"
-                )
-                print(
-                    f"               ═════════════ {color.print_gradient('Luna')} ═════════════      {ui_riskmode}"
-                )
-                print(f"               {ui_commands}     {ui_deletetimer}")
-                print(f"               {ui_commands_custom}     {ui_startup}")
-                print(
-                    f"               ════════════════════════════════      ════════════════════════════════\n"
-                )
-            else:
-                print()
-                print(
-                    f"                           {color.print_gradient('[')}+{color.print_gradient('] CONNECTED')}"
-                )
-                print(
-                    f"                           {color.print_gradient('[')}+{color.print_gradient(']')} Luna#0000 | {color.print_gradient('0')} Guilds | {color.print_gradient('0')} Friends"
-                )
-                print(
-                    f"                           {color.print_gradient('[')}+{color.print_gradient(']')} {newprefix}\n"
-                )
-        else:
-            command_count = len(bot.commands)
-            cog = bot.get_cog('Custom commands')
-            try:
-                custom = cog.get_commands()
-                custom_command_count = 0
-                for _ in custom:
-                    custom_command_count += 1
-            except BaseException:
-                custom_command_count = 0
-            print(motd.center(os.get_terminal_size().columns))
-            if beta:
-                print("Beta Build".center(os.get_terminal_size().columns))
-            console_mode = files.json(
-                "data/console/console.json", "mode", documents=False
-            )
-            if console_mode == "2":
-                riskmode = files.json(
-                    "data/config.json",
-                    "risk_mode", documents=False
-                )
-                themesvar = files.json(
-                    "data/config.json", "theme", documents=False
-                )
-                deletetimer = int(
-                    files.json(
-                        "data/config.json", "delete_timer", documents=False
-                    )
-                )
-                startup_status = files.json(
-                    "data/config.json", "startup_status", documents=False
-                )
-                nitro_sniper = files.json(
-                    "data/snipers/nitro.json", "sniper", documents=False
-                )
-                giveawayjoiner = files.json(
-                    "data/snipers/giveaway.json", "joiner", documents=False
-                )
-                if themesvar == "default":
-                    pass
-                else:
-                    themesvar = themesvar[:-5]
-                bot_user = f"{bot.user}"
-                ui_user = f" {color.print_gradient('User:')} {bot_user:<26}"
-                ui_guilds = f" {color.print_gradient('Guilds:')} {len(bot.guilds):<24}"
-                ui_friends = f" {color.print_gradient('Friends:')} {len(bot.user.friends):<23}"
-                ui_prefix = f" {color.print_gradient('Prefix:')} {newprefix:<24}"
-                ui_theme = f" {color.print_gradient('Theme:')} {themesvar:<25}"
-                ui_commands = f" {color.print_gradient('Commands:')} {command_count - custom_command_count:<22}"
-                ui_commands_custom = f" {color.print_gradient('Custom Commands:')} {custom_command_count:<15}"
-                ui_nitro_sniper = f" {color.print_gradient('Nitro Sniper:')} {nitro_sniper}"
-                ui_giveaway_sniper = f" {color.print_gradient('Giveaway Joiner:')} {giveawayjoiner}"
-                ui_riskmode = f" {color.print_gradient('Riskmode:')} {riskmode}"
-                ui_deletetimer = f" {color.print_gradient('Delete Timer:')} {deletetimer}"
-                ui_startup = f" {color.print_gradient('Startup Status:')} {startup_status}"
-                print()
-                print(
-                    f"               ═════════════ {color.print_gradient('User')} ═════════════      ═══════════ {color.print_gradient('Settings')} ═══════════"
-                )
-                print(f"               {ui_user}     {ui_prefix}")
-                print(f"               {ui_guilds}     {ui_theme}")
-                print(f"               {ui_friends}     {ui_nitro_sniper}")
-                print(
-                    f"               ════════════════════════════════      {ui_giveaway_sniper}"
-                )
-                print(
-                    f"               ═════════════ {color.print_gradient('Luna')} ═════════════      {ui_riskmode}"
-                )
-                print(f"               {ui_commands}     {ui_deletetimer}")
-                print(f"               {ui_commands_custom}     {ui_startup}")
-                print(
-                    f"               ════════════════════════════════      ════════════════════════════════\n"
-                )
-            else:
-                print()
-                print(
-                    f"                           {color.print_gradient('[')}+{color.print_gradient('] CONNECTED')}"
-                )
-                print(
-                    f"                           {color.print_gradient('[')}+{color.print_gradient(']')} "
-                    f"{bot.user} | "
-                    f"{color.print_gradient(f'{len(bot.guilds)}')} Guilds | "
-                    f"{color.print_gradient(f'{len(bot.user.friends)}')} Friends"
-                )
-                print(
-                    f"                           {color.print_gradient('[')}+{color.print_gradient(']')} {newprefix}\n"
-                )
-        print(f"═══════════════════════════════════════════════════════════════════════════════════════════════════\n")
-        prints.message(
-            f"{color.print_gradient(f'{command_count - custom_command_count}')} commands | {color.print_gradient(f'{custom_command_count}')} custom commands"
-        )
-        prints.message(f"Prefix changed to {color.print_gradient(f'{newprefix}')}")
+        prints.message(f"Prefix changed to {newprefix}")
         await message_builder(ctx, description=f"```\nPrefix changed to {newprefix}```")
 
     @commands.command(
@@ -13735,7 +13646,7 @@ async def {name}(self, luna):
     await luna.send("Documentation for custom commands can be found here: https://www.team-luna.org/documentation")
 """
         files.write_file(f"data/scripts/{name}.py", content, documents=False, append=True)
-        await message_builder(ctx, description=f"```\nCreated new custom command in \"Documents/data/scripts/{name}.py\"```")
+        await message_builder(ctx, description=f"```\nCreated new custom command in \"data/scripts/{name}.py\"```")
 
     @commands.command(
         name="darkmode",
@@ -14818,16 +14729,40 @@ class SniperCog(commands.Cog, name="Sniper settings"):
         description="Sniper visual charge"
     )
     async def snipercharge(self, luna, mode: str):
-
-        global charge_sniper
         if mode == "on" or mode == "off":
             prints.message(f"Nitro sniper charge » {mode}")
             config._global("data/snipers/nitro.json", "charge", mode)
-            if mode == "on":
-                charge_sniper = True
-            elif mode == "off":
-                charge_sniper = False
             await message_builder(luna, description=f"```\nNitro sniper charge » {mode}```")
+            if mode == "on":
+                startup_status = files.json(
+                "data/config.json", "startup_status", documents=False
+                )
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
+                    'Content-Type': 'application/json',
+                    'Authorization': user_token,
+                }
+                request = requests.Session()
+                setting = {
+                    'status': startup_status,
+                    "custom_status": {"text": f"Charge: [#####]"}
+                }
+                request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+            else:
+                startup_status = files.json(
+                    "data/config.json", "startup_status", documents=False
+                )
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
+                    'Content-Type': 'application/json',
+                    'Authorization': user_token,
+                }
+                request = requests.Session()
+                setting = {
+                    'status': startup_status,
+                    "custom_status": {"text": f""}
+                }
+                request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
         else:
             await mode_error(luna, "on or off")
 
@@ -16336,6 +16271,14 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 
         r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
         version_url = r["version"]
+
+        r = requests.get("https://pastebin.com/raw/eSGbZgms").json()
+        beta_version_url = r["version"]
+        
+        if beta:
+            prints.message("Beta Build")
+            version_url = beta_version_url
+
         if developer_mode:
             await message_builder(
                 luna, title="Update",
@@ -16371,7 +16314,36 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
                     description=f"Starting update {version_url}"
                 )
             await message_builder(luna, title="Update", description=f"```\nStarted update » {version_url}```")
-            luna.update()
+
+            r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
+            updater_url = r["updater"]
+
+            r = requests.get("https://pastebin.com/raw/eSGbZgms").json()
+            beta_updater_url = r["updater"]
+
+            url = updater_url
+            if beta:
+                prints.message("Beta Build")
+                url = beta_updater_url
+            prints.event("Downloading Updater...")
+            from clint.textui import progress
+            r = requests.get(url, stream=True)
+            with open('Updater.exe', 'wb') as f:
+                total_length = int(r.headers.get('content-length'))
+                for chunk in progress.bar(
+                        r.iter_content(
+                            chunk_size=1024
+                        ), expected_size=(
+                                                total_length / 1024) + 1
+                ):
+                    if chunk:
+                        f.write(chunk)
+                        f.flush()
+                f.close()
+            time.sleep(3)
+            prints.event("Starting Updater.exe...")
+            os.startfile('Updater.exe')
+            os._exit(0)
 
     @commands.command(
         name="restart",
@@ -16742,12 +16714,13 @@ dpg.create_context()
 dpg.create_viewport(
     title='Luna', width=790, height=590, resizable=False, decorated=True, clear_color=(40, 40, 40, 255), small_icon="data/resources/luna.ico", large_icon="data/resources/luna.ico"
 )
+
 with dpg.font_registry():
     default_font = dpg.add_font("C:/Windows/Fonts/arial.ttf", 13)
 
 dpg.bind_font(default_font)
 
-with dpg.window(tag="Primary Window", width=200, height=562, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, no_bring_to_front_on_focus=True):
+with dpg.window(tag="primary_window", width=200, height=562, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, no_bring_to_front_on_focus=True):
     width, height, channels, data = dpg.load_image("data/resources/luna.png")
 
     with dpg.texture_registry():
@@ -16757,7 +16730,10 @@ with dpg.window(tag="Primary Window", width=200, height=562, no_title_bar=True, 
     dpg.add_spacer(height=80)
     dpg.add_separator()
     luna_user = dpg.add_text("Unknown User")
-    dpg.add_text("Beta Build V1 (Paid)")
+    dpg.add_text(f"Luna Platinum V{version}")
+    dpg.add_separator()
+    prefix = files.json("data/config.json", "prefix", documents=False)
+    gui_prefix = dpg.add_text(f"Prefix: {prefix}")
     dpg.add_separator()
     dpg.add_text(f"{command_count} Commands")
     custom_amount_text = dpg.add_text("Loading custom commands...")
@@ -16773,18 +16749,18 @@ with dpg.window(tag="Primary Window", width=200, height=562, no_title_bar=True, 
         os._exit(0)
 
     with dpg.menu_bar():
-        with dpg.menu(label="Settings"):
+        with dpg.menu(label="Settings", tag="settings_bar"):
             dpg.add_menu_item(label="Logout Account", callback=close_account)
             dpg.add_menu_item(label="Logout Token", callback=close_token)
             dpg.add_menu_item(label="Style Editor", callback=lambda: dpg.show_tool(dpg.mvTool_Style))
             dpg.add_menu_item(label="Font Manager", callback=lambda: dpg.show_tool(dpg.mvTool_Font))
             dpg.add_menu_item(label="Metrics", callback=lambda: dpg.show_tool(dpg.mvTool_Metrics))
-            dpg.add_menu_item(label="Debug", callback=lambda: dpg.show_tool(dpg.mvTool_Debug))
+            # dpg.add_menu_item(label="Debug", callback=lambda: dpg.show_tool(dpg.mvTool_Debug))
 
-    with dpg.window(label="Logs", width=200, height=322, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(0, 240)):
+    with dpg.window(label="Logs", tag="logs", width=200, height=298, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(0, 264)):
         logs_text = dpg.add_text("No Commands Used Yet")
 
-with dpg.window(tag="Secondary Window", width=586, height=562, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(199, 0), no_bring_to_front_on_focus=True):
+with dpg.window(tag="secondary_window", width=586, height=562, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(199, 0), no_bring_to_front_on_focus=True):
     logged = dpg.add_text("Idle")
     dpg.add_separator()
 
@@ -16872,14 +16848,57 @@ with dpg.window(tag="Secondary Window", width=586, height=562, no_title_bar=True
         if app_data:
             prints.message(f"Nitro sniper charge » on")
             config._global("data/snipers/nitro.json", "charge", "on")
+            startup_status = files.json(
+                "data/config.json", "startup_status", documents=False
+            )
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
+                'Content-Type': 'application/json',
+                'Authorization': user_token,
+            }
+            request = requests.Session()
+            setting = {
+                'status': startup_status,
+                "custom_status": {"text": f"Charge: [#####]"}
+            }
+            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
         else:
             prints.message(f"Nitro sniper charge » off")
             config._global("data/snipers/nitro.json", "charge", "off")
+            startup_status = files.json(
+                "data/config.json", "startup_status", documents=False
+            )
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
+                'Content-Type': 'application/json',
+                'Authorization': user_token,
+            }
+            request = requests.Session()
+            setting = {
+                'status': startup_status,
+                "custom_status": {"text": f""}
+            }
+            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
 
 
     def delay_control(sender, app_data, user_data):
-        prints.message(f"Auto delete timer » {str(app_data)}")
-        config.giveaway.delay_in_minutes(f"{app_data}") 
+        minutes_value = dpg.get_value(minutes_slider)
+        prints.message(f"Giveaway joiner delay » {str(minutes_value)}")
+        config.giveaway.delay_in_minutes(f"{minutes_value}") 
+
+
+    def prefix_control(sender, app_data, user_data):
+        prefix_value = dpg.get_value(gui_input_prefix)
+        prints.message(f"Prefix » {str(prefix_value)}")
+        bot.command_prefix = prefix_value
+        config.prefix(prefix_value)
+        dpg.set_value(gui_prefix, f"Prefix: {prefix_value}")
+
+
+    def timer_control(sender, app_data, user_data):
+        timer_value = dpg.get_value(gui_delete_timer)
+        config.delete_timer(f"{timer_value}")
+        prints.message(f"Auto delete timer » {str(timer_value)}")
 
 
     def joiner_control(sender, app_data, user_data):
@@ -16891,7 +16910,7 @@ with dpg.window(tag="Secondary Window", width=586, height=562, no_title_bar=True
             config.giveaway.guild_joiner("off")
 
 
-    with dpg.window(label="Sniper Settings", width=260, height=320, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(220, 224)):
+    with dpg.window(label="Sniper Settings", tag="sniper_settings", width=260, height=319, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(220, 228)):
         nitro_sniper = files.json(
             "data/snipers/nitro.json", "sniper", documents=False
         )
@@ -16899,7 +16918,6 @@ with dpg.window(tag="Secondary Window", width=586, height=562, no_title_bar=True
             nitro_sniper = True
         else:
             nitro_sniper = False
-        dpg.add_checkbox(label="Nitro Sniper", default_value=nitro_sniper, callback=nitro_control)
 
         giveaway_joiner = files.json(
             "data/snipers/giveaway.json", "joiner", documents=False
@@ -16908,7 +16926,6 @@ with dpg.window(tag="Secondary Window", width=586, height=562, no_title_bar=True
             giveaway_joiner = True
         else:
             giveaway_joiner = False
-        dpg.add_checkbox(label="Giveaway Sniper", default_value=giveaway_joiner, callback=giveaway_control)
 
         privnote_sniper = files.json(
             "data/snipers/privnote.json", "sniper", documents=False
@@ -16917,9 +16934,6 @@ with dpg.window(tag="Secondary Window", width=586, height=562, no_title_bar=True
             privnote_sniper = True
         else:
             privnote_sniper = False
-        dpg.add_checkbox(label="Privnote Sniper", default_value=privnote_sniper, callback=privnote_control)
-        dpg.add_separator()
-        dpg.add_text("Nitro Sniper")
     
         nitro_charge = files.json(
             "data/snipers/nitro.json", "charge", documents=False
@@ -16928,15 +16942,11 @@ with dpg.window(tag="Secondary Window", width=586, height=562, no_title_bar=True
             nitro_charge = True
         else:
             nitro_charge = False
-        dpg.add_checkbox(label="Charge Status", default_value=nitro_charge, callback=charge_control)
-        dpg.add_separator()
-        dpg.add_text("Giveaway Sniper")
 
         delay_in_minutes = files.json(
             "data/snipers/giveaway.json", "delay_in_minutes", documents=False
         )
         delay_in_minutes = int(delay_in_minutes)
-        dpg.add_slider_int(label="Minutes", default_value=delay_in_minutes, min_value=1, max_value=10, callback=delay_control)
 
         guild_joiner = files.json(
             "data/snipers/giveaway.json", "guild_joiner", documents=False
@@ -16945,7 +16955,36 @@ with dpg.window(tag="Secondary Window", width=586, height=562, no_title_bar=True
             guild_joiner = True
         else:
             guild_joiner = False
-        dpg.add_checkbox(label="Guild Joiner", default_value=guild_joiner, callback=joiner_control)
+
+        prefix = files.json("data/config.json", "prefix", documents=False)
+
+        gui_delete_timer = files.json(
+            "data/config.json", "delete_timer", documents=False
+        )
+        gui_delete_timer = int(gui_delete_timer)
+
+        dpg.add_checkbox(label="Nitro Sniper", default_value=nitro_sniper, callback=nitro_control)
+        dpg.add_checkbox(label="Giveaway Sniper", default_value=giveaway_joiner, callback=giveaway_control)
+        dpg.add_checkbox(label="Privnote Sniper", default_value=privnote_sniper, callback=privnote_control)
+        # dpg.add_spacer(height=1)
+        dpg.add_separator()
+        dpg.add_text("Nitro Sniper")
+        dpg.add_checkbox(label="Charge Status", default_value=nitro_charge, callback=charge_control)
+        # dpg.add_spacer(height=1)
+        dpg.add_separator()
+        dpg.add_text("Giveaway Sniper")
+        minutes_slider = dpg.add_slider_int(label="Minutes", default_value=delay_in_minutes, min_value=1, max_value=60)
+        with dpg.group(horizontal=True, label="group_buttons"):
+            dpg.add_button(label="Save", callback=delay_control)
+            dpg.add_checkbox(label="Guild Joiner", default_value=guild_joiner, callback=joiner_control)
+        dpg.add_separator()
+        dpg.add_text("General Settings")
+        gui_input_prefix = dpg.add_input_text(label="Prefix", default_value=prefix)
+        gui_delete_timer = dpg.add_slider_int(label="Delete Timer", default_value=gui_delete_timer, min_value=0, max_value=300)
+        with dpg.group(horizontal=True, label="group_buttons"):
+            dpg.add_button(label="Save Prefix", callback=prefix_control)
+            dpg.add_button(label="Save Delete Timer", callback=timer_control)
+
 
     
     path_to_json = 'data/themes/'
@@ -17044,7 +17083,12 @@ with dpg.window(tag="Secondary Window", width=586, height=562, no_title_bar=True
         prints.message(f"Changed theme » {theme_name}")
 
 
-    with dpg.window(label="Theme Settings", width=260, height=320, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(500, 224)):
+    with dpg.window(label="Theme Settings", tag="theme_settings", width=260, height=319, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(500, 228)):
+
+        protections_footer = files.json(
+            "data/protections/config.json", "footer", documents=False
+        )
+
         selected_theme = dpg.add_text(f"Active Theme: {themesvar}")
         dpg.add_separator()
         dpg.add_text("Available Themes")
@@ -17053,11 +17097,9 @@ with dpg.window(tag="Secondary Window", width=586, height=562, no_title_bar=True
             dpg.add_button(label="Reload", callback=reload_themes)
             dpg.add_button(label="Delete", callback=delete_selected)
 
+        dpg.add_spacer(height=1)
         dpg.add_separator()
 
-        protections_footer = files.json(
-            "data/protections/config.json", "footer", documents=False
-        )
         dpg.add_checkbox(label="Protections Footer", default_value=protections_footer, callback=protections_footer_control)
         dpg.add_separator()
         dpg.add_text("Theme Editor")
@@ -17093,7 +17135,8 @@ with dpg.theme() as global_theme:
         dpg.add_theme_color(dpg.mvThemeCol_FrameBgHovered, (50, 50, 50, 255), category=dpg.mvThemeCat_Core)
         dpg.add_theme_color(dpg.mvThemeCol_FrameBgActive, (80, 100, 150, 255), category=dpg.mvThemeCat_Core)
 
-        dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+        # dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, (51, 51, 55, 255), category=dpg.mvThemeCat_Core)
         dpg.add_theme_color(dpg.mvThemeCol_TitleBg, (51, 51, 55, 255), category=dpg.mvThemeCat_Core)
 
 
@@ -17142,7 +17185,6 @@ class CustomCog(commands.Cog, name="Custom commands"):
     except Exception as e:
         prints.error(e)
         pass
-
 
 bot.add_cog(CustomCog(bot))
 

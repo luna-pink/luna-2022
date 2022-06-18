@@ -11293,8 +11293,7 @@ class AllCog(commands.Cog, name="All commands"):
                 pass
         else:
             await error_builder(luna, description="```\nRiskmode is disabled```")
-
-
+            
 bot.add_cog(AllCog(bot))
 
 
@@ -17126,6 +17125,10 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         description="Restart Luna"
     )
     async def restart(self, luna):
+        try:
+            await luna.message.delete()
+        except BaseException:
+            pass
 
         # if configs.mode() == 2:
         # 	sent = await luna.send(f"```ini\n[ Restarting ]\n\nAllow up to 5 seconds\n\n[ {theme.footer()} ]```")
@@ -17152,7 +17155,10 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         description="Shutdown Luna"
     )
     async def shutdown(self, luna):
-
+        try:
+            await luna.message.delete()
+        except BaseException:
+            pass
         os._exit(0)
 
     @commands.command(

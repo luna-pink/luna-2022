@@ -8,7 +8,7 @@ developer_mode = False
 
 beta = True
 
-version = '2022.26'
+version = '2022.28'
 api_version = 'v9'
 beta_version = 'v9'
 
