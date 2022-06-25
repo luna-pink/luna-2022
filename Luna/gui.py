@@ -48,6 +48,7 @@ from Functions import *
 from variables import *
 from Encryption import *
 from Encryption.CEAShim256 import *
+from gui_module import *
 
 def is_admin():
     admin = ctypes.windll.shell32.IsUserAnAdmin()
@@ -56,16 +57,13 @@ def is_admin():
     else:
         return True
 
-if is_admin():
-    pass
-else:
-    ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
-    sys.exit()
+# if is_admin():
+#     pass
+# else:
+#     ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+#     sys.exit()
 
-# hide = win32gui.GetForegroundWindow()
-# win32gui.ShowWindow(hide , win32con.SW_HIDE)
-
-ctypes.windll.user32.ShowWindow( ctypes.windll.kernel32.GetConsoleWindow(), 0 )
+# ctypes.windll.user32.ShowWindow( ctypes.windll.kernel32.GetConsoleWindow(), 0 )
 
 if files.file_exist('Updater.exe'):
     os.remove('Updater.exe')
@@ -73,7 +71,7 @@ if files.file_exist('Updater.exe'):
 # ///////////////////////////////////////////////////////////////
 # Special Variables
 
-command_logs = ""
+luna_user_id = "Unknown"
 
 logo = """  *                        o              +                 *                 .
        O                     .              .                      .                   *
@@ -1946,7 +1944,7 @@ def restart_program():
 
 auth_luna = Atlas(
     "45.41.240.7", 9696,
-    "97555040593864335346", "RPstUMSxDn9qXLnABEt3UdwZnJnBfNSa"
+    "41014302915357696839", "SqpozXfd6dbv5KdNLvtefJjudikBkbbp"
 )
 
 motd = urllib.request.urlopen(
@@ -2138,12 +2136,12 @@ class prints:
                 "timestamp",
                 documents=False
         ):
-            command_logs += f"{strftime('%H:%M', localtime())}{prints.spacer_1}{get_prefix()}{self}\n"
-            dpg.set_value(logs_text, command_logs)
+            command_logs += f"{strftime('%H:%M', localtime())}{prints.spacer_1}Command{prints.spacer_2}{get_prefix()}{self}\n"
+            dpg.set_value(logs_block, command_logs)
             return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient('Command')}{prints.spacer_2}{get_prefix()}{self}")
         else:
-            command_logs += f"{prints.spacer_1}{get_prefix()}{self}\n"
-            dpg.set_value(logs_text, command_logs)
+            command_logs += f"{prints.spacer_1}Command{prints.spacer_2}{get_prefix()}{self}\n"
+            dpg.set_value(logs_block, command_logs)
             return print(f"{prints.spacer_1}{color.print_gradient('Command')}{prints.spacer_2}{get_prefix()}{self}")
 
     def shared(self):
@@ -2154,13 +2152,13 @@ class prints:
                 "timestamp",
                 documents=False
         ):
-            command_logs += f"{strftime('%H:%M', localtime())}{prints.spacer_1}{get_prefix()}{self}\n"
-            dpg.set_value(logs_text, command_logs)
+            command_logs += f"{strftime('%H:%M', localtime())}{prints.spacer_1}Sharing{prints.spacer_2}{get_prefix()}{self}\n"
+            dpg.set_value(logs_block, command_logs)
             return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient('Sharing')}{prints.spacer_2}{get_prefix()}{self}")
 
         else:
-            command_logs += f"{prints.spacer_1}{get_prefix()}{self}\n"
-            dpg.set_value(logs_text, command_logs)
+            command_logs += f"{prints.spacer_1}Sharing{prints.spacer_2}{get_prefix()}{self}\n"
+            dpg.set_value(logs_block, command_logs)
             return print(f"{prints.spacer_1}{color.print_gradient('Sharing')}{prints.spacer_2}{get_prefix()}{self}")
 
     def info(self):
@@ -2171,14 +2169,14 @@ class prints:
                 "timestamp",
                 documents=False
         ):
-            command_logs += f"{strftime('%H:%M', localtime())}{prints.spacer_1}{self}\n"
-            dpg.set_value(logs_text, command_logs)
-            return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient(' info  ')}{prints.spacer_2}{self}")
+            command_logs += f"{strftime('%H:%M', localtime())}{prints.spacer_1} Info  {prints.spacer_2}{self}\n"
+            dpg.set_value(logs_block, command_logs)
+            return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient(' Info  ')}{prints.spacer_2}{self}")
 
         else:
-            command_logs += f"{prints.spacer_1}{self}\n"
-            dpg.set_value(logs_text, command_logs)
-            return print(f"{prints.spacer_1}{color.print_gradient(' info  ')}{prints.spacer_2}{self}")
+            command_logs += f"{prints.spacer_1} Info  {prints.spacer_2}{self}\n"
+            dpg.set_value(logs_block, command_logs)
+            return print(f"{prints.spacer_1}{color.print_gradient(' Info  ')}{prints.spacer_2}{self}")
 
     def message(self):
         """Prints a message log."""
@@ -2188,13 +2186,13 @@ class prints:
                 "timestamp",
                 documents=False
         ):
-            command_logs += f"{strftime('%H:%M', localtime())}{prints.spacer_1}{self}\n"
-            dpg.set_value(logs_text, command_logs)
+            command_logs += f"{strftime('%H:%M', localtime())}{prints.spacer_1}Message{prints.spacer_2}{self}\n"
+            dpg.set_value(logs_block, command_logs)
             return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient('Message')}{prints.spacer_2}{self}")
 
         else:
-            command_logs += f"{prints.spacer_1}{self}\n"
-            dpg.set_value(logs_text, command_logs)
+            command_logs += f"{prints.spacer_1}Message{prints.spacer_2}{self}\n"
+            dpg.set_value(logs_block, command_logs)
             return print(f"{prints.spacer_1}{color.print_gradient('Message')}{prints.spacer_2}{self}")
 
     def sniper(self):
@@ -2205,13 +2203,13 @@ class prints:
                 "timestamp",
                 documents=False
         ):
-            command_logs += f"{strftime('%H:%M', localtime())}{prints.spacer_1}{self}\n"
-            dpg.set_value(logs_text, command_logs)
+            command_logs += f"{strftime('%H:%M', localtime())}{prints.spacer_1}Sniper {prints.spacer_2}{self}\n"
+            dpg.set_value(logs_block, command_logs)
             return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient('Sniper ')}{prints.spacer_2}{self}")
 
         else:
-            command_logs += f"{prints.spacer_1}{self}\n"
-            dpg.set_value(logs_text, command_logs)
+            command_logs += f"{prints.spacer_1}Sniper {prints.spacer_2}{self}\n"
+            dpg.set_value(logs_block, command_logs)
             return print(f"{prints.spacer_1}{color.print_gradient('Sniper ')}{prints.spacer_2}{self}")
 
     def event(self):
@@ -2222,13 +2220,13 @@ class prints:
                 "timestamp",
                 documents=False
         ):
-            command_logs += f"{strftime('%H:%M', localtime())}{prints.spacer_1}{self}\n"
-            dpg.set_value(logs_text, command_logs)
+            command_logs += f"{strftime('%H:%M', localtime())}{prints.spacer_1} Event {prints.spacer_2}{self}\n"
+            dpg.set_value(logs_block, command_logs)
             return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient(' Event ')}{prints.spacer_2}{self}")
 
         else:
-            command_logs += f"{prints.spacer_1}{self}\n"
-            dpg.set_value(logs_text, command_logs)
+            command_logs += f"{prints.spacer_1} Event {prints.spacer_2}{self}\n"
+            dpg.set_value(logs_block, command_logs)
             return print(f"{prints.spacer_1}{color.print_gradient(' Event ')}{prints.spacer_2}{self}")
 
     def selfbot(self):
@@ -2239,13 +2237,13 @@ class prints:
                 "timestamp",
                 documents=False
         ):
-            command_logs += f"{strftime('%H:%M', localtime())}{prints.spacer_1}{self}\n"
-            dpg.set_value(logs_text, command_logs)
+            command_logs += f"{strftime('%H:%M', localtime())}{prints.spacer_1}Selfbot{prints.spacer_2}{self}\n"
+            dpg.set_value(logs_block, command_logs)
             return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.print_gradient('Selfbot')}{prints.spacer_2}{self}")
 
         else:
-            command_logs += f"{prints.spacer_1}{self}\n"
-            dpg.set_value(logs_text, command_logs)
+            command_logs += f"{prints.spacer_1}Selfbot{prints.spacer_2}{self}\n"
+            dpg.set_value(logs_block, command_logs)
             return print(f"{prints.spacer_1}{color.print_gradient('Selfbot')}{prints.spacer_2}{self}")
 
     def error(self):
@@ -2256,13 +2254,13 @@ class prints:
                 "timestamp",
                 documents=False
         ):
-            command_logs += f"{strftime('%H:%M', localtime())}{prints.spacer_1}{self}\n"
-            dpg.set_value(logs_text, command_logs)
+            command_logs += f"{strftime('%H:%M', localtime())}{prints.spacer_1} Error {prints.spacer_2}{self}\n"
+            dpg.set_value(logs_block, command_logs)
             return print(f"{strftime('%H:%M', localtime())}{prints.spacer_1}{color.error} Error {color.reset}{prints.spacer_2}{self}")
 
         else:
-            command_logs += f"{prints.spacer_1}{self}\n"
-            dpg.set_value(logs_text, command_logs)
+            command_logs += f"{prints.spacer_1} Error {prints.spacer_2}{self}\n"
+            dpg.set_value(logs_block, command_logs)
             return print(f'{prints.spacer_1}{color.error} Error {color.reset}{prints.spacer_2}{self}')
 
     def input(self):
@@ -2408,7 +2406,7 @@ def login():
             def close_register():
                 dpg.delete_item(item="register")
 
-            with dpg.window(label="Register", tag="register", width=784, height=600, no_resize=True, no_collapse=True, no_close=True):
+            with dpg.window(label="Register", tag="register", width=744, height=600, no_resize=True, no_collapse=True, no_close=True):
                 dpg.add_spacer(height=140)
                 dpg.add_text("Register", indent=230)
                 username = dpg.add_input_text(label="Username", default_value="", indent=230, width=300)
@@ -2423,6 +2421,7 @@ def login():
                     dpg.add_button(label="Back To Login", callback=close_register)
 
         def auth_login():
+            global luna_user_id
             username_value = dpg.get_value(username)
             password_value = dpg.get_value(password)
             if username_value == "" or password_value == "":
@@ -2442,6 +2441,7 @@ def login():
                 files.write_json("data/auth.luna", data, documents=False)
                 dpg.set_value(status, f"Status: Logged in. Welcome back, {username_value}")
                 dpg.delete_item(item="auth")
+                luna_user_id = auth_luna.GetUserUID()
                 auth_luna.disconnect()
                 print("Disconnected from server")
                 return login()
@@ -2451,7 +2451,7 @@ def login():
                 dpg.set_value(status, f"Status: {e}")
                 return
 
-        with dpg.window(label="Authentication", tag="auth", width=784, height=600, no_resize=True, no_collapse=True, no_move=True, no_close=True, pos=(0, 0)):
+        with dpg.window(label="Authentication", tag="auth", width=744, height=600, no_resize=True, no_collapse=True, no_move=True, no_close=True, pos=(0, 0)):
             dpg.add_spacer(height=180)
             dpg.add_text("Authentication", indent=230)
             username = dpg.add_input_text(label="Username", default_value="", indent=230, width=300)
@@ -2463,6 +2463,7 @@ def login():
                 dpg.add_button(label="Register", callback=auth_register)
                 dpg.add_button(label="Login", callback=auth_login)
     else:
+        global luna_user_id
         if not developer_mode:
             try:
                 username = files.json(
@@ -2500,6 +2501,7 @@ def login():
                 )[1].strip('\\r').strip()
                 auth_luna.ValidateUserHWID(hwid)
                 auth_luna.ValidateEntitlement("LunaSB")
+                luna_user_id = auth_luna.GetUserUID()
                 print("Validated")
                 auth_luna.disconnect()
                 print("Disconnected from server")
@@ -2524,6 +2526,7 @@ def login():
 
         print(f"{greeting}, {color.print_gradient(username)}.")
         dpg.set_value(luna_user, f"{greeting}, {username}")
+        dpg.set_value(luna_uid_text, f"UID: {luna_user_id}")
 
         # ///////////////////////////////////////////////////////////////
 
@@ -2611,7 +2614,7 @@ def login():
                     dpg.set_value(account, "Invalid Token")
                     return
 
-            with dpg.window(label="First Time Setup", tag="setup", width=784, height=600, no_resize=True, no_collapse=True, no_move=True):
+            with dpg.window(label="First Time Setup", tag="setup", width=744, height=600, no_resize=True, no_collapse=True, no_move=True):
                 dpg.add_spacer(height=180)
                 dpg.add_text("Please enter your Discord token", indent=230)
                 token_input = dpg.add_input_text(
@@ -2665,7 +2668,8 @@ def uptime_thread():
 async def on_ready():
     print(f"Logged into {color.print_gradient(bot.user.name)}#{color.print_gradient(bot.user.discriminator)}")
     dpg.set_value(logged, f"Logged into {bot.user}")
-
+    dpg.set_value(friends_text, f"{len(bot.user.friends)} Friends")
+    dpg.set_value(guilds_text, f"{len(bot.guilds)} Guilds")
     cog = bot.get_cog('Custom commands')
     try:
         custom = cog.get_commands()
@@ -2673,6 +2677,8 @@ async def on_ready():
     except BaseException:
         custom_command_count = 0
     dpg.set_value(custom_amount_text, f"{custom_command_count} Custom Commands Loaded")
+    command_count = len(bot.commands)
+    dpg.set_value(commands_amount_text, f"{command_count - custom_command_count} Commands")
 
     debugger_thread = threading.Thread(target=uptime_thread)
     debugger_thread.daemon = True
@@ -2697,6 +2703,8 @@ async def on_ready():
             url=webhook.login_url(), name="login",
             description=f"Logged into {bot.user}"
         )
+
+    threading.Thread(target=privacy_mode, name='privacy_mode').start()
 
 
 # ///////////////////////////////////////////////////////////////
@@ -3737,7 +3745,9 @@ class OnCommand(commands.Cog, name="on command"):
     @commands.Cog.listener()
     async def on_command(self, luna: commands.Context):
         prints.command(luna.command.name)
-
+        global commands_used
+        commands_used += 1
+        dpg.set_value(commands_used_text, f"Commands Used: {commands_used}")
         with contextlib.suppress(discord.NotFound, AttributeError, RuntimeError):
             if "mreact" not in luna.command.name:
                 await asyncio.sleep(0)
@@ -3745,7 +3755,6 @@ class OnCommand(commands.Cog, name="on command"):
         global last_used
         if luna.command.name != "repeat":
             last_used = luna.command.name
-        prints.command(luna.command.name)
 
         theme_json = files.json("data/config.json", "theme", documents=False)
         try:
@@ -11416,6 +11425,7 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
     async def privacy(self, ctx, mode: str):
 
         global privacy
+        global luna_user_id
 
         if mode == "on" or mode == "off":
             if mode == "on":
@@ -11430,6 +11440,7 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
                     greeting = "Good evening"
                 dpg.set_value(luna_user, f"{greeting}, Luna")
                 dpg.set_value(logged, "Logged into Luna#0000")
+                dpg.set_value(luna_uid_text, "UID: Privacy Mode")
             else:
                 privacy = False
                 now = datetime.now()
@@ -11442,15 +11453,19 @@ class PrivacyCog(commands.Cog, name="Privacy commands"):
                 else:
                     greeting = "Good evening"
 
-                if files.file_exist('data/auth.luna', documents=False):
-                    username = files.json(
-                        "data/auth.luna", "username", documents=False
-                    )
-                    username = Decryption(
-                        '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
-                    ).CEA256(username)
+                if not developer_mode:
+                    if files.file_exist('data/auth.luna', documents=False):
+                        username = files.json(
+                            "data/auth.luna", "username", documents=False
+                        )
+                        username = Decryption(
+                            '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
+                        ).CEA256(username)
+                else:
+                    username = "Developer"
                 dpg.set_value(luna_user, f"{greeting}, {username}")
                 dpg.set_value(logged, f"Logged into {bot.user}")
+                dpg.set_value(luna_uid_text, f"UID: {luna_user_id}")
             prints.message(f"Privacy mode » {mode}")
             await message_builder(ctx, description=f"```\nPrivacy mode » {mode}```")
         else:
@@ -16390,7 +16405,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
     async def clear(self, ctx):
         global command_logs
         command_logs = ""
-        dpg.set_value(logs_text, "Logs cleared")
+        dpg.set_value(logs_block, "Logs cleared")
 
     @commands.command(
         name="covid",
@@ -16696,72 +16711,72 @@ async def error_builder(luna, description=""):
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-command_count = len(bot.commands)
-
-dpg.create_context()
+# dpg.create_context()
+# # dpg.create_viewport(
+# #     title='Luna', width=800, height=600, resizable=False, decorated=True, clear_color=(40, 40, 40, 255), small_icon="data/resources/luna.ico", large_icon="data/resources/luna.ico"
+# # )
 # dpg.create_viewport(
-#     title='Luna', width=800, height=600, resizable=False, decorated=True, clear_color=(40, 40, 40, 255), small_icon="data/resources/luna.ico", large_icon="data/resources/luna.ico"
+#     title='Luna', width=790, height=590, resizable=False, decorated=True, clear_color=(40, 40, 40, 255), small_icon="data/resources/luna.ico", large_icon="data/resources/luna.ico"
 # )
-dpg.create_viewport(
-    title='Luna', width=790, height=590, resizable=False, decorated=True, clear_color=(40, 40, 40, 255), small_icon="data/resources/luna.ico", large_icon="data/resources/luna.ico"
-)
 
-with dpg.font_registry():
-    default_font = dpg.add_font("C:/Windows/Fonts/arial.ttf", 13)
+# with dpg.font_registry():
+#     default_font = dpg.add_font("C:/Windows/Fonts/arial.ttf", 13)
 
-dpg.bind_font(default_font)
+# dpg.bind_font(default_font)
 
-with dpg.window(tag="primary_window", width=200, height=562, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, no_bring_to_front_on_focus=True):
-    width, height, channels, data = dpg.load_image("data/resources/luna.png")
+# with dpg.window(tag="primary_window", width=200, height=562, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, no_bring_to_front_on_focus=True):
+#     width, height, channels, data = dpg.load_image("data/resources/luna.png")
 
-    with dpg.texture_registry():
-        texture_id = dpg.add_static_texture(width, height, data)
+#     with dpg.texture_registry():
+#         texture_id = dpg.add_static_texture(width, height, data)
 
-    dpg.add_image(texture_id, width=75, height=75, pos=(58, 28))
-    dpg.add_spacer(height=80)
-    dpg.add_separator()
-    luna_user = dpg.add_text("Unknown User")
-    dpg.add_text(f"Luna Platinum V{version}")
-    dpg.add_separator()
-    prefix = files.json("data/config.json", "prefix", documents=False)
-    gui_prefix = dpg.add_text(f"Prefix: {prefix}")
-    dpg.add_separator()
-    dpg.add_text(f"{command_count} Commands")
-    custom_amount_text = dpg.add_text("Loading custom commands...")
-    dpg.add_separator()
-    uptime_text = dpg.add_text("Uptime: Loading...")
+#     dpg.add_image(texture_id, width=75, height=75, pos=(58, 28))
+#     dpg.add_spacer(height=80)
+#     dpg.add_separator()
+#     luna_user = dpg.add_text("Unknown User")
+#     dpg.add_text(f"Luna Platinum V{version}")
+#     dpg.add_separator()
+#     prefix = files.json("data/config.json", "prefix", documents=False)
+#     gui_prefix = dpg.add_text(f"Prefix: {prefix}")
+#     dpg.add_separator()
+#     dpg.add_text(f"{command_count} Commands")
+#     custom_amount_text = dpg.add_text("Loading custom commands...")
+#     dpg.add_separator()
+#     uptime_text = dpg.add_text("Uptime: Loading...")
 
-    def close_account():
-        files.remove('data/auth.luna', documents=False)
-        os._exit(0)
+#     def close_account():
+#         files.remove('data/auth.luna', documents=False)
+#         os._exit(0)
 
-    def close_token():
-        files.remove('data/discord.luna', documents=False)
-        os._exit(0)
+#     def close_token():
+#         files.remove('data/discord.luna', documents=False)
+#         os._exit(0)
 
-    with dpg.menu_bar():
-        with dpg.menu(label="Settings", tag="settings_bar"):
-            dpg.add_menu_item(label="Logout Account", callback=close_account)
-            dpg.add_menu_item(label="Logout Token", callback=close_token)
-            dpg.add_menu_item(label="Style Editor", callback=lambda: dpg.show_tool(dpg.mvTool_Style))
-            dpg.add_menu_item(label="Font Manager", callback=lambda: dpg.show_tool(dpg.mvTool_Font))
-            dpg.add_menu_item(label="Metrics", callback=lambda: dpg.show_tool(dpg.mvTool_Metrics))
-            # dpg.add_menu_item(label="Debug", callback=lambda: dpg.show_tool(dpg.mvTool_Debug))
+#     with dpg.menu_bar():
+#         with dpg.menu(label="Settings", tag="settings_bar"):
+#             dpg.add_menu_item(label="Logout Account", callback=close_account)
+#             dpg.add_menu_item(label="Logout Token", callback=close_token)
+#             dpg.add_menu_item(label="Style Editor", callback=lambda: dpg.show_tool(dpg.mvTool_Style))
+#             dpg.add_menu_item(label="Font Manager", callback=lambda: dpg.show_tool(dpg.mvTool_Font))
+#             dpg.add_menu_item(label="Metrics", callback=lambda: dpg.show_tool(dpg.mvTool_Metrics))
+#             # dpg.add_menu_item(label="Debug", callback=lambda: dpg.show_tool(dpg.mvTool_Debug))
 
-    with dpg.window(label="Logs", tag="logs", width=200, height=298, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(0, 264)):
-        logs_text = dpg.add_text("No Commands Used Yet")
+#     with dpg.window(label="Logs", tag="logs", width=200, height=298, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(0, 264)):
+#         logs_block = dpg.add_text("No Commands Used Yet")
 
-with dpg.window(tag="secondary_window", width=586, height=562, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(199, 0), no_bring_to_front_on_focus=True):
-    logged = dpg.add_text("Idle")
-    dpg.add_separator()
+# with dpg.window(tag="secondary_window", width=586, height=562, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(199, 0), no_bring_to_front_on_focus=True):
+#     logged = dpg.add_text("Idle")
+#     dpg.add_separator()
 
-    width, height, channels, data = dpg.load_image("data/resources/luna_ascii.png")
+#     width, height, channels, data = dpg.load_image("data/resources/luna_ascii.png")
 
-    def privacy_mode(sender, app_data, user_data):
+def privacy_mode():
 
-        global privacy
+    global privacy
+    global luna_user_id
 
-        if app_data:
+    while True:
+        if dpg.get_value('privacy_checkbox'):
             privacy = True
             now = datetime.now()
             hour = now.hour
@@ -16773,6 +16788,7 @@ with dpg.window(tag="secondary_window", width=586, height=562, no_title_bar=True
                 greeting = "Good evening"
             dpg.set_value(luna_user, f"{greeting}, Luna")
             dpg.set_value(logged, "Logged into Luna#0000")
+            dpg.set_value(luna_uid_text, "UID: Privacy Mode")
         else:
             privacy = False
             now = datetime.now()
@@ -16785,350 +16801,354 @@ with dpg.window(tag="secondary_window", width=586, height=562, no_title_bar=True
             else:
                 greeting = "Good evening"
 
-            if files.file_exist('data/auth.luna', documents=False):
-                username = files.json(
-                    "data/auth.luna", "username", documents=False
-                )
-                username = Decryption(
-                    '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
-                ).CEA256(username)
+            if not developer_mode:
+                if files.file_exist('data/auth.luna', documents=False):
+                    username = files.json(
+                        "data/auth.luna", "username", documents=False
+                    )
+                    username = Decryption(
+                        '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
+                    ).CEA256(username)
+            else:
+                username = "Developer"
             dpg.set_value(luna_user, f"{greeting}, {username}")
             dpg.set_value(logged, f"Logged into {bot.user}")
-        prints.message(f"Privacy mode » {privacy}")
+            dpg.set_value(luna_uid_text, f"UID: {luna_user_id}")
+        time.sleep(1)
 
 
-    with dpg.texture_registry():
-        texture_id = dpg.add_static_texture(width, height, data)
+#     with dpg.texture_registry():
+#         texture_id = dpg.add_static_texture(width, height, data)
 
-    dpg.add_image(texture_id, width=570, height=119, pos=(0, 37))
-    dpg.add_spacer(height=122)
-    dpg.add_separator()
-    dpg.add_text(motd)
-    dpg.add_checkbox(label="Privacy Mode", default_value=False, callback=privacy_mode)
-    dpg.add_separator()
-
-
-    def nitro_control(sender, app_data, user_data):
-        if app_data:
-            prints.message(f"Nitro sniper » on")
-            config.nitro.sniper("on")
-        else:
-            prints.message(f"Nitro sniper » off")
-            config.nitro.sniper("off")
-
-    
-    def giveaway_control(sender, app_data, user_data):
-        if app_data:
-            prints.message(f"Giveaway sniper » on")
-            config.giveaway.joiner("on")
-        else:
-            prints.message(f"Giveaway sniper » off")
-            config.giveaway.joiner("off")
+#     dpg.add_image(texture_id, width=570, height=119, pos=(0, 37))
+#     dpg.add_spacer(height=122)
+#     dpg.add_separator()
+#     dpg.add_text(motd)
+#     dpg.add_checkbox(label="Privacy Mode", default_value=False, callback=privacy_mode)
+#     dpg.add_separator()
 
 
-    def privnote_control(sender, app_data, user_data):
-        if app_data:
-            prints.message(f"Privnote sniper » on")
-            config.privnote.sniper("on")
-        else:
-            prints.message(f"Privnote sniper » off")
-            config.privnote.sniper("off")
-
-
-    def charge_control(sender, app_data, user_data):
-        if app_data:
-            prints.message(f"Nitro sniper charge » on")
-            config._global("data/snipers/nitro.json", "charge", "on")
-            startup_status = files.json(
-                "data/config.json", "startup_status", documents=False
-            )
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
-                'Content-Type': 'application/json',
-                'Authorization': user_token,
-            }
-            request = requests.Session()
-            setting = {
-                'status': startup_status,
-                "custom_status": {"text": f"Ratelimit: [#####]"}
-            }
-            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
-        else:
-            prints.message(f"Nitro sniper charge » off")
-            config._global("data/snipers/nitro.json", "charge", "off")
-            startup_status = files.json(
-                "data/config.json", "startup_status", documents=False
-            )
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
-                'Content-Type': 'application/json',
-                'Authorization': user_token,
-            }
-            request = requests.Session()
-            setting = {
-                'status': startup_status,
-                "custom_status": {"text": f""}
-            }
-            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
-
-
-    def delay_control(sender, app_data, user_data):
-        minutes_value = dpg.get_value(minutes_slider)
-        prints.message(f"Giveaway joiner delay » {str(minutes_value)}")
-        config.giveaway.delay_in_minutes(f"{minutes_value}") 
-
-
-    def prefix_control(sender, app_data, user_data):
-        prefix_value = dpg.get_value(gui_input_prefix)
-        prints.message(f"Prefix » {str(prefix_value)}")
-        bot.command_prefix = prefix_value
-        config.prefix(prefix_value)
-        dpg.set_value(gui_prefix, f"Prefix: {prefix_value}")
-
-
-    def timer_control(sender, app_data, user_data):
-        timer_value = dpg.get_value(gui_delete_timer)
-        config.delete_timer(f"{timer_value}")
-        prints.message(f"Auto delete timer » {str(timer_value)}")
-
-
-    def joiner_control(sender, app_data, user_data):
-        if app_data:
-            prints.message(f"Server joiner » on")
-            config.giveaway.guild_joiner("on")
-        else:
-            prints.message(f"Server joiner » off")
-            config.giveaway.guild_joiner("off")
-
-
-    with dpg.window(label="Sniper Settings", tag="sniper_settings", width=260, height=319, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(220, 228)):
-        nitro_sniper = files.json(
-            "data/snipers/nitro.json", "sniper", documents=False
-        )
-        if nitro_sniper == "on":
-            nitro_sniper = True
-        else:
-            nitro_sniper = False
-
-        giveaway_joiner = files.json(
-            "data/snipers/giveaway.json", "joiner", documents=False
-        )
-        if giveaway_joiner == "on":
-            giveaway_joiner = True
-        else:
-            giveaway_joiner = False
-
-        privnote_sniper = files.json(
-            "data/snipers/privnote.json", "sniper", documents=False
-        )
-        if privnote_sniper == "on":
-            privnote_sniper = True
-        else:
-            privnote_sniper = False
-    
-        nitro_charge = files.json(
-            "data/snipers/nitro.json", "charge", documents=False
-        )
-        if nitro_charge == "on":
-            nitro_charge = True
-        else:
-            nitro_charge = False
-
-        delay_in_minutes = files.json(
-            "data/snipers/giveaway.json", "delay_in_minutes", documents=False
-        )
-        delay_in_minutes = int(delay_in_minutes)
-
-        guild_joiner = files.json(
-            "data/snipers/giveaway.json", "guild_joiner", documents=False
-        )
-        if guild_joiner == "on":
-            guild_joiner = True
-        else:
-            guild_joiner = False
-
-        prefix = files.json("data/config.json", "prefix", documents=False)
-
-        gui_delete_timer = files.json(
-            "data/config.json", "delete_timer", documents=False
-        )
-        gui_delete_timer = int(gui_delete_timer)
-
-        dpg.add_checkbox(label="Nitro Sniper", default_value=nitro_sniper, callback=nitro_control)
-        dpg.add_checkbox(label="Giveaway Sniper", default_value=giveaway_joiner, callback=giveaway_control)
-        dpg.add_checkbox(label="Privnote Sniper", default_value=privnote_sniper, callback=privnote_control)
-        # dpg.add_spacer(height=1)
-        dpg.add_separator()
-        dpg.add_text("Nitro Sniper")
-        dpg.add_checkbox(label="Charge Status", default_value=nitro_charge, callback=charge_control)
-        # dpg.add_spacer(height=1)
-        dpg.add_separator()
-        dpg.add_text("Giveaway Sniper")
-        minutes_slider = dpg.add_slider_int(label="Minutes", default_value=delay_in_minutes, min_value=1, max_value=60)
-        with dpg.group(horizontal=True, label="group_buttons"):
-            dpg.add_button(label="Save", callback=delay_control)
-            dpg.add_checkbox(label="Guild Joiner", default_value=guild_joiner, callback=joiner_control)
-        dpg.add_separator()
-        dpg.add_text("General Settings")
-        gui_input_prefix = dpg.add_input_text(label="Prefix", default_value=prefix)
-        gui_delete_timer = dpg.add_slider_int(label="Delete Timer", default_value=gui_delete_timer, min_value=0, max_value=300)
-        with dpg.group(horizontal=True, label="group_buttons"):
-            dpg.add_button(label="Save Prefix", callback=prefix_control)
-            dpg.add_button(label="Save Delete Timer", callback=timer_control)
-
+#     def nitro_control(sender, app_data, user_data):
+#         if app_data:
+#             prints.message(f"Nitro sniper » on")
+#             config.nitro.sniper("on")
+#         else:
+#             prints.message(f"Nitro sniper » off")
+#             config.nitro.sniper("off")
 
     
-    path_to_json = 'data/themes/'
-    themes = [pos_json.replace(".json", "") for pos_json in os.listdir(
-        path_to_json
-    ) if pos_json.endswith('.json')]
-    themes.insert(0, "default")
-    prefix = files.json("data/config.json", "prefix", documents=False)
-    themesvar = files.json("data/config.json", "theme", documents=False)
-    if themesvar == "default":
-        pass
-    else:
-        themesvar = (themesvar[:-5])
+#     def giveaway_control(sender, app_data, user_data):
+#         if app_data:
+#             prints.message(f"Giveaway sniper » on")
+#             config.giveaway.joiner("on")
+#         else:
+#             prints.message(f"Giveaway sniper » off")
+#             config.giveaway.joiner("off")
 
 
-    def theme_control(sender, app_data, user_data):
-        if app_data == "default":
-            prints.message(f"Changed theme » {app_data}")
-            config.theme(app_data)
-            dpg.set_value(selected_theme, f"Active Theme: {app_data}")
-        else:
-            prints.message(f"Changed theme » {app_data}")
-            config.theme(app_data + ".json")
-            dpg.set_value(selected_theme, f"Active Theme: {app_data}")
+#     def privnote_control(sender, app_data, user_data):
+#         if app_data:
+#             prints.message(f"Privnote sniper » on")
+#             config.privnote.sniper("on")
+#         else:
+#             prints.message(f"Privnote sniper » off")
+#             config.privnote.sniper("off")
+
+
+#     def charge_control(sender, app_data, user_data):
+#         if app_data:
+#             prints.message(f"Nitro sniper charge » on")
+#             config._global("data/snipers/nitro.json", "charge", "on")
+#             startup_status = files.json(
+#                 "data/config.json", "startup_status", documents=False
+#             )
+#             headers = {
+#                 'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
+#                 'Content-Type': 'application/json',
+#                 'Authorization': user_token,
+#             }
+#             request = requests.Session()
+#             setting = {
+#                 'status': startup_status,
+#                 "custom_status": {"text": f"Ratelimit: [#####]"}
+#             }
+#             request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+#         else:
+#             prints.message(f"Nitro sniper charge » off")
+#             config._global("data/snipers/nitro.json", "charge", "off")
+#             startup_status = files.json(
+#                 "data/config.json", "startup_status", documents=False
+#             )
+#             headers = {
+#                 'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
+#                 'Content-Type': 'application/json',
+#                 'Authorization': user_token,
+#             }
+#             request = requests.Session()
+#             setting = {
+#                 'status': startup_status,
+#                 "custom_status": {"text": f""}
+#             }
+#             request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+
+
+#     def delay_control(sender, app_data, user_data):
+#         minutes_value = dpg.get_value(minutes_slider)
+#         prints.message(f"Giveaway joiner delay » {str(minutes_value)}")
+#         config.giveaway.delay_in_minutes(f"{minutes_value}") 
+
+
+#     def prefix_control(sender, app_data, user_data):
+#         prefix_value = dpg.get_value(gui_input_prefix)
+#         prints.message(f"Prefix » {str(prefix_value)}")
+#         bot.command_prefix = prefix_value
+#         config.prefix(prefix_value)
+#         dpg.set_value(gui_prefix, f"Prefix: {prefix_value}")
+
+
+#     def timer_control(sender, app_data, user_data):
+#         timer_value = dpg.get_value(gui_delete_timer)
+#         config.delete_timer(f"{timer_value}")
+#         prints.message(f"Auto delete timer » {str(timer_value)}")
+
+
+#     def joiner_control(sender, app_data, user_data):
+#         if app_data:
+#             prints.message(f"Server joiner » on")
+#             config.giveaway.guild_joiner("on")
+#         else:
+#             prints.message(f"Server joiner » off")
+#             config.giveaway.guild_joiner("off")
+
+
+#     with dpg.window(label="Sniper Settings", tag="sniper_settings", width=260, height=319, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(220, 228)):
+#         nitro_sniper = files.json(
+#             "data/snipers/nitro.json", "sniper", documents=False
+#         )
+#         if nitro_sniper == "on":
+#             nitro_sniper = True
+#         else:
+#             nitro_sniper = False
+
+#         giveaway_joiner = files.json(
+#             "data/snipers/giveaway.json", "joiner", documents=False
+#         )
+#         if giveaway_joiner == "on":
+#             giveaway_joiner = True
+#         else:
+#             giveaway_joiner = False
+
+#         privnote_sniper = files.json(
+#             "data/snipers/privnote.json", "sniper", documents=False
+#         )
+#         if privnote_sniper == "on":
+#             privnote_sniper = True
+#         else:
+#             privnote_sniper = False
+    
+#         nitro_charge = files.json(
+#             "data/snipers/nitro.json", "charge", documents=False
+#         )
+#         if nitro_charge == "on":
+#             nitro_charge = True
+#         else:
+#             nitro_charge = False
+
+#         delay_in_minutes = files.json(
+#             "data/snipers/giveaway.json", "delay_in_minutes", documents=False
+#         )
+#         delay_in_minutes = int(delay_in_minutes)
+
+#         guild_joiner = files.json(
+#             "data/snipers/giveaway.json", "guild_joiner", documents=False
+#         )
+#         if guild_joiner == "on":
+#             guild_joiner = True
+#         else:
+#             guild_joiner = False
+
+#         prefix = files.json("data/config.json", "prefix", documents=False)
+
+#         gui_delete_timer = files.json(
+#             "data/config.json", "delete_timer", documents=False
+#         )
+#         gui_delete_timer = int(gui_delete_timer)
+
+#         dpg.add_checkbox(label="Nitro Sniper", default_value=nitro_sniper, callback=nitro_control)
+#         dpg.add_checkbox(label="Giveaway Sniper", default_value=giveaway_joiner, callback=giveaway_control)
+#         dpg.add_checkbox(label="Privnote Sniper", default_value=privnote_sniper, callback=privnote_control)
+#         # dpg.add_spacer(height=1)
+#         dpg.add_separator()
+#         dpg.add_text("Nitro Sniper")
+#         dpg.add_checkbox(label="Charge Status", default_value=nitro_charge, callback=charge_control)
+#         # dpg.add_spacer(height=1)
+#         dpg.add_separator()
+#         dpg.add_text("Giveaway Sniper")
+#         minutes_slider = dpg.add_slider_int(label="Minutes", default_value=delay_in_minutes, min_value=1, max_value=60)
+#         with dpg.group(horizontal=True, label="group_buttons"):
+#             dpg.add_button(label="Save", callback=delay_control)
+#             dpg.add_checkbox(label="Guild Joiner", default_value=guild_joiner, callback=joiner_control)
+#         dpg.add_separator()
+#         dpg.add_text("General Settings")
+#         gui_input_prefix = dpg.add_input_text(label="Prefix", default_value=prefix)
+#         gui_delete_timer = dpg.add_slider_int(label="Delete Timer", default_value=gui_delete_timer, min_value=0, max_value=300)
+#         with dpg.group(horizontal=True, label="group_buttons"):
+#             dpg.add_button(label="Save Prefix", callback=prefix_control)
+#             dpg.add_button(label="Save Delete Timer", callback=timer_control)
+
 
     
-    def reload_themes(sender, app_data, user_data):
-        themes = [pos_json.replace(".json", "") for pos_json in os.listdir(
-            path_to_json
-        ) if pos_json.endswith('.json')]
-        themes.insert(0, "default")
-        dpg.configure_item(themes_box, items=themes)
-        selected = dpg.get_value(themes_box)
-        if selected not in themes:
-            dpg.set_value(themes_box, "default")
-            dpg.set_value(selected_theme, "Active Theme: default")
-            prints.message("Changed theme » default")
-            config.theme("default")
-        else:
-            themesvar = files.json("data/config.json", "theme", documents=False)
-            if themesvar == "default":
-                pass
-            else:
-                themesvar = (themesvar[:-5])
-            dpg.set_value(themes_box, themesvar)
-            dpg.set_value(selected_theme, f"Active Theme: {themesvar}")
-            prints.message(f"Reloaded theme » {themesvar}")
-            config.theme(themesvar)
+#     path_to_json = 'data/themes/'
+#     themes = [pos_json.replace(".json", "") for pos_json in os.listdir(
+#         path_to_json
+#     ) if pos_json.endswith('.json')]
+#     themes.insert(0, "default")
+#     prefix = files.json("data/config.json", "prefix", documents=False)
+#     themesvar = files.json("data/config.json", "theme", documents=False)
+#     if themesvar == "default":
+#         pass
+#     else:
+#         themesvar = (themesvar[:-5])
 
 
-    def delete_selected(sender, app_data, user_data):
-        selected = dpg.get_value(themes_box)
-        if selected == "default":
-            prints.message("Can't delete default theme")
-            pass
-        else:
-            dpg.set_value(themes_box, "default")
-            dpg.set_value(selected_theme, "Active Theme: default")
-            config.theme("default")
-            files.remove(f"data/themes/{selected}.json", documents=False)
-            prints.message(f"Deleted theme » {selected}")
-
-
-    def protections_footer_control(sender, app_data, user_data):
-        if app_data:
-            prints.message(f"Protections footer » on")
-            config._global("data/protections/config.json", "footer", True)
-        else:
-            prints.message(f"Protections footer » off")
-            config._global("data/protections/config.json", "footer", False)
+#     def theme_control(sender, app_data, user_data):
+#         if app_data == "default":
+#             prints.message(f"Changed theme » {app_data}")
+#             config.theme(app_data)
+#             dpg.set_value(selected_theme, f"Active Theme: {app_data}")
+#         else:
+#             prints.message(f"Changed theme » {app_data}")
+#             config.theme(app_data + ".json")
+#             dpg.set_value(selected_theme, f"Active Theme: {app_data}")
 
     
-    def theme_editor():
-        theme_name = dpg.get_value(editor_theme)
-        theme_title = dpg.get_value(editor_title)
-        theme_footer = dpg.get_value(editor_footer)
-        theme_description = dpg.get_value(description_footer)
-
-        prints.message(f"Created theme » {theme_name}")
-        data = {
-            "title": theme_title,
-            "footer": theme_footer,
-            "description": theme_description
-        }
-        files.write_json(
-            f"data/themes/{theme_name}.json", data, documents=False
-        )
-        config.theme(theme_name)
-        themes = [pos_json.replace(".json", "") for pos_json in os.listdir(
-            path_to_json
-        ) if pos_json.endswith('.json')]
-        themes.insert(0, "default")
-        dpg.configure_item(themes_box, items=themes)
-        dpg.set_value(themes_box, theme_name)
-        dpg.set_value(selected_theme, f"Active Theme: {theme_name}")
-        prints.message(f"Changed theme » {theme_name}")
+#     def reload_themes(sender, app_data, user_data):
+#         themes = [pos_json.replace(".json", "") for pos_json in os.listdir(
+#             path_to_json
+#         ) if pos_json.endswith('.json')]
+#         themes.insert(0, "default")
+#         dpg.configure_item(themes_box, items=themes)
+#         selected = dpg.get_value(themes_box)
+#         if selected not in themes:
+#             dpg.set_value(themes_box, "default")
+#             dpg.set_value(selected_theme, "Active Theme: default")
+#             prints.message("Changed theme » default")
+#             config.theme("default")
+#         else:
+#             themesvar = files.json("data/config.json", "theme", documents=False)
+#             if themesvar == "default":
+#                 pass
+#             else:
+#                 themesvar = (themesvar[:-5])
+#             dpg.set_value(themes_box, themesvar)
+#             dpg.set_value(selected_theme, f"Active Theme: {themesvar}")
+#             prints.message(f"Reloaded theme » {themesvar}")
+#             config.theme(themesvar)
 
 
-    with dpg.window(label="Theme Settings", tag="theme_settings", width=260, height=319, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(500, 228)):
+#     def delete_selected(sender, app_data, user_data):
+#         selected = dpg.get_value(themes_box)
+#         if selected == "default":
+#             prints.message("Can't delete default theme")
+#             pass
+#         else:
+#             dpg.set_value(themes_box, "default")
+#             dpg.set_value(selected_theme, "Active Theme: default")
+#             config.theme("default")
+#             files.remove(f"data/themes/{selected}.json", documents=False)
+#             prints.message(f"Deleted theme » {selected}")
 
-        protections_footer = files.json(
-            "data/protections/config.json", "footer", documents=False
-        )
 
-        selected_theme = dpg.add_text(f"Active Theme: {themesvar}")
-        dpg.add_separator()
-        dpg.add_text("Available Themes")
-        themes_box = dpg.add_combo(label="Themes", items=themes, default_value=themesvar, callback=theme_control)
-        with dpg.group(horizontal=True, label="group_buttons"):
-            dpg.add_button(label="Reload", callback=reload_themes)
-            dpg.add_button(label="Delete", callback=delete_selected)
+#     def protections_footer_control(sender, app_data, user_data):
+#         if app_data:
+#             prints.message(f"Protections footer » on")
+#             config._global("data/protections/config.json", "footer", True)
+#         else:
+#             prints.message(f"Protections footer » off")
+#             config._global("data/protections/config.json", "footer", False)
 
-        dpg.add_spacer(height=1)
-        dpg.add_separator()
+    
+#     def theme_editor():
+#         theme_name = dpg.get_value(editor_theme)
+#         theme_title = dpg.get_value(editor_title)
+#         theme_footer = dpg.get_value(editor_footer)
+#         theme_description = dpg.get_value(description_footer)
 
-        dpg.add_checkbox(label="Protections Footer", default_value=protections_footer, callback=protections_footer_control)
-        dpg.add_separator()
-        dpg.add_text("Theme Editor")
+#         prints.message(f"Created theme » {theme_name}")
+#         data = {
+#             "title": theme_title,
+#             "footer": theme_footer,
+#             "description": theme_description
+#         }
+#         files.write_json(
+#             f"data/themes/{theme_name}.json", data, documents=False
+#         )
+#         config.theme(theme_name)
+#         themes = [pos_json.replace(".json", "") for pos_json in os.listdir(
+#             path_to_json
+#         ) if pos_json.endswith('.json')]
+#         themes.insert(0, "default")
+#         dpg.configure_item(themes_box, items=themes)
+#         dpg.set_value(themes_box, theme_name)
+#         dpg.set_value(selected_theme, f"Active Theme: {theme_name}")
+#         prints.message(f"Changed theme » {theme_name}")
 
-        editor_theme = dpg.add_input_text(label="Theme Name", default_value="Luna")
-        editor_title = dpg.add_input_text(label="Title", default_value="Luna")
-        editor_footer = dpg.add_input_text(label="Footer", default_value="www.team-luna.org")
-        description_footer = dpg.add_checkbox(label="Description", default_value=True)
-        dpg.add_button(label="Save", callback=theme_editor)
 
-with dpg.theme() as global_theme:
-    with dpg.theme_component(dpg.mvAll):
-        dpg.add_theme_style(dpg.mvStyleVar_WindowRounding, 6, category=dpg.mvThemeCat_Core)
-        dpg.add_theme_style(dpg.mvStyleVar_ChildRounding, 6, category=dpg.mvThemeCat_Core)
-        dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, 6, category=dpg.mvThemeCat_Core)
-        dpg.add_theme_style(dpg.mvStyleVar_PopupRounding, 6, category=dpg.mvThemeCat_Core)
-        dpg.add_theme_style(dpg.mvStyleVar_GrabRounding, 6, category=dpg.mvThemeCat_Core)
+#     with dpg.window(label="Theme Settings", tag="theme_settings", width=260, height=319, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(500, 228)):
 
-        dpg.add_theme_color(dpg.mvThemeCol_TabActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+#         protections_footer = files.json(
+#             "data/protections/config.json", "footer", documents=False
+#         )
 
-        dpg.add_theme_color(dpg.mvThemeCol_CheckMark, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+#         selected_theme = dpg.add_text(f"Active Theme: {themesvar}")
+#         dpg.add_separator()
+#         dpg.add_text("Available Themes")
+#         themes_box = dpg.add_combo(label="Themes", items=themes, default_value=themesvar, callback=theme_control)
+#         with dpg.group(horizontal=True, label="group_buttons"):
+#             dpg.add_button(label="Reload", callback=reload_themes)
+#             dpg.add_button(label="Delete", callback=delete_selected)
 
-        dpg.add_theme_color(dpg.mvThemeCol_SliderGrab, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
-        dpg.add_theme_color(dpg.mvThemeCol_SliderGrabActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+#         dpg.add_spacer(height=1)
+#         dpg.add_separator()
 
-        dpg.add_theme_color(dpg.mvThemeCol_Button, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
-        dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (80, 100, 150, 255), category=dpg.mvThemeCat_Core)
-        dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+#         dpg.add_checkbox(label="Protections Footer", default_value=protections_footer, callback=protections_footer_control)
+#         dpg.add_separator()
+#         dpg.add_text("Theme Editor")
 
-        dpg.add_theme_color(dpg.mvThemeCol_HeaderHovered, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
-        dpg.add_theme_color(dpg.mvThemeCol_HeaderActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+#         editor_theme = dpg.add_input_text(label="Theme Name", default_value="Luna")
+#         editor_title = dpg.add_input_text(label="Title", default_value="Luna")
+#         editor_footer = dpg.add_input_text(label="Footer", default_value="www.team-luna.org")
+#         description_footer = dpg.add_checkbox(label="Description", default_value=True)
+#         dpg.add_button(label="Save", callback=theme_editor)
 
-        dpg.add_theme_color(dpg.mvThemeCol_FrameBgHovered, (50, 50, 50, 255), category=dpg.mvThemeCat_Core)
-        dpg.add_theme_color(dpg.mvThemeCol_FrameBgActive, (80, 100, 150, 255), category=dpg.mvThemeCat_Core)
+# with dpg.theme() as global_theme:
+#     with dpg.theme_component(dpg.mvAll):
+#         dpg.add_theme_style(dpg.mvStyleVar_WindowRounding, 6, category=dpg.mvThemeCat_Core)
+#         dpg.add_theme_style(dpg.mvStyleVar_ChildRounding, 6, category=dpg.mvThemeCat_Core)
+#         dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, 6, category=dpg.mvThemeCat_Core)
+#         dpg.add_theme_style(dpg.mvStyleVar_PopupRounding, 6, category=dpg.mvThemeCat_Core)
+#         dpg.add_theme_style(dpg.mvStyleVar_GrabRounding, 6, category=dpg.mvThemeCat_Core)
 
-        # dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
-        dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, (51, 51, 55, 255), category=dpg.mvThemeCat_Core)
-        dpg.add_theme_color(dpg.mvThemeCol_TitleBg, (51, 51, 55, 255), category=dpg.mvThemeCat_Core)
+#         dpg.add_theme_color(dpg.mvThemeCol_TabActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+
+#         dpg.add_theme_color(dpg.mvThemeCol_CheckMark, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+
+#         dpg.add_theme_color(dpg.mvThemeCol_SliderGrab, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+#         dpg.add_theme_color(dpg.mvThemeCol_SliderGrabActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+
+#         dpg.add_theme_color(dpg.mvThemeCol_Button, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+#         dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (80, 100, 150, 255), category=dpg.mvThemeCat_Core)
+#         dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+
+#         dpg.add_theme_color(dpg.mvThemeCol_HeaderHovered, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+#         dpg.add_theme_color(dpg.mvThemeCol_HeaderActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+
+#         dpg.add_theme_color(dpg.mvThemeCol_FrameBgHovered, (50, 50, 50, 255), category=dpg.mvThemeCat_Core)
+#         dpg.add_theme_color(dpg.mvThemeCol_FrameBgActive, (80, 100, 150, 255), category=dpg.mvThemeCat_Core)
+
+#         # dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+#         dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, (51, 51, 55, 255), category=dpg.mvThemeCat_Core)
+#         dpg.add_theme_color(dpg.mvThemeCol_TitleBg, (51, 51, 55, 255), category=dpg.mvThemeCat_Core)
 
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -17183,9 +17203,4 @@ bot.add_cog(CustomCog(bot))
 
 login()
 
-dpg.bind_theme(global_theme)
-
-dpg.setup_dearpygui()
-dpg.show_viewport()
-dpg.start_dearpygui()
-dpg.destroy_context()
+start_gui()

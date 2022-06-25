@@ -57,6 +57,9 @@ privacy = False
 copycat = None
 charge_sniper = False
 
+commands_used = 0
+command_logs = ""
+
 r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 updater_url = r["updater"]
 version_url = r["version"]
