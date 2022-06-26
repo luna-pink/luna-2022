@@ -1,19 +1,17 @@
 import requests
-import asyncpraw
 
 # ///////////////////////////////////////////////////////////////
 # Developer Variables
 
-free_mode = True
+free_mode = False
 developer_mode = False
 
+platinum = True
 beta = False
-version = '2021.3.43'
-api_version = 'v9'
-beta_version = 'v10'
 
-reddit_app_id = 'tpO3tUTb6mktmrhAKzej5Q'
-reddit_app_secret = 'QZvNrrMRVgl38lMJjewyCaiiVRnrFg'
+version = '2022.32'
+api_version = 'v10'
+beta_version = 'v10'
 
 # ///////////////////////////////////////////////////////////////
 # Luna Variables
@@ -60,18 +58,20 @@ privacy = False
 copycat = None
 charge_sniper = False
 
+commands_used = 0
+command_logs = ""
+
 r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
 updater_url = r["updater"]
 version_url = r["version"]
 
-r = requests.get(
-    "https://raw.githubusercontent.com/Nshout/Luna/main/beta.json").json()
-beta_updater_url = r["updater"]
-beta_version_url = r["version"]
-beta_user = r["beta_user"]
+r = requests.get("https://pastebin.com/raw/eSGbZgms").json()
+platinum_updater_url = r["updater"]
+platinum_version_url = r["version"]
+# beta_user = r["beta_user"]
 
-if beta:
-    version_url = beta_version_url
+if platinum:
+    version_url = platinum_version_url
 
 loader_src = """import asyncio
 import ctypes

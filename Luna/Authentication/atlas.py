@@ -342,3 +342,18 @@ class Atlas:
         except Exception as e:
             self.disconnect()
             raise CustomError("Error: {}".format(e))
+
+    def GetUserUID(self):
+        socket = self.socket
+        try:
+            AuthReponse = CEADecrypt(
+                self.app_token).CEA256(
+                self._send(
+                    socket,
+                    CEAEncrypt(
+                        self.app_token).CEA256(f"OpCode=5;AppOpCode=10;")))
+            AuthMessage = AuthReponse.split(";")[1].split("=")[1]
+            return AuthMessage
+        except Exception as e:
+            self.disconnect()
+            raise CustomError("{}".format(e))
