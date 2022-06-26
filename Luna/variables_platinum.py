@@ -3,13 +3,13 @@ import requests
 # ///////////////////////////////////////////////////////////////
 # Developer Variables
 
-free_mode = True
+free_mode = False
 developer_mode = False
 
-platinum = False
+platinum = True
 beta = False
 
-version = '2022.4'
+version = '2022.34'
 api_version = 'v10'
 beta_version = 'v10'
 
