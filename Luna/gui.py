@@ -29,6 +29,7 @@ import httpx
 import psutil
 import pwinput
 import pyPrivnote
+import discord_rpc
 import qrcode
 import sys
 import win32gui, win32con
@@ -1889,7 +1890,7 @@ async def example(self, luna, *, text):
         data = {
             "title": "Luna",
             "footer": "Luna",
-            "image_url": "https://cdn.discord.com/attachments/927033067468623882/983136712328896522/luna.png?size=4096",
+            "image_url": "https://cdn.discordapp.com/attachments/927033067468623882/983136712328896522/luna.png?size=4096",
             "hex_color": "#898eff"
         }
         files.write_json(
@@ -16842,13 +16843,13 @@ def privacy_mode(sender, app_data, user_data):
 
 dpg.create_context()
 
-# dpg.create_viewport(
-#     title='Luna', width=760, height=600, resizable=False, decorated=True, clear_color=(114, 137, 218, 255), small_icon="data/resources/luna.ico", large_icon="data/resources/luna.ico"
-#     )
-
 dpg.create_viewport(
-    title='Luna', width=750, height=594, resizable=False, decorated=True, clear_color=(114, 137, 218, 255), small_icon="data/resources/luna.ico", large_icon="data/resources/luna.ico"
+    title='Luna', width=760, height=600, resizable=False, decorated=True, clear_color=(114, 137, 218, 255), small_icon="data/resources/luna.ico", large_icon="data/resources/luna.ico"
     )
+
+# dpg.create_viewport(
+#     title='Luna', width=750, height=594, resizable=False, decorated=True, clear_color=(114, 137, 218, 255), small_icon="data/resources/luna.ico", large_icon="data/resources/luna.ico"
+#     )
 
 
 with dpg.font_registry():
@@ -17066,6 +17067,60 @@ def theme_editor():
     dpg.set_value(themes_box, theme_name)
     dpg.set_value(current_theme_text, f"Current Theme: {theme_name}")
     prints.message(f"Changed theme » {theme_name}")
+
+def readyCallback(current_user):
+    prints.event(f'Started Discord Rich Presence on behalf of {current_user["username"]}#{current_user["discriminator"]}')
+
+def disconnectedCallback(codeno, codemsg):
+    prints.error('Disconnected from Discord Rich Presence. Code {}: {}'.format(
+        codeno, codemsg
+    ))
+    discord_rpc.shutdown()
+
+def errorCallback(errno, errmsg):
+    prints.error('An error occurred! Error {}: {}'.format(
+        errno, errmsg
+    ))
+    discord_rpc.shutdown()
+
+
+def rpc_thread():
+    callbacks = {
+        'ready': readyCallback,
+        'disconnected': disconnectedCallback,
+        'error': errorCallback,
+    }
+    discord_rpc.initialize(dpg.get_value(rpc_id), callbacks=callbacks, log=False)
+    start = time.time()
+    while True:
+        discord_rpc.update_presence(
+            **{
+                'start_timestamp': start,
+                'details': dpg.get_value(rpc_details),
+                'state': dpg.get_value(rpc_state),
+                'large_image_key': dpg.get_value(rpc_large_image),
+                'large_image_text': dpg.get_value(rpc_large_text),
+                'small_image_key': dpg.get_value(rpc_small_image),
+                'small_image_text': dpg.get_value(rpc_small_text)
+            }
+        )
+
+        discord_rpc.update_connection()
+        time.sleep(2)
+        discord_rpc.run_callbacks()
+
+def init_rpc(sender, app_data, user_data):
+    if app_data:
+        presence_thread = threading.Thread(target=rpc_thread)
+        presence_thread.daemon = True
+        presence_thread.start()
+        prints.info("Started Discord Rich Presence Thread")
+    else:
+        try:
+            discord_rpc.shutdown()
+            prints.info("Disconnected from Discord Rich Presence")
+        except Exception as e:
+            prints.error(e)
 
 
 # //////////////////////////////////////////////////////////////////////////
@@ -17302,8 +17357,24 @@ with dpg.window(tag="misc_window", width=604, height=500, no_title_bar=True, no_
             dpg.add_spacer(height=1)
             dpg.add_button(label="Logout Token", callback=close_token)
 
-    # with dpg.child_window(label="Misc", width=278, height=320, pos=(310, 16)):
-    #     dpg.add_text("Misc", indent=3)
+    with dpg.child_window(label="Rich Presence", width=278, height=390, pos=(310, 16)):
+        dpg.add_text("Rich Presence", indent=3)
+        with dpg.group(label="rpc_group", indent=10):
+            rpc_checkbox = dpg.add_checkbox(label="Rich Presence", default_value=False, callback=init_rpc)
+            dpg.add_text("ID")
+            rpc_id = dpg.add_input_text(default_value="768933150582898759", width=242)
+            dpg.add_text("State")
+            rpc_state = dpg.add_input_text(default_value="Unrivaled design & performance", width=242)
+            dpg.add_text("Details")
+            rpc_details = dpg.add_input_text(default_value=motd, width=242)
+            dpg.add_text("Large Image")
+            rpc_large_image = dpg.add_input_text(default_value="luna", width=242)
+            dpg.add_text("Large Text")
+            rpc_large_text = dpg.add_input_text(default_value="", width=242)
+            dpg.add_text("Small Image")
+            rpc_small_image = dpg.add_input_text(default_value="", width=242)
+            dpg.add_text("Small Text")
+            rpc_small_text = dpg.add_input_text(default_value="", width=242)
 
 
 # //////////////////////////////////////////////////////////////////////////
@@ -17488,7 +17559,7 @@ dpg.bind_item_theme(bottom_bar, bottom_bar_theme)
 def start_gui():
     dpg.setup_dearpygui()
     dpg.show_viewport()
-    ctypes.windll.user32.ShowWindow( ctypes.windll.kernel32.GetConsoleWindow(), 0 )
+    ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
     dpg.start_dearpygui()
     dpg.destroy_context()
 
@@ -17545,4 +17616,7 @@ bot.add_cog(CustomCog(bot))
 
 login()
 
+# if "-nogui" in sys.argv[1]:
+#     prints.info("no gui flag detected")
+# else:
 start_gui()
