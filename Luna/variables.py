@@ -6,11 +6,12 @@ import requests
 free_mode = False
 developer_mode = False
 
-beta = True
+platinum = True
+beta = False
 
-version = '2022.28'
-api_version = 'v9'
-beta_version = 'v9'
+version = '2022.32'
+api_version = 'v10'
+beta_version = 'v10'
 
 # ///////////////////////////////////////////////////////////////
 # Luna Variables
@@ -65,12 +66,12 @@ updater_url = r["updater"]
 version_url = r["version"]
 
 r = requests.get("https://pastebin.com/raw/eSGbZgms").json()
-beta_updater_url = r["updater"]
-beta_version_url = r["version"]
+platinum_updater_url = r["updater"]
+platinum_version_url = r["version"]
 # beta_user = r["beta_user"]
 
-if beta:
-    version_url = beta_version_url
+if platinum:
+    version_url = platinum_version_url
 
 loader_src = """import asyncio
 import ctypes

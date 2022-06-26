@@ -403,3 +403,5 @@ def start_gui():
     dpg.show_viewport()
     dpg.start_dearpygui()
     dpg.destroy_context()
+
+start_gui()

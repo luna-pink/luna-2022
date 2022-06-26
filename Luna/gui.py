@@ -48,7 +48,6 @@ from Functions import *
 from variables import *
 from Encryption import *
 from Encryption.CEAShim256 import *
-from gui_module import *
 
 def is_admin():
     admin = ctypes.windll.shell32.IsUserAnAdmin()
@@ -57,13 +56,11 @@ def is_admin():
     else:
         return True
 
-# if is_admin():
-#     pass
-# else:
-#     ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
-#     sys.exit()
-
-# ctypes.windll.user32.ShowWindow( ctypes.windll.kernel32.GetConsoleWindow(), 0 )
+if is_admin():
+    pass
+else:
+    ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+    sys.exit()
 
 if files.file_exist('Updater.exe'):
     os.remove('Updater.exe')
@@ -109,10 +106,10 @@ class notify:
         except BaseException:
             pass
 
-    def webhook(self, description="", name="", error=False):
+    def webhook(url="", description="", name="", error=False):
         """Create a webhook notification"""
         try:
-            if self == "":
+            if url == "":
                 prints.error(
                     f"The webhook url can't be empty » {name} » Has been cleared"
                 )
@@ -122,7 +119,7 @@ class notify:
                 files.write_json("data/webhooks/url.json", json_object)
 
                 return
-            elif "https://discord.com/api/webhooks/" not in self:
+            elif "https://discord.com/api/webhooks/" not in url:
                 prints.error(
                     f"Invalid webhook url » {name} » Has been cleared"
                 )
@@ -132,7 +129,7 @@ class notify:
                 files.write_json("data/webhooks/url.json", json_object)
 
                 return
-            hook = dhooks.Webhook(url=self, avatar_url=webhook.image_url())
+            hook = dhooks.Webhook(url=url, avatar_url=webhook.image_url())
             color = 0x000000
             if error:
                 color = 0xE10959
@@ -1240,7 +1237,7 @@ class theme:
                 hexcolorvar = "#000000"
             elif hexcolorvar == "random":
                 hexcolorvar = random.randint(0, 0xffffff)
-            elif len(hexcolorvar) > 7:
+            elif len(hexcolorvar) < 7:
                 hexcolorvar = int(hexcolorvar)
             else:
                 hexcolorvar = int(hexcolorvar.replace('#', ''), 16)
@@ -1252,7 +1249,7 @@ class theme:
                 hexcolorvar = "#000000"
             if hexcolorvar == "random":
                 hexcolorvar = random.randint(0, 0xffffff)
-            elif len(hexcolorvar) > 7:
+            elif len(hexcolorvar) < 7:
                 hexcolorvar = int(hexcolorvar)
             else:
                 hexcolorvar = int(hexcolorvar.replace('#', ''), 16)
@@ -1361,7 +1358,7 @@ class webhook:
             hexcolorvar = "#000000"
         if hexcolorvar == "random":
             hexcolorvar = random.randint(0, 0xffffff)
-        elif len(hexcolorvar) > 7:
+        elif len(hexcolorvar) < 7:
             hexcolorvar = int(hexcolorvar)
         else:
             hexcolorvar = int(hexcolorvar.replace('#', ''), 16)
@@ -1466,7 +1463,7 @@ def statuscon():
     elif startup_status == "idle":
         return Status.idle
     elif startup_status in ["invisible", "offline"]:
-        return Status.offline
+        return Status.invisible
     else:
         return Status.online
 
@@ -1552,7 +1549,7 @@ def file_check():
 
     if not files.file_exist("data/scripts/example.py", documents=False):
         content = """# Its as simple as writing commands for cogs! (Note: You need to use \"self\")
-# Documentation for custom commands can be found here: https://www.team-luna.org/documentation
+# Documentation for custom commands can be found here: https://docs.team-luna.org/
 
 @commands.command(
     name="example",
@@ -1730,7 +1727,7 @@ async def example(self, luna, *, text):
 
     if not files.file_exist("data/resources/luna.png", documents=False):
         r = requests.get(
-            "https://cdn.discordapp.com/attachments/927033067468623882/983136712328896522/luna.png?size=4096",
+            "https://cdn.discordapp.com/attachments/927033067468623882/983136712328896522/luna.png",
             stream=True
         )
         open(
@@ -1747,6 +1744,54 @@ async def example(self, luna, *, text):
         )
         open(
             'data/resources/luna_ascii.png',
+            'wb'
+        ).write(
+            r.content
+        )
+
+    if not files.file_exist("data/resources/home.png", documents=False):
+        r = requests.get(
+            "https://cdn.discordapp.com/attachments/927033067468623882/990624995099156540/home.png",
+            stream=True
+        )
+        open(
+            'data/resources/home.png',
+            'wb'
+        ).write(
+            r.content
+        )
+
+    if not files.file_exist("data/resources/logs.png", documents=False):
+        r = requests.get(
+            "https://cdn.discordapp.com/attachments/927033067468623882/990624995338252328/code.png",
+            stream=True
+        )
+        open(
+            'data/resources/logs.png',
+            'wb'
+        ).write(
+            r.content
+        )
+
+    if not files.file_exist("data/resources/misc.png", documents=False):
+        r = requests.get(
+            "https://cdn.discordapp.com/attachments/927033067468623882/990624995531161630/misc.png",
+            stream=True
+        )
+        open(
+            'data/resources/misc.png',
+            'wb'
+        ).write(
+            r.content
+        )
+
+    if not files.file_exist("data/resources/arial.ttf", documents=False):
+        r = requests.get(
+            "https://cdn.discordapp.com/attachments/927033067468623882/990628505903587328/arial.ttf",
+            stream=True
+        )
+        open(
+            'data/resources/arial.ttf',
             'wb'
         ).write(
             r.content
@@ -1844,7 +1889,7 @@ async def example(self, luna, *, text):
         data = {
             "title": "Luna",
             "footer": "Luna",
-            "image_url": "https://cdn.discordapp.com/attachments/927033067468623882/983136712328896522/luna.png?size=4096",
+            "image_url": "https://cdn.discord.com/attachments/927033067468623882/983136712328896522/luna.png?size=4096",
             "hex_color": "#898eff"
         }
         files.write_json(
@@ -1893,7 +1938,12 @@ async def example(self, luna, *, text):
 
 # ///////////////////////////////////////////////////////////////
 
-file_check()
+try:
+    file_check()
+except Exception as e:
+    print(e)
+    os.system("pause")
+    os._exit(0)
 
 
 def get_prefix():
@@ -1979,13 +2029,13 @@ class luna:
         updater_url = r["updater"]
 
         r = requests.get("https://pastebin.com/raw/eSGbZgms").json()
-        beta_updater_url = r["updater"]
+        platinum_updater_url = r["updater"]
 
         url = updater_url
-        if beta:
-            prints.message("Beta Build")
-            url = beta_updater_url
-        prints.event("Downloading Updater...")
+        if platinum:
+            prints.message("platinum build")
+            url = platinum_updater_url
+        prints.event("downloading updater...")
         from clint.textui import progress
         r = requests.get(url, stream=True)
         with open('Updater.exe', 'wb') as f:
@@ -2279,6 +2329,8 @@ class prints:
 
 
 def login():
+    print(logo)
+    prints.message("Welcome to Luna Selfbot!")
     if version != version_url and not developer_mode:
         if files.json(
                 "data/notifications/toasts.json",
@@ -2309,14 +2361,14 @@ def login():
 
     if not files.file_exist('data/auth.luna', documents=False) and not developer_mode:
         def auth_connect(username):
-            dpg.set_value(status, "Status: Connecting to server...")
-            print("Connecting to Atlas...")
+            dpg.set_value(status, "Status: connecting to server...")
+            prints.event("connecting to server...")
             try:
                 auth_luna.connect()
-                dpg.set_value(status, "Status: Connected to server")
+                dpg.set_value(status, "Status: connected to server")
             except BaseException:
                 dpg.set_value(status, "Status: Connection failed")
-                print("Failed to connect to Atlas")
+                prints.error("failed to connect to server")
             auth_luna.Identify(username)
 
         def auth_validate():
@@ -2342,20 +2394,20 @@ def login():
                     return
 
                 if password_value != confirm_password_value:
-                    print("Passwords do not match")
+                    prints.error("passwords do not match")
                     dpg.set_value(status, "Status: Passwords do not match")
                     return
 
                 try:
-                    dpg.set_value(status, "Status: Connecting to server...")
-                    print("Connecting to server...")
+                    dpg.set_value(status, "Status: connecting to server...")
+                    prints.event("connecting to server...")
                     auth_luna.connect()
-                    dpg.set_value(status, "Status: Connected to server")
+                    dpg.set_value(status, "Status: connected to server")
                 except BaseException:
                     auth_luna.disconnect()
-                    print("Disconnected from server")
+                    prints.info("disconnected from server")
                     dpg.set_value(status, "Status: Connection failed, try again later")
-                    print("Connection failed, try again later")
+                    prints.error("connection failed, try again later")
                     return
                 try:
 
@@ -2365,7 +2417,7 @@ def login():
                         dpg.set_value(status, "Status: Key is valid")
                     except BaseException:
                         auth_luna.disconnect()
-                        print("Disconnected from server")
+                        prints.info("disconnected from server")
                         dpg.set_value(status, "Status: Key is invalid")
                         return
 
@@ -2377,15 +2429,15 @@ def login():
                     auth_luna.InitAppUser(hwid)
                     auth_luna.RedeemEntitlement(key_value, "LunaSB")
                     auth_luna.disconnect()
-                    print("Disconnected from server")
+                    prints.info("disconnected from server")
                 except BaseException:
                     dpg.set_value(status, "Status: Failed to register")
-                    print("Failed to register")
+                    prints.error("failed to register")
                     auth_luna.disconnect()
-                    print("Disconnected from server")
+                    prints.info("disconnected from server")
                     return
 
-                print("Successfully registered")
+                prints.info("successfully registered")
                 dpg.set_value(status, "Status: Successfully registered")
                 username_value = Encryption(
                     '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
@@ -2425,16 +2477,16 @@ def login():
             username_value = dpg.get_value(username)
             password_value = dpg.get_value(password)
             if username_value == "" or password_value == "":
-                print("Username or password is empty")
+                prints.info("username or password is empty")
                 dpg.set_value(status, "Status: Please enter a username and password")
                 return
             try:
                 auth_connect(username_value)
-                print("Connected to Atlas")
+                prints.info("connected to server")
                 auth_luna.Login(username_value, password_value)
-                print("Logged in")
+                prints.info("logged in")
                 auth_validate()
-                print("Validated")
+                prints.info("validated")
                 username_value = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(username_value)
                 password_value = Encryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(password_value)
                 data = {"username": f"{username_value}", "password": f"{password_value}"}
@@ -2443,15 +2495,20 @@ def login():
                 dpg.delete_item(item="auth")
                 luna_user_id = auth_luna.GetUserUID()
                 auth_luna.disconnect()
-                print("Disconnected from server")
+                prints.info("disconnected from server")
                 return login()
             except Exception as e:
                 auth_luna.disconnect()
-                print(e)
+                prints.error(e)
                 dpg.set_value(status, f"Status: {e}")
                 return
 
         with dpg.window(label="Authentication", tag="auth", width=744, height=600, no_resize=True, no_collapse=True, no_move=True, no_close=True, pos=(0, 0)):
+            prints.message("no user found")
+            prints.event("opening authentication window")
+            time.sleep(0.1)
+            prints.event("loading ui")
+            time.sleep(2)
             dpg.add_spacer(height=180)
             dpg.add_text("Authentication", indent=230)
             username = dpg.add_input_text(label="Username", default_value="", indent=230, width=300)
@@ -2481,37 +2538,41 @@ def login():
                 ).CEA256(password)
 
                 try:
-                    print("Connecting to server...")
+                    prints.event("connecting to server...")
                     auth_luna.connect()
-                    print("Connected to server")
+                    prints.info("connected to server")
                 except BaseException:
                     auth_luna.disconnect()
-                    print("Failed to connect, try again later")
+                    prints.error("failed to connect, try again later")
                     ctypes.windll.user32.MessageBoxW(0, "Failed to connect, try again later", "Error", 0)
-                    print(e)
+                    prints.error(e)
                     files.remove('data/auth.luna', documents=False)
                     return login()
 
                 auth_luna.Identify(username)
-                print("Connected to Atlas")
+                prints.info("identified")
                 auth_luna.Login(username, password)
-                print("Logged in")
+                prints.info("logged in")
                 hwid = str(subprocess.check_output('wmic csproduct get uuid')).split(
                     '\\r\\n'
                 )[1].strip('\\r').strip()
                 auth_luna.ValidateUserHWID(hwid)
                 auth_luna.ValidateEntitlement("LunaSB")
                 luna_user_id = auth_luna.GetUserUID()
-                print("Validated")
+                prints.info("validated")
                 auth_luna.disconnect()
-                print("Disconnected from server")
+                prints.info("disconnected from server")
+                time.sleep(0.1)
+                prints.event("loading ui")
+                time.sleep(2)
             except Exception as e:
                 auth_luna.disconnect()
-                print("Disconnected from server")
-                print(e)
+                prints.info("disconnected from server")
+                prints.error(e)
                 ctypes.windll.user32.MessageBoxW(0, e, "Error", 0)
                 files.remove('data/auth.luna', documents=False)
-                return login()
+                os.system("pause")
+                os._exit(0)
         else:
             username = "Developer"
 
@@ -2531,14 +2592,13 @@ def login():
         # ///////////////////////////////////////////////////////////////
 
         def login_after():
-            print("login_after")
             token = files.json("data/discord.luna", "token", documents=False)
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
                 'Content-Type': 'application/json',
                 'authorization': Decryption('5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk').CEA256(token)
             }
-            r = requests.get(f"https://discordapp.com/api/{api_version}/users/@me", headers=headers).json()
+            r = requests.get(f"https://discord.com/api/{api_version}/users/@me", headers=headers).json()
             print(f"Logging into {color.print_gradient(r['username'])}#{color.print_gradient(r['discriminator'])}...")
             dpg.set_value(logged, f"Logging into {r['username']}#{r['discriminator']}...")
             global user_token
@@ -2564,7 +2624,7 @@ def login():
                 elif check == "Check the account after entering the token" or "Valid Token" not in check:
                     dpg.set_value(account, "Check the account first")
                     return
-                print("Valid Token Entered")
+                print("valid token entered")
 
                 json_object = json.load(
                     open(
@@ -2580,16 +2640,13 @@ def login():
                     json_object
                 )
 
-                print("Token Saved")
+                print("token saved")
                 dpg.set_value(account, "Logging in...")
-
-                print(f"Token: {token}")
-                print(f"Check: {check}")
 
                 # ///////////////////////////////////////////////////////////////
 
                 dpg.delete_item(item="setup")
-                print("Returning")
+                print("returning")
                 return login_thread()
 
             def get_token_user():
@@ -2605,7 +2662,7 @@ def login():
                         'authorization': token
                     }
                     r = requests.get(
-                        f"https://discordapp.com/api/{api_version}/users/@me",
+                        f"https://discord.com/api/{api_version}/users/@me",
                         headers=headers
                     ).json()
                     dpg.set_value(account, f"Valid Token: {r['username']}#{r['discriminator']}")
@@ -2632,6 +2689,40 @@ def login():
 
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+def update_thread():
+    update_found = False
+    while True:
+        r = requests.get("https://pastebin.com/raw/jBrn4WU4").json()
+        version_url = r["version"]
+
+        r = requests.get("https://pastebin.com/raw/eSGbZgms").json()
+        platinum_version_url = r["version"]
+
+        if platinum:
+            version_url = platinum_version_url
+        if not developer_mode and version != version_url:
+            if files.json(
+                    "data/notifications/toasts.json",
+                    "login",
+                    documents=False
+            ) == "on" and files.json(
+                "data/notifications/toasts.json",
+                "toasts",
+                documents=False
+            ) == "on":
+                notify.toast(f"Starting update {version_url}")
+            if files.json("data/webhooks/webhooks.json", "login", documents=False) == "on" and files.json(
+                    "data/webhooks/webhooks.json", "webhooks", documents=False
+            ) == "on" and webhook.login_url() != "webhook-url-here":
+                notify.webhook(
+                    url=webhook.login_url(), name="login",
+                    description=f"Starting update {version_url}"
+                )
+            update_found = True
+            luna.update()
+        if not update_found:
+            time.sleep(300)
 
 def uptime_thread():
     global hour
@@ -2666,6 +2757,7 @@ def uptime_thread():
 
 @bot.event
 async def on_ready():
+    await bot.change_presence(afk=True)
     print(f"Logged into {color.print_gradient(bot.user.name)}#{color.print_gradient(bot.user.discriminator)}")
     dpg.set_value(logged, f"Logged into {bot.user}")
     dpg.set_value(friends_text, f"{len(bot.user.friends)} Friends")
@@ -2683,6 +2775,10 @@ async def on_ready():
     debugger_thread = threading.Thread(target=uptime_thread)
     debugger_thread.daemon = True
     debugger_thread.start()
+    upd_thread = threading.Thread(target=update_thread)
+    upd_thread.daemon = True
+    if not developer_mode:
+        upd_thread.start()
 
     if files.json(
             "data/notifications/toasts.json",
@@ -2703,8 +2799,6 @@ async def on_ready():
             url=webhook.login_url(), name="login",
             description=f"Logged into {bot.user}"
         )
-
-    threading.Thread(target=privacy_mode, name='privacy_mode').start()
 
 
 # ///////////////////////////////////////////////////////////////
@@ -2733,7 +2827,7 @@ class OnMessage(commands.Cog, name="on message"):
                     async with httpx.AsyncClient() as client:
                         start_time = time.time()
                         result = await client.post(
-                            f'https://discordapp.com/api/{api_version}/entitlements/gift-codes/{code}/redeem',
+                            f'https://discord.com/api/{api_version}/entitlements/gift-codes/{code}/redeem',
                             json={'channel_id': message.channel.id},
                             headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'}
                         )
@@ -2803,10 +2897,10 @@ class OnMessage(commands.Cog, name="on message"):
                                             f"Request » {elapsed}"
                             )
 
-                        nitro_charge = files.json(
+                        nitro_ratelimit = files.json(
                             "data/snipers/nitro.json", "charge", documents=False
                         )
-                        if nitro_charge == "on":
+                        if nitro_ratelimit == "on":
                             startup_status = files.json(
                                 "data/config.json", "startup_status", documents=False
                             )
@@ -2820,37 +2914,37 @@ class OnMessage(commands.Cog, name="on message"):
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [⠀⠀⠀⠀⠀]"}
                             }
-                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [#⠀⠀⠀⠀]"}
                             }
-                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [##⠀⠀⠀]"}
                             }
-                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [###⠀⠀]"}
                             }
-                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [####⠀]"}
                             }
-                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [#####]"}
                             }
-                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
 
             elif files.json(
                     "data/snipers/nitro.json", "sniper",
@@ -2865,7 +2959,7 @@ class OnMessage(commands.Cog, name="on message"):
                     async with httpx.AsyncClient() as client:
                         start_time = time.time()
                         result = await client.post(
-                            f'https://discordapp.com/api/{api_version}/entitlements/gift-codes/{code}/redeem',
+                            f'https://discord.com/api/{api_version}/entitlements/gift-codes/{code}/redeem',
                             json={'channel_id': message.channel.id},
                             headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'}
                         )
@@ -2935,10 +3029,10 @@ class OnMessage(commands.Cog, name="on message"):
                                             f"Request » {elapsed}"
                             )
 
-                        nitro_charge = files.json(
+                        nitro_ratelimit = files.json(
                             "data/snipers/nitro.json", "charge", documents=False
                         )
-                        if nitro_charge == "on":
+                        if nitro_ratelimit == "on":
                             startup_status = files.json(
                                 "data/config.json", "startup_status", documents=False
                             )
@@ -2952,37 +3046,37 @@ class OnMessage(commands.Cog, name="on message"):
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [⠀⠀⠀⠀⠀]"}
                             }
-                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [#⠀⠀⠀⠀]"}
                             }
-                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [##⠀⠀⠀]"}
                             }
-                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [###⠀⠀]"}
                             }
-                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [####⠀]"}
                             }
-                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [#####]"}
                             }
-                            request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
         except Exception as e:
             prints.error(e)
 
@@ -4649,10 +4743,10 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         description="Online status"
     )
     async def online(self, luna):
-
+        await bot.change_presence(status=discord.Status.online, afk=True)
         payload = {'status': "online"}
         requests.patch(
-            f'https://discordapp.com/api/{api_version}/users/@me/settings',
+            f'https://discord.com/api/{api_version}/users/@me/settings',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -4667,10 +4761,10 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         description="Idle status"
     )
     async def idle(self, luna):
-
+        await bot.change_presence(status=discord.Status.idle, afk=True)
         payload = {'status': "idle"}
         requests.patch(
-            f'https://discordapp.com/api/{api_version}/users/@me/settings',
+            f'https://discord.com/api/{api_version}/users/@me/settings',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -4685,10 +4779,10 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         description="Do not disturb status"
     )
     async def dnd(self, luna):
-
+        await bot.change_presence(status=discord.Status.dnd, afk=True)
         payload = {'status': "dnd"}
         requests.patch(
-            f'https://discordapp.com/api/{api_version}/users/@me/settings',
+            f'https://discord.com/api/{api_version}/users/@me/settings',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -4703,10 +4797,10 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         description="Offline status"
     )
     async def offline(self, luna):
-
+        await bot.change_presence(status=discord.Status.invisible, afk=True)
         payload = {'status': "invisible"}
         requests.patch(
-            f'https://discordapp.com/api/{api_version}/users/@me/settings',
+            f'https://discord.com/api/{api_version}/users/@me/settings',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -4732,28 +4826,6 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         else:
             await mode_error(luna, "online, idle, dnd or offline")
 
-    @commands.command(
-        name="cstatus",
-        usage="<text>",
-        description="Custom status"
-    )
-    async def cstatus(self, luna, text: str):
-
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
-            'Content-Type': 'application/json',
-            'authorization': user_token
-        }
-        setting = {
-            "custom_status": {"text": text}
-        }
-        requests.patch(
-            f"https://discordapp.com/api/{api_version}/users/@me/settings",
-            headers=headers,
-            json=setting
-        ).json()
-        await message_builder(luna, description=f"```\nChanged custom status to » {text}```")
-
 
 bot.add_cog(ProfileCog(bot))
 
@@ -4767,10 +4839,10 @@ class StatusCog(commands.Cog, name="Animated statuses"):
         usage="<text>",
         description="Set a custom status"
     )
-    async def status(self, luna, text: str):
+    async def status(self, luna, *, text: str):
         payload = {'custom_status': {"text": f"{text}"}}
         requests.patch(
-            f'https://discordapp.com/api/{api_version}/users/@me/settings',
+            f'https://discord.com/api/{api_version}/users/@me/settings',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -4787,7 +4859,7 @@ class StatusCog(commands.Cog, name="Animated statuses"):
     async def removestatus(self, luna):
         payload = {'custom_status': {"text": ""}}
         requests.patch(
-            f'https://discordapp.com/api/{api_version}/users/@me/settings',
+            f'https://discord.com/api/{api_version}/users/@me/settings',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -4860,7 +4932,7 @@ class ChannelCog(commands.Cog, name="Channel commands"):
             'type': 13
         }
         requests.post(
-            f'https://discordapp.com/api/{api_version}/guilds/{luna.guild.id}/channels',
+            f'https://discord.com/api/{api_version}/guilds/{luna.guild.id}/channels',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -4883,7 +4955,7 @@ class ChannelCog(commands.Cog, name="Channel commands"):
             'type': 5
         }
         requests.post(
-            f'https://discordapp.com/api/{api_version}/guilds/{luna.guild.id}/channels',
+            f'https://discord.com/api/{api_version}/guilds/{luna.guild.id}/channels',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -5003,7 +5075,7 @@ class ChannelCog(commands.Cog, name="Channel commands"):
         description="Purge the channel"
     )
     async def purge(self, luna, amount: int):
-
+        await luna.message.delete()
         async for message in luna.message.channel.history(limit=amount):
             try:
                 await message.delete()
@@ -5044,7 +5116,7 @@ class MemberCog(commands.Cog, name="Member commands"):
         if user is None:
             user = luna.author
         r = requests.get(
-            f'https://discordapp.com/api/{api_version}/users/{user.id}',
+            f'https://discord.com/api/{api_version}/users/{user.id}',
             headers={
                 'authorization': user_token,
                 'user-agent': 'Mozilla/5.0'
@@ -5053,7 +5125,7 @@ class MemberCog(commands.Cog, name="Member commands"):
         req = await bot.http.request(discord.http.Route("GET", "/users/{uid}", uid=user.id))
         banner_id = req["banner"]
         if banner_id:
-            banner_url = f"https://cdn.discordapp.com/banners/{user.id}/{banner_id}?size=1024"
+            banner_url = f"https://cdn.discord.com/banners/{user.id}/{banner_id}?size=1024"
         else:
             banner_url = None
         await message_builder(
@@ -5128,7 +5200,7 @@ class MemberCog(commands.Cog, name="Member commands"):
             'reason': reason
         }
         requests.post(
-            'https://discordapp.com/api/{api_version}/report',
+            'https://discord.com/api/{api_version}/report',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -5184,7 +5256,7 @@ class MemberCog(commands.Cog, name="Member commands"):
             'duration': time
         }
         requests.post(
-            f'https://discordapp.com/api/{api_version}/guilds/{luna.guild.id}/bans',
+            f'https://discord.com/api/{api_version}/guilds/{luna.guild.id}/bans',
             json=payload,
             headers={
                 'authorization': user_token,
@@ -8919,7 +8991,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                     'Content-Type': 'application/json',
                     'authorization': token
                 }
-                url = f"https://discordapp.com/api/v6/users/@me/library"
+                url = f"https://discord.com/api/v6/users/@me/library"
                 request = requests.get(url, headers=headers)
                 if request.status_code == 200:
                     valid_tokens.append(token)
@@ -8944,7 +9016,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
     async def tokeninfo(self, luna, token: str):
 
         headers = {"Authorization": token, "Content-Type": "application/json"}
-        res = requests.get(f"https://discordapp.com/api/{api_version}/users/@me", headers=headers)
+        res = requests.get(f"https://discord.com/api/{api_version}/users/@me", headers=headers)
         cc_digits = {"american express": "3", "visa": "4", "mastercard": "5"}
         languages = {
             "da": "Danish, Denmark",
@@ -8981,7 +9053,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
             user_name = f'{res_json["username"]}#{res_json["discriminator"]}'
             user_id = res_json["id"]
             avatar_id = res_json["avatar"]
-            avatar_url = f"https://cdn.discordapp.com/avatars/{user_id}/{avatar_id}.gif"
+            avatar_url = f"https://cdn.discord.com/avatars/{user_id}/{avatar_id}.gif"
             phone_number = res_json["phone"]
             email = res_json["email"]
             mfa_enabled = res_json["mfa_enabled"]
@@ -8993,7 +9065,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                 ((int(user_id) >> 22) + 1420070400000) / 1000
             ).strftime("%d-%m-%Y %H:%M:%S")
             res = requests.get(
-                "https://discordapp.com/api/v6/users/@me/billing/subscriptions",
+                "https://discord.com/api/v6/users/@me/billing/subscriptions",
                 headers=headers,
             )
             nitro_data = res.json()
@@ -9010,7 +9082,7 @@ class ToolsCog(commands.Cog, name="Tools commands"):
                 days_left = abs((d2 - d1).days)
             billing_info = []
             for x in requests.get(
-                    "https://discordapp.com/api/v6/users/@me/billing/payment-sources",
+                    "https://discord.com/api/v6/users/@me/billing/payment-sources",
                     headers=headers,
             ).json():
                 y = x["billing_address"]
@@ -10213,7 +10285,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
     )
     async def playing(self, luna, *, status: str):
         try:
-            await self.bot.change_presence(activity=discord.Game(name=status))
+            await self.bot.change_presence(activity=discord.Game(name=status), afk=True)
             await message_builder(luna, title="Status Changed", description=f"```Status changed to » Playing {status}```")
         except Exception as e:
             await error_builder(luna, description=f"```{e}```")
@@ -10225,7 +10297,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
     )
     async def streaming(self, luna, *, status: str):
         try:
-            await self.bot.change_presence(activity=discord.Streaming(name=status, url=configs.stream_url()))
+            await self.bot.change_presence(activity=discord.Streaming(name=status, url=configs.stream_url()), afk=True)
             await message_builder(luna, title="Status Changed", description=f"```Status changed to » Streaming {status}```")
         except Exception as e:
             await error_builder(luna, description=f"```{e}```")
@@ -10237,7 +10309,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
     )
     async def listening(self, luna, *, status: str):
         try:
-            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=status))
+            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=status), afk=True)
             await message_builder(luna, title="Status Changed", description=f"```Status changed to » Listening to {status}```")
         except Exception as e:
             await error_builder(luna, description=f"```{e}```")
@@ -10249,7 +10321,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
     )
     async def watching(self, luna, *, status: str = None):
         try:
-            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=status))
+            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=status), afk=True)
             await message_builder(luna, title="Status Changed", description=f"```Status changed to » Watching {status}```")
         except Exception as e:
             await error_builder(luna, description=f"```{e}```")
@@ -10262,7 +10334,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
     )
     async def stopactivity(self, luna):
         try:
-            await self.bot.change_presence(activity=None)
+            await self.bot.change_presence(activity=None, afk=True)
             await message_builder(luna, title="Status Changed", description="```Status changed to » Nothing```")
         except Exception as e:
             await error_builder(luna, description=f"```{e}```")
@@ -10273,7 +10345,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
         description="Clean your messages"
     )
     async def clean(self, luna, amount: int):
-
+        await luna.message.delete()
         try:
             await luna.channel.purge(limit=amount, before=luna.message, check=is_me)
         except BaseException:
@@ -10381,7 +10453,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 
         try:
             request.post(
-                'https://discordapp.com/api/{api_version}/hypesquad/online',
+                'https://discord.com/api/{api_version}/hypesquad/online',
                 headers=headers, json=payload
             )
             prints.message(f"Successfully set your hypesquad house to {house}")
@@ -10471,7 +10543,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
 
         try:
             guilds = requests.get(
-                'https://discordapp.com/api/{api_version}/users/@me/guilds',
+                'https://discord.com/api/{api_version}/users/@me/guilds',
                 headers={
                     'authorization': user_token,
                     'user-agent': 'Mozilla/5.0'
@@ -10480,7 +10552,7 @@ class UtilsCog(commands.Cog, name="Util commands"):
             for guild in range(0, len(guilds)):
                 guild_id = guilds[guild]['id']
                 requests.delete(
-                    f'https://discordapp.com/api/{api_version}/users/@me/guilds/{guild_id}',
+                    f'https://discord.com/api/{api_version}/users/@me/guilds/{guild_id}',
                     headers={
                         'authorization': user_token,
                         'user-agent': 'Mozilla/5.0'
@@ -10593,7 +10665,7 @@ class SpamCog(commands.Cog, name="Spam commands"):
                         'reason': reason
                     }
                     requests.post(
-                        'https://discordapp.com/api/{api_version}/report',
+                        'https://discord.com/api/{api_version}/report',
                         json=payload,
                         headers={
                             'authorization': user_token,
@@ -11110,8 +11182,8 @@ class GuildCog(commands.Cog, name="Guild commands"):
         if configs.risk_mode() == "on":
             try:
                 for channel in luna.guild.channels:
-                    if channel.name != "general":
-                        await channel.delete()
+                    await channel.delete()
+                    await asyncio.sleep(1)
                 await message_builder(luna, title="Success", description="```\nDeleted all channels```")
             except Exception as e:
                 await error_builder(luna, description=f"```{e}```")
@@ -11127,6 +11199,7 @@ class GuildCog(commands.Cog, name="Guild commands"):
                 for role in luna.guild.roles:
                     if role.name != "@everyone":
                         await role.delete()
+                        await asyncio.sleep(1)
                 await message_builder(luna, title="Success", description="```\nDeleted all roles```")
             except Exception as e:
                 await error_builder(luna, description=f"```{e}```")
@@ -11141,6 +11214,7 @@ class GuildCog(commands.Cog, name="Guild commands"):
             try:
                 for emoji in luna.guild.emojis:
                     await emoji.delete()
+                    await asyncio.sleep(1)
                 await message_builder(luna, title="Success", description="```\nDeleted all emojis```")
             except Exception as e:
                 await error_builder(luna, description=f"```{e}```")
@@ -11250,7 +11324,7 @@ class ExploitCog(commands.Cog, name="Exploit commands"):
 #
 
 # 	await message_builder(luna, title="Token Disabler", description=f"```\nAttempting to disable the token...```", delete_after=3)
-# 	res = requests.patch('https://discordapp.com/api/{api_version}/guilds', headers={'Authorization': token}, json={'name': 'Luna Disabler'})
+# 	res = requests.patch('https://discord.com/api/{api_version}/guilds', headers={'Authorization': token}, json={'name': 'Luna Disabler'})
 # await message_builder(luna, title="Token Disabler",
 # description=f"```\n{res}``````json\nJSON\n\n{res.json()}```")
 
@@ -11266,7 +11340,7 @@ class ExploitCog(commands.Cog, name="Exploit commands"):
 
 # 	DISABLED_MESSAGE = "You need to be 13 or older in order to use Discord."
 # 	IMMUNE_MESSAGE = "You cannot update your date of birth."
-# 	res = requests.patch('https://discordapp.com/api/{api_version}/users/@me', headers={'Authorization': token}, json={'date_of_birth': '2017-2-11'})
+# 	res = requests.patch('https://discord.com/api/{api_version}/users/@me', headers={'Authorization': token}, json={'date_of_birth': '2017-2-11'})
 
 # 	if res.status_code == 400:
 # 		res_message = res.json().get('date_of_birth', ['no response message'])[0]
@@ -12433,8 +12507,8 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 except BaseException:
                     custom_command_count = 0
                 print(motd.center(os.get_terminal_size().columns))
-                if beta:
-                    print("Beta Build".center(os.get_terminal_size().columns))
+                if platinum:
+                    print("Platinum Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
                     "data/config.json",
                     "prefix", documents=False
@@ -12521,8 +12595,8 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 except BaseException:
                     custom_command_count = 0
                 print(motd.center(os.get_terminal_size().columns))
-                if beta:
-                    print("Beta Build".center(os.get_terminal_size().columns))
+                if platinum:
+                    print("Platinum Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
                     "data/config.json",
                     "prefix", documents=False
@@ -12634,8 +12708,8 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 except BaseException:
                     custom_command_count = 0
                 print(motd.center(os.get_terminal_size().columns))
-                if beta:
-                    print("Beta Build".center(os.get_terminal_size().columns))
+                if platinum:
+                    print("Platinum Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
                     "data/config.json",
                     "prefix", documents=False
@@ -12722,8 +12796,8 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 except BaseException:
                     custom_command_count = 0
                 print(motd.center(os.get_terminal_size().columns))
-                if beta:
-                    print("Beta Build".center(os.get_terminal_size().columns))
+                if platinum:
+                    print("Platinum Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
                     "data/config.json",
                     "prefix", documents=False
@@ -12835,8 +12909,8 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 except BaseException:
                     custom_command_count = 0
                 print(motd.center(os.get_terminal_size().columns))
-                if beta:
-                    print("Beta Build".center(os.get_terminal_size().columns))
+                if platinum:
+                    print("Platinum Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
                     "data/config.json",
                     "prefix", documents=False
@@ -12923,8 +12997,8 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 except BaseException:
                     custom_command_count = 0
                 print(motd.center(os.get_terminal_size().columns))
-                if beta:
-                    print("Beta Build".center(os.get_terminal_size().columns))
+                if platinum:
+                    print("Platinum Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
                     "data/config.json",
                     "prefix", documents=False
@@ -13035,8 +13109,8 @@ class SettingsCog(commands.Cog, name="Settings commands"):
             except BaseException:
                 custom_command_count = 0
             print(motd.center(os.get_terminal_size().columns))
-            if beta:
-                print("Beta Build".center(os.get_terminal_size().columns))
+            if platinum:
+                print("Platinum Build".center(os.get_terminal_size().columns))
             prefix = files.json(
                 "data/config.json",
                 "prefix", documents=False
@@ -13123,8 +13197,8 @@ class SettingsCog(commands.Cog, name="Settings commands"):
             except BaseException:
                 custom_command_count = 0
             print(motd.center(os.get_terminal_size().columns))
-            if beta:
-                print("Beta Build".center(os.get_terminal_size().columns))
+            if platinum:
+                print("Platinum Build".center(os.get_terminal_size().columns))
             prefix = files.json(
                 "data/config.json",
                 "prefix", documents=False
@@ -13237,8 +13311,8 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 except BaseException:
                     custom_command_count = 0
                 print(motd.center(os.get_terminal_size().columns))
-                if beta:
-                    print("Beta Build".center(os.get_terminal_size().columns))
+                if platinum:
+                    print("Platinum Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
                     "data/config.json",
                     "prefix", documents=False
@@ -13325,8 +13399,8 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 except BaseException:
                     custom_command_count = 0
                 print(motd.center(os.get_terminal_size().columns))
-                if beta:
-                    print("Beta Build".center(os.get_terminal_size().columns))
+                if platinum:
+                    print("Platinum Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
                     "data/config.json",
                     "prefix", documents=False
@@ -13441,8 +13515,8 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 except BaseException:
                     custom_command_count = 0
                 print(motd.center(os.get_terminal_size().columns))
-                if beta:
-                    print("Beta Build".center(os.get_terminal_size().columns))
+                if platinum:
+                    print("Platinum Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
                     "data/config.json",
                     "prefix", documents=False
@@ -13529,8 +13603,8 @@ class SettingsCog(commands.Cog, name="Settings commands"):
                 except BaseException:
                     custom_command_count = 0
                 print(motd.center(os.get_terminal_size().columns))
-                if beta:
-                    print("Beta Build".center(os.get_terminal_size().columns))
+                if platinum:
+                    print("Platinum Build".center(os.get_terminal_size().columns))
                 prefix = files.json(
                     "data/config.json",
                     "prefix", documents=False
@@ -13664,7 +13738,7 @@ async def {name}(self, luna):
     async def darkmode(self, luna):
 
         requests.patch(
-            f'https://discordapp.com/api/{api_version}/users/@me/settings',
+            f'https://discord.com/api/{api_version}/users/@me/settings',
             json={
                 'theme': "dark"
             },
@@ -13683,7 +13757,7 @@ async def {name}(self, luna):
     async def lightmode(self, luna):
 
         requests.patch(
-            f'https://discordapp.com/api/{api_version}/users/@me/settings',
+            f'https://discord.com/api/{api_version}/users/@me/settings',
             json={
                 'theme': "light"
             },
@@ -13732,7 +13806,7 @@ class ShareCog(commands.Cog, name="Share commands"):
             await error_builder(luna, description=f"```\nYou can't use share on yourself```")
             return
         config.user_id(user.id)
-        prints.message(f"Share user set to » {color.print_gradient(f'{user}')}")
+        prints.message(f"Share user set to » {user}")
         await message_builder(luna, description=f"```\nShare user set to » {user}```")
 
     @commands.command(
@@ -14736,9 +14810,9 @@ class SniperCog(commands.Cog, name="Sniper settings"):
     )
     async def snipercharge(self, luna, mode: str):
         if mode == "on" or mode == "off":
-            prints.message(f"Nitro sniper charge » {mode}")
+            prints.message(f"Nitro ratelimit » {mode}")
             config._global("data/snipers/nitro.json", "charge", mode)
-            await message_builder(luna, description=f"```\nNitro sniper charge » {mode}```")
+            await message_builder(luna, description=f"```\nNitro ratelimit » {mode}```")
             if mode == "on":
                 startup_status = files.json(
                 "data/config.json", "startup_status", documents=False
@@ -14753,7 +14827,7 @@ class SniperCog(commands.Cog, name="Sniper settings"):
                     'status': startup_status,
                     "custom_status": {"text": f"Ratelimit: [#####]"}
                 }
-                request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
             else:
                 startup_status = files.json(
                     "data/config.json", "startup_status", documents=False
@@ -14768,7 +14842,7 @@ class SniperCog(commands.Cog, name="Sniper settings"):
                     'status': startup_status,
                     "custom_status": {"text": f""}
                 }
-                request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
         else:
             await mode_error(luna, "on or off")
 
@@ -15905,8 +15979,8 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         custom_command_count = 0
         for _ in custom:
             custom_command_count += 1
-        if beta:
-            beta_info = f" Beta Build"
+        if platinum:
+            beta_info = f"Platinum Build"
         else:
             beta_info = ""
         await message_builder(
@@ -16279,11 +16353,11 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         version_url = r["version"]
 
         r = requests.get("https://pastebin.com/raw/eSGbZgms").json()
-        beta_version_url = r["version"]
+        platinum_version_url = r["version"]
         
-        if beta:
-            prints.message("Beta Build")
-            version_url = beta_version_url
+        if platinum:
+            prints.message("platinum build")
+            version_url = platinum_version_url
 
         if developer_mode:
             await message_builder(
@@ -16325,13 +16399,13 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
             updater_url = r["updater"]
 
             r = requests.get("https://pastebin.com/raw/eSGbZgms").json()
-            beta_updater_url = r["updater"]
+            platinum_updater_url = r["updater"]
 
             url = updater_url
-            if beta:
-                prints.message("Beta Build")
-                url = beta_updater_url
-            prints.event("Downloading Updater...")
+            if platinum:
+                prints.message("platinum build")
+                url = platinum_updater_url
+            prints.event("downloading updater...")
             from clint.textui import progress
             r = requests.get(url, stream=True)
             with open('Updater.exe', 'wb') as f:
@@ -16358,7 +16432,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         description="Restart Luna"
     )
     async def restart(self, luna):
-
+        await luna.message.delete()
         # if configs.mode() == 2:
         # 	sent = await luna.send(f"```ini\n[ Restarting ]\n\nAllow up to 5 seconds\n\n[ {theme.footer()} ]```")
         # 	await asyncio.sleep(3)
@@ -16384,7 +16458,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         description="Shutdown Luna"
     )
     async def shutdown(self, luna):
-
+        await luna.message.delete()
         os._exit(0)
 
     @commands.command(
@@ -16393,7 +16467,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         description="Quickly close Luna"
     )
     async def panic(self, luna):
-
+        await luna.message.delete()
         os._exit(0)
 
     @commands.command(
@@ -16481,13 +16555,13 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
         headers = {'Authorization': user_token}
         message_ = f'{magic_char} {message} {magic_char}'
         res = requests.post(
-            f'https://discordapp.com/api/{api_version}/channels/{luna.channel.id}/messages', headers=headers,
+            f'https://discord.com/api/{api_version}/channels/{luna.channel.id}/messages', headers=headers,
             json={'content': message_}
         )
         if res.status_code == 200:
             message_id = res.json()['id']
             requests.patch(
-                f'https://discordapp.com/api/{api_version}/channels/{luna.channel.id}/messages/{message_id}',
+                f'https://discord.com/api/{api_version}/channels/{luna.channel.id}/messages/{message_id}',
                 headers=headers, json={'content': ' ' + message_}
             )
 
@@ -16770,51 +16844,55 @@ async def error_builder(luna, description=""):
 
 #     width, height, channels, data = dpg.load_image("data/resources/luna_ascii.png")
 
-def privacy_mode():
+def privacy_mode(sender, app_data, user_data):
 
     global privacy
     global luna_user_id
 
-    while True:
-        if dpg.get_value('privacy_checkbox'):
-            privacy = True
-            now = datetime.now()
-            hour = now.hour
-            if hour < 12:
-                greeting = "Good morning"
-            elif hour < 18:
-                greeting = "Good afternoon"
-            else:
-                greeting = "Good evening"
-            dpg.set_value(luna_user, f"{greeting}, Luna")
-            dpg.set_value(logged, "Logged into Luna#0000")
-            dpg.set_value(luna_uid_text, "UID: Privacy Mode")
+    if app_data:
+        privacy = True
+        now = datetime.now()
+        hour = now.hour
+        if hour < 12:
+            greeting = "Good morning"
+        elif hour < 18:
+            greeting = "Good afternoon"
         else:
-            privacy = False
-            now = datetime.now()
-            hour = now.hour
-            username = f"Dev - {os.getlogin()}" if developer_mode else os.getlogin()
-            if hour < 12:
-                greeting = "Good morning"
-            elif hour < 18:
-                greeting = "Good afternoon"
-            else:
-                greeting = "Good evening"
+            greeting = "Good evening"
+        dpg.set_value(luna_user, f"{greeting}, Luna")
+        dpg.set_value(logged, "Logged into Luna#0000")
+        dpg.set_value(luna_uid_text, "UID: Privacy Mode")
+        dpg.set_value(friends_text, "0 Friends")
+        dpg.set_value(guilds_text, "0 Guilds")
+        prints.message("Privacy mode » on")
+    else:
+        privacy = False
+        now = datetime.now()
+        hour = now.hour
+        username = f"Dev - {os.getlogin()}" if developer_mode else os.getlogin()
+        if hour < 12:
+            greeting = "Good morning"
+        elif hour < 18:
+            greeting = "Good afternoon"
+        else:
+            greeting = "Good evening"
 
-            if not developer_mode:
-                if files.file_exist('data/auth.luna', documents=False):
-                    username = files.json(
-                        "data/auth.luna", "username", documents=False
-                    )
-                    username = Decryption(
-                        '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
-                    ).CEA256(username)
-            else:
-                username = "Developer"
-            dpg.set_value(luna_user, f"{greeting}, {username}")
-            dpg.set_value(logged, f"Logged into {bot.user}")
-            dpg.set_value(luna_uid_text, f"UID: {luna_user_id}")
-        time.sleep(1)
+        if not developer_mode:
+            if files.file_exist('data/auth.luna', documents=False):
+                username = files.json(
+                    "data/auth.luna", "username", documents=False
+                )
+                username = Decryption(
+                    '5QXapyTDbrRwW4ZBnUgPGAs9CeVSdiLk'
+                ).CEA256(username)
+        else:
+            username = "Developer"
+        dpg.set_value(luna_user, f"{greeting}, {username}")
+        dpg.set_value(logged, f"Logged into {bot.user}")
+        dpg.set_value(luna_uid_text, f"UID: {luna_user_id}")
+        dpg.set_value(friends_text, f"{len(bot.user.friends)} Friends")
+        dpg.set_value(guilds_text, f"{len(bot.guilds)} Guilds")
+        prints.message("Privacy mode » off")
 
 
 #     with dpg.texture_registry():
@@ -16855,9 +16933,9 @@ def privacy_mode():
 #             config.privnote.sniper("off")
 
 
-#     def charge_control(sender, app_data, user_data):
+#     def ratelimit_control(sender, app_data, user_data):
 #         if app_data:
-#             prints.message(f"Nitro sniper charge » on")
+#             prints.message(f"Nitro ratelimit » on")
 #             config._global("data/snipers/nitro.json", "charge", "on")
 #             startup_status = files.json(
 #                 "data/config.json", "startup_status", documents=False
@@ -16872,9 +16950,9 @@ def privacy_mode():
 #                 'status': startup_status,
 #                 "custom_status": {"text": f"Ratelimit: [#####]"}
 #             }
-#             request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+#             request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
 #         else:
-#             prints.message(f"Nitro sniper charge » off")
+#             prints.message(f"Nitro ratelimit » off")
 #             config._global("data/snipers/nitro.json", "charge", "off")
 #             startup_status = files.json(
 #                 "data/config.json", "startup_status", documents=False
@@ -16889,7 +16967,7 @@ def privacy_mode():
 #                 'status': startup_status,
 #                 "custom_status": {"text": f""}
 #             }
-#             request.patch(f"https://discordapp.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+#             request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
 
 
 #     def delay_control(sender, app_data, user_data):
@@ -16946,13 +17024,13 @@ def privacy_mode():
 #         else:
 #             privnote_sniper = False
     
-#         nitro_charge = files.json(
+#         nitro_ratelimit = files.json(
 #             "data/snipers/nitro.json", "charge", documents=False
 #         )
-#         if nitro_charge == "on":
-#             nitro_charge = True
+#         if nitro_ratelimit == "on":
+#             nitro_ratelimit = True
 #         else:
-#             nitro_charge = False
+#             nitro_ratelimit = False
 
 #         delay_in_minutes = files.json(
 #             "data/snipers/giveaway.json", "delay_in_minutes", documents=False
@@ -16980,7 +17058,7 @@ def privacy_mode():
 #         # dpg.add_spacer(height=1)
 #         dpg.add_separator()
 #         dpg.add_text("Nitro Sniper")
-#         dpg.add_checkbox(label="Charge Status", default_value=nitro_charge, callback=charge_control)
+#         dpg.add_checkbox(label="Charge Status", default_value=nitro_ratelimit, callback=ratelimit_control)
 #         # dpg.add_spacer(height=1)
 #         dpg.add_separator()
 #         dpg.add_text("Giveaway Sniper")
@@ -17015,11 +17093,11 @@ def privacy_mode():
 #         if app_data == "default":
 #             prints.message(f"Changed theme » {app_data}")
 #             config.theme(app_data)
-#             dpg.set_value(selected_theme, f"Active Theme: {app_data}")
+#             dpg.set_value(current_theme_text, f"Current Theme: {app_data}")
 #         else:
 #             prints.message(f"Changed theme » {app_data}")
 #             config.theme(app_data + ".json")
-#             dpg.set_value(selected_theme, f"Active Theme: {app_data}")
+#             dpg.set_value(current_theme_text, f"Current Theme: {app_data}")
 
     
 #     def reload_themes(sender, app_data, user_data):
@@ -17031,7 +17109,7 @@ def privacy_mode():
 #         selected = dpg.get_value(themes_box)
 #         if selected not in themes:
 #             dpg.set_value(themes_box, "default")
-#             dpg.set_value(selected_theme, "Active Theme: default")
+#             dpg.set_value(current_theme_text, "Current Theme: default")
 #             prints.message("Changed theme » default")
 #             config.theme("default")
 #         else:
@@ -17041,7 +17119,7 @@ def privacy_mode():
 #             else:
 #                 themesvar = (themesvar[:-5])
 #             dpg.set_value(themes_box, themesvar)
-#             dpg.set_value(selected_theme, f"Active Theme: {themesvar}")
+#             dpg.set_value(current_theme_text, f"Current Theme: {themesvar}")
 #             prints.message(f"Reloaded theme » {themesvar}")
 #             config.theme(themesvar)
 
@@ -17053,7 +17131,7 @@ def privacy_mode():
 #             pass
 #         else:
 #             dpg.set_value(themes_box, "default")
-#             dpg.set_value(selected_theme, "Active Theme: default")
+#             dpg.set_value(current_theme_text, "Current Theme: default")
 #             config.theme("default")
 #             files.remove(f"data/themes/{selected}.json", documents=False)
 #             prints.message(f"Deleted theme » {selected}")
@@ -17090,7 +17168,7 @@ def privacy_mode():
 #         themes.insert(0, "default")
 #         dpg.configure_item(themes_box, items=themes)
 #         dpg.set_value(themes_box, theme_name)
-#         dpg.set_value(selected_theme, f"Active Theme: {theme_name}")
+#         dpg.set_value(current_theme_text, f"Current Theme: {theme_name}")
 #         prints.message(f"Changed theme » {theme_name}")
 
 
@@ -17100,7 +17178,7 @@ def privacy_mode():
 #             "data/protections/config.json", "footer", documents=False
 #         )
 
-#         selected_theme = dpg.add_text(f"Active Theme: {themesvar}")
+#         current_theme_text = dpg.add_text(f"Current Theme: {themesvar}")
 #         dpg.add_separator()
 #         dpg.add_text("Available Themes")
 #         themes_box = dpg.add_combo(label="Themes", items=themes, default_value=themesvar, callback=theme_control)
@@ -17150,6 +17228,662 @@ def privacy_mode():
 #         dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, (51, 51, 55, 255), category=dpg.mvThemeCat_Core)
 #         dpg.add_theme_color(dpg.mvThemeCol_TitleBg, (51, 51, 55, 255), category=dpg.mvThemeCat_Core)
 
+# //////////////////////////////////////////////////////////////////////////
+# Create viewport and bind font
+# //////////////////////////////////////////////////////////////////////////
+
+dpg.create_context()
+
+# dpg.create_viewport(
+#     title='Luna', width=760, height=600, resizable=False, decorated=True, clear_color=(114, 137, 218, 255), small_icon="data/resources/luna.ico", large_icon="data/resources/luna.ico"
+#     )
+
+dpg.create_viewport(
+    title='Luna', width=750, height=594, resizable=False, decorated=True, clear_color=(114, 137, 218, 255), small_icon="data/resources/luna.ico", large_icon="data/resources/luna.ico"
+    )
+
+
+with dpg.font_registry():
+    default_font = dpg.add_font("data/resources/arial.ttf", 13)
+
+dpg.bind_font(default_font)
+
+
+# //////////////////////////////////////////////////////////////////////////
+# Functions
+# //////////////////////////////////////////////////////////////////////////
+
+
+
+def close_account():
+    files.remove('data/auth.luna', documents=False)
+    os._exit(0)
+
+
+def close_token():
+    files.remove('data/discord.luna', documents=False)
+    os._exit(0)
+
+
+def nitro_control(sender, app_data, user_data):
+    if app_data:
+        prints.message(f"Nitro sniper » on")
+        config.nitro.sniper("on")
+    else:
+        prints.message(f"Nitro sniper » off")
+        config.nitro.sniper("off")
+
+
+def giveaway_control(sender, app_data, user_data):
+    if app_data:
+        prints.message(f"Giveaway sniper » on")
+        config.giveaway.joiner("on")
+    else:
+        prints.message(f"Giveaway sniper » off")
+        config.giveaway.joiner("off")
+
+
+def privnote_control(sender, app_data, user_data):
+    if app_data:
+        prints.message(f"Privnote sniper » on")
+        config.privnote.sniper("on")
+    else:
+        prints.message(f"Privnote sniper » off")
+        config.privnote.sniper("off")
+
+
+def ratelimit_control(sender, app_data, user_data):
+    if app_data:
+        prints.message(f"Nitro ratelimit » on")
+        config._global("data/snipers/nitro.json", "charge", "on")
+        startup_status = files.json(
+            "data/config.json", "startup_status", documents=False
+        )
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
+            'Content-Type': 'application/json',
+            'Authorization': user_token,
+        }
+        request = requests.Session()
+        setting = {
+            'status': startup_status,
+            "custom_status": {"text": f"Ratelimit: [#####]"}
+        }
+        request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+    else:
+        prints.message(f"Nitro ratelimit » off")
+        config._global("data/snipers/nitro.json", "charge", "off")
+        startup_status = files.json(
+            "data/config.json", "startup_status", documents=False
+        )
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
+            'Content-Type': 'application/json',
+            'Authorization': user_token,
+        }
+        request = requests.Session()
+        setting = {
+            'status': startup_status,
+            "custom_status": {"text": f""}
+        }
+        request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+
+
+def delay_control(sender, app_data, user_data):
+    minutes_value = dpg.get_value(minutes_slider)
+    prints.message(f"Giveaway joiner delay » {str(minutes_value)}")
+    config.giveaway.delay_in_minutes(f"{minutes_value}") 
+
+
+def prefix_control(sender, app_data, user_data):
+    prefix_value = dpg.get_value(gui_input_prefix)
+    prints.message(f"Prefix » {str(prefix_value)}")
+    bot.command_prefix = prefix_value
+    config.prefix(prefix_value)
+    dpg.set_value(gui_prefix, f"Prefix: {prefix_value}")
+
+
+def timer_control(sender, app_data, user_data):
+    timer_value = dpg.get_value(gui_delete_timer)
+    config.delete_timer(f"{timer_value}")
+    prints.message(f"Auto delete timer » {str(timer_value)}")
+
+
+def joiner_control(sender, app_data, user_data):
+    if app_data:
+        prints.message(f"Server joiner » on")
+        config.giveaway.guild_joiner("on")
+    else:
+        prints.message(f"Server joiner » off")
+        config.giveaway.guild_joiner("off")
+
+
+path_to_json = 'data/themes/'
+themes = [pos_json.replace(".json", "") for pos_json in os.listdir(
+    path_to_json
+) if pos_json.endswith('.json')]
+themes.insert(0, "default")
+prefix = files.json("data/config.json", "prefix", documents=False)
+themesvar = files.json("data/config.json", "theme", documents=False)
+if themesvar == "default":
+    pass
+else:
+    themesvar = (themesvar[:-5])
+
+
+def theme_control(sender, app_data, user_data):
+    if app_data == "default":
+        prints.message(f"Changed theme » {app_data}")
+        config.theme(app_data)
+        dpg.set_value(current_theme_text, f"Current Theme: {app_data}")
+    else:
+        prints.message(f"Changed theme » {app_data}")
+        config.theme(app_data + ".json")
+        dpg.set_value(current_theme_text, f"Current Theme: {app_data}")
+
+
+def reload_themes(sender, app_data, user_data):
+    themes = [pos_json.replace(".json", "") for pos_json in os.listdir(
+        path_to_json
+    ) if pos_json.endswith('.json')]
+    themes.insert(0, "default")
+    dpg.configure_item(themes_box, items=themes)
+    selected = dpg.get_value(themes_box)
+    if selected not in themes:
+        dpg.set_value(themes_box, "default")
+        dpg.set_value(current_theme_text, "Current Theme: default")
+        prints.message("Changed theme » default")
+        config.theme("default")
+    else:
+        themesvar = files.json("data/config.json", "theme", documents=False)
+        if themesvar == "default":
+            pass
+        else:
+            themesvar = (themesvar[:-5])
+        dpg.set_value(themes_box, themesvar)
+        dpg.set_value(current_theme_text, f"Current Theme: {themesvar}")
+        prints.message(f"Reloaded theme » {themesvar}")
+        config.theme(themesvar)
+
+
+def delete_selected(sender, app_data, user_data):
+    selected = dpg.get_value(themes_box)
+    if selected == "default":
+        prints.message("Can't delete default theme")
+        pass
+    else:
+        dpg.set_value(themes_box, "default")
+        dpg.set_value(current_theme_text, "Current Theme: default")
+        config.theme("default")
+        files.remove(f"data/themes/{selected}.json", documents=False)
+        prints.message(f"Deleted theme » {selected}")
+        prints.message("Changed theme » default")
+        themes = [pos_json.replace(".json", "") for pos_json in os.listdir(
+            path_to_json
+        ) if pos_json.endswith('.json')]
+        themes.insert(0, "default")
+        dpg.configure_item(themes_box, items=themes)
+
+
+def protections_footer_control(sender, app_data, user_data):
+    if app_data:
+        prints.message(f"Protections footer » on")
+        config._global("data/protections/config.json", "footer", True)
+    else:
+        prints.message(f"Protections footer » off")
+        config._global("data/protections/config.json", "footer", False)
+
+
+def theme_editor():
+    theme_name = dpg.get_value(editor_theme)
+    theme_title = dpg.get_value(editor_title)
+    theme_footer = dpg.get_value(editor_footer)
+    theme_description = dpg.get_value(description_footer)
+
+    prints.message(f"Created theme » {theme_name}")
+    data = {
+        "title": theme_title,
+        "footer": theme_footer,
+        "description": theme_description
+    }
+    files.write_json(
+        f"data/themes/{theme_name}.json", data, documents=False
+    )
+    config.theme(theme_name)
+    themes = [pos_json.replace(".json", "") for pos_json in os.listdir(
+        path_to_json
+    ) if pos_json.endswith('.json')]
+    themes.insert(0, "default")
+    dpg.configure_item(themes_box, items=themes)
+    dpg.set_value(themes_box, theme_name)
+    dpg.set_value(current_theme_text, f"Current Theme: {theme_name}")
+    prints.message(f"Changed theme » {theme_name}")
+
+
+# //////////////////////////////////////////////////////////////////////////
+# Create Windows
+# //////////////////////////////////////////////////////////////////////////
+
+def button_main_window():
+    dpg.show_item("luna_ascii")
+    dpg.show_item("user_info")
+    dpg.show_item("luna_info")
+    dpg.show_item("discord_info")
+    dpg.show_item("general_info")
+    dpg.show_item("motd_info")
+    dpg.hide_item("general_settings")
+    dpg.hide_item("theme_settings")
+    dpg.hide_item("sniper_settings")
+    dpg.hide_item("privacy_settings")
+
+def button_general_window():
+    dpg.show_item("general_settings")
+    dpg.show_item("theme_settings")
+    dpg.show_item("privacy_settings")
+    dpg.hide_item("user_info")
+    dpg.hide_item("luna_info")
+    dpg.hide_item("discord_info")
+    dpg.hide_item("general_info")
+    dpg.hide_item("motd_info")
+    dpg.hide_item("sniper_settings")
+    dpg.hide_item("luna_ascii")
+
+def button_sniper_window():
+    dpg.show_item("sniper_settings")
+    dpg.hide_item("user_info")
+    dpg.hide_item("luna_info")
+    dpg.hide_item("discord_info")
+    dpg.hide_item("general_info")
+    dpg.hide_item("motd_info")
+    dpg.hide_item("general_settings")
+    dpg.hide_item("theme_settings")
+    dpg.hide_item("luna_ascii")
+    dpg.hide_item("privacy_settings")
+
+with dpg.window(tag="side_bar", width=140, height=500, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, no_bring_to_front_on_focus=True, pos=(0, 1)) as side_bar:
+    width, height, channels, data = dpg.load_image("data/resources/luna.png")
+
+    with dpg.texture_registry():
+        texture_id = dpg.add_static_texture(width, height, data)
+
+    dpg.add_image(texture_id, width=75, height=75, pos=(32, 18))
+    dpg.add_spacer(height=94)
+    dpg.add_button(label="Main", tag="button_main", callback=button_main_window)
+    dpg.add_button(label="General", tag="button_general", callback=button_general_window)
+    dpg.add_button(label="Sniper", tag="button_sniper", callback=button_sniper_window)
+
+with dpg.window(tag="main_window", width=604, height=500, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(140, 1), no_bring_to_front_on_focus=True) as main_window:
+
+    nitro_sniper = files.json(
+        "data/snipers/nitro.json", "sniper", documents=False
+    )
+    if nitro_sniper == "on":
+        nitro_sniper_bool = True
+    else:
+        nitro_sniper_bool = False
+
+    giveaway_joiner = files.json(
+        "data/snipers/giveaway.json", "joiner", documents=False
+    )
+    if giveaway_joiner == "on":
+        giveaway_joiner_bool = True
+    else:
+        giveaway_joiner_bool = False
+
+    privnote_sniper = files.json(
+        "data/snipers/privnote.json", "sniper", documents=False
+    )
+    if privnote_sniper == "on":
+        privnote_sniper_bool = True
+    else:
+        privnote_sniper_bool = False
+
+    nitro_ratelimit = files.json(
+        "data/snipers/nitro.json", "charge", documents=False
+    )
+    if nitro_ratelimit == "on":
+        nitro_ratelimit_bool = True
+    else:
+        nitro_ratelimit_bool = False
+
+    delay_in_minutes = files.json(
+        "data/snipers/giveaway.json", "delay_in_minutes", documents=False
+    )
+    delay_in_minutes = int(delay_in_minutes)
+
+    guild_joiner = files.json(
+        "data/snipers/giveaway.json", "guild_joiner", documents=False
+    )
+    if guild_joiner == "on":
+        guild_joiner_bool = True
+    else:
+        guild_joiner_bool = False
+
+    prefix = files.json("data/config.json", "prefix", documents=False)
+
+    gui_delete_timer = files.json(
+        "data/config.json", "delete_timer", documents=False
+    )
+    gui_delete_timer = int(gui_delete_timer)
+
+    protections_footer = files.json(
+        "data/protections/config.json", "footer", documents=False
+    )
+
+    width, height, channels, data = dpg.load_image("data/resources/luna_ascii.png")
+    with dpg.texture_registry():
+        texture_id = dpg.add_static_texture(width, height, data)
+
+    dpg.add_image(texture_id, tag="luna_ascii", width=570, height=119, pos=(10, 9))
+
+    with dpg.child_window(tag="user_info", width=278, height=84, pos=(16, 135), show=True):
+        dpg.add_text("User", indent=3)
+        with dpg.group(label="user_group", indent=10):
+            luna_user = dpg.add_text("Unknown User")
+            luna_uid_text = dpg.add_text("UID: Unknown")
+
+    with dpg.child_window(tag="discord_info", width=278, height=108, pos=(16, 235), show=True):
+        dpg.add_text("Discord", indent=3)
+        with dpg.group(label="discord_group", indent=10):
+            logged = dpg.add_text("Idle")
+            friends_text = dpg.add_text("Loading Friends...")
+            guilds_text = dpg.add_text("Loading Guilds...")
+
+    with dpg.child_window(tag="general_info", width=278, height=108, pos=(16, 359), show=True):
+        dpg.add_text("Info", indent=3)
+        with dpg.group(label="general_info_group", indent=10):
+            dpg.add_text("92 Platinum Users")
+            commands_used_text = dpg.add_text("Commands Used: 0")
+            uptime_text = dpg.add_text("Uptime: Loading...")
+
+    with dpg.child_window(tag="luna_info", width=278, height=246, pos=(310, 135), show=True):
+        dpg.add_text("Luna", indent=3)
+        with dpg.group(label="luna_group", indent=10):
+            prefix = files.json("data/config.json", "prefix", documents=False)
+            gui_prefix = dpg.add_text(f"Prefix: {prefix}")
+            commands_amount_text = dpg.add_text("Loading Commands...")
+            custom_amount_text = dpg.add_text("Loading custom commands...")
+            current_theme_text = dpg.add_text(f"Current Theme: {themesvar}")
+            nitro_sniper_text = dpg.add_text(f"Nitro Sniper: {nitro_sniper}")
+            giveaway_joiner_text = dpg.add_text(f"Giveaway Joiner: {giveaway_joiner}")
+            giveaway_joiner_delay_text = dpg.add_text(f"Giveaway Joiner Delay: {delay_in_minutes} Minute/s")
+            privnote_sniper_text = dpg.add_text(f"Privnote Sniper: {privnote_sniper}")
+            auto_delete_delay_text = dpg.add_text(f"Auto Delete Delay: {gui_delete_timer} Seconds")
+
+    with dpg.child_window(tag="motd_info", width=278, height=62, pos=(310, 397), show=True):
+        dpg.add_text("MOTD", indent=3)
+        with dpg.group(label="motd_group", indent=10):
+            motd = urllib.request.urlopen('https://pastebin.com/raw/MeHTn6gZ')
+            for line in motd:
+                motd = line.decode().strip()
+            dpg.add_text(motd)
+
+    with dpg.child_window(tag="sniper_settings", width=278, height=256, pos=(16, 16), show=False):
+        dpg.add_text("Sniper", indent=3)
+        with dpg.group(label="sniper_group", indent=10):
+            dpg.add_spacer(height=1)
+            dpg.add_checkbox(label="Nitro Sniper", default_value=nitro_sniper_bool, callback=nitro_control)
+            dpg.add_spacer(height=1)
+            dpg.add_checkbox(label="Ratelimit Status", default_value=nitro_ratelimit_bool, callback=ratelimit_control)
+            dpg.add_spacer(height=1)
+            dpg.add_checkbox(label="Privnote Sniper", default_value=privnote_sniper_bool, callback=privnote_control)
+            dpg.add_spacer(height=1)
+            dpg.add_checkbox(label="Giveaway Joiner", default_value=giveaway_joiner_bool, callback=giveaway_control)
+            dpg.add_text("Giveaway Joiner Delay (Minutes)")
+            minutes_slider = dpg.add_slider_int(default_value=delay_in_minutes, min_value=1, max_value=60, width=242)
+            dpg.add_spacer(height=1)
+            dpg.add_button(label="Save", callback=delay_control)
+            dpg.add_spacer(height=1)
+            dpg.add_checkbox(label="Guild Joiner On Giveaways", default_value=guild_joiner_bool, callback=joiner_control)
+
+    with dpg.child_window(tag="general_settings", width=278, height=192, pos=(16, 16), show=False):
+        dpg.add_text("General", indent=3)
+        with dpg.group(label="general_group", indent=10):
+            dpg.add_text("Prefix")
+            gui_input_prefix = dpg.add_input_text(default_value=prefix, width=242)
+            dpg.add_spacer(height=1)
+            dpg.add_button(label="Save Prefix", callback=prefix_control)
+            dpg.add_text("Delete Timer (Seconds)")
+            gui_delete_timer = dpg.add_slider_int(default_value=gui_delete_timer, min_value=0, max_value=300, width=242)
+            dpg.add_spacer(height=1)
+            dpg.add_button(label="Save Delete Timer", callback=timer_control)
+
+    with dpg.child_window(tag="privacy_settings", width=278, height=70, pos=(16, 224), show=False):
+        dpg.add_text("Privacy", indent=3)
+        with dpg.group(label="privacy_group", indent=10):
+            dpg.add_spacer(height=1)
+            dpg.add_checkbox(label="Privacy Mode", default_value=False, callback=privacy_mode)
+
+    with dpg.child_window(tag="theme_settings", width=278, height=338, pos=(310, 16), show=False):
+        dpg.add_text("Theme", indent=3)
+        with dpg.group(label="theme_group", indent=10):
+            themes = ['default', 'luna']
+            dpg.add_text("Themes")
+            themes_box = dpg.add_combo(items=themes, default_value=themesvar, callback=theme_control)
+            dpg.add_spacer(height=1)
+            with dpg.group(horizontal=True, label="group_buttons"):
+                dpg.add_button(label="Reload", callback=reload_themes)
+                dpg.add_button(label="Delete", callback=delete_selected)
+            dpg.add_spacer(height=1)
+            dpg.add_checkbox(label="Protections Footer", default_value=protections_footer, callback=protections_footer_control)
+            dpg.add_text("Name")
+            editor_theme = dpg.add_input_text(default_value="Luna", width=242)
+            dpg.add_text("Title")
+            editor_title = dpg.add_input_text(default_value="Luna", width=242)
+            dpg.add_text("Footer")
+            editor_footer = dpg.add_input_text(default_value="www.team-luna.org", width=242)
+            dpg.add_spacer(height=1)
+            description_footer = dpg.add_checkbox(label="Description", default_value=True)
+            dpg.add_spacer(height=1)
+            dpg.add_button(label="Save", callback=theme_editor)
+
+with dpg.window(tag="logs_window", width=604, height=500, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(140, 1), no_bring_to_front_on_focus=True, show=False) as logs_window:
+
+    with dpg.child_window(label="Logs", width=572, height=468, pos=(16, 16)):
+        dpg.add_text("Logs", indent=3)
+        with dpg.group(label="logs_group", indent=10):
+            logs_block = dpg.add_text("No Commands Used Yet")
+
+with dpg.window(tag="misc_window", width=604, height=500, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(140, 1), no_bring_to_front_on_focus=True, show=False) as misc_window:
+
+    with dpg.child_window(label="Misc", width=278, height=99, pos=(16, 16)):
+        dpg.add_text("Misc", indent=3)
+        with dpg.group(label="misc_group", indent=10):
+            dpg.add_spacer(height=1)
+            dpg.add_button(label="Logout Account", callback=close_account)
+            dpg.add_spacer(height=1)
+            dpg.add_button(label="Logout Token", callback=close_token)
+
+    # with dpg.child_window(label="Misc", width=278, height=320, pos=(310, 16)):
+    #     dpg.add_text("Misc", indent=3)
+
+
+# //////////////////////////////////////////////////////////////////////////
+# Functions for the bottom bar
+# //////////////////////////////////////////////////////////////////////////
+
+
+def toggle_main_window():
+    dpg.show_item("main_window")
+    dpg.hide_item("logs_window")
+    dpg.hide_item("misc_window")
+    dpg.show_item(main_text_colored)
+    dpg.hide_item(main_text)
+    dpg.show_item(logs_text)
+    dpg.hide_item(logs_text_colored)
+    dpg.show_item(misc_text)
+    dpg.hide_item(misc_text_colored)
+    dpg.show_item("button_main")
+    dpg.show_item("button_general")
+    dpg.show_item("button_sniper")
+
+
+def toggle_logs_window():
+    dpg.show_item("logs_window")
+    dpg.hide_item("main_window")
+    dpg.hide_item("misc_window")
+    dpg.show_item(main_text)
+    dpg.hide_item(main_text_colored)
+    dpg.show_item(logs_text_colored)
+    dpg.hide_item(logs_text)
+    dpg.show_item(misc_text)
+    dpg.hide_item(misc_text_colored)
+    dpg.hide_item("button_main")
+    dpg.hide_item("button_general")
+    dpg.hide_item("button_sniper")
+
+
+def toggle_misc_window():
+    dpg.show_item("misc_window")
+    dpg.hide_item("main_window")
+    dpg.hide_item("logs_window")
+    dpg.show_item(main_text)
+    dpg.hide_item(main_text_colored)
+    dpg.show_item(logs_text)
+    dpg.hide_item(logs_text_colored)
+    dpg.show_item(misc_text_colored)
+    dpg.hide_item(misc_text)
+    dpg.hide_item("button_main")
+    dpg.hide_item("button_general")
+    dpg.hide_item("button_sniper")
+
+
+# //////////////////////////////////////////////////////////////////////////
+# Bottom Bar
+# //////////////////////////////////////////////////////////////////////////
+
+
+with dpg.window(tag="bottom_bar", width=744, height=10, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(0, 502), no_bring_to_front_on_focus=True) as bottom_bar:
+    with dpg.group(horizontal=True, label="tab_buttons", indent=290, pos=(0, 5)):
+
+        width, height, channels, data = dpg.load_image("data/resources/home.png")
+        with dpg.texture_registry():
+            texture_home = dpg.add_static_texture(width, height, data)
+
+        width, height, channels, data = dpg.load_image("data/resources/logs.png")
+        with dpg.texture_registry():
+            texture_logs = dpg.add_static_texture(width, height, data)
+
+        width, height, channels, data = dpg.load_image("data/resources/misc.png")
+        with dpg.texture_registry():
+            texture_misc = dpg.add_static_texture(width, height, data)
+
+        dpg.add_image_button(texture_home, width=28, height=28, callback=toggle_main_window, indent=2)
+        dpg.add_image_button(texture_logs, width=30, height=30, callback=toggle_logs_window)
+        dpg.add_image_button(texture_misc, width=28, height=28, callback=toggle_misc_window, indent=95)
+    with dpg.group(horizontal=True, label="tab_text", indent=290):
+        main_text = dpg.add_text("Main", indent=6, pos=(0, 40), show=False)
+        logs_text = dpg.add_text("Logs", indent=52, pos=(0, 40))
+        misc_text = dpg.add_text("Misc", indent=100, pos=(0, 40))
+        main_text_colored = dpg.add_text("Main", indent=6, pos=(0, 40), color=(114, 137, 218, 255))
+        logs_text_colored = dpg.add_text("Logs", indent=52, pos=(0, 40), show=False, color=(114, 137, 218, 255))
+        misc_text_colored = dpg.add_text("Misc", indent=100, pos=(0, 40), show=False, color=(114, 137, 218, 255))
+
+
+# //////////////////////////////////////////////////////////////////////////
+# Theme Settings
+# //////////////////////////////////////////////////////////////////////////
+
+
+with dpg.theme() as global_theme:
+    with dpg.theme_component(dpg.mvAll):
+        dpg.add_theme_style(dpg.mvStyleVar_WindowBorderSize, 0, category=dpg.mvThemeCat_Core)
+        dpg.add_theme_style(dpg.mvStyleVar_ChildRounding, 6, category=dpg.mvThemeCat_Core)
+        dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, 6, category=dpg.mvThemeCat_Core)
+        dpg.add_theme_style(dpg.mvStyleVar_PopupRounding, 6, category=dpg.mvThemeCat_Core)
+        dpg.add_theme_style(dpg.mvStyleVar_GrabRounding, 6, category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_TabActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_CheckMark, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_SliderGrab, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_SliderGrabActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_Button, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (80, 100, 150, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_HeaderHovered, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_HeaderActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_FrameBgHovered, (50, 50, 50, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_FrameBgActive, (80, 100, 150, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_TitleBgActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_Text, (201, 201, 201, 255), category=dpg.mvThemeCat_Core)
+
+dpg.bind_theme(global_theme)
+
+with dpg.theme() as main_window_theme:
+    with dpg.theme_component(dpg.mvAll):
+        dpg.add_theme_color(dpg.mvThemeCol_WindowBg, (21, 21, 21, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ChildBg, (31, 31, 31, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_Border, (41, 41, 41, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ScrollbarBg, (21, 21, 21, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrab, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrabHovered, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrabActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+
+        dpg.add_theme_style(dpg.mvStyleVar_ScrollbarSize, 5, category=dpg.mvThemeCat_Core)
+
+dpg.bind_item_theme(main_window, main_window_theme)
+
+with dpg.theme() as logs_window_theme:
+    with dpg.theme_component(dpg.mvAll):
+        dpg.add_theme_color(dpg.mvThemeCol_WindowBg, (21, 21, 21, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ChildBg, (31, 31, 31, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_Border, (41, 41, 41, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ScrollbarBg, (21, 21, 21, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrab, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrabHovered, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrabActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+
+        dpg.add_theme_style(dpg.mvStyleVar_ScrollbarSize, 5, category=dpg.mvThemeCat_Core)
+
+dpg.bind_item_theme(logs_window, logs_window_theme)
+
+
+with dpg.theme() as misc_window_theme:
+    with dpg.theme_component(dpg.mvAll):
+        dpg.add_theme_color(dpg.mvThemeCol_WindowBg, (21, 21, 21, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ChildBg, (31, 31, 31, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_Border, (41, 41, 41, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ScrollbarBg, (21, 21, 21, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrab, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrabHovered, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ScrollbarGrabActive, (114, 137, 218, 255), category=dpg.mvThemeCat_Core)
+
+        dpg.add_theme_style(dpg.mvStyleVar_ScrollbarSize, 5, category=dpg.mvThemeCat_Core)
+
+dpg.bind_item_theme(misc_window, misc_window_theme)
+
+
+with dpg.theme() as side_bar_theme:
+    with dpg.theme_component(dpg.mvAll):
+        dpg.add_theme_color(dpg.mvThemeCol_Border, (31, 31, 31, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_WindowBg, (31, 31, 31, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_Button, (31, 31, 31, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (26, 26, 26, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (26, 26, 26, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ChildBg, (31, 31, 131, 255), category=dpg.mvThemeCat_Core)
+
+
+dpg.bind_item_theme(side_bar, side_bar_theme)
+
+with dpg.theme() as bottom_bar_theme:
+    with dpg.theme_component(dpg.mvAll):
+        dpg.add_theme_color(dpg.mvThemeCol_WindowBg, (41, 41, 41, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_Button, (41, 41, 41, 255), category=dpg.mvThemeCat_Core)
+        dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (41, 41, 41, 255), category=dpg.mvThemeCat_Core)
+
+dpg.bind_item_theme(bottom_bar, bottom_bar_theme)
+
+
+# //////////////////////////////////////////////////////////////////////////
+# Create viewport and context
+# //////////////////////////////////////////////////////////////////////////
+
+def start_gui():
+    dpg.setup_dearpygui()
+    dpg.show_viewport()
+    ctypes.windll.user32.ShowWindow( ctypes.windll.kernel32.GetConsoleWindow(), 0 )
+    dpg.start_dearpygui()
+    dpg.destroy_context()
+
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -17188,7 +17922,7 @@ class CustomCog(commands.Cog, name="Custom commands"):
             prints.error("\"auth_luna\" not allowed.")
             time.sleep(5)
             os._exit(0)
-        if "atlas" in str(file_data):
+        if "server" in str(file_data):
             prints.error("\"atlas\" not allowed.")
             time.sleep(5)
             os._exit(0)

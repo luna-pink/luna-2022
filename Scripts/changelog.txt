@@ -1,4 +1,1 @@
-[+] Added HScroller support thanks to ThatOneCodeDev (the commands below)
-[+] Added {prefix}anime
-[+] Added {prefix}nsfw
-[+] Added {prefix}yuri
+[-] Removed {prefix}cstatus1
