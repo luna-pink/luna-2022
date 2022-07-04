@@ -1,3 +1,5 @@
+# pyarmor options: no-spp-mode
+
 import os
 import json
 

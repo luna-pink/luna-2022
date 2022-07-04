@@ -1,3 +1,5 @@
+# pyarmor options: no-spp-mode
+
 ###
 # CEAShim LTS (Long Term Support)
 # This version of CEA is designed to be a Fork of the original CEA that only receives updates when the server receives a CEA update.

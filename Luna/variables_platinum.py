@@ -5,6 +5,7 @@ import requests
 
 free_mode = False
 developer_mode = False
+hide_console = False
 
 platinum = True
 beta = False

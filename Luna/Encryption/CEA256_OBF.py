@@ -1,3 +1,5 @@
+# pyarmor options: no-spp-mode
+
 ##################################################################
 #                                                                #
 #     CEA-256 Is A Fully Custom Encryption Made By $Exodus       #

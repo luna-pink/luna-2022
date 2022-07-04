@@ -58,11 +58,12 @@ def is_admin():
     else:
         return True
 
-if is_admin():
-    pass
-else:
-    ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
-    sys.exit()
+if hide_console:
+    if is_admin():
+        pass
+    else:
+        ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+        sys.exit()
 
 if files.file_exist('Updater.exe'):
     os.remove('Updater.exe')
@@ -17730,13 +17731,14 @@ def start_gui():
         dpg.setup_dearpygui()
         dpg.show_viewport()
         prints.event("loading ui...")
-        try:
-            ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
-        except Exception as e:
-            prints.error("failed to hide console")
-            prints.error(e)
-            os.system("pause")
-            os._exit(0)
+        if hide_console:
+            try:
+                ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
+            except Exception as e:
+                prints.error("failed to hide console")
+                prints.error(e)
+                os.system("pause")
+                os._exit(0)
         dpg.start_dearpygui()
         dpg.destroy_context()
     except Exception as e:
