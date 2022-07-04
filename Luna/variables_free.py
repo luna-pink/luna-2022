@@ -7,7 +7,7 @@ free_mode = True
 developer_mode = False
 
 beta = False
-version = '2022.5'
+version = '2022.6'
 api_version = 'v10'
 beta_version = 'v10'
 

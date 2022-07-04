@@ -9,7 +9,7 @@ developer_mode = False
 platinum = True
 beta = False
 
-version = '2022.34'
+version = '2022.37'
 api_version = 'v10'
 beta_version = 'v10'
 

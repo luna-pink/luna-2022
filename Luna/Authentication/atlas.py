@@ -357,3 +357,31 @@ class Atlas:
         except Exception as e:
             self.disconnect()
             raise CustomError("{}".format(e))
+
+    def ResetPassword(self, otp: str, password: str):
+        socket = self.socket
+        try:
+            AuthReponse = CEADecrypt(
+                self.app_token).CEA256(
+                self._send(
+                    socket,
+                    CEAEncrypt(
+                        self.app_token).CEA256(f"OpCode=4;AuthOpCode=8;OTP={otp};UserPass={password};")))
+            AuthCode = AuthReponse.split(";")[0].split("=")[1]
+            AuthMessage = AuthReponse.split(";")[1].split("=")[1]
+            if AuthCode == "8":
+                match AuthMessage:
+                    case "Success":
+                        return True
+                    case "Failed":
+                        raise CustomError("Failed to reset password, contact support")
+                    case "TokenInitFailed":
+                        raise CustomError("Failed to initialize token for user, contact support")
+            else:
+                raise CustomError("An unknown issue occured while attempting to authenticate")
+        except Exception as e:
+            self.disconnect()
+            raise CustomError("{}".format(e))
+
+
+    

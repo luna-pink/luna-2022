@@ -17,6 +17,7 @@ import time
 import typing
 import urllib
 import json
+import gzip
 from ctypes import windll
 from datetime import datetime
 from os import error, system
@@ -2467,7 +2468,7 @@ def login():
                 confirm_password = dpg.add_input_text(label="Confirm Password", default_value="", password=True, indent=230, width=300)
                 key = dpg.add_input_text(label="Key", default_value="", indent=230, width=300)
                 dpg.add_separator()
-                status = dpg.add_text("Status: Not Registered.", indent=230)
+                status = dpg.add_text("Status: Not Registered", indent=230)
                 dpg.add_separator()
                 with dpg.group(horizontal=True, label="group_buttons", indent=230, width=146):
                     dpg.add_button(label="Register", callback=register_check)
@@ -2504,12 +2505,126 @@ def login():
                 dpg.set_value(status, f"Status: {e}")
                 return
 
+        def auth_password_reset():
+
+            def password_reset():
+
+                username_value = dpg.get_value(username)
+                password_value = dpg.get_value(password)
+                confirm_password_value = dpg.get_value(confirm_password)
+                otp_code_value = dpg.get_value(otp_code)
+
+                if username_value == "" or password_value == "" or confirm_password_value == "" or otp_code_value == "":
+                    dpg.set_value(status, "Status: Please fill in all fields")
+                    return
+
+                if password_value != confirm_password_value:
+                    prints.error("passwords do not match")
+                    dpg.set_value(status, "Status: Passwords do not match")
+                    return
+
+                try:
+                    auth_connect(username_value)
+                    prints.info("connected to server")
+                    dpg.set_value(status, "Status: connected to server")
+                    
+                    try:
+                        auth_luna.ResetPassword(otp_code_value, password_value)
+                    except BaseException:
+                        dpg.set_value(status, "Status: Failed to reset password, contact support")
+                        auth_luna.disconnect()
+                        return
+
+                    auth_luna.disconnect()
+                    prints.info("disconnected from server")
+                    dpg.set_value(status, "Status: Successfully resetted password, return to login")
+                except Exception as e:
+                    auth_luna.disconnect()
+                    prints.error(e)
+                    dpg.set_value(status, f"Status: {e}")
+                    return
+
+            def close_password_reset():
+                dpg.delete_item(item="password_reset")
+
+            with dpg.window(label="Password Reset", tag="password_reset", width=744, height=600, no_resize=True, no_collapse=True, no_close=True):
+                dpg.add_spacer(height=140)
+                dpg.add_text("Password Reset", indent=230)
+                username = dpg.add_input_text(label="Username", default_value="", indent=230, width=300)
+                password = dpg.add_input_text(label="New Password", default_value="", password=True, indent=230, width=300)
+                confirm_password = dpg.add_input_text(label="Confirm New Password", default_value="", password=True, indent=230, width=300)
+                otp_code = dpg.add_input_text(label="OTP Code", default_value="", indent=230, width=300)
+                dpg.add_separator()
+                status = dpg.add_text("Status: Idle", indent=230)
+                dpg.add_separator()
+                with dpg.group(horizontal=True, label="group_buttons", indent=230, width=146):
+                    dpg.add_button(label="Reset Password", callback=password_reset)
+                    dpg.add_button(label="Back To Login", callback=close_password_reset)
+
+        def auth_hwid_reset():
+            def hwid_reset():
+                username_value = dpg.get_value(username)
+                password_value = dpg.get_value(password)
+                if username_value == "" or password_value == "":
+                    prints.info("username or password is empty")
+                    dpg.set_value(status, "Status: Please enter a username and password")
+                    return
+                try:
+                    dpg.set_value(status, "Status: connecting to server...")
+                    auth_connect(username_value)
+                    dpg.set_value(status, "Status: connected to server")
+                    prints.info("connected to server")
+                    auth_luna.Login(username_value, password_value)
+
+                    try:
+                        dpg.set_value(status, "Status: Grabbing HWID...")
+                        hwid = str(subprocess.check_output('wmic csproduct get uuid')).split(
+                            '\\r\\n'
+                        )[1].strip('\\r').strip()
+                        dpg.set_value(status, "Status: Grabbed HWID")
+                    except BaseException:
+                        dpg.set_value(status, "Status: Failed to grab HWID")
+                        auth_luna.disconnect()
+                        return
+
+                    try:
+                        dpg.set_value(status, "Status: Setting the new HWID...")
+                        auth_luna.SetUserHWID(hwid)
+                        dpg.set_value(status, "Status: Set the new HWID")
+                    except BaseException:
+                        dpg.set_value(status, "Status: Failed to reset HWID, out of reset tokens, contact staff")
+                        auth_luna.disconnect()
+                        return
+
+                    auth_validate()
+                    prints.info("validated")
+                    auth_luna.disconnect()
+                    prints.info("disconnected from server")
+                    dpg.set_value(status, "Status: Successfully resetted HWID, return to login")
+                except Exception as e:
+                    auth_luna.disconnect()
+                    prints.error(e)
+                    dpg.set_value(status, f"Status: {e}")
+                    return
+
+            def close_hwid_reset():
+                dpg.delete_item(item="hwid_reset")
+
+            with dpg.window(label="HWID Reset", tag="hwid_reset", width=744, height=600, no_resize=True, no_collapse=True, no_close=True):
+                dpg.add_spacer(height=140)
+                dpg.add_text("HWID Reset", indent=230)
+                username = dpg.add_input_text(label="Username", default_value="", indent=230, width=300)
+                password = dpg.add_input_text(label="Password", default_value="", password=True, indent=230, width=300)
+                dpg.add_separator()
+                status = dpg.add_text("Status: Idle", indent=230)
+                dpg.add_separator()
+                with dpg.group(horizontal=True, label="group_buttons", indent=230, width=146):
+                    dpg.add_button(label="Reset HWID", callback=hwid_reset)
+                    dpg.add_button(label="Back To Login", callback=close_hwid_reset)
+
         with dpg.window(label="Authentication", tag="auth", width=744, height=600, no_resize=True, no_collapse=True, no_move=True, no_close=True, pos=(0, 0)):
             prints.message("no user found")
             prints.event("opening authentication window")
-            time.sleep(0.1)
-            prints.event("loading ui")
-            time.sleep(2)
             dpg.add_spacer(height=180)
             dpg.add_text("Authentication", indent=230)
             username = dpg.add_input_text(label="Username", default_value="", indent=230, width=300)
@@ -2520,6 +2635,9 @@ def login():
             with dpg.group(horizontal=True, label="group_buttons2", indent=230, width=146):
                 dpg.add_button(label="Register", callback=auth_register)
                 dpg.add_button(label="Login", callback=auth_login)
+            with dpg.group(horizontal=True, label="group_buttons2", indent=230, width=146):
+                dpg.add_button(label="Forgot Password?", callback=auth_password_reset)
+                dpg.add_button(label="HWID Reset", callback=auth_hwid_reset)
     else:
         global luna_user_id
         if not developer_mode:
@@ -2563,9 +2681,6 @@ def login():
                 prints.info("validated")
                 auth_luna.disconnect()
                 prints.info("disconnected from server")
-                time.sleep(0.1)
-                prints.event("loading ui")
-                time.sleep(2)
             except Exception as e:
                 auth_luna.disconnect()
                 prints.info("disconnected from server")
@@ -4046,7 +4161,7 @@ class HelpCog(commands.Cog, name="Help commands"):
             await message_builder(
                 luna,
                 description=f"{theme.description()}```\n\
-Luna\n\nCommands          » {command_count - custom_command_count}\n\
+Luna Platinum\n\nCommands          » {command_count - custom_command_count}\n\
 Custom Commands   » {custom_command_count}\n``````\n\
 Categories\n\n\
 {prefix}help [command]   » Display all commands\n\
@@ -4686,9 +4801,14 @@ Version\n\n{version}```"
         else:
             for command in commands:
                 helptext += f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n"
+
+        # cog = self.bot.get_cog('Script tools commands')
+        # commands = cog.get_commands()
+        # helptext1 = "".join(f"{prefix + command.name + ' ' + command.usage:<17} » {command.description}\n" for command in commands)
+
         await message_builder(
             luna, title="Your custom commands",
-            description=f"{theme.description()}```\n{helptext}``````\nCommand Control\n\n{prefix}restart          » Restart to load your commands\n{prefix}newcmd <name>    » Create new command```"
+            description=f"{theme.description()}```\n{helptext}``````\nScript Control\n\n{prefix}restart          » Restart to load your scripts\n{prefix}newscript <name>    » Create new script```"
         )
 
     @commands.command(
@@ -4744,7 +4864,7 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         description="Online status"
     )
     async def online(self, luna):
-        await bot.change_presence(status=discord.Status.online, afk=True)
+        await self.bot.change_presence(status=discord.Status.online, afk=True)
         payload = {'status': "online"}
         requests.patch(
             f'https://discord.com/api/{api_version}/users/@me/settings',
@@ -4762,7 +4882,7 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         description="Idle status"
     )
     async def idle(self, luna):
-        await bot.change_presence(status=discord.Status.idle, afk=True)
+        await self.bot.change_presence(status=discord.Status.idle, afk=True)
         payload = {'status': "idle"}
         requests.patch(
             f'https://discord.com/api/{api_version}/users/@me/settings',
@@ -4780,7 +4900,7 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         description="Do not disturb status"
     )
     async def dnd(self, luna):
-        await bot.change_presence(status=discord.Status.dnd, afk=True)
+        await self.bot.change_presence(status=discord.Status.dnd, afk=True)
         payload = {'status': "dnd"}
         requests.patch(
             f'https://discord.com/api/{api_version}/users/@me/settings',
@@ -4798,7 +4918,7 @@ class ProfileCog(commands.Cog, name="Profile commands"):
         description="Offline status"
     )
     async def offline(self, luna):
-        await bot.change_presence(status=discord.Status.invisible, afk=True)
+        await self.bot.change_presence(status=discord.Status.invisible, afk=True)
         payload = {'status': "invisible"}
         requests.patch(
             f'https://discord.com/api/{api_version}/users/@me/settings',
@@ -13712,11 +13832,11 @@ class SettingsCog(commands.Cog, name="Settings commands"):
     #     # await message_builder(ctx, description=f"```\nReload has been disabled until further notice, use {prefix}restart instead```")
 
     @commands.command(
-        name="newcmd",
+        name="newscript",
         usage="<name>",
         description="Create new command"
     )
-    async def newcmd(self, ctx, name: str):
+    async def newscript(self, ctx, name: str):
 
         content = f"""
 @commands.command(
@@ -17163,6 +17283,16 @@ def button_sniper_window():
     dpg.hide_item("luna_ascii")
     dpg.hide_item("privacy_settings")
 
+def button_script_editor_window():
+    dpg.hide_item("misc_tab")
+    dpg.hide_item("rpc_tab")
+    dpg.show_item("script_editor")
+
+def button_misc_window():
+    dpg.show_item("misc_tab")
+    dpg.show_item("rpc_tab")
+    dpg.hide_item("script_editor")
+
 with dpg.window(tag="side_bar", width=140, height=500, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, no_bring_to_front_on_focus=True, pos=(0, 1)) as side_bar:
     width, height, channels, data = dpg.load_image("data/resources/luna.png")
 
@@ -17171,9 +17301,12 @@ with dpg.window(tag="side_bar", width=140, height=500, no_title_bar=True, no_res
 
     dpg.add_image(texture_id, width=75, height=75, pos=(32, 18))
     dpg.add_spacer(height=94)
-    dpg.add_button(label="Main", tag="button_main", callback=button_main_window)
-    dpg.add_button(label="General", tag="button_general", callback=button_general_window)
-    dpg.add_button(label="Sniper", tag="button_sniper", callback=button_sniper_window)
+    dpg.add_button(label="Main", tag="button_main", callback=button_main_window, show=True)
+    dpg.add_button(label="General", tag="button_general", callback=button_general_window, show=True)
+    dpg.add_button(label="Sniper", tag="button_sniper", callback=button_sniper_window, show=True)
+    
+    dpg.add_button(label="Script Editor", tag="button_script_editor", callback=button_script_editor_window, show=False)
+    dpg.add_button(label="Miscellaneous", tag="button_miscellaneous", callback=button_misc_window, show=False)
 
 with dpg.window(tag="main_window", width=604, height=500, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(140, 1), no_bring_to_front_on_focus=True) as main_window:
 
@@ -17347,9 +17480,38 @@ with dpg.window(tag="logs_window", width=604, height=500, no_title_bar=True, no_
         with dpg.group(label="logs_group", indent=10):
             logs_block = dpg.add_text("No Commands Used Yet")
 
+# //////////////////////////////////////////////////////////////////////////
+# Create Windows for Misc
+# //////////////////////////////////////////////////////////////////////////
+
+def save(sender):
+    open(os.getcwd() + "\\data\\scripts\\" + dpg.get_value("script_name") + ".py", "w").write(dpg.get_value("script_text"))
+    dpg.configure_item("script_output", default_value = "Status: Saved script")
+
+scripts = os.listdir(os.getcwd() + "\\data\\scripts")
+
 with dpg.window(tag="misc_window", width=604, height=500, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(140, 1), no_bring_to_front_on_focus=True, show=False) as misc_window:
 
-    with dpg.child_window(label="Misc", width=278, height=99, pos=(16, 16)):
+    with dpg.child_window(label="Script Editor", tag="script_editor", width=572, height=468, pos=(16, 16), show=True):
+        dpg.add_text("Script Editor", indent=3)
+        with dpg.group(label="script_editor_group", indent=10):
+            dpg.add_input_text(label="", tag="script_text", multiline=True, tab_input=True, height=290, width=537)
+            dpg.add_spacer(height=1)
+            dpg.add_combo(label="Custom Scripts", items=scripts, default_value=scripts[0], tag="script_combo")
+            dpg.add_spacer(height=1)
+            with dpg.group(horizontal=True):
+                dpg.add_button(label="Load Script", callback=lambda: dpg.configure_item("script_text", default_value=open(os.getcwd() + "\\data\\scripts\\" + dpg.get_value("script_combo")).read()))
+                dpg.add_button(label="Reload Scripts" , callback=lambda: dpg.configure_item("script_combo", items=os.listdir(os.getcwd() + "\\data\\scripts")))
+                dpg.add_button(label="Reload Commands", callback=lambda: restart_program())
+            dpg.add_spacer(height=1)
+            dpg.add_input_text(label="Script Name", tag="script_name")
+            dpg.add_spacer(height=1)
+            with dpg.group(horizontal=True):
+                dpg.add_button(label="Save Script", callback=save)
+                dpg.add_button(label="Exit Editor", callback=lambda: dpg.delete_item("script_editor"))
+            dpg.add_text(label = "", default_value = "Status: Idle", tag="script_output")
+
+    with dpg.child_window(label="Misc", tag="misc_tab", width=278, height=99, pos=(16, 16), show=False):
         dpg.add_text("Misc", indent=3)
         with dpg.group(label="misc_group", indent=10):
             dpg.add_spacer(height=1)
@@ -17357,7 +17519,7 @@ with dpg.window(tag="misc_window", width=604, height=500, no_title_bar=True, no_
             dpg.add_spacer(height=1)
             dpg.add_button(label="Logout Token", callback=close_token)
 
-    with dpg.child_window(label="Rich Presence", width=278, height=390, pos=(310, 16)):
+    with dpg.child_window(label="Rich Presence", tag="rpc_tab", width=278, height=390, pos=(310, 16), show=False):
         dpg.add_text("Rich Presence", indent=3)
         with dpg.group(label="rpc_group", indent=10):
             rpc_checkbox = dpg.add_checkbox(label="Rich Presence", default_value=False, callback=init_rpc)
@@ -17395,6 +17557,8 @@ def toggle_main_window():
     dpg.show_item("button_main")
     dpg.show_item("button_general")
     dpg.show_item("button_sniper")
+    dpg.hide_item("button_script_editor")
+    dpg.hide_item("button_miscellaneous")
 
 
 def toggle_logs_window():
@@ -17410,6 +17574,8 @@ def toggle_logs_window():
     dpg.hide_item("button_main")
     dpg.hide_item("button_general")
     dpg.hide_item("button_sniper")
+    dpg.hide_item("button_script_editor")
+    dpg.hide_item("button_miscellaneous")
 
 
 def toggle_misc_window():
@@ -17425,6 +17591,8 @@ def toggle_misc_window():
     dpg.hide_item("button_main")
     dpg.hide_item("button_general")
     dpg.hide_item("button_sniper")
+    dpg.show_item("button_script_editor")
+    dpg.show_item("button_miscellaneous")
 
 
 # //////////////////////////////////////////////////////////////////////////
@@ -17557,22 +17725,167 @@ dpg.bind_item_theme(bottom_bar, bottom_bar_theme)
 # //////////////////////////////////////////////////////////////////////////
 
 def start_gui():
-    dpg.setup_dearpygui()
-    dpg.show_viewport()
-    ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
-    dpg.start_dearpygui()
-    dpg.destroy_context()
+    prints.event("preparing ui...")
+    try:
+        dpg.setup_dearpygui()
+        dpg.show_viewport()
+        prints.event("loading ui...")
+        try:
+            ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
+        except Exception as e:
+            prints.error("failed to hide console")
+            prints.error(e)
+            os.system("pause")
+            os._exit(0)
+        dpg.start_dearpygui()
+        dpg.destroy_context()
+    except Exception as e:
+        prints.error("failed to prepare ui")
+        prints.error(e)
+        os.system("pause")
+        os._exit(0)
 
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+def SecurityCheck(file_data: str):
+    if "sys.modules" in str(file_data):
+        prints.error("Using sys.modules is not allowed.")
+        time.sleep(5)
+        os._exit(0)
+    if "import inspect" in str(file_data):
+        prints.error("Importing inspect is not allowed.")
+        time.sleep(5)
+        os._exit(0)
+    if "import dill" in str(file_data):
+        prints.error("Importing dill is not allowed.")
+        time.sleep(5)
+        os._exit(0)
+    if "exec" in str(file_data):
+        prints.error("Using exec is not allowed.")
+        time.sleep(5)
+        os._exit(0)
+    if "auth_luna" in str(file_data):
+        prints.error("\"auth_luna\" not allowed.")
+        time.sleep(5)
+        os._exit(0)
+    if "atlas" in str(file_data):
+        prints.error("\"atlas\" not allowed.")
+        time.sleep(5)
+        os._exit(0)
+    return True
+    
+# def ObfuscateScript(function_name):
+#     #
+#     #  Nshout ich liebe dich mann, aber das war zu viel verdammte mühe, um es selbst für dich zu tun.
+#     #
+#     import inspect
+#     import Encryption.CEA256_OBF as cea
+
+#     CEA = Cea(key="H7ABD63JABS1A", mode=Mode.CDA, format=Format.BASE64, lengthCheck=False, useSalt=True, saltPrefix="@")
+#     try:
+#         file = ""
+#         for x in os.listdir("data/scripts"):
+#             if x.endswith(".py"):
+#                 if open("data/scripts/" + x, "rb").read().decode().find("async def " + function_name) != -1:
+#                     prints.message("Found file with command")
+#                     file = "data/scripts/" + x
+#                     break
+                    
+#         print("0")
+#         file_data = open(file, "rb").read().decode()
+#         print(x)
+#         if file_data.find("LunaObfuscated") != -1:
+#             prints.error("Command already obfuscated.")
+#         else:
+#             print(771)
+#             new_defs = {}
+#             old_defs = {}
+#             print(1)
+#             current_path = os.getcwd()
+#             print("cp")
+#             sys.path.insert(0, current_path + "\\data\\scripts")
+#             print("cp2")
+#             print(file.split("/")[2].replace(".py", ""))
+            
+#             print("cp3")
+#             sys.path.insert(0, current_path)
+#             print("cp4")
+#             for function in functions:
+#                 print("cp5")
+#                 """check if function name is the same as parameter"""
+#                 if function_name == function[1].__name__:
+#                     print(2)
+#                     source = inspect.getsource(function[1]).split("\n")
+#                     source_def = source[0]
+#                     source.remove(source[0])
+#                     print(3)
+#                     old_defs[source_def] = "\\n".join(source)
+#                     for i in range(len(source)):
+#                         source[i] = source[i][4:]
+#                     print(4)
+#                     obf_source = CEA.encrypt("\\n".join(source))
+#                     print(5)
+#                     obf_source = gzip.compress(obf_source)
+#                     print(6)
+#                     obf_source = base64.encodebytes(obf_source)
+#                     print(7)
+#                     new_defs[source_def] = f"    LunaObfuscated({obf_source}, locals())\n".encode()
+#                     print(8)
+#             for def_ in new_defs:
+#                 file_data = file_data.replace(old_defs[def_].replace("\\n", "\n"), new_defs[def_].decode())
+#             print(9)
+#             open(file, "wb").write(file_data.encode())
+#             print(10)
+#             prints.message("Command obfuscated.")
+#     except Exception as e:
+#         prints.error(e)
+#         pass
+    
+# # ////////////////// SCRIPT USE ONLY //////////////////
+# def LunaObfuscated(data, locals):
+#     import Encryption.CEA256_OBF as cea
+#     CEA = Cea(key="H7ABD63JABS1A", mode=Mode.CDA, format=Format.BASE64, lengthCheck=False, useSalt=True, saltPrefix="@")
+#     if type(data) == bytes:
+#         data = base64.decodebytes(data)
+#         data = gzip.decompress(data)
+#         data = CEA.decrypt(data.decode()).replace("\\n", "\n")
+#         SecurityCheck(data)
+#         exec(data, locals)
+#     else:
+#         prints.error("Invalid data type passed in obfuscator.")
+#         time.sleep(5)
+#         os._exit(0)
+
+# # ////////////////// SCRIPT USE ONLY //////////////////
+
+# class ScriptToolsCog(commands.Cog, name="Script tools commands"):
+#     def __init__(self, bot: commands.bot):
+#         self.bot = bot
+
+#     @commands.command(
+#         name="obfuscate",
+#         usage="<function name>",
+#         description="Obfuscate a custom script"
+#     )
+#     async def obfuscate(self, luna, funcName: str):
+#         try:
+#             ObfuscateScript(funcName)
+#             await message_builder(luna, title="Script Obfusactor", description=f"```Command obfuscated```")
+#         except Exception as e:
+#             await message_builder(luna, title="Script Obfusactor", description=f"```Command obfuscation failed```")
+#             prints.error(e)
+
+# bot.add_cog(ScriptToolsCog(bot))
+
+# ////////////////// SCRIPT USE ONLY //////////////////
+        
 class CustomCog(commands.Cog, name="Custom commands"):
     def __init__(self, bot: commands.bot):
         self.bot = bot
 
     try:
         file_data = ""
-
         for filename in os.listdir("data/scripts"):
             if filename.endswith(".py"):
                 file = open(
@@ -17580,35 +17893,12 @@ class CustomCog(commands.Cog, name="Custom commands"):
                 )
                 file_data += file.read()
         file.close()
-
-        if "sys.modules" in str(file_data):
-            prints.error("Using sys.modules is not allowed.")
-            time.sleep(5)
-            os._exit(0)
-        if "import inspect" in str(file_data):
-            prints.error("Importing inspect is not allowed.")
-            time.sleep(5)
-            os._exit(0)
-        if "import dill" in str(file_data):
-            prints.error("Importing dill is not allowed.")
-            time.sleep(5)
-            os._exit(0)
-        if "exec" in str(file_data):
-            prints.error("Using exec is not allowed.")
-            time.sleep(5)
-            os._exit(0)
-        if "auth_luna" in str(file_data):
-            prints.error("\"auth_luna\" not allowed.")
-            time.sleep(5)
-            os._exit(0)
-        if "server" in str(file_data):
-            prints.error("\"atlas\" not allowed.")
-            time.sleep(5)
-            os._exit(0)
-        exec(file_data)
+        SecurityCheck(file_data)
     except Exception as e:
         prints.error(e)
         pass
+
+    exec(file_data)
 
 bot.add_cog(CustomCog(bot))
 
@@ -17619,4 +17909,5 @@ login()
 # if "-nogui" in sys.argv[1]:
 #     prints.info("no gui flag detected")
 # else:
+
 start_gui()

