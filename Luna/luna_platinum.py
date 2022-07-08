@@ -17890,6 +17890,7 @@ class CustomCog(commands.Cog, name="Custom commands"):
         file_data = ""
         for filename in os.listdir("data/scripts"):
             if filename.endswith(".py"):
+                print(f"loading {filename}")
                 file = open(
                     f"data/scripts/{filename}", "r"
                 )
@@ -17900,7 +17901,9 @@ class CustomCog(commands.Cog, name="Custom commands"):
         prints.error(e)
         pass
 
+    print("executing scripts")
     exec(file_data)
+    print("executed scripts")
 
 bot.add_cog(CustomCog(bot))
 
