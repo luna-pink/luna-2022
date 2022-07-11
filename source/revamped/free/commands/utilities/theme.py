@@ -1,6 +1,6 @@
-from functions import *
+from .functions import *
 
-from request import *
+from .request import *
 
 
 class theme:

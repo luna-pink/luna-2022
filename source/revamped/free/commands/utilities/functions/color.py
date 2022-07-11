@@ -1,62 +1,56 @@
 # pyarmor options: no-spp-mode
 
-from files import *
-
-
 # ///////////////////////////////////////////////////////////////
 # ANSI Colors & Gradients
+import json
+import os
+
 
 class color:
     error = '\033[38;2;225;9;89m'
     reset = "\033[0m"
 
-    def logo_gradient(text):
+    def logo_gradient(self):
         """Gradient for the logo"""
-        gradient = files.json(
-            "data/console/console.json",
-            "logo_gradient", documents=False
-        )
+        gradient = json.load(open("data/console/console.json", encoding="utf-8"))["logo_gradient"]
         match gradient:
             case "1":
-                return color.purple_blue(f"""{text}""")
+                return color.purple_blue(f"""{self}""")
             case "2":
-                return color.purple_cyan(f"""{text}""")
+                return color.purple_cyan(f"""{self}""")
             case "3":
-                return color.pink_red(f"""{text}""")
+                return color.pink_red(f"""{self}""")
             case "4":
-                return color.blue_cyan(f"""{text}""")
+                return color.blue_cyan(f"""{self}""")
             case "5":
-                return color.green_blue(f"""{text}""")
+                return color.green_blue(f"""{self}""")
             case "6":
-                return color.orange_red(f"""{text}""")
+                return color.orange_red(f"""{self}""")
             case "7":
-                return color.black_white(f"""{text}""")
+                return color.black_white(f"""{self}""")
         if int(gradient) > 7:
-            return color.purple_blue(f"""{text}""")
+            return color.purple_blue(f"""{self}""")
 
-    def print_gradient(text):
+    def print_gradient(self):
         """Gradient for the console"""
-        gradient = files.json(
-            "data/console/console.json",
-            "print_gradient", documents=False
-        )
+        gradient = json.load(open("data/console/console.json", encoding="utf-8"))["print_gradient"]
         match gradient:
             case "1":
-                return color.purple(f"{text}")
+                return color.purple(f"{self}")
             case "2":
-                return color.blue(f"{text}")
+                return color.blue(f"{self}")
             case "3":
-                return color.pink(f"{text}")
+                return color.pink(f"{self}")
             case "4":
-                return color.yellow(f"{text}")
+                return color.yellow(f"{self}")
             case "5":
-                return color.green(f"{text}")
+                return color.green(f"{self}")
             case "6":
-                return color.red(f"{text}")
+                return color.red(f"{self}")
             case "7":
-                return color.black(f"{text}")
+                return color.black(f"{self}")
         if int(gradient) > 7:
-            return color.purple(f"{text}")
+            return color.purple(f"{self}")
 
     def black(self):
         os.system("")

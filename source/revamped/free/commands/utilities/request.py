@@ -1,4 +1,10 @@
+import urllib
+
 import requests
+
+motd = urllib.request.urlopen(
+    'https://pastebin.com/raw/MeHTn6gZ'
+).read().decode('utf-8')
 
 title_request = requests.get(
     "https://raw.githubusercontent.com/Nshout/Luna/main/default.json"

@@ -1,8 +1,8 @@
 import discord
-from theme import *
-from prints import *
-from configs import *
-from dependencies.variables import *
+from .theme import *
+from .prints import *
+from .configs import *
+from .dependencies.variables import *
 
 
 def convert_to_text(embed: discord.Embed):
@@ -92,7 +92,7 @@ async def send(luna, embed, delete_after=None):
     return await luna.send(convert_to_text(embed), delete_after=deletetimer) if int(mode) == 2 else await luna.send(convert_to_indent(embed), delete_after=deletetimer)
 
 
-async def message_builder(luna, title: str = theme.title(), description="", large_image: str = "", delete_after: int = None, footer_extra: str = None, footer: str = None):
+async def message_builder(luna, title: str = None, description="", large_image: str = "", delete_after: int = None, footer_extra: str = None, footer: str = None):
     """
     It's a function that builds an embed message
 
@@ -111,6 +111,8 @@ async def message_builder(luna, title: str = theme.title(), description="", larg
     :return: The embed is being returned.
     """
 
+    if title is None:
+        title = theme.title()
     if footer == "None":
         footer_extra = ""
     elif footer_extra is None:

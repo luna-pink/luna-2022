@@ -2,8 +2,7 @@ import asyncio
 
 from discord.ext import commands
 
-from utilities import *
-from dependencies.variables import *
+from .utilities import *
 
 
 class HelpCog(commands.Cog, name="Help commands"):

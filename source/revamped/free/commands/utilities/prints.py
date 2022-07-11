@@ -2,10 +2,11 @@ from time import strftime, localtime
 
 import pwinput
 
-from configs import *
+from .configs import *
 
 
 class prints:
+    file_check()
     try:
         if files.json("data/console/console.json", "spacers", documents=False):
             spacer_2 = " " + \

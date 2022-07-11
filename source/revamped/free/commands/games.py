@@ -1,5 +1,5 @@
 from discord.ext import commands
-from utilities import *
+from .utilities import *
 
 
 class GamesCog(commands.Cog, name="Game commands"):
