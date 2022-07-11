@@ -1,5 +1,6 @@
 # pyarmor options: no-spp-mode
 
+import contextlib
 import os
 import json
 
@@ -131,11 +132,9 @@ class files:
 
         :param documents: If True, the file will be removed from the documents' folder, defaults to False (optional)
         """
-        try:
+        with contextlib.suppress(BaseException):
             if documents:
                 if os.path.exists(os.path.join(files.documents(), self)):
                     os.remove(os.path.join(files.documents(), self))
             elif os.path.exists(self):
                 os.remove(self)
-        except BaseException:
-            pass

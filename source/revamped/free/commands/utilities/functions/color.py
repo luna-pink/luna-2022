@@ -1,6 +1,6 @@
 # pyarmor options: no-spp-mode
 
-from Functions import *
+from files import *
 
 
 # ///////////////////////////////////////////////////////////////
@@ -58,10 +58,10 @@ class color:
         if int(gradient) > 7:
             return color.purple(f"{text}")
 
-    def black(text):
+    def black(self):
         os.system("")
         faded = ""
-        for line in text.splitlines():
+        for line in self.splitlines():
             red = 25
             green = 25
             blue = 25
@@ -76,70 +76,66 @@ class color:
                 faded += f"\033[38;2;{red};{green};{blue}m{character}\033[0m"
         return faded
 
-    def green(text):
+    def green(self):
         os.system("")
         faded = ""
-        for line in text.splitlines():
+        for line in self.splitlines():
             blue = 100
             for character in line:
                 blue += 20
-                if blue > 255:
-                    blue = 255
+                blue = min(blue, 255)
                 faded += f"\033[38;2;0;255;{blue}m{character}\033[0m"
         return faded
 
-    def blue(text):
+    def blue(self):
         os.system("")
         faded = ""
-        for line in text.splitlines():
+        for line in self.splitlines():
             green = 0
             for character in line:
                 green += 20
-                if green > 255:
-                    green = 255
+                green = min(green, 255)
                 faded += f"\033[38;2;0;{green};255m{character}\033[0m"
         return faded
 
-    def pink(text):
+    def pink(self):
         os.system("")
         faded = ""
-        for line in text.splitlines():
+        for line in self.splitlines():
             blue = 255
             for character in line:
                 blue -= 20
-                if blue < 0:
-                    blue = 0
+                blue = max(blue, 0)
                 faded += f"\033[38;2;255;0;{blue}m{character}\033[0m"
         return faded
 
-    def yellow(text):
+    def yellow(self):
         os.system("")
         faded = ""
-        for line in text.splitlines():
+        for line in self.splitlines():
             red = 0
             for character in line:
-                if not red > 200:
+                if red <= 200:
                     red += 20
                 faded += f"\033[38;2;{red};255;0m{character}\033[0m"
         return faded
 
-    def red(text):
+    def red(self):
         os.system("")
         faded = ""
-        for line in text.splitlines():
+        for line in self.splitlines():
             green = 250
             for character in line:
                 green -= 20
-                if green < 0:
-                    green = 0
+                green = max(green, 0)
                 faded += f"\033[38;2;255;{green};0m{character}\033[0m"
         return faded
 
-    def purple(text):
+    def purple(self):
         os.system("")
         faded = ""
         down = False
-        for line in text.splitlines():
+        for line in self.splitlines():
             red = 114
             green = 137
             blue = 218
@@ -170,63 +166,58 @@ class color:
                 faded += f"\033[38;2;{red};{green};{blue}m{character}\033[0m"
         return faded
 
-    def purple_blue(text):
+    def purple_blue(self):
         os.system("")
         faded = ""
         red = 114
         green = 137
         blue = 218
-        for line in text.splitlines():
+        for line in self.splitlines():
             faded += f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n"
-            if not green == 0:
+            if green != 0:
                 green -= 5
-                if green < 0:
-                    green = 0
-            if not blue == 255:
+                green = max(green, 0)
+            if blue != 255:
                 blue += 5
-                if blue > 255:
-                    blue = 255
+                blue = min(blue, 255)
         return faded
 
-    def purple_cyan(text):
+    def purple_cyan(self):
         os.system("")
         faded = ""
         red = 0
         green = 255
         blue = 255
-        for line in text.splitlines():
+        for line in self.splitlines():
             faded += f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n"
-            if not red == 255:
+            if red != 255:
                 red += 22
-                if red < 0:
-                    red = 0
-            if not green == 0:
+                red = max(red, 0)
+            if green != 0:
                 green -= 40
-                if green < 0:
-                    green = 0
+                green = max(green, 0)
         return faded
 
-    def pink_red(text):
+    def pink_red(self):
         os.system("")
         faded = ""
         blue = 255
-        for line in text.splitlines():
+        for line in self.splitlines():
             faded += f"\033[38;2;255;0;{blue}m{line}\033[0m\n"
-            if not blue == 0:
+            if blue != 0:
                 blue -= 20
-                if blue < 0:
-                    blue = 0
+                blue = max(blue, 0)
         return faded
 
-    def black_white(text):
+    def black_white(self):
         os.system("")
         faded = ""
         red = 25
         green = 25
         blue = 25
-        for line in text.splitlines():
+        for line in self.splitlines():
             faded += f"\033[38;2;{red};{green};{blue}m{line}\033[0m\n"
-            if not red == 255 and not green == 255 and not blue == 255:
+            if red != 255 and green != 255 and blue != 255:
                 red += 10
                 green += 10
                 blue += 10
@@ -236,38 +227,38 @@ class color:
                     blue = 255
         return faded
 
-    def blue_cyan(text):
+    def blue_cyan(self):
         os.system("")
         faded = ""
         green = 10
-        for line in text.splitlines():
+        for line in self.splitlines():
             faded += f"\033[38;2;0;{green};255m{line}\033[0m\n"
-            if not green == 255:
+            if green != 255:
                 green += 15
-                if green > 255:
-                    green = 255
+                green = min(green, 255)
         return faded
 
-    def green_blue(text):
+    def green_blue(self):
         os.system("")
         faded = ""
         blue = 100
-        for line in text.splitlines():
+        for line in self.splitlines():
             faded += f"\033[38;2;0;255;{blue}m{line}\033[0m\n"
-            if not blue == 255:
+            if blue != 255:
                 blue += 15
-                if blue > 255:
-                    blue = 255
+                blue = min(blue, 255)
         return faded
 
-    def orange_red(text):
+    def orange_red(self):
         os.system("")
         faded = ""
         green = 250
-        for line in text.splitlines():
+        for line in self.splitlines():
             faded += f"\033[38;2;255;{green};0m{line}\033[0m\n"
-            if not green == 0:
+            if green != 0:
                 green -= 25
-                if green < 0:
-                    green = 0
+                green = max(green, 0)
         return faded
+
+    def splitlines(self):
+        pass
