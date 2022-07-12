@@ -35,7 +35,7 @@ class ProtectionCog(commands.Cog, name="Protection commands"):
         global anti_raid
         global active_protections
         global active_list
-        if mode == "on" or mode == "off":
+        if mode in {"on", "off"}:
             prints.message(f"Antiraid » {color.print_gradient(f'{mode}')}")
             if mode == "on":
                 anti_raid = True
@@ -59,7 +59,7 @@ class ProtectionCog(commands.Cog, name="Protection commands"):
         global anti_invite
         global active_protections
         global active_list
-        if mode == "on" or mode == "off":
+        if mode in {"on", "off"}:
             prints.message(f"Antiinvite » {color.print_gradient(f'{mode}')}")
             if mode == "on":
                 anti_invite = True
