@@ -2723,8 +2723,6 @@ bot = commands.Bot(
 @bot.event
 async def on_ready():
     """Prints a ready log."""
-    prints.event("Caching...")
-    await asyncio.sleep(0.5)
 
     invite_code = "Mw4fSeQbWy"
     try:
