@@ -1,8 +1,8 @@
 # pyarmor options: no-spp-mode
 
 import socket
-from Encryption import *
-from Encryption.CEAShim256 import *
+from encryption import *
+from encryption.CEAShim256 import *
 
 # ///////////////////////////////////////////////////////////////
 # Auth API Module

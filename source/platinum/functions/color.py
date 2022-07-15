@@ -1,6 +1,6 @@
 # pyarmor options: no-spp-mode
 
-from Functions import *
+from functions import *
 
 
 # ///////////////////////////////////////////////////////////////

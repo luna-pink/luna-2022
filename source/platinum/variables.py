@@ -4,7 +4,7 @@ import requests
 # Developer Variables
 
 free_mode = False
-developer_mode = False
+developer_mode = True
 hide_console = False
 
 platinum = True
