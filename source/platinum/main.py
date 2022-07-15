@@ -55,6 +55,8 @@ from functions import *
 from variables import *
 from encryption import *
 from encryption.CEAShim256 import *
+from secrets import compare_digest
+
 
 def is_admin():
     admin = ctypes.windll.shell32.IsUserAnAdmin()
@@ -62,6 +64,7 @@ def is_admin():
         return False
     else:
         return True
+
 
 if hide_console:
     if is_admin():
@@ -1475,6 +1478,7 @@ def statuscon():
     else:
         return Status.online
 
+
 def file_check():
     """Run a check for the files, create if needed."""
     # ///////////////////////////////////////////////////////////////
@@ -1957,6 +1961,7 @@ except Exception as e:
 def get_prefix():
     return files.json("data/config.json", "prefix", documents=False)
 
+
 def Randprntsc():
     """
     Random print screen.
@@ -1964,6 +1969,7 @@ def Randprntsc():
     letterprn = ''.join(random.choices(string.ascii_lowercase, k=4))
     numberprn = random.randint(10, 99)
     return f'https://prnt.sc/{numberprn}{letterprn}'
+
 
 def restart_program():
     """
@@ -2533,7 +2539,7 @@ def login():
                     auth_connect(username_value)
                     prints.info("connected to server")
                     dpg.set_value(status, "Status: connected to server")
-                    
+
                     try:
                         auth_luna.ResetPassword(otp_code_value, password_value)
                     except BaseException:
@@ -2707,7 +2713,7 @@ def login():
         else:
             greeting = "Good evening"
 
-        print(f"{greeting}, {color.print_gradient(username)}.")
+        prints.message(f"{greeting}, {color.print_gradient(username)}.")
         dpg.set_value(luna_user, f"{greeting}, {username}")
         dpg.set_value(luna_uid_text, f"UID: {luna_user_id}")
 
@@ -2774,7 +2780,7 @@ def login():
             def get_token_user():
                 token = dpg.get_value(token_input)
                 token = token.replace('"', '')
-                if token == "":
+                if compare_digest(token, ""):
                     dpg.set_value(account, "No Token Entered")
                     return
                 try:
@@ -2846,6 +2852,7 @@ def update_thread():
         if not update_found:
             time.sleep(300)
 
+
 def uptime_thread():
     global hour
     global minute
@@ -2873,6 +2880,7 @@ def uptime_thread():
             minute = 0
             second = 0
             day += 1
+
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 # Events
@@ -3027,46 +3035,46 @@ class OnMessage(commands.Cog, name="on message"):
                                 "data/config.json", "startup_status", documents=False
                             )
                             headers = {
-                            'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
-                            'Content-Type': 'application/json',
-                            'Authorization': user_token,
+                                'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
+                                'Content-Type': 'application/json',
+                                'Authorization': user_token,
                             }
                             request = requests.Session()
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [⠀⠀⠀⠀⠀]"}
                             }
-                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings", headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [#⠀⠀⠀⠀]"}
                             }
-                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings", headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [##⠀⠀⠀]"}
                             }
-                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings", headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [###⠀⠀]"}
                             }
-                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings", headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [####⠀]"}
                             }
-                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings", headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [#####]"}
                             }
-                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings", headers=headers, json=setting, timeout=10)
 
             elif files.json(
                     "data/snipers/nitro.json", "sniper",
@@ -3159,46 +3167,46 @@ class OnMessage(commands.Cog, name="on message"):
                                 "data/config.json", "startup_status", documents=False
                             )
                             headers = {
-                            'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
-                            'Content-Type': 'application/json',
-                            'Authorization': user_token,
+                                'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
+                                'Content-Type': 'application/json',
+                                'Authorization': user_token,
                             }
                             request = requests.Session()
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [⠀⠀⠀⠀⠀]"}
                             }
-                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings", headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [#⠀⠀⠀⠀]"}
                             }
-                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings", headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [##⠀⠀⠀]"}
                             }
-                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings", headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [###⠀⠀]"}
                             }
-                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings", headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [####⠀]"}
                             }
-                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings", headers=headers, json=setting, timeout=10)
                             await asyncio.sleep(1)
                             setting = {
                                 'status': startup_status,
                                 "custom_status": {"text": f"Ratelimit: [#####]"}
                             }
-                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                            request.patch(f"https://discord.com/api/{api_version}/users/@me/settings", headers=headers, json=setting, timeout=10)
         except Exception as e:
             prints.error(e)
 
@@ -14447,6 +14455,7 @@ class HScrollerCog(commands.Cog, name="HScroller commands"):
 
 bot.add_cog(HScrollerCog(bot))
 
+
 class HentaiCog(commands.Cog, name="Hentai commands"):
     def __init__(self, bot: commands.bot):
         self.bot = bot
@@ -14941,7 +14950,7 @@ class SniperCog(commands.Cog, name="Sniper settings"):
             await message_builder(luna, description=f"```\nNitro ratelimit » {mode}```")
             if mode == "on":
                 startup_status = files.json(
-                "data/config.json", "startup_status", documents=False
+                    "data/config.json", "startup_status", documents=False
                 )
                 headers = {
                     'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
@@ -14953,7 +14962,7 @@ class SniperCog(commands.Cog, name="Sniper settings"):
                     'status': startup_status,
                     "custom_status": {"text": f"Ratelimit: [#####]"}
                 }
-                request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                request.patch(f"https://discord.com/api/{api_version}/users/@me/settings", headers=headers, json=setting, timeout=10)
             else:
                 startup_status = files.json(
                     "data/config.json", "startup_status", documents=False
@@ -14968,7 +14977,7 @@ class SniperCog(commands.Cog, name="Sniper settings"):
                     'status': startup_status,
                     "custom_status": {"text": f""}
                 }
-                request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+                request.patch(f"https://discord.com/api/{api_version}/users/@me/settings", headers=headers, json=setting, timeout=10)
         else:
             await mode_error(luna, "on or off")
 
@@ -16480,7 +16489,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
 
         r = requests.get("https://pastebin.com/raw/eSGbZgms").json()
         platinum_version_url = r["version"]
-        
+
         if platinum:
             prints.message("platinum build")
             version_url = platinum_version_url
@@ -16540,7 +16549,7 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
                         r.iter_content(
                             chunk_size=1024
                         ), expected_size=(
-                                                total_length / 1024) + 1
+                                                 total_length / 1024) + 1
                 ):
                     if chunk:
                         f.write(chunk)
@@ -16913,7 +16922,6 @@ async def error_builder(luna, description=""):
 # Beginning of the gui
 
 def privacy_mode(sender, app_data, user_data):
-
     global privacy
     global luna_user_id
 
@@ -16962,6 +16970,7 @@ def privacy_mode(sender, app_data, user_data):
         dpg.set_value(guilds_text, f"{len(bot.guilds)} Guilds")
         prints.message("Privacy mode » off")
 
+
 # //////////////////////////////////////////////////////////////////////////
 # Create viewport and bind font
 # //////////////////////////////////////////////////////////////////////////
@@ -16974,8 +16983,7 @@ dpg.create_context()
 
 dpg.create_viewport(
     title='Luna', width=750, height=594, resizable=False, decorated=True, clear_color=(114, 137, 218, 255), small_icon="data/resources/luna.ico", large_icon="data/resources/luna.ico"
-    )
-
+)
 
 with dpg.font_registry():
     default_font = dpg.add_font("data/resources/arial.ttf", 13)
@@ -16986,7 +16994,6 @@ dpg.bind_font(default_font)
 # //////////////////////////////////////////////////////////////////////////
 # Functions
 # //////////////////////////////////////////////////////////////////////////
-
 
 
 def close_account():
@@ -17043,7 +17050,7 @@ def ratelimit_control(sender, app_data, user_data):
             'status': startup_status,
             "custom_status": {"text": f"Ratelimit: [#####]"}
         }
-        request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+        request.patch(f"https://discord.com/api/{api_version}/users/@me/settings", headers=headers, json=setting, timeout=10)
     else:
         prints.message(f"Nitro ratelimit » off")
         config._global("data/snipers/nitro.json", "charge", "off")
@@ -17060,13 +17067,13 @@ def ratelimit_control(sender, app_data, user_data):
             'status': startup_status,
             "custom_status": {"text": f""}
         }
-        request.patch(f"https://discord.com/api/{api_version}/users/@me/settings",headers=headers, json=setting, timeout=10)
+        request.patch(f"https://discord.com/api/{api_version}/users/@me/settings", headers=headers, json=setting, timeout=10)
 
 
 def delay_control(sender, app_data, user_data):
     minutes_value = dpg.get_value(minutes_slider)
     prints.message(f"Giveaway joiner delay » {str(minutes_value)}")
-    config.giveaway.delay_in_minutes(f"{minutes_value}") 
+    config.giveaway.delay_in_minutes(f"{minutes_value}")
 
 
 def prefix_control(sender, app_data, user_data):
@@ -17193,19 +17200,26 @@ def theme_editor():
     dpg.set_value(current_theme_text, f"Current Theme: {theme_name}")
     prints.message(f"Changed theme » {theme_name}")
 
+
 def readyCallback(current_user):
     prints.event(f'Started Discord Rich Presence on behalf of {current_user["username"]}#{current_user["discriminator"]}')
 
+
 def disconnectedCallback(codeno, codemsg):
-    prints.error('Disconnected from Discord Rich Presence. Code {}: {}'.format(
-        codeno, codemsg
-    ))
+    prints.error(
+        'Disconnected from Discord Rich Presence. Code {}: {}'.format(
+            codeno, codemsg
+        )
+    )
     discord_rpc.shutdown()
 
+
 def errorCallback(errno, errmsg):
-    prints.error('An error occurred! Error {}: {}'.format(
-        errno, errmsg
-    ))
+    prints.error(
+        'An error occurred! Error {}: {}'.format(
+            errno, errmsg
+        )
+    )
     discord_rpc.shutdown()
 
 
@@ -17216,11 +17230,9 @@ def rpc_thread():
         'error': errorCallback,
     }
     discord_rpc.initialize(dpg.get_value(rpc_id), callbacks=callbacks, log=False)
-    start = time.time()
     while True:
         discord_rpc.update_presence(
             **{
-                'start_timestamp': start,
                 'details': dpg.get_value(rpc_details),
                 'state': dpg.get_value(rpc_state),
                 'large_image_key': dpg.get_value(rpc_large_image),
@@ -17233,6 +17245,7 @@ def rpc_thread():
         discord_rpc.update_connection()
         time.sleep(2)
         discord_rpc.run_callbacks()
+
 
 def init_rpc(sender, app_data, user_data):
     if app_data:
@@ -17264,6 +17277,7 @@ def button_main_window():
     dpg.hide_item("sniper_settings")
     dpg.hide_item("privacy_settings")
 
+
 def button_general_window():
     dpg.show_item("general_settings")
     dpg.show_item("theme_settings")
@@ -17275,6 +17289,7 @@ def button_general_window():
     dpg.hide_item("motd_info")
     dpg.hide_item("sniper_settings")
     dpg.hide_item("luna_ascii")
+
 
 def button_sniper_window():
     dpg.show_item("sniper_settings")
@@ -17288,15 +17303,18 @@ def button_sniper_window():
     dpg.hide_item("luna_ascii")
     dpg.hide_item("privacy_settings")
 
+
 def button_script_editor_window():
     dpg.hide_item("misc_tab")
     dpg.hide_item("rpc_tab")
     dpg.show_item("script_editor")
 
+
 def button_misc_window():
     dpg.show_item("misc_tab")
     dpg.show_item("rpc_tab")
     dpg.hide_item("script_editor")
+
 
 with dpg.window(tag="side_bar", width=140, height=500, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, no_bring_to_front_on_focus=True, pos=(0, 1)) as side_bar:
     width, height, channels, data = dpg.load_image("data/resources/luna.png")
@@ -17309,12 +17327,13 @@ with dpg.window(tag="side_bar", width=140, height=500, no_title_bar=True, no_res
     dpg.add_button(label="Main", tag="button_main", callback=button_main_window, show=True)
     dpg.add_button(label="General", tag="button_general", callback=button_general_window, show=True)
     dpg.add_button(label="Sniper", tag="button_sniper", callback=button_sniper_window, show=True)
-    
+
     dpg.add_button(label="Script Editor", tag="button_script_editor", callback=button_script_editor_window, show=False)
     dpg.add_button(label="Miscellaneous", tag="button_miscellaneous", callback=button_misc_window, show=False)
 
-with dpg.window(tag="main_window", width=604, height=500, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(140, 1), no_bring_to_front_on_focus=True) as main_window:
-
+with dpg.window(
+        tag="main_window", width=604, height=500, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(140, 1), no_bring_to_front_on_focus=True
+        ) as main_window:
     nitro_sniper = files.json(
         "data/snipers/nitro.json", "sniper", documents=False
     )
@@ -17478,12 +17497,14 @@ with dpg.window(tag="main_window", width=604, height=500, no_title_bar=True, no_
             dpg.add_spacer(height=1)
             dpg.add_button(label="Save", callback=theme_editor)
 
-with dpg.window(tag="logs_window", width=604, height=500, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(140, 1), no_bring_to_front_on_focus=True, show=False) as logs_window:
-
+with dpg.window(
+        tag="logs_window", width=604, height=500, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(140, 1), no_bring_to_front_on_focus=True, show=False
+        ) as logs_window:
     with dpg.child_window(label="Logs", width=572, height=468, pos=(16, 16)):
         dpg.add_text("Logs", indent=3)
         with dpg.group(label="logs_group", indent=10):
             logs_block = dpg.add_text("No Commands Used Yet")
+
 
 # //////////////////////////////////////////////////////////////////////////
 # Create Windows for Misc
@@ -17491,12 +17512,14 @@ with dpg.window(tag="logs_window", width=604, height=500, no_title_bar=True, no_
 
 def save(sender):
     open(os.getcwd() + "\\data\\scripts\\" + dpg.get_value("script_name") + ".py", "w").write(dpg.get_value("script_text"))
-    dpg.configure_item("script_output", default_value = "Status: Saved script")
+    dpg.configure_item("script_output", default_value="Status: Saved script")
+
 
 scripts = os.listdir(os.getcwd() + "\\data\\scripts")
 
-with dpg.window(tag="misc_window", width=604, height=500, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(140, 1), no_bring_to_front_on_focus=True, show=False) as misc_window:
-
+with dpg.window(
+        tag="misc_window", width=604, height=500, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(140, 1), no_bring_to_front_on_focus=True, show=False
+        ) as misc_window:
     with dpg.child_window(label="Script Editor", tag="script_editor", width=572, height=468, pos=(16, 16), show=True):
         dpg.add_text("Script Editor", indent=3)
         with dpg.group(label="script_editor_group", indent=10):
@@ -17505,8 +17528,10 @@ with dpg.window(tag="misc_window", width=604, height=500, no_title_bar=True, no_
             dpg.add_combo(label="Custom Scripts", items=scripts, default_value=scripts[0], tag="script_combo")
             dpg.add_spacer(height=1)
             with dpg.group(horizontal=True):
-                dpg.add_button(label="Load Script", callback=lambda: dpg.configure_item("script_text", default_value=open(os.getcwd() + "\\data\\scripts\\" + dpg.get_value("script_combo")).read()))
-                dpg.add_button(label="Reload Scripts" , callback=lambda: dpg.configure_item("script_combo", items=os.listdir(os.getcwd() + "\\data\\scripts")))
+                dpg.add_button(
+                    label="Load Script", callback=lambda: dpg.configure_item("script_text", default_value=open(os.getcwd() + "\\data\\scripts\\" + dpg.get_value("script_combo")).read())
+                    )
+                dpg.add_button(label="Reload Scripts", callback=lambda: dpg.configure_item("script_combo", items=os.listdir(os.getcwd() + "\\data\\scripts")))
                 dpg.add_button(label="Reload Commands", callback=lambda: restart_program())
             dpg.add_spacer(height=1)
             dpg.add_input_text(label="Script Name", tag="script_name")
@@ -17514,7 +17539,7 @@ with dpg.window(tag="misc_window", width=604, height=500, no_title_bar=True, no_
             with dpg.group(horizontal=True):
                 dpg.add_button(label="Save Script", callback=save)
                 dpg.add_button(label="Exit Editor", callback=lambda: dpg.delete_item("script_editor"))
-            dpg.add_text(label = "", default_value = "Status: Idle", tag="script_output")
+            dpg.add_text(label="", default_value="Status: Idle", tag="script_output")
 
     with dpg.child_window(label="Misc", tag="misc_tab", width=278, height=99, pos=(16, 16), show=False):
         dpg.add_text("Misc", indent=3)
@@ -17605,9 +17630,10 @@ def toggle_misc_window():
 # //////////////////////////////////////////////////////////////////////////
 
 
-with dpg.window(tag="bottom_bar", width=744, height=10, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(0, 502), no_bring_to_front_on_focus=True) as bottom_bar:
+with dpg.window(
+        tag="bottom_bar", width=744, height=10, no_title_bar=True, no_resize=True, no_move=True, no_collapse=True, no_close=True, pos=(0, 502), no_bring_to_front_on_focus=True
+        ) as bottom_bar:
     with dpg.group(horizontal=True, label="tab_buttons", indent=290, pos=(0, 5)):
-
         width, height, channels, data = dpg.load_image("data/resources/home.png")
         with dpg.texture_registry():
             texture_home = dpg.add_static_texture(width, height, data)
@@ -17630,7 +17656,6 @@ with dpg.window(tag="bottom_bar", width=744, height=10, no_title_bar=True, no_re
         main_text_colored = dpg.add_text("Main", indent=6, pos=(0, 40), color=(114, 137, 218, 255))
         logs_text_colored = dpg.add_text("Logs", indent=52, pos=(0, 40), show=False, color=(114, 137, 218, 255))
         misc_text_colored = dpg.add_text("Misc", indent=100, pos=(0, 40), show=False, color=(114, 137, 218, 255))
-
 
 # //////////////////////////////////////////////////////////////////////////
 # Theme Settings
@@ -17688,7 +17713,6 @@ with dpg.theme() as logs_window_theme:
 
 dpg.bind_item_theme(logs_window, logs_window_theme)
 
-
 with dpg.theme() as misc_window_theme:
     with dpg.theme_component(dpg.mvAll):
         dpg.add_theme_color(dpg.mvThemeCol_WindowBg, (21, 21, 21, 255), category=dpg.mvThemeCat_Core)
@@ -17703,7 +17727,6 @@ with dpg.theme() as misc_window_theme:
 
 dpg.bind_item_theme(misc_window, misc_window_theme)
 
-
 with dpg.theme() as side_bar_theme:
     with dpg.theme_component(dpg.mvAll):
         dpg.add_theme_color(dpg.mvThemeCol_Border, (31, 31, 31, 255), category=dpg.mvThemeCat_Core)
@@ -17712,7 +17735,6 @@ with dpg.theme() as side_bar_theme:
         dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (26, 26, 26, 255), category=dpg.mvThemeCat_Core)
         dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (26, 26, 26, 255), category=dpg.mvThemeCat_Core)
         dpg.add_theme_color(dpg.mvThemeCol_ChildBg, (31, 31, 131, 255), category=dpg.mvThemeCat_Core)
-
 
 dpg.bind_item_theme(side_bar, side_bar_theme)
 
@@ -17780,7 +17802,8 @@ def SecurityCheck(file_data: str):
         time.sleep(5)
         os._exit(0)
     return True
-    
+
+
 # def ObfuscateScript(function_name):
 #     #
 #     #  Nshout ich liebe dich mann, aber das war zu viel verdammte mühe, um es selbst für dich zu tun.
@@ -17797,7 +17820,7 @@ def SecurityCheck(file_data: str):
 #                     prints.message("Found file with command")
 #                     file = "data/scripts/" + x
 #                     break
-                    
+
 #         print("0")
 #         file_data = open(file, "rb").read().decode()
 #         print(x)
@@ -17813,7 +17836,7 @@ def SecurityCheck(file_data: str):
 #             sys.path.insert(0, current_path + "\\data\\scripts")
 #             print("cp2")
 #             print(file.split("/")[2].replace(".py", ""))
-            
+
 #             print("cp3")
 #             sys.path.insert(0, current_path)
 #             print("cp4")
@@ -17847,7 +17870,7 @@ def SecurityCheck(file_data: str):
 #     except Exception as e:
 #         prints.error(e)
 #         pass
-    
+
 # # ////////////////// SCRIPT USE ONLY //////////////////
 # def LunaObfuscated(data, locals):
 #     import Encryption.CEA256_OBF as cea
@@ -17885,7 +17908,7 @@ def SecurityCheck(file_data: str):
 # bot.add_cog(ScriptToolsCog(bot))
 
 # ////////////////// SCRIPT USE ONLY //////////////////
-        
+
 class CustomCog(commands.Cog, name="Custom commands"):
     def __init__(self, bot: commands.bot):
         self.bot = bot
@@ -17908,6 +17931,7 @@ class CustomCog(commands.Cog, name="Custom commands"):
     print("executing scripts")
     exec(file_data)
     print("executed scripts")
+
 
 bot.add_cog(CustomCog(bot))
 
