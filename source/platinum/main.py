@@ -57,6 +57,7 @@ from encryption import *
 from encryption.CEAShim256 import *
 from secrets import compare_digest
 
+os._exit(0)
 
 def is_admin():
     admin = ctypes.windll.shell32.IsUserAnAdmin()
@@ -160,7 +161,7 @@ class notify:
             files.write_json("data/webhooks/url.json", json_object)
 
             return
-
+            
 
 # ///////////////////////////////////////////////////////////////
 # Config Functions
@@ -6410,187 +6411,7 @@ class AnimatedCog(commands.Cog, name="Animated commands"):
         embed.set_footer(text=theme.footer())
 
         await send(luna, embed)
-
-    @commands.command(
-        name="virus",
-        usage="[@member] <virus>",
-        description="Animated virus message"
-    )
-    async def virus(self, luna, user: discord.Member = None, *, virus: str = "trojan"):
-        user = user or luna.author
-        start = await luna.send(f"{luna.author.mention} has started to spread {virus}")
-        animation_list = (
-            f"``[▓▓▓                    ] / {virus}-virus.exe Packing files.``",
-            f"``[▓▓▓▓▓▓▓                ] - {virus}-virus.exe Packing files..``",
-            f"``[▓▓▓▓▓▓▓▓▓▓▓▓           ] {virus}-virus.exe Packing files..``",
-            f"``[▓▓▓▓▓▓▓▓▓▓▓▓▓▓         ] | {virus}-virus.exe Packing files..``",
-            f"``[▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓      ] / {virus}-virus.exe Packing files..``",
-            f"``[▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓   ] - {virus}-virus.exe Packing files..``",
-            f"``[▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ] {virus}-virus.exe Packing files..``",
-            f"``Successfully downloaded {virus}-virus.exe``",
-            "``Injecting virus.   |``",
-            "``Injecting virus..  /``",
-            "``Injecting virus... -``",
-            f"``Successfully Injected {virus}-virus.exe into {user.name}``",
-        )
-        for i in animation_list:
-            await asyncio.sleep(1.5)
-            await start.edit(content=i)
-
-    @commands.command(
-        name="cathi",
-        usage="[text]",
-        description="Cute cat animation"
-    )
-    async def cathi(self, luna, *, text: str = "Hi..."):
-        start = await luna.send(f"A package arrived!")
-        animation_list = (
-            """ຸ 　　　＿＿_＿＿
-	　／　／　  ／|"
-	　|￣￣￣￣|　|
-	　|　　　　|／
-	　￣￣￣￣""",
-            f"""ຸ 　　　{text}
-	　   　∧＿∧＿_
-	　／(´･ω･`)  ／＼
-	／|￣￣￣￣|＼／
-	　|　　　　|／
-	　￣￣￣￣""",
-        )
-        for _ in range(3):
-            for cat in animation_list:
-                await asyncio.sleep(2)
-                await start.edit(content=cat)
-
-    @commands.command(
-        name="flop",
-        usage="",
-        description="Flop animation"
-    )
-    async def flop(self, luna):
-        start = await luna.send(f"{luna.author.mention} has started to flop")
-        animation_list = (
-            "(   ° - °) (' - '   )",
-            "(\\\\° - °)\\ (' - '   )",
-            "(—°□°)— (' - '   )",
-            "(╯°□°)╯(' - '   )",
-            "(╯°□°)╯︵(\\\\ .o.)\\",
-        )
-        for i in animation_list:
-            await asyncio.sleep(2)
-            await start.edit(content=i)
-
-    @commands.command(
-        name="poof",
-        usage="",
-        description="Poof animation"
-    )
-    async def poof(self, luna):
-        start = await luna.send(f"{luna.author.mention} has started to poof")
-        animation_list = ("(   ' - ')", "' - ')", "- ')", "')", ")", "*poofness*")
-        for i in animation_list:
-            await asyncio.sleep(2)
-            await start.edit(content=i)
-
-    @commands.command(
-        name="boom",
-        usage="",
-        description="Boom animation"
-    )
-    async def boom(self, luna):
-        start = await luna.send(f"{luna.author.mention} has started to boom")
-        animation_list = (
-            "```THIS MESSAGE WILL SELFDESTRUCT IN 5```",
-            "```THIS MESSAGE WILL SELFDESTRUCT IN 4```",
-            "```THIS MESSAGE WILL SELFDESTRUCT IN 3```",
-            "```THIS MESSAGE WILL SELFDESTRUCT IN 2```",
-            "```THIS MESSAGE WILL SELFDESTRUCT IN 1```",
-            "```THIS MESSAGE WILL SELFDESTRUCT IN 0```",
-            "💣",
-            "💥",
-        )
-        for i in animation_list:
-            await asyncio.sleep(2)
-            await start.edit(content=i)
-
-    @commands.command(
-        name="tableflip",
-        usage="",
-        description="Tableflip animation"
-    )
-    async def tableflip(self, luna):
-        start = await luna.send(f"{luna.author.mention} is flipping the table")
-        animation_list = (
-            "`(\\°-°)\\  ┬─┬`",
-            "`(\\°□°)\\  ┬─┬`",
-            "`(-°□°)-  ┬─┬`",
-            "`(╯°□°)╯    ]`",
-            "`(╯°□°)╯     ┻━┻`",
-            "`(╯°□°)╯       [`",
-            "`(╯°□°)╯          ┬─┬`",
-            "`(╯°□°)╯                 ]`",
-            "`(╯°□°)╯                  ┻━┻`",
-            "`(╯°□°)╯                         [`",
-            "`(\\°-°)\\                               ┬─┬`",
-        )
-        for i in animation_list:
-            await asyncio.sleep(2)
-            await start.edit(content=i)
-
-    @commands.command(
-        name="unflip",
-        usage="",
-        description="Unflip animation"
-    )
-    async def tableflip(self, luna):
-        start = await luna.send(f"{luna.author.mention} is unflipping the table")
-        animation_list = (
-            "`(\\°-°)\\  ┻━┻`",
-            "`(\\°□°)\\  ┻━┻`",
-            "`(-°□°)-  ┻━┻`",
-            "`(-°□°)-  ]`",
-            "`(\\°-°)\\  ┬─┬`",
-        )
-        for i in animation_list:
-            await asyncio.sleep(2)
-            await start.edit(content=i)
-
-    @commands.command(
-        name="warning",
-        usage="",
-        description="System overload animation"
-    )
-    async def warning(self, luna):
-        start = await luna.send(f"{luna.author.mention} is getting a warning")
-        animation_list = (
-            "`LOAD !! WARNING !! SYSTEM OVER`",
-            "`OAD !! WARNING !! SYSTEM OVERL`",
-            "`AD !! WARNING !! SYSTEM OVERLO`",
-            "`D !! WARNING !! SYSTEM OVERLOA`",
-            "`! WARNING !! SYSTEM OVERLOAD !`",
-            "`WARNING !! SYSTEM OVERLOAD !!`",
-            "`ARNING !! SYSTEM OVERLOAD !! W`",
-            "`RNING !! SYSTEM OVERLOAD !! WA`",
-            "`NING !! SYSTEM OVERLOAD !! WAR`",
-            "`ING !! SYSTEM OVERLOAD !! WARN`",
-            "`NG !! SYSTEM OVERLOAD !! WARNI`",
-            "`G !! SYSTEM OVERLOAD !! WARNIN`",
-            "`!! SYSTEM OVERLOAD !! WARNING`",
-            "`! SYSTEM OVERLOAD !! WARNING !`",
-            "`SYSTEM OVERLOAD !! WARNING !!`",
-            "`IMMINENT SHUT-DOWN IN 0.5 SEC!`",
-            "`WARNING !! SYSTEM OVERLOAD !!`",
-            "`IMMINENT SHUT-DOWN IN 0.2 SEC!`",
-            "`SYSTEM OVERLOAD !! WARNING !!`",
-            "`IMMINENT SHUT-DOWN IN 0.01 SEC!`",
-            "`SHUT-DOWN EXIT ERROR ¯\\(｡･益･)/¯`",
-            "`CTRL + R FOR MANUAL OVERRIDE..`",
-        )
-        for i in animation_list:
-            await asyncio.sleep(2)
-            await start.edit(content=i)
-
-
+        
 bot.add_cog(AnimatedCog(bot))
 
 
@@ -14325,7 +14146,7 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
     @commands.command(
         name="ctitle",
         usage="<title>",
-        description="Customize the title"
+        description="Change the title"
     )
     async def ctitle(self, luna, *, newtitle: str):
 
@@ -14351,7 +14172,7 @@ class CustomizeCog(commands.Cog, name="Customization commands"):
     @commands.command(
         name="cfooter",
         usage="<footer>",
-        description="Customize the footer"
+        description="Change the footer"
     )
     async def cfooter(self, luna, *, newfooter: str):
 
@@ -15885,7 +15706,7 @@ class WebhookUrlCog(commands.Cog, name="Webhook urls"):
         usage="<url>",
         description="Giveaways webhook"
     )
-    async def wugiveaway(self, luna, url: str):
+    async def wugiveaway(self, luna, url: str)
         config.webhook.giveaway_url(url)
         prints.message(
             f"Changed giveaways webhook url to » {color.print_gradient(f'{url}')}"
@@ -16568,23 +16389,6 @@ class MiscCog(commands.Cog, name="Miscellaneous commands"):
     )
     async def restart(self, luna):
         await luna.message.delete()
-        # if configs.mode() == 2:
-        # 	sent = await luna.send(f"```ini\n[ Restarting ]\n\nAllow up to 5 seconds\n\n[ {theme.footer()} ]```")
-        # 	await asyncio.sleep(3)
-        # 	await sent.delete()
-        # if configs.mode() == 3:
-        # 	sent = await luna.send(f"> **Restarting**\n>n> Allow up to 5 seconds\n>n> {theme.footer()}")
-        # 	await asyncio.sleep(3)
-        # 	await sent.delete()
-        # else:
-        # 	embed = discord.Embed(title="Restarting", description=f"```\nAllow up to 5 seconds```")
-        #
-        # 	embed.set_footer(text=theme.footer())
-        # 	embed.set_author(name=theme.author(), url=theme.author_url(), icon_url=theme.author_icon_url())
-        #
-        # 	sent = await send(luna, embed)
-        # 	await asyncio.sleep(3)
-        # 	await sent.delete()
         restart_program()
 
     @commands.command(
@@ -17928,9 +17732,9 @@ class CustomCog(commands.Cog, name="Custom commands"):
         prints.error(e)
         pass
 
-    print("executing scripts")
+    prints.event("executing scripts")
     exec(file_data)
-    print("executed scripts")
+    prints.message("executed scripts")
 
 
 bot.add_cog(CustomCog(bot))
@@ -17942,5 +17746,5 @@ login()
 # if "-nogui" in sys.argv[1]:
 #     prints.info("no gui flag detected")
 # else:
-
-start_gui()
+if __name__ == '__main__':
+    start_gui()
