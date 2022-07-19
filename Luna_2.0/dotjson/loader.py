@@ -13,6 +13,7 @@ def load_keys(folder: list):
     :type folder: list
     :return: A list of dictionaries.
     """
+    keys.clear()
     for i in folder:
         for file in os.listdir(i):
             if file.endswith('.json'):
