@@ -11,11 +11,11 @@ Team Luna's flagship selfbot!
 
 Luna selfbot is a selfbot for the Discord chat service. 
 It is designed to be a lightweight and easy to use bot that provides a variety of features to the user.
-Currently Luna SelfBot is in production, but it is still in development. This repo keeps track of all the features that are currently in development.
+Currently, Luna SelfBot is in production, but it is still in development. This repo keeps track of all the features that are currently in development.
 
 ## Account requirements for development.
 
-- To start developing with Luna SelfBot, you will need to have a [Discord](https://discord.com/) account and a [github](https://github.com/) account.
+- To start developing with Luna SelfBot, you will need to have a [Discord](https://discord.com/) account and a [GitHub](https://github.com/) account.
 
 ### Developing with Luna SelfBot
 
@@ -25,9 +25,9 @@ Currently Luna SelfBot is in production, but it is still in development. This re
 
 - To start use `pip install -r requirements.txt`
 
-- Next, you will need to obtain the modified version of [Luna SelfBot's discord wrapper](https://github.com/Team-Luna-Development/DiscordPY-Modifications) and [CEA256](https://github.com/Team-Luna-Development/CEA256), once you have downloaded it, you will need to install it by replacing all files within the discord.py folder, that was installed earlier with the last step, with the modified version.
+- Next, you will need to obtain the modified version of [Luna SelfBots discord wrapper](https://github.com/Team-Luna-Development/DiscordPY-Modifications) and [CEA256](https://github.com/Team-Luna-Development/CEA256), once you have downloaded it, you will need to install it by replacing all files within the discord.py folder, that was installed earlier with the last step, with the modified version.
 
-- Finally you will need to clone the Luna SelfBot repo to a folder of your choice to start with development.
+- Finally, you will need to clone the Luna SelfBot repo to a folder of your choice to start with development.
 
 Happy coding!
 
@@ -36,7 +36,7 @@ Happy coding!
 Once you have completed the above steps, you can start contributing to the Luna SelfBot repo.
 To contribute a build to the Luna SelfBot repo, you will need to follow the following steps:
 
-- Open a pull request on github with the build you want to contribute.
+- Open a pull request on GitHub with the build you want to contribute.
 
 - Within the pull request, you will need to add a description of all the changes you have made and how the build is intended to be used.
 
