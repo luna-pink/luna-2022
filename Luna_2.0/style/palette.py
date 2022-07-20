@@ -14,6 +14,8 @@ class rose_pine:
     highlight_low = (33, 32, 46)
     highlight_med = (64, 61, 82)
     highlight_high = (82, 79, 103)
+    spotify_window = (57, 53, 82)
+    spotify_hover = (42, 39, 63)
 
 
 class rose_pine_dawn:
