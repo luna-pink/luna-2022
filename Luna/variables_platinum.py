@@ -3,10 +3,10 @@ import requests
 # ///////////////////////////////////////////////////////////////
 # Developer Variables
 
-free_mode = True
-developer_mode = False
+free_mode = False
+developer_mode = True
 
-platinum = False
+platinum = True
 beta = False
 
 version = '2022.4'

@@ -3,6 +3,15 @@ import json
 from .loader import *
 
 
+def get_list():
+    """
+    It returns the list of keys
+
+    :return: The list of keys
+    """
+    return keys
+
+
 def get_key(key):
     """
     It returns the value of the key in the dictionary, if the key is in the dictionary, otherwise it raises a KeyError

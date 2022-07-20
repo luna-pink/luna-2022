@@ -53,7 +53,6 @@ def resize():
 
 
 with dpg.window(tag="Primary Window"):
-    # dpg.add_text("Hello, world")
 
     with dpg.child_window(label="Child Window", height=38, no_scrollbar=True):
         dpg.add_text("Nshout 1", color=rose_pine.subtle)
@@ -88,12 +87,34 @@ with dpg.window(tag="Primary Window"):
 
                     with dpg.group(horizontal=True):
                         with dpg.child_window(label="Child Window", width=258): # 342
-                            dpg.add_text("Window 1")
+                            dpg.add_text("Discord")
+                            dpg.add_separator()
+                            dpg.add_text("Not logged in")
+                            dpg.add_text("Loading friends...")
+                            dpg.add_text("Loading guilds...")
+                            dpg.add_text("Loading status...")
+                            dpg.add_text("Loading settings...")
+                            dpg.add_text("Loading nitro...")
+
                         with dpg.child_window(label="Child Window", width=258):
-                            dpg.add_text("Window 2")
+                            dpg.add_text("Luna")
+                            dpg.add_separator()
+                            dpg.add_text("Prefix: .")
+                            dpg.add_text("Loading commands...")
+                            dpg.add_text("Loading custom commands...")
+                            dpg.add_text("Current theme: default")
+                            dpg.add_text("Nitro sniper: enabled")
+                            dpg.add_text("Giveaway joiner: enabled")
+                            dpg.add_text("Giveaway delay: 1 minute/s")
+                            dpg.add_text("Privnote sniper: enabled")
+                            dpg.add_text("Auto delete delay: 30 seconds")
+
 
                 with dpg.tab(label="Logs"):
-                    dpg.add_text("Hello, world")
+                    with dpg.child_window(label="Logs Window"):
+                        dpg.add_text("Logs")
+                        dpg.add_separator()
+                        dpg.add_text("Nothing logged yet")
 
                 with dpg.tab(label="Scripts"):
                     with dpg.tab_bar(tag="scripts_tab_bar"):

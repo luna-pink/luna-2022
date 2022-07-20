@@ -22,7 +22,6 @@ from datetime import datetime
 from os import error, system
 from time import localtime, strftime
 
-import aiohttp
 import dhooks
 import discord
 import httpx
@@ -10205,10 +10204,6 @@ class UtilsCog(commands.Cog, name="Util commands"):
 
         if luna.message.attachments:
             image = await luna.message.attachments[0].read()
-        elif image_url:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(image_url) as resp:
-                    image = await resp.read()
         await luna.guild.create_custom_emoji(name=emoji_name, image=image)
         embed = discord.Embed(
             title="Emoji Added",
