@@ -17,6 +17,7 @@ from luna import log
 # ----------------------------------------------------------------------------------------------------------------------
 
 from events.miscellaneous.on_ready import OnReadyCog
+from events.sniper.nitro import SniperCog
 
 from commands.help.help import HelpCog
 
@@ -49,6 +50,7 @@ bot = commands.Bot(
 
 bot.add_cog(OnReadyCog(bot))
 bot.add_cog(HelpCog(bot))
+bot.add_cog(SniperCog(bot))
 
 
 def check_if_debug() -> Callable[[FrameType, str, Any], Callable[[FrameType, str, Any], Any] | None] | None:
