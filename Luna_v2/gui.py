@@ -1,11 +1,14 @@
 import ctypes
-import time
 
+import requests
 from win32api import GetSystemMetrics
 import dearpygui.dearpygui as dpg
 import style
+from dotjson import get_key, load_keys
 from style.palette import rose_pine
 import animation as dpg_anim
+
+load_keys(["data"])
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -156,7 +159,14 @@ with dpg.window(tag="Primary Window"):
     dpg.add_spacer()
 
     with dpg.child_window(label="Child Window", height=38, no_scrollbar=True):
-        dpg.add_text("Logging into Nshout#0001...", color=rose_pine.subtle)
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
+            'Content-Type': 'application/json',
+            'authorization': get_key("token")
+        }
+        r = requests.get("https://discord.com/api/v10/users/@me", headers=headers).json()
+
+        dpg.add_text(f"Logging into {r['username']}#{r['discriminator']}...", tag='status', color=rose_pine.subtle)
 
 # -----------------------------------------------------------------------------------------
 
@@ -179,15 +189,8 @@ dpg.bind_theme("Dark")
 def start_gui(debug):
     dpg.setup_dearpygui()
     dpg.show_viewport()
-    if debug is True:
-        ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
     dpg.set_primary_window("Primary Window", True)
+    if debug is False:
+        ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
     dpg.start_dearpygui()
     dpg.destroy_context()
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-
-
-if __name__ == '__main__':
-    start_gui()

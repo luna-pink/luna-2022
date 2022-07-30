@@ -1,9 +1,12 @@
 import ctypes
 import sys
 import threading
+import dearpygui.dearpygui as dpg
 from contextlib import suppress
 from types import FrameType
 from typing import Callable, Any
+
+import requests
 
 from dotjson import load_keys, get_key, write_key, write_new, remove_key
 from gui import start_gui
