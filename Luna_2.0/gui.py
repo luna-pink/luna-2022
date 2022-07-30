@@ -176,10 +176,11 @@ style.load_themes()
 dpg.bind_theme("Dark")
 
 
-def start_gui():
+def start_gui(debug):
     dpg.setup_dearpygui()
     dpg.show_viewport()
-    # ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
+    if debug is True:
+        ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
     dpg.set_primary_window("Primary Window", True)
     dpg.start_dearpygui()
     dpg.destroy_context()
