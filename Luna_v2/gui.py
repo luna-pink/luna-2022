@@ -4,11 +4,12 @@ import requests
 from win32api import GetSystemMetrics
 import dearpygui.dearpygui as dpg
 import style
-from dotjson import get_key, load_keys
+from dotjson import get_key, load_keys, backup_path
 from style.palette import rose_pine
 import animation as dpg_anim
 
 load_keys(["data"])
+backup_path(["data"])
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -43,11 +44,10 @@ def resize():
     global window_width, window_height, trigger
     trigger = not trigger
     if not trigger:
-        dpg_anim.viewport_resize("Luna", duration=10, loop=38, width=-7, height=0, center=True)
-
+        dpg_anim.viewport_resize("Luna", duration=10, loop=38, width=-7, height=0, final_width=740, center=True)
         dpg.delete_item("third_window")
     else:
-        with dpg.child_window(label="Child Window", width=258, parent="main_group", tag="third_window"):  # 342
+        with dpg.child_window(label="Child Window", width=258, parent="main_group", tag="third_window"):
             dpg.add_text("Documentation")
             dpg.add_separator()
             with dpg.collapsing_header(label="Discord"):
@@ -61,12 +61,12 @@ def resize():
                 with dpg.tree_node(label="Advanced"):
                     dpg.add_text("https://discord.gg/QWQWQWQ")
 
-        dpg_anim.viewport_resize("Luna", duration=10, loop=38, width=7, height=0, center=True)
+        dpg_anim.viewport_resize("Luna", duration=10, loop=38, width=7, height=0, final_width=1006, center=True)
 
 
 with dpg.window(tag="Primary Window"):
     with dpg.child_window(label="Child Window", height=38, no_scrollbar=True):
-        dpg.add_text("Nshout 1", color=rose_pine.subtle)
+        dpg.add_text("Nshout 1 | Version 2.0", color=rose_pine.subtle)
 
     dpg.add_spacer()
 
@@ -80,8 +80,6 @@ with dpg.window(tag="Primary Window"):
 
             dpg.add_spacer(height=90)
             dpg.add_separator()
-
-            # dpg.add_text("Start Luna")
             dpg.add_spacer()
             dpg.add_button(label="Expand", callback=resize, width=144, height=25)
             dpg.add_spacer()
@@ -100,25 +98,26 @@ with dpg.window(tag="Primary Window"):
                         with dpg.child_window(label="Child Window", width=258):  # 342
                             dpg.add_text("Discord")
                             dpg.add_separator()
-                            dpg.add_text("Not logged in")
-                            dpg.add_text("Loading friends...")
-                            dpg.add_text("Loading guilds...")
-                            dpg.add_text("Loading status...")
-                            dpg.add_text("Loading settings...")
-                            dpg.add_text("Loading nitro...")
+                            dpg.add_text("Not logged in", tag="logged_in_text")
+                            dpg.add_text("Loading friends...", tag="friends_text")
+                            dpg.add_text("Loading blocked...", tag="blocked_text")
+                            dpg.add_text("Loading guilds...", tag="guilds_text")
+                            dpg.add_text("Loading status...", tag="status_text")
+                            dpg.add_text("Loading settings...", tag="settings_text")
+                            dpg.add_text("Loading nitro...", tag="nitro_text")
 
                         with dpg.child_window(label="Child Window", width=258):
                             dpg.add_text("Luna")
                             dpg.add_separator()
-                            dpg.add_text("Prefix: .")
-                            dpg.add_text("Loading commands...")
-                            dpg.add_text("Loading custom commands...")
-                            dpg.add_text("Current theme: default")
-                            dpg.add_text("Nitro sniper: enabled")
-                            dpg.add_text("Giveaway joiner: enabled")
-                            dpg.add_text("Giveaway delay: 1 minute/s")
-                            dpg.add_text("Privnote sniper: enabled")
-                            dpg.add_text("Auto delete delay: 30 seconds")
+                            dpg.add_text("Prefix: .", tag="prefix_text")
+                            dpg.add_text("Loading commands...", tag="commands_text")
+                            dpg.add_text("Loading custom commands...", tag="custom_commands_text")
+                            dpg.add_text("Current theme: default", tag="current_theme_text")
+                            dpg.add_text("Nitro sniper: enabled", tag="nitro_sniper_text")
+                            dpg.add_text("Giveaway joiner: enabled", tag="giveaway_joiner_text")
+                            dpg.add_text("Giveaway delay: 1 minute/s", tag="giveaway_delay_text")
+                            dpg.add_text("Privnote sniper: enabled", tag="privnote_sniper_text")
+                            dpg.add_text("Auto delete delay: 30 seconds", tag="delete_delay_text")
 
                 with dpg.tab(label="Logs"):
                     with dpg.child_window(label="Logs Window"):
