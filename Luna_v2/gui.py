@@ -41,8 +41,24 @@ dpg.create_viewport(
 
 
 def authentication_process():
-    with dpg.window(label="Authentication", modal=True, no_close=True, no_resize=True, no_collapse=True, no_move=True):
-        dpg.add_text("Authenticating...")
+    with dpg.window(label="Authentication", tag="authentication_modal", modal=True, no_close=True, no_resize=True, no_collapse=True, no_move=True, width=319, height=154):
+        dpg.set_item_pos("authentication_modal", pos=[
+            (dpg.get_viewport_width() - dpg.get_item_width("authentication_modal")) / 2,
+            (dpg.get_viewport_height() - dpg.get_item_height("authentication_modal")) / 2
+        ])
+        username = dpg.add_input_text(label="Username", default_value="", no_spaces=True)
+        dpg.add_spacer()
+        password = dpg.add_input_text(label="Password", default_value="", password=True, no_spaces=True)
+        dpg.add_spacer()
+        dpg.add_separator()
+        status = dpg.add_text("Status: Not Authenticated")
+        dpg.add_separator()
+        dpg.add_spacer()
+        with dpg.group(horizontal=True, label="group_buttons"):
+            dpg.add_button(label="Login")
+            dpg.add_button(label="Register")
+            dpg.add_button(label="HWID Reset")
+            dpg.add_button(label="Password Reset")
 
 
 def resize():
