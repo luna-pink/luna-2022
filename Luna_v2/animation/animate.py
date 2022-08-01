@@ -21,6 +21,8 @@ def viewport_resize(item: str = '', duration: int = 10, loop: int = 10, width: i
         calculation_width = 0
         calculation_height = 0
         for _ in range(loop):
+            if viewport_height == final_height and viewport_width == final_width:
+                break
             calculation_width += width / 2
             calculation_height += height / 2
             viewport_width += width
@@ -29,7 +31,6 @@ def viewport_resize(item: str = '', duration: int = 10, loop: int = 10, width: i
             viewport_height += height
             if height > 0 and viewport_height > final_height or height <= 0 and viewport_height < final_height:
                 viewport_height = final_height
-            print(viewport_width, viewport_height)
             x_position = viewport_x - calculation_width
             y_position = viewport_y - calculation_height
             dpg.configure_viewport(item, width=viewport_width, height=viewport_height, x_pos=x_position, y_pos=y_position)

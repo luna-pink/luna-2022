@@ -40,6 +40,11 @@ dpg.create_viewport(
 )
 
 
+def authentication_process():
+    with dpg.window(label="Authentication", modal=True, no_close=True, no_resize=True, no_collapse=True, no_move=True):
+        dpg.add_text("Authenticating...")
+
+
 def resize():
     global window_width, window_height, trigger
     trigger = not trigger
@@ -64,7 +69,7 @@ def resize():
         dpg_anim.viewport_resize("Luna", duration=10, loop=38, width=7, height=0, final_width=1006, center=True)
 
 
-with dpg.window(tag="Primary Window"):
+with dpg.window(tag="primary_window"):
     width, height, channels, data = dpg.load_image("data/resources/background.jpg")
     with dpg.texture_registry():
         texture_id = dpg.add_static_texture(width, height, data)
@@ -78,12 +83,11 @@ with dpg.window(tag="Primary Window"):
 
     with dpg.group(horizontal=True):
         with dpg.child_window(label="Child Window", width=160, height=422):
-
             width, height, channels, data = dpg.load_image("data/resources/luna.png")
             with dpg.texture_registry():
                 texture_id = dpg.add_static_texture(width, height, data)
 
-            dpg.add_image(texture_id, width=75, height=75, pos=(40, 13))
+            dpg.add_image(texture_id, width=75, height=75, pos=(42, 13))
 
             dpg.add_spacer(height=90)
             dpg.add_separator()
@@ -92,17 +96,17 @@ with dpg.window(tag="Primary Window"):
             dpg.add_spacer()
             dpg.add_button(label="Style", callback=dpg.show_style_editor, width=144, height=25)
 
-        with dpg.child_window(label="Child Window", height=422, tag="main_window"):  # width 600, height 532
+        with dpg.child_window(label="Child Window", height=422, tag="main_window"):
             with dpg.tab_bar(tag="top_tab_bar"):
                 with dpg.tab(label="Home"):
                     width, height, channels, data = dpg.load_image("data/resources/luna_ascii.png")
                     with dpg.texture_registry():
                         texture_id = dpg.add_static_texture(width, height, data)
 
-                    dpg.add_image(texture_id, tag="luna_ascii", width=516, height=108)  # , width=516, height=108 / , width=690, height=144
+                    dpg.add_image(texture_id, tag="luna_ascii", width=516, height=108)
 
                     with dpg.group(horizontal=True, tag="main_group"):
-                        with dpg.child_window(label="Child Window", width=258):  # 342
+                        with dpg.child_window(label="Child Window", width=258):
                             dpg.add_text("Discord")
                             dpg.add_separator()
                             dpg.add_text("Not logged in", tag="logged_in_text")
@@ -193,9 +197,10 @@ dpg.bind_theme("Dark")
 
 
 def start_gui(debug):
+    authentication_process()
     dpg.setup_dearpygui()
     dpg.show_viewport()
-    dpg.set_primary_window("Primary Window", True)
+    dpg.set_primary_window("primary_window", True)
     if debug is False:
         ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
     dpg.start_dearpygui()
