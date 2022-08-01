@@ -65,13 +65,20 @@ def resize():
 
 
 with dpg.window(tag="Primary Window"):
+    width, height, channels, data = dpg.load_image("data/resources/background.jpg")
+    with dpg.texture_registry():
+        texture_id = dpg.add_static_texture(width, height, data)
+
+    dpg.add_image(texture_id, width=1006, height=522, pos=(0, 0))
+
     with dpg.child_window(label="Child Window", height=38, no_scrollbar=True):
-        dpg.add_text("Nshout 1 | Version 2.0", color=rose_pine.subtle)
+        dpg.add_text("Nshout 1 | Version 2.0")
 
     dpg.add_spacer()
 
     with dpg.group(horizontal=True):
         with dpg.child_window(label="Child Window", width=160, height=422):
+
             width, height, channels, data = dpg.load_image("data/resources/luna.png")
             with dpg.texture_registry():
                 texture_id = dpg.add_static_texture(width, height, data)
@@ -165,7 +172,7 @@ with dpg.window(tag="Primary Window"):
         }
         r = requests.get("https://discord.com/api/v10/users/@me", headers=headers).json()
 
-        dpg.add_text(f"Logging into {r['username']}#{r['discriminator']}...", tag='status', color=rose_pine.subtle)
+        dpg.add_text(f"Logging into {r['username']}#{r['discriminator']}...", tag='status')
 
 # -----------------------------------------------------------------------------------------
 
