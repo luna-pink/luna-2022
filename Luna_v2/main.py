@@ -112,6 +112,7 @@ def reload_scripts():
     dpg.configure_item("scripts_listbox", items=scripts)
     log('scripts', 'Scripts reloaded')
 
+
 # ----------------------------------------------------------------------------------------------------------------------
 
 dpg.create_context()
