@@ -7,6 +7,7 @@ import style
 from dotjson import get_key, load_keys, backup_path
 from style.palette import rose_pine
 import animation as dpg_anim
+import dearpygui.demo as demo
 
 load_keys(["data"])
 backup_path(["data"])
@@ -105,12 +106,26 @@ with dpg.window(tag="primary_window"):
 
             dpg.add_image(texture_id, width=75, height=75, pos=(42, 13))
 
+            # width, height, channels, data = dpg.load_image("data/resources/mlp.png")
+            # with dpg.texture_registry():
+            #     texture_id = dpg.add_static_texture(width, height, data)
+            #
+            # dpg.add_image(texture_id, width=75, height=78, pos=(42, 13))
+
             dpg.add_spacer(height=90)
             dpg.add_separator()
             dpg.add_spacer()
             dpg.add_button(label="Expand", callback=resize, width=144, height=25)
             dpg.add_spacer()
             dpg.add_button(label="Style", callback=dpg.show_style_editor, width=144, height=25)
+            dpg.add_spacer()
+            dpg.add_button(label="Demo", callback=demo.show_demo, width=144, height=25)
+
+            width, height, channels, data = dpg.load_image("data/resources/mlp.png")
+            with dpg.texture_registry():
+                texture_id = dpg.add_static_texture(width, height, data)
+
+            dpg.add_image(texture_id, width=150, height=155, pos=(5, 256))
 
         with dpg.child_window(label="Child Window", height=422, tag="main_window"):
             with dpg.tab_bar(tag="top_tab_bar"):
@@ -154,8 +169,19 @@ with dpg.window(tag="primary_window"):
 
                 with dpg.tab(label="Scripts"):
                     with dpg.tab_bar(tag="scripts_tab_bar"):
-                        with dpg.tab(label="Editor"):
-                            dpg.add_text("Hello, world")
+                        with dpg.tab(label="Loader"):
+                            scripts = ("luna", "example", "nshout script")
+                            loaded_scripts = ("nshout script",)
+                            with dpg.group(horizontal=True):
+                                with dpg.child_window(label="Child Window", width=258):
+                                    dpg.add_text("Scripts")
+                                    dpg.add_listbox(scripts, tag="scripts_listbox", width=242)
+                                with dpg.child_window(label="Child Window", width=258):
+                                    dpg.add_button(label="Load", width=242, height=25)
+                                    dpg.add_button(label="Unload", width=242, height=25, enabled=False)
+                                    dpg.add_text("Loaded scripts: 1", tag="loaded_scripts_text")
+                                    dpg.add_listbox(loaded_scripts, tag="loaded_scripts_listbox", width=242)
+                                dpg.add_text("Hello, world")
 
                 with dpg.tab(label="Sniper"):
                     dpg.add_text("Hello, world")
@@ -196,13 +222,6 @@ with dpg.window(tag="primary_window"):
 
 # -----------------------------------------------------------------------------------------
 
-with dpg.tab(label="Custom Window", parent="scripts_tab_bar"):
-    with dpg.group(horizontal=True):
-        with dpg.child_window(label="Child Window", width=258):
-            dpg.add_text("Window 1")
-        with dpg.child_window(label="Child Window", width=258):
-            dpg.add_text("Window 2")
-
 with dpg.font_registry():
     default_font = dpg.add_font("c:/windows/fonts/arial.ttf", 15)
 
@@ -213,7 +232,7 @@ dpg.bind_theme("Dark")
 
 
 def start_gui(debug):
-    authentication_process()
+    # authentication_process()
     dpg.setup_dearpygui()
     dpg.show_viewport()
     dpg.set_primary_window("primary_window", True)
