@@ -1,4 +1,5 @@
 import ctypes
+import json
 import os
 import sys
 import threading
@@ -14,7 +15,7 @@ import dearpygui.demo as demo
 
 import requests
 
-from dotjson import load_keys, get_key, write_key, write_new, remove_key, backup_path
+from dotjson import load_keys, get_key, write_key, backup_path
 from discord import *
 from discord.ext import commands
 from luna import log
@@ -51,15 +52,56 @@ x_pos = int((screen_width - window_width) / 2)
 y_pos = int((screen_height - window_height) / 2)
 
 trigger = False
+debug_mode = False
 
 scripts = []
 loaded_scripts = []
 loaded_scripts_ids = {}
 
+
 # ----------------------------------------------------------------------------------------------------------------------
 
+def file_check():
+    print("Checking files...")
+
+    if os.path.isfile('data/discord.json') is False:
+        write_data = {
+            "prefix": ".",
+            "token": "",
+            "startup": "online"
+        }
+        with open('data/discord.json', 'w', encoding='utf-8') as f:
+            json.dump(write_data, f, ensure_ascii=False, indent=4)
+
+    if os.path.isfile('data/gui.json') is False:
+        write_data = {
+            "top_logo": "logo_luna",
+            "bottom_logo": ""
+        }
+        with open('data/gui.json', 'w', encoding='utf-8') as f:
+            json.dump(write_data, f, ensure_ascii=False, indent=4)
+
+    print("Files checked")
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+file_check()
 load_keys(['data'])
 backup_path(['data'])
+
+print(f"Startup status set to: {get_key('startup')}")
+match get_key('startup'):
+    case "online":
+        startup_status = Status.online
+    case "idle":
+        startup_status = Status.idle
+    case "do_not_disturb":
+        startup_status = Status.do_not_disturb
+    case "invisible":
+        startup_status = Status.invisible
+    case _:
+        startup_status = Status.online
 
 bot = commands.Bot(
     command_prefix=get_key('prefix'),
@@ -69,6 +111,7 @@ bot = commands.Bot(
     help_command=None,
     guild_subscription_options=GuildSubscriptionOptions.off(),
     key="Jgy67HUXLEY!Luna",
+    status=startup_status,
 )
 
 bot.add_cog(OnReadyCog(bot))
@@ -115,6 +158,28 @@ def reload_scripts():
 
 # ----------------------------------------------------------------------------------------------------------------------
 
+
+def pony_control(sender, app_data, user_data):
+    if sender == "checkbox_bottom_logo":
+        if app_data:
+            dpg.show_item("bottom_pony")
+            write_key("bottom_logo", "bottom_pony")
+        else:
+            dpg.hide_item("bottom_pony")
+            write_key("bottom_logo", "")
+    elif sender == "checkbox_top_logo":
+        if app_data:
+            dpg.hide_item("logo_luna")
+            dpg.show_item("logo_pony")
+            write_key("top_logo", "logo_pony")
+        else:
+            dpg.show_item("logo_luna")
+            dpg.hide_item("logo_pony")
+            write_key("top_logo", "logo_luna")
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
 dpg.create_context()
 
 dpg.create_viewport(
@@ -129,7 +194,58 @@ dpg.create_viewport(
 )
 
 
+def load_config():
+    log("event", "Applying config...")
+
+    if get_key('top_logo') == "logo_pony":
+        dpg.show_item("logo_pony")
+        dpg.hide_item("logo_luna")
+        dpg.set_value("checkbox_top_logo", True)
+    else:
+        dpg.show_item("logo_luna")
+        dpg.hide_item("logo_pony")
+        dpg.set_value("checkbox_top_logo", False)
+
+    if get_key('bottom_logo') == "bottom_pony":
+        dpg.show_item("bottom_pony")
+        dpg.set_value("checkbox_bottom_logo", True)
+    else:
+        dpg.hide_item("bottom_pony")
+        dpg.set_value("checkbox_bottom_logo", False)
+
+    log("event", "Config applied")
+
+
+def register_process():
+    with dpg.window(label="Authentication", tag="register_modal", modal=True, no_close=True, no_resize=True, no_collapse=True, no_move=True, width=319, height=154):
+        dpg.set_item_pos(
+            "register_modal", pos=[
+                (dpg.get_viewport_width() - dpg.get_item_width("register_modal")) / 2,
+                (dpg.get_viewport_height() - dpg.get_item_height("register_modal")) / 2
+            ]
+        )
+        username = dpg.add_input_text(label="Username", default_value="", no_spaces=True)
+        dpg.add_spacer()
+        password = dpg.add_input_text(label="Password", default_value="", password=True, no_spaces=True)
+        dpg.add_spacer()
+        repeat_password = dpg.add_input_text(label="Repeat Password", default_value="", password=True, no_spaces=True)
+        dpg.add_spacer()
+        license_input = dpg.add_input_text(label="License", default_value="", password=True, no_spaces=True)
+        dpg.add_spacer()
+        dpg.add_separator()
+        dpg.add_text("Status: Not Authenticated", tag="register_status")
+        dpg.add_separator()
+        dpg.add_spacer()
+        with dpg.group(horizontal=True, label="group_buttons"):
+            dpg.add_button(label="Login")
+            dpg.add_button(label="Register")
+            dpg.add_button(label="HWID Reset")
+            dpg.add_button(label="Password Reset")
+
+
 def authentication_process():
+    if debug_mode:
+        return
     with dpg.window(label="Authentication", tag="authentication_modal", modal=True, no_close=True, no_resize=True, no_collapse=True, no_move=True, width=319, height=154):
         dpg.set_item_pos(
             "authentication_modal", pos=[
@@ -142,7 +258,7 @@ def authentication_process():
         password = dpg.add_input_text(label="Password", default_value="", password=True, no_spaces=True)
         dpg.add_spacer()
         dpg.add_separator()
-        status = dpg.add_text("Status: Not Authenticated")
+        dpg.add_text("Status: Not Authenticated", tag="login_status")
         dpg.add_separator()
         dpg.add_spacer()
         with dpg.group(horizontal=True, label="group_buttons"):
@@ -152,6 +268,64 @@ def authentication_process():
             dpg.add_button(label="Password Reset")
 
 
+def token_callback():
+    token_value = dpg.get_value("token_input")
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
+            'Content-Type': 'application/json',
+            'authorization': token_value
+        }
+        r = requests.get("https://discord.com/api/v10/users/@me", headers=headers).json()
+        dpg.set_value("status", f"Logging in as {r['username']}#{r['discriminator']}")
+        write_key("token", token_value)
+        dpg.delete_item("token_modal")
+        run_thread()
+    except BaseException:
+        if token_value == "":
+            dpg.set_value("token_status", "Status: Enter a token first")
+            return
+        dpg.set_value("token_status", "Status: Invalid token")
+
+
+def token_check(sender, app_data, user_data):
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
+            'Content-Type': 'application/json',
+            'authorization': app_data
+        }
+        r = requests.get("https://discord.com/api/v10/users/@me", headers=headers).json()
+
+        dpg.set_value("token_status", f"Status: Valid token: {r['username']}#{r['discriminator']}")
+        return
+    except BaseException:
+        dpg.set_value("token_status", "Status: Invalid token")
+        return
+
+
+def token_process():
+    if get_key('token') != "":
+        run_thread()
+        return
+
+    with dpg.window(label="Token", tag="token_modal", modal=True, no_close=True, no_resize=True, no_collapse=True, no_move=True, width=319, height=124):
+        dpg.set_item_pos(
+            "token_modal", pos=[
+                (dpg.get_viewport_width() - dpg.get_item_width("token_modal")) / 2,
+                (dpg.get_viewport_height() - dpg.get_item_height("token_modal")) / 2
+            ]
+        )
+        dpg.add_input_text(label="Token", default_value="", no_spaces=True, tag="token_input", callback=token_check, password=True)
+        dpg.add_spacer()
+        dpg.add_separator()
+        dpg.add_text("Status: No token found", tag="token_status")
+        dpg.add_separator()
+        dpg.add_spacer()
+        with dpg.group(horizontal=True, label="group_buttons"):
+            dpg.add_button(label="Login", callback=token_callback)
+
+
 def resize():
     global window_width, window_height, trigger
     trigger = not trigger
@@ -159,7 +333,7 @@ def resize():
         dpg_anim.viewport_resize("Luna", duration=10, loop=38, width=-7, height=0, final_width=740, center=True)
         dpg.delete_item("third_window")
     else:
-        with dpg.child_window(label="Child Window", width=258, parent="main_group", tag="third_window"):
+        with dpg.child_window(label="Child Window", parent="main_group", tag="third_window"):
             dpg.add_text("Documentation")
             dpg.add_separator()
             with dpg.collapsing_header(label="Discord"):
@@ -189,18 +363,18 @@ with dpg.window(tag="primary_window"):
     dpg.add_spacer()
 
     with dpg.group(horizontal=True):
-        with dpg.child_window(label="Child Window", width=160, height=422):
+        with dpg.child_window(label="Child Window", tag="left_child_window", width=160, height=422):
             width, height, channels, data = dpg.load_image("data/resources/luna.png")
             with dpg.texture_registry():
                 texture_id = dpg.add_static_texture(width, height, data)
 
-            dpg.add_image(texture_id, width=75, height=75, pos=(42, 13))
+            dpg.add_image(texture_id, tag="logo_luna", width=75, height=75, pos=(42, 13))
 
-            # width, height, channels, data = dpg.load_image("data/resources/mlp.png")
-            # with dpg.texture_registry():
-            #     texture_id = dpg.add_static_texture(width, height, data)
-            #
-            # dpg.add_image(texture_id, width=75, height=78, pos=(42, 13))
+            width, height, channels, data = dpg.load_image("data/resources/mlp.png")
+            with dpg.texture_registry():
+                texture_id = dpg.add_static_texture(width, height, data)
+
+            dpg.add_image(texture_id, tag="logo_pony", width=75, height=78, pos=(42, 13), show=False)
 
             dpg.add_spacer(height=90)
             dpg.add_separator()
@@ -215,7 +389,7 @@ with dpg.window(tag="primary_window"):
             with dpg.texture_registry():
                 texture_id = dpg.add_static_texture(width, height, data)
 
-            dpg.add_image(texture_id, width=150, height=155, pos=(5, 256))
+            dpg.add_image(texture_id, tag="bottom_pony", width=150, height=155, pos=(5, 256), show=False)
 
         with dpg.child_window(label="Child Window", height=422, tag="main_window"):
             with dpg.tab_bar(tag="top_tab_bar"):
@@ -276,7 +450,6 @@ with dpg.window(tag="primary_window"):
                                     dpg.add_button(label="Unload", callback=unload_script, width=242, height=25, enabled=True)
                                     dpg.add_text("Loaded scripts: 0", tag="loaded_scripts_text")
                                     dpg.add_listbox(loaded_scripts, tag="loaded_scripts_listbox", width=242)
-                                dpg.add_text("Hello, world")
 
                 with dpg.tab(label="Sniper"):
                     dpg.add_text("Hello, world")
@@ -295,10 +468,11 @@ with dpg.window(tag="primary_window"):
                 with dpg.tab(label="Settings"):
                     with dpg.tab_bar(tag="third_tab_bar"):
                         with dpg.tab(label="Config"):
-                            dpg.add_text("Hello, world")
+                            dpg.add_button(label="Load Config", callback=load_config)
 
                         with dpg.tab(label="Theme"):
-                            dpg.add_text("Hello, world")
+                            dpg.add_checkbox(label="Princess Luna", default_value=False, callback=pony_control, tag="checkbox_top_logo")
+                            dpg.add_checkbox(label="Princess Luna (Bottom)", default_value=False, callback=pony_control, tag="checkbox_bottom_logo")
 
             # with dpg.child_window(label="Child Window", height=532):
             #     dpg.add_text("test")
@@ -306,14 +480,7 @@ with dpg.window(tag="primary_window"):
     dpg.add_spacer()
 
     with dpg.child_window(label="Child Window", height=38, no_scrollbar=True):
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
-            'Content-Type': 'application/json',
-            'authorization': get_key("token")
-        }
-        r = requests.get("https://discord.com/api/v10/users/@me", headers=headers).json()
-
-        dpg.add_text(f"Logging into {r['username']}#{r['discriminator']}...", tag='status')
+        dpg.add_text("Idle", tag='status')
 
 # -----------------------------------------------------------------------------------------
 
@@ -351,6 +518,13 @@ def check_if_admin():
 
 
 def run():
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.12) Gecko/20050915 Firefox/1.0.7',
+        'Content-Type': 'application/json',
+        'authorization': get_key("token")
+    }
+    r = requests.get("https://discord.com/api/v10/users/@me", headers=headers).json()
+    dpg.set_value("status", f"Logging in as {r['username']}#{r['discriminator']}")
     log('event', 'Logging in...')
     bot.run(get_key('token'))
 
@@ -363,11 +537,12 @@ def run_thread():
 
 def initialize_luna():
     print(logo)
-    debug_mode = False
+    global debug_mode
     if check_if_debug() is not None:
         debug_mode = True
         log('info', 'Luna is running in debug mode.')
-    run_thread()
+    authentication_process()
+    token_process()
     start_gui(debug_mode)
 
 
