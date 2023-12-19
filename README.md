@@ -3,15 +3,28 @@ Team Luna's flagship selfbot!
 
 [![built with: Python3](https://camo.githubusercontent.com/0d9fbff04202da688cc79c5ffe984bd171edf453b2e41e5e56e55202dd5bdbb2/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6275696c74253230776974682d507974686f6e332d7265642e737667)](https://www.python.org/)
 
-![Luna Logo](https://github.com/Team-Luna-Development/Luna-SelfBot/blob/dev/Images/Luna_Logo.png)
+![Luna Logo](https://github.com/luna-pink/luna-2022/blob/dev/Images/Luna_Logo.png)
 
 ---------------------------
 
 ## Description
 
+Luna's development started before 2020, often went through rewrites. Messy and inefficient code is to be expected. Amateur code is also to be found. Luna, for a long time, was a project we had to learn Python and get known with its inner workings before embarking to/continuing with other programming languages.
+
 Luna selfbot is a selfbot for the Discord chat service. 
 It is designed to be a lightweight and easy to use bot that provides a variety of features to the user.
 Currently, Luna SelfBot is in production, but it is still in development. This repo keeps track of all the features that are currently in development.
+
+## Contributors
+
+- nshout, pre 2020-2022
+  Founding and creation of Luna and command development.
+
+- Exodus, 2021-2022
+  CEA256 encryption and command development.
+  
+- ThatOneCodeDev, 2021-2022
+  Authentication system.
 
 ## Account requirements for development.
 
